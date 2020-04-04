@@ -4,7 +4,7 @@
 
 
  /* File created by MIDL compiler version 7.00.0500 */
-/* at Fri Mar 20 19:02:54 2020
+/* at Sun Apr 05 08:28:19 2020
  */
 /* Compiler settings for .\vpnweb.idl:
     Oicf, W1, Zp8, env=Win32 (32b run)
@@ -585,7 +585,7 @@ static const USER_MARSHAL_ROUTINE_QUADRUPLE UserMarshalRoutines[ WIRE_MARSHAL_TA
 
 
 /* Object interface: IVpnWebControl, ver. 0.0,
-   GUID={0x2C954023,0x34FF,0x490B,{0x86,0x1F,0x71,0xB0,0xCE,0xBC,0x03,0xB7}} */
+   GUID={0xBEAC96A9,0x05ED,0x46B3,{0x97,0x5C,0x44,0x62,0xE8,0x38,0x78,0xF5}} */
 
 #pragma code_seg(".orpc")
 static const unsigned short IVpnWebControl_FormatStringOffsetTable[] =

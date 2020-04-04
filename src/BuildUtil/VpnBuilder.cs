@@ -316,7 +316,7 @@ namespace BuildUtil
 		public const string Prefix = "softether-";
 #else
 		// SoftEther VPN (build by Open Source Developers)
-		public static readonly string VPN4SolutionFileName = Path.Combine(BaseDirName, "SEVPN.sln");
+		public static readonly string VPN4SolutionFileName = Path.Combine(BaseDirName, "DeskVPN.sln");
 		public static readonly string DebugSnapshotBaseDir = IO.NormalizePath(Path.Combine(BaseDirName, @"..\output\debug"));
 		public static readonly string ReleaseDestDir = IO.NormalizePath(Path.Combine(BaseDirName, @"..\output\pkg"));
 		public const string Prefix = "softether_open-";
