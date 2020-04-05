@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="vpnserver"
-	ProjectGUID="{7CF21BD6-659F-449C-91CB-CE52AABAD22D}"
-	RootNamespace="vpnserver"
+	Name="DeskConfig"
+	ProjectGUID="{92B04960-1AA9-4A7A-B75C-1403046F25B3}"
+	RootNamespace="DeskConfig"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\vpnserver.exe"
+				OutputFile="$(OutDir)\DeskConfig.exe"
 				LinkIncremental="2"
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;x86&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
@@ -80,7 +80,6 @@
 				GenerateMapFile="true"
 				MapFileName="$(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map"
 				SubSystem="2"
-				StackReserveSize="100000"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -160,7 +159,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\vpnserver_x64.exe"
+				OutputFile="$(OutDir)\DeskConfig_x64.exe"
 				LinkIncremental="2"
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
@@ -169,7 +168,6 @@
 				GenerateMapFile="true"
 				MapFileName="$(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map"
 				SubSystem="2"
-				StackReserveSize="100000"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -252,7 +250,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\vpnserver.exe"
+				OutputFile="$(OutDir)\DeskConfig.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\Microsoft Visual Studio 8\VC\lib&quot;"
 				GenerateManifest="false"
@@ -263,7 +261,6 @@
 				GenerateMapFile="true"
 				MapFileName="$(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map"
 				SubSystem="2"
-				StackReserveSize="100000"
 				OptimizeReferences="1"
 				EnableCOMDATFolding="1"
 				TargetMachine="1"
@@ -349,7 +346,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\vpnserver_x64.exe"
+				OutputFile="$(OutDir)\DeskConfig_x64.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				GenerateManifest="false"
@@ -360,7 +357,6 @@
 				GenerateMapFile="true"
 				MapFileName="$(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map"
 				SubSystem="2"
-				StackReserveSize="100000"
 				OptimizeReferences="1"
 				EnableCOMDATFolding="1"
 				TargetMachine="17"
@@ -399,7 +395,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\vpnserver.c"
+				RelativePath=".\DeskConfig.c"
 				>
 			</File>
 		</Filter>
@@ -423,7 +419,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\vpnserver.rc"
+				RelativePath=".\Server_Offline.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\VPN.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\DeskConfig.rc"
 				>
 			</File>
 		</Filter>

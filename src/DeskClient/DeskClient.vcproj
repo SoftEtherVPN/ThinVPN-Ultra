@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="vpnbridge"
-	ProjectGUID="{BA0DBC31-5BBF-41BF-A2DB-7B6F3F71E919}"
-	RootNamespace="vpnbridge"
+	Name="DeskClient"
+	ProjectGUID="{D7216F25-434B-45D3-BA48-6772AF997C84}"
+	RootNamespace="DeskClient"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -56,6 +56,7 @@
 				WarningLevel="3"
 				DebugInformationFormat="4"
 				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -70,7 +71,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\vpnbridge.exe"
+				OutputFile="$(OutDir)\DeskClient.exe"
 				LinkIncremental="2"
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;x86&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
@@ -144,6 +145,7 @@
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -158,7 +160,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\vpnbridge_x64.exe"
+				OutputFile="$(OutDir)\DeskClient_x64.exe"
 				LinkIncremental="2"
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
@@ -229,12 +231,12 @@
 				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
-				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -249,7 +251,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\vpnbridge.exe"
+				OutputFile="$(OutDir)\DeskClient.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\Microsoft Visual Studio 8\VC\lib&quot;"
 				GenerateManifest="false"
@@ -325,12 +327,12 @@
 				ExceptionHandling="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
-				BufferSecurityCheck="false"
 				EnableFunctionLevelLinking="false"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="1"
+				DisableSpecificWarnings="4996"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -345,7 +347,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\vpnbridge_x64.exe"
+				OutputFile="$(OutDir)\DeskClient_x64.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				GenerateManifest="false"
@@ -395,7 +397,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\vpnbridge.c"
+				RelativePath=".\DeskClient.c"
 				>
 			</File>
 		</Filter>
@@ -408,6 +410,10 @@
 				RelativePath=".\resource.h"
 				>
 			</File>
+			<File
+				RelativePath=".\DeskClient.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -415,11 +421,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\vpnbridge.ico"
+				RelativePath=".\Machine.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\vpnbridge.rc"
+				RelativePath=".\DeskClient.rc"
 				>
 			</File>
 		</Filter>

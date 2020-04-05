@@ -54,7 +54,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_MAIN                ICON                    "vpnbridge.ico"
+IDI_MAIN                ICON                    "WideGate.ico"
 #endif    // Japanese resources
 /////////////////////////////////////////////////////////////////////////////
 
