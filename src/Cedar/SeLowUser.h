@@ -105,7 +105,7 @@
 #ifndef	SELOWUSER_H
 #define	SELOWUSER_H
 
-#include <SeLow/SeLowCommon.h>
+#include <Cedar/SeLowCommon.h>
 
 //// Macro
 #define	SL_USER_INSTALL_LOCK_TIMEOUT		60000		// Lock acquisition timeout

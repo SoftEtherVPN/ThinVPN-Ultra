@@ -1131,7 +1131,7 @@ typedef struct CEDAR
 
 #ifdef	OS_WIN32
 // Neo device driver
-#include <Neo/Neo.h>
+#include <Cedar/Neo.h>
 // SeLow User-mode
 #include <Cedar/SeLowUser.h>
 #endif	// OS_WIN32
@@ -1161,7 +1161,7 @@ typedef struct CEDAR
 #include <Cedar/WebUI.h>
 
 // VPN Gate Plugin DLL
-#include <VGate/VGateCommon.h>
+//#include <VGate/VGateCommon.h>
 
 // VPN Gate Main Implementation
 #include <Cedar/VG.h>

@@ -129,7 +129,7 @@
 #include <Mayaqua/Mayaqua.h>
 #include <Cedar/Cedar.h>
 #include "IPsec_Win7Inner.h"
-#include <Wfp/Wfp.h>
+#include <Cedar/Wfp.h>
 
 static IPSEC_WIN7_FUNCTIONS *api = NULL;
 static HINSTANCE hDll = NULL;
