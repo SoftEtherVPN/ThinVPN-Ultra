@@ -12826,6 +12826,54 @@ bool MsIsAdmin()
 	return ms->IsAdmin;
 }
 
+// RDP ログオン画面が有効かどうか
+bool MsIsRdpAllowLoginScreen()
+{
+	char *key = "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services";
+	char *value = "SecurityLayer";
+	UINT v;
+
+	if (MsRegIsValue(REG_LOCAL_MACHINE, key, value) == false)
+	{
+		return false;
+	}
+
+	v = MsRegReadInt(REG_LOCAL_MACHINE, key, value);
+	if (v == 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+// RDP ログオン画面を有効 / 無効にする
+void MsSetRdpAllowLoginScreen(bool b)
+{
+	char *key = "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services";
+	char *value = "SecurityLayer";
+
+	if (b)
+	{
+		// 有効化
+		MsRegWriteInt(REG_LOCAL_MACHINE, key, value, 0);
+	}
+	else
+	{
+		// 無効化
+		if (MsRegIsValue(REG_LOCAL_MACHINE, key, value))
+		{
+			UINT v;
+
+			v = MsRegReadInt(REG_LOCAL_MACHINE, key, value);
+			if (v == 0)
+			{
+				MsRegDeleteValue(REG_LOCAL_MACHINE, key, value);
+			}
+		}
+	}
+}
+
 // Load the NT system function
 NT_API *MsLoadNtApiFunctions()
 {

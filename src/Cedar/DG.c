@@ -1035,7 +1035,7 @@ void DgInitSmServerAndSmHub(SM_SERVER **ppserver, SM_HUB **pphub, DG *dg)
 	s->ServerType = SERVER_TYPE_STANDALONE;
 	s->Bridge = false;
 	s->CapsList = ScGetCapsEx(dg->Rpc);
-	s->EmptyPassword = false;
+	//s->EmptyPassword = false;
 	s->CurrentSetting = NULL;
 
 	h = ZeroMalloc(sizeof(SM_HUB));

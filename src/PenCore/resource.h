@@ -11,7 +11,6 @@
 #define IDCANCEL3                       3
 #define B_WEB                           3
 #define B_SIMULATION                    3
-#define B_RESTORE                       3
 #define B_MESSAGE                       3
 #define B_PUSH                          3
 #define B_HUB_STATUS                    4
@@ -1281,6 +1280,7 @@
 #define D_DG_HASH                       2643
 #define D_DU_ADVAUTH                    2644
 #define D_DU_AUTH                       2645
+#define B_RESTORE                       2646
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021

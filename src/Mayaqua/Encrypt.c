@@ -211,39 +211,8 @@ bool IsXRevoked(X *x)
 // 証明書が CRL によって無効化されているかどうか確認する
 bool IsXRevokedByXCrl(X *x, X_CRL *r)
 {
-#ifdef	OS_WIN32
-	X509_REVOKED tmp;
-	X509_CRL_INFO *info;
-	int index;
-	// 引数チェック
-	if (x == NULL || r == NULL)
-	{
-		return false;
-	}
-
-	Zero(&tmp, sizeof(tmp));
-	tmp.serialNumber = X509_get_serialNumber(x->x509);
-
-	info = r->Crl->crl;
-
-	if (sk_X509_REVOKED_is_sorted(info->revoked) == false)
-	{
-		sk_X509_REVOKED_sort(info->revoked);
-	}
-
-	index = sk_X509_REVOKED_find(info->revoked, &tmp);
-
-	if (index < 0)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-#else	// OS_WIN32
+	// 手抜きさん
 	return false;
-#endif	// OS_WIN32
 }
 
 // CRL の解放

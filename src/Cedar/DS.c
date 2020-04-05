@@ -14,40 +14,40 @@
 #include "CedarPch.h"
 #include "..\PenCore\resource.h"
 
-// 指定された IP アドレスがプライベート IP アドレスかどうかチェックする
-bool IsIPPrivate(IP *ip)
-{
-	// 引数チェック
-	if (ip == NULL)
-	{
-		return false;
-	}
-
-	if (ip->addr[0] == 10)
-	{
-		return true;
-	}
-
-	if (ip->addr[0] == 172)
-	{
-		if (ip->addr[1] >= 16 && ip->addr[1] <= 31)
-		{
-			return true;
-		}
-	}
-
-	if (ip->addr[0] == 192 && ip->addr[1] == 168)
-	{
-		return true;
-	}
-
-	if (ip->addr[0] == 169 && ip->addr[1] == 254)
-	{
-		return true;
-	}
-
-	return false;
-}
+//// 指定された IP アドレスがプライベート IP アドレスかどうかチェックする
+//bool IsIPPrivate(IP *ip)
+//{
+//	// 引数チェック
+//	if (ip == NULL)
+//	{
+//		return false;
+//	}
+//
+//	if (ip->addr[0] == 10)
+//	{
+//		return true;
+//	}
+//
+//	if (ip->addr[0] == 172)
+//	{
+//		if (ip->addr[1] >= 16 && ip->addr[1] <= 31)
+//		{
+//			return true;
+//		}
+//	}
+//
+//	if (ip->addr[0] == 192 && ip->addr[1] == 168)
+//	{
+//		return true;
+//	}
+//
+//	if (ip->addr[0] == 169 && ip->addr[1] == 254)
+//	{
+//		return true;
+//	}
+//
+//	return false;
+//}
 
 // Bluetooth データ受信処理メイン
 void DsBluetoothMain(DS *ds, SOCKIO *sock)
@@ -366,7 +366,7 @@ bool DsAuthUserByPlainPassword(DS *ds, UCHAR *client_id, HUB *hub, char *usernam
 		return true;
 	}
 
-	ret = SamAuthUserByPlainPassword(hub, username, password, ast);
+	ret = SamAuthUserByPlainPassword(NULL, hub, username, password, ast, NULL, NULL);
 
 	if (ret)
 	{
@@ -875,7 +875,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 					HashPassword(hashed_password, auth_username, plain_password);
 					SecurePassword(secure_password, hashed_password, rand);
-					auth_ret = SamAuthUserByPassword(hub, auth_username, rand, secure_password);
+					auth_ret = SamAuthUserByPassword(hub, auth_username, rand, secure_password, NULL, NULL, NULL);
 					if (auth_ret == false)
 					{
 						// 外部サーバーを用いたパスワード認証
@@ -2241,7 +2241,7 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 			ReleaseHub(h);
 		}
 
-		SiLoadHubCfgEx(ds->Server, f, CEDAR_DESKVPN_HUBNAME, b);
+		SiLoadHubCfg(ds->Server, f, CEDAR_DESKVPN_HUBNAME);
 	}
 
 #ifndef	DESK_DISABLE_NEW_FEATURE
@@ -2362,7 +2362,7 @@ FOLDER *DsSaveConfigMain(DS *ds)
 #ifdef	DESK_DISABLE_NEW_FEATURE
 			b = true;
 #endif	// DESK_DISABLE_NEW_FEATURE
-			SiWriteHubCfgEx(f, h, b);
+			SiWriteHubCfg(f, h);
 		}
 		Unlock(h->lock);
 

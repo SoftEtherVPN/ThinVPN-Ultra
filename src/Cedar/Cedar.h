@@ -988,14 +988,6 @@ typedef struct TINY_LOG
 	LOCK *Lock;						// Lock
 } TINY_LOG;
 
-// 簡易ログ保存
-typedef struct TINY_LOG
-{
-	char FileName[MAX_PATH];		// ファイル名
-	IO *io;							// ファイル
-	LOCK *Lock;						// ロック
-} TINY_LOG;
-
 // CEDAR structure
 typedef struct CEDAR
 {

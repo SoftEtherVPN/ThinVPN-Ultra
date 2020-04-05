@@ -2729,7 +2729,7 @@ bool DiInstallUrdpToProgramFiles(HWND hWnd, DI *di)
 	ret = false;
 
 	UniStrCpy(tmp, sizeof(tmp), L"/CALLEDFROMSETUP:TRUE /INSTALLURDP:TRUE");
-	ret = MsExecuteExW(exe, tmp, &h, false);
+	ret = MsExecuteEx3W(exe, tmp, &h, false, false);
 
 	if (ret == false)
 	{
@@ -2761,7 +2761,7 @@ bool DiVistaSelectDlgCallHelper(HWND hWnd, DI *di)
 	ret = false;
 
 	UniStrCpy(tmp, sizeof(tmp), L"/CALLEDFROMSETUP:TRUE");
-	ret = MsExecuteExW(exe, tmp, &h, false);
+	ret = MsExecuteEx3W(exe, tmp, &h, false, false);
 
 	if (ret == false)
 	{

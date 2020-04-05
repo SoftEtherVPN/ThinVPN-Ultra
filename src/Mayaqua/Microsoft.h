@@ -748,6 +748,8 @@ void MsStartIsLockedThread();
 void MsStopIsLockedThread();
 bool MsDetermineIsLockedByWtsApi();
 
+bool MsIsRdpAllowLoginScreen();
+void MsSetRdpAllowLoginScreen(bool b);
 
 bool MsShutdown(bool reboot, bool force);
 bool MsShutdownEx(bool reboot, bool force, UINT time_limit, char *message);

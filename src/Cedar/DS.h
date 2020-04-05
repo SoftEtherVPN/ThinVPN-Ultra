@@ -167,7 +167,7 @@ void DsAddHistory(DS *ds, IP *ip);
 void DsFlushHistory(DS *ds);
 UINT DsGetHistoryCount(DS *ds, IP *ip);
 void DsReportAuthFailed(DS *ds, UINT tunnel_id, IP *ip, char *hostname);
-bool IsIPPrivate(IP *ip);
+//bool IsIPPrivate(IP *ip);
 bool DsAuthUserByPlainPassword(DS *ds, UCHAR *client_id, HUB *hub, char *username, char *password, bool ast);
 void DsInitRadiusCacheList(DS *ds);
 void DsFreeRadiusCacheList(DS *ds);

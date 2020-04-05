@@ -1066,6 +1066,28 @@ void Win32GetOsInfo(OS_INFO *info)
 	info->OsVendorName = CopyStr("Microsoft Corporation");
 }
 
+// Windows 10 or later?
+bool Win32IsWindow10OrLater()
+{
+	OSVERSIONINFOA v;
+
+	Zero(&v, sizeof(v));
+
+	v.dwOSVersionInfoSize = sizeof(v);
+
+	Win32GetVersionExInternal(&v);
+
+	if (v.dwPlatformId == VER_PLATFORM_WIN32_NT)
+	{
+		if (v.dwMajorVersion >= 10)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 // GetVersionEx API (Ignore the tricky features that have been added to the Windows 8.2 or later)
 bool Win32GetVersionExInternal(void *info)
 {

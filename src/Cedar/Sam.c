@@ -173,7 +173,7 @@ bool SamAuthUserByPlainPassword(CONNECTION *c, HUB *hub, char *username, char *p
 	bool auth_by_nt = false;
 	HUB *h;
 	// Validate arguments
-	if (hub == NULL || c == NULL || username == NULL)
+	if (hub == NULL || /*c == NULL ||*/ username == NULL)
 	{
 		return false;
 	}
