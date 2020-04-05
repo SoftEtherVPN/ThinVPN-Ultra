@@ -1,0 +1,2 @@
+https://noderef1.desktopvpn.net/ref/noderef.txt
+https://noderef2.desktopvpn.net/ref/noderef.txt
