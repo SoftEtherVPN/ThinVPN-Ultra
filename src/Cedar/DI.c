@@ -11,6 +11,8 @@
 
 // Build 8600
 
+#include <GlobalConst.h>
+
 #ifdef	WIN32
 
 #define	SM_C

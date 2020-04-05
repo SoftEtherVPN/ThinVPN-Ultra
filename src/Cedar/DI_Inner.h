@@ -11,17 +11,10 @@
 
 // 定数
 
-// レジストリキー
-#define DI_REGKEY	"Software\\SoftEther Corporation\\Desktop VPN Server\\Installer"
-
 
 // インストールする製品の種類
 #define DI_PRODUCT_SERVER		1	// Desktop VPN Server のインストール
 #define DI_PRODUCT_CLIENT		2	// Desktop VPN Client のインストール
-
-// シンプル製品名
-#define DI_PRODUCT_SERVER_NAME	"DeskServer"
-#define DI_PRODUCT_CLIENT_NAME	"DeskClient"
 
 //ディレクトリ
 #define	DI_DIR_STARTMENU		((wchar_t *)1)		// スタートメニュー

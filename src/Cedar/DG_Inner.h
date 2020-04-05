@@ -12,9 +12,6 @@
 // 定数
 #define DG_MAIN_DLG_TIMER_INTERVAL		(250)
 
-// レジストリキー
-#define DG_REGKEY	"Software\\SoftEther Corporation\\Desktop VPN Server\\Config Tool"
-
 // 構造体宣言
 typedef struct DG
 {

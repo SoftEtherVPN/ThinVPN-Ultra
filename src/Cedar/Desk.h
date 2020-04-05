@@ -24,19 +24,14 @@
 
 
 // バージョン情報
-#define	DESK_BUILD						8600		// ビルド番号
-#define DESK_VERSION					270			// バージョン番号
+#define	DESK_BUILD						CEDAR_BUILD		// ビルド番号
+#define DESK_VERSION					CEDAR_VER			// バージョン番号
 
 // EXE の末尾のシグネチャ (これが書いてあれば共有機能強制 OFF 版)
 #define	DESK_EXE_DISABLE_SHARE_SIGNATURE	"DisableShare\r\n"
 #define	DESK_EXE_DISABLE_SHARE_SIGNATURE_SIZE	14
 
 // 通信関係
-#define	DESK_SVC_NAME					"DESK"	// WideTunnel でのサービス名
-#define DS_RPC_PORT						9822	// Server の RPC ポート
-#define DC_RDP_PORT_START				3500	// Client の RDP ポートの開始番号
-#define DS_URDP_PORT					3456	// User-mode RDP ポート
-#define DS_RDP_PORT						3389	// RDP のデフォルトのポート番号
 #define DS_WAIT_FOR_URDP_SERVER_TIMEOUT	(15 * 1000)	// URDP Server が利用可能になるまでの待機時間
 #define DS_PROTOCOL_CONNECTING_TIMEOUT	(60 * 1000)	// 接続中のプロトコルでのタイムアウト
 
@@ -50,9 +45,6 @@
 // 提供するサービス
 #define DESK_SERVICE_RDP				0		// RDP
 #define DESK_SERVICE_VNC				1		// VNC
-
-// Secure Pack 名
-#define	DESK_SECURE_PACK_NAME			"DESK_SERVER"
 
 // エラーコード一覧
 #define ERR_DESK_VERSION_DIFF			300		// サービスと設定ツールのバージョンが違う
