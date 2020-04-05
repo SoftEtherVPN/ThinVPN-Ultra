@@ -220,7 +220,7 @@ PACK *WpcCallEx2(char *url, INTERNET_SETTING *setting, UINT timeout_connect, UIN
 
 	FreeBuf(recv);
 
-	FreeX(packet.Cert);
+//	FreeX(packet.Cert);
 
 	return packet.Pack;
 }
@@ -235,7 +235,7 @@ void WpcFreePacket(WPC_PACKET *packet)
 	}
 
 	FreePack(packet->Pack);
-	FreeX(packet->Cert);
+//	FreeX(packet->Cert);
 }
 
 // Parse the packet
@@ -263,74 +263,77 @@ bool WpcParsePacket(WPC_PACKET *packet, BUF *buf)
 		packet->Pack = BufToPack(b);
 		FreeBuf(b);
 
-		if (packet->Pack != NULL)
-		{
-			BUF *b;
+		ret = true;
 
-			ret = true;
+		// 2020/4/5 Obsolete
+		//if (packet->Pack != NULL)
+		//{
+		//	BUF *b;
 
-			b = WpcDataEntryToBuf(WpcFindDataEntry(o, "HASH"));
+		//	ret = true;
 
-			if (b != NULL)
-			{
-				if (b->Size != SHA1_SIZE || Cmp(b->Buf, hash, SHA1_SIZE) != 0)
-				{
-					ret = false;
-					FreePack(packet->Pack);
-				}
-				else
-				{
-					BUF *b;
+		//	b = WpcDataEntryToBuf(WpcFindDataEntry(o, "HASH"));
 
-					Copy(packet->Hash, hash, SHA1_SIZE);
+		//	if (b != NULL)
+		//	{
+		//		if (b->Size != SHA1_SIZE || Cmp(b->Buf, hash, SHA1_SIZE) != 0)
+		//		{
+		//			ret = false;
+		//			FreePack(packet->Pack);
+		//		}
+		//		else
+		//		{
+		//			BUF *b;
 
-					b = WpcDataEntryToBuf(WpcFindDataEntry(o, "CERT"));
+		//			Copy(packet->Hash, hash, SHA1_SIZE);
 
-					if (b != NULL)
-					{
-						X *cert = BufToX(b, false);
-						if (cert == NULL)
-						{
-							ret = false;
-							FreePack(packet->Pack);
-						}
-						else
-						{
-							BUF *b = WpcDataEntryToBuf(WpcFindDataEntry(o, "SIGN"));
+		//			b = WpcDataEntryToBuf(WpcFindDataEntry(o, "CERT"));
 
-							if (b == NULL || (b->Size != 128))
-							{
-								ret = false;
-								FreeX(cert);
-								FreePack(packet->Pack);
-							}
-							else
-							{
-								K *k = GetKFromX(cert);
+		//			if (b != NULL)
+		//			{
+		//				X *cert = BufToX(b, false);
+		//				if (cert == NULL)
+		//				{
+		//					ret = false;
+		//					FreePack(packet->Pack);
+		//				}
+		//				else
+		//				{
+		//					BUF *b = WpcDataEntryToBuf(WpcFindDataEntry(o, "SIGN"));
 
-								if (RsaVerify(hash, SHA1_SIZE, b->Buf, k) == false)
-								{
-									ret = false;
-									FreeX(cert);
-									FreePack(packet->Pack);
-								}
-								else
-								{
-									packet->Cert = cert;
-									Copy(packet->Sign, b->Buf, 128);
-								}
+		//					if (b == NULL || (b->Size != 128))
+		//					{
+		//						ret = false;
+		//						FreeX(cert);
+		//						FreePack(packet->Pack);
+		//					}
+		//					else
+		//					{
+		//						K *k = GetKFromX(cert);
 
-								FreeK(k);
-							}
+		//						if (RsaVerify(hash, SHA1_SIZE, b->Buf, k) == false)
+		//						{
+		//							ret = false;
+		//							FreeX(cert);
+		//							FreePack(packet->Pack);
+		//						}
+		//						else
+		//						{
+		//							packet->Cert = cert;
+		//							Copy(packet->Sign, b->Buf, 128);
+		//						}
 
-							FreeBuf(b);
-						}
-						FreeBuf(b);
-					}
-				}
-				FreeBuf(b);
-			}
-		}
+		//						FreeK(k);
+		//					}
+
+		//					FreeBuf(b);
+		//				}
+		//				FreeBuf(b);
+		//			}
+		//		}
+		//		FreeBuf(b);
+		//	}
+		//}
 	}
 
 	WpcFreeDataEntryList(o);

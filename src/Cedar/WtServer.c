@@ -683,7 +683,7 @@ SOCK *WtSockConnect(WT_CONNECT *param, UINT *error_code)
 	switch (param->ProxyType)
 	{
 	case PROXY_DIRECT:
-		sock = TcpIpConnect(param->HostName, param->Port, false, false);
+		sock = TcpIpConnectEx(param->HostName, param->Port, false, false, NULL, true, false, false, NULL);
 		if (sock == NULL)
 		{
 			err = ERR_CONNECT_FAILED;
