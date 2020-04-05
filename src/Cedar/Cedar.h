@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -105,6 +105,10 @@
 #ifndef	CEDAR_H
 #define	CEDAR_H
 
+
+// For DeskVPN
+#define	CEDAR_DESKVPN
+#define	CEDAR_DESKVPN_HUBNAME	"DESKTOPVPN"
 
 //////////////////////////////////////////////////////////////////////
 // 
@@ -423,6 +427,10 @@
 // Message related
 #define	HUB_MAXMSG_LEN				20000		// The maximum number of characters in a message
 
+
+// 簡易ログ
+#define TINY_LOG_DIRNAME			"@tiny_log"
+#define TINY_LOG_FILENAME			"@tiny_log/%04u%02u%02u_%02u%02u%02u.log"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -980,6 +988,14 @@ typedef struct TINY_LOG
 	LOCK *Lock;						// Lock
 } TINY_LOG;
 
+// 簡易ログ保存
+typedef struct TINY_LOG
+{
+	char FileName[MAX_PATH];		// ファイル名
+	IO *io;							// ファイル
+	LOCK *Lock;						// ロック
+} TINY_LOG;
+
 // CEDAR structure
 typedef struct CEDAR
 {
@@ -1258,6 +1274,9 @@ UINT CedarGetQueueBudgetBalance(CEDAR *c);
 UINT CedarGetFifoBudgetBalance(CEDAR *c);
 bool CedarIsThereAnyEapEnabledRadiusConfig(CEDAR *c);
 
+void FreeTinyLog(TINY_LOG *t);
+void WriteTinyLog(TINY_LOG *t, char *str);
+TINY_LOG *NewTinyLog();
 
 
 #endif	// CEDAR_H

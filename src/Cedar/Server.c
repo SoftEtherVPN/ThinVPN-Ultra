@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -2537,6 +2537,38 @@ void SiSetDefaultHubOption(HUB_OPTION *o)
 	o->FloodingSendQueueBufferQuota = DEFAULT_FLOODING_QUEUE_LENGTH;
 }
 
+// Desktop VPN のためのデフォルトの仮想 HUB を作成する
+void SiInitDefaultHubListForDesktopVPN(SERVER *s)
+{
+	HUB *h;
+	HUB_OPTION o;
+	HUB_LOG g;
+	// 引数チェック
+	if (s == NULL)
+	{
+		return;
+	}
+
+	Zero(&o, sizeof(o));
+	o.MaxSession = 0;
+
+	h = NewHub(s->Cedar, CEDAR_DESKVPN_HUBNAME, &o);
+	AddHub(s->Cedar, h);
+
+	// パスワードを乱数にする
+	Rand(h->HashedPassword, sizeof(h->HashedPassword));
+	Rand(h->SecurePassword, sizeof(h->SecurePassword));
+
+	h->Offline = true;
+	SetHubOnline(h);
+
+	// ログ設定
+	SiSetDefaultLogSetting(&g);
+	SetHubLogSetting(h, &g);
+
+	ReleaseHub(h);
+}
+
 // Create a default virtual HUB
 void SiInitDefaultHubList(SERVER *s)
 {
@@ -2633,7 +2665,11 @@ void SiLoadInitialConfiguration(SERVER *s)
 	Lock(s->Keep->lock);
 	{
 		KEEP *keep = s->Keep;
+#ifndef	CEDAR_DESKVPN
 		keep->Enable = k.UseKeepConnect;
+#else	// CEDAR_DESKVPN
+		keep->Enable = false;
+#endif	// CEDAR_DESKVPN
 		keep->Server = true;
 		StrCpy(keep->ServerName, sizeof(keep->ServerName), k.KeepConnectHost);
 		keep->ServerPort = k.KeepConnectPort;
@@ -2654,9 +2690,13 @@ void SiLoadInitialConfiguration(SERVER *s)
 	SiInitDefaultServerCert(s);
 
 	// Create a default HUB
+#ifndef	CEDAR_DESKVPN
 	{
 		SiInitDefaultHubList(s);
 	}
+#else	// CEDAR_DESKVPN
+	SiInitDefaultHubListForDesktopVPN(s);
+#endif	// CEDAR_DESKVPN
 
 	if (s->Cedar->Bridge == false)
 	{
@@ -2666,7 +2706,9 @@ void SiLoadInitialConfiguration(SERVER *s)
 
 
 	// Set the listener list to default setting
+#ifndef	CEDAR_DESKVPN
 	SiInitListenerList(s);
+#endif	// CEDAR_DESKVPN
 
 	if (s->Cedar->Bridge)
 	{
@@ -2697,7 +2739,9 @@ void SiLoadInitialConfiguration(SERVER *s)
 		}
 	}
 
+#ifndef	CEDAR_DESKVPN
 	s->Eraser = NewEraser(s->Logger, 0);
+#endif	// CEDAR_DESKVPN
 }
 
 // Check whether the ports required for VPN-over-ICMP can be opened
@@ -2793,7 +2837,9 @@ void SiInitConfiguration(SERVER *s)
 		return;
 	}
 
+#ifndef	CEDAR_DESKVPN
 	s->AutoSaveConfigSpan = SERVER_FILE_SAVE_INTERVAL_DEFAULT;
+#endif	// CEDAR_DESKVPN
 	s->BackupConfigOnlyWhenModified = true;
 
 	// IPsec server
@@ -2808,11 +2854,14 @@ void SiInitConfiguration(SERVER *s)
 		s->OpenVpnServerUdp = NewOpenVpnServerUdp(s->Cedar);
 	}
 
+#ifndef	CEDAR_DESKVPN
 	SLog(s->Cedar, "LS_LOAD_CONFIG_1");
 	if (SiLoadConfigurationFile(s) == false)
 	{
 		// Ethernet initialization
+#ifndef	CEDAR_DESKVPN
 		InitEth();
+#endif	// CEDAR_DESKVPN
 
 		SLog(s->Cedar, "LS_LOAD_CONFIG_3");
 		SiLoadInitialConfiguration(s);
@@ -2825,6 +2874,9 @@ void SiInitConfiguration(SERVER *s)
 	{
 		SLog(s->Cedar, "LS_LOAD_CONFIG_2");
 	}
+#else	// CEDAR_DESKVPN
+	SiLoadInitialConfiguration(s);
+#endif	// CEDAR_DESKVPN
 
 	s->CfgRw->DontBackup = s->DontBackupConfig;
 
@@ -2865,9 +2917,11 @@ void SiInitConfiguration(SERVER *s)
 #endif	//OS_WIN32
 
 	// Create a saving thread
+#ifndef	CEDAR_DESKVPN
 	SLog(s->Cedar, "LS_INIT_SAVE_THREAD", s->AutoSaveConfigSpan / 1000);
 	s->SaveHaltEvent = NewEvent();
 	s->SaveThread = NewThread(SiSaverThread, s);
+#endif	// CEDAR_DESKVPN
 }
 
 // Set the state of Enabled / Disabled of Azure Client
@@ -2997,7 +3051,9 @@ bool SiLoadConfigurationCfg(SERVER *s, FOLDER *root)
 #endif	// OS_WIN32
 
 	// Ethernet initialization
+#ifndef	CEDAR_DESKVPN
 	InitEth();
+#endif	// CEDAR_DESKVPN
 
 	s->ConfigRevision = CfgGetInt(root, "ConfigRevision");
 
@@ -4267,10 +4323,14 @@ void SiWriteUserCfg(FOLDER *f, USER *u)
 	{
 		CfgAddUniStr(f, "RealName", u->RealName);
 		CfgAddUniStr(f, "Note", u->Note);
+
+#ifndef	CEDAR_DESKVPN
 		if (u->Group != NULL)
 		{
 			CfgAddStr(f, "GroupName", u->GroupName);
 		}
+#endif	// CEDAR_DESKVPN
+
 		CfgAddInt64(f, "CreatedTime", u->CreatedTime);
 		CfgAddInt64(f, "UpdatedTime", u->UpdatedTime);
 		CfgAddInt64(f, "ExpireTime", u->ExpireTime);
@@ -4278,9 +4338,14 @@ void SiWriteUserCfg(FOLDER *f, USER *u)
 		CfgAddInt(f, "NumLogin", u->NumLogin);
 		if (u->Policy != NULL)
 		{
+#ifndef	CEDAR_DESKVPN
 			SiWritePolicyCfg(CfgCreateFolder(f, "Policy"), u->Policy, false);
+#endif	// CEDAR_DESKVPN
 		}
+
+#ifndef	CEDAR_DESKVPN
 		SiWriteTraffic(f, "Traffic", u->Traffic);
+#endif	// CEDAR_DESKVPN
 
 		CfgAddInt(f, "AuthType", u->AuthType);
 		if (u->AuthData != NULL)
@@ -4371,7 +4436,11 @@ void SiLoadUserCfg(HUB *h, FOLDER *f)
 	username = f->Name;
 	CfgGetUniStr(f, "RealName", realname, sizeof(realname));
 	CfgGetUniStr(f, "Note", note, sizeof(note));
+#ifndef	CEDAR_DESKVPN
 	CfgGetStr(f, "GroupName", groupname, sizeof(groupname));
+#else	// CEDAR_DESKVPN
+	Zero(groupname, sizeof(groupname));
+#endif	// CEDAR_DESKVPN
 
 	created_time = CfgGetInt64(f, "CreatedTime");
 	updated_time = CfgGetInt64(f, "UpdatedTime");
@@ -4379,11 +4448,14 @@ void SiLoadUserCfg(HUB *h, FOLDER *f)
 	last_login_time = CfgGetInt64(f, "LastLoginTime");
 	num_login = CfgGetInt(f, "NumLogin");
 	pf = CfgGetFolder(f, "Policy");
+
+#ifndef	CEDAR_DESKVPN
 	if (pf != NULL)
 	{
 		SiLoadPolicyCfg(&p, pf);
 	}
 	SiLoadTraffic(f, "Traffic", &t);
+#endif	// CEDAR_DESKVPN
 
 	authtype = CfgGetInt(f, "AuthType");
 	authdata = NULL;
@@ -4997,7 +5069,9 @@ void SiWriteHubDb(FOLDER *f, HUBDB *db, bool no_save_ac_list)
 	}
 
 	SiWriteUserList(CfgCreateFolder(f, "UserList"), db->UserList);
+#ifndef	CEDAR_DESKVPN
 	SiWriteGroupList(CfgCreateFolder(f, "GroupList"), db->GroupList);
+#endif	// CEDAR_DESKVPN
 	SiWriteCertList(CfgCreateFolder(f, "CertList"), db->RootCertList);
 	SiWriteCrlList(CfgCreateFolder(f, "CrlList"), db->CrlList);
 
@@ -5016,7 +5090,10 @@ void SiLoadHubDb(HUB *h, FOLDER *f)
 		return;
 	}
 
+#ifndef	CEDAR_DESKVPN
 	SiLoadGroupList(h, CfgGetFolder(f, "GroupList"));
+#endif	// CEDAR_DESKVPN
+
 	SiLoadUserList(h, CfgGetFolder(f, "UserList"));
 
 	if (h->HubDb != NULL)
@@ -5055,21 +5132,30 @@ void SiWriteHubCfg(FOLDER *f, HUB *h)
 	Unlock(h->RadiusOptionLock);
 
 	// Password
+#ifndef	CEDAR_DESKVPN
 	CfgAddByte(f, "HashedPassword", h->HashedPassword, sizeof(h->HashedPassword));
 	CfgAddByte(f, "SecurePassword", h->SecurePassword, sizeof(h->SecurePassword));
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	// Online / Offline flag
 	if (h->Cedar->Bridge == false)
 	{
 		CfgAddBool(f, "Online", (h->Offline && (h->HubIsOnlineButHalting == false)) ? false : true);
 	}
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	// Traffic information
 	SiWriteTraffic(f, "Traffic", h->Traffic);
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	// HUB options
 	SiWriteHubOptionCfg(CfgCreateFolder(f, "Option"), h->Option);
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	// Message
 	{
 		FOLDER *folder = CfgCreateFolder(f, "Message");
@@ -5079,16 +5165,22 @@ void SiWriteHubCfg(FOLDER *f, HUB *h)
 			CfgAddUniStr(folder, "MessageText", h->Msg);
 		}
 	}
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	// HUB_LOG
 	SiWriteHubLogCfg(CfgCreateFolder(f, "LogSetting"), &h->LogSetting);
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	if (h->Type == HUB_TYPE_STANDALONE)
 	{
 		// Link list
 		SiWriteHubLinks(CfgCreateFolder(f, "CascadeList"), h);
 	}
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	if (h->Type != HUB_TYPE_FARM_STATIC)
 	{
 		if (GetServerCapsBool(h->Cedar->Server, "b_support_securenat"))
@@ -5097,15 +5189,22 @@ void SiWriteHubCfg(FOLDER *f, HUB *h)
 			SiWriteSecureNAT(h, CfgCreateFolder(f, "SecureNAT"));
 		}
 	}
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	// Access list
 	SiWriteHubAccessLists(CfgCreateFolder(f, "AccessList"), h);
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	// Administration options
 	SiWriteHubAdminOptions(CfgCreateFolder(f, "AdminOption"), h);
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	// Type of HUB
 	CfgAddInt(f, "Type", h->Type);
+#endif	// CEDAR_DESKVPN
 
 	// Database
 	if (h->Cedar->Bridge == false)
@@ -5115,11 +5214,13 @@ void SiWriteHubCfg(FOLDER *f, HUB *h)
 			);
 	}
 
+#ifndef	CEDAR_DESKVPN
 	// Usage status
 	CfgAddInt64(f, "LastCommTime", h->LastCommTime);
 	CfgAddInt64(f, "LastLoginTime", h->LastLoginTime);
 	CfgAddInt64(f, "CreatedTime", h->CreatedTime);
 	CfgAddInt(f, "NumLogin", h->NumLogin);
+#endif	// CEDAR_DESKVPN
 }
 
 // Read the logging options
@@ -5197,13 +5298,16 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 
 	// Get the option
 	Zero(&o, sizeof(o));
+#ifndef	CEDAR_DESKVPN
 	SiLoadHubOptionCfg(CfgGetFolder(f, "Option"), &o);
+#endif	// CEDAR_DESKVPN
 
 	// Create a HUB
 	h = NewHub(c, name, &o);
 	if (h != NULL)
 	{
 		HUB_LOG g;
+		Zero(&g, sizeof(g));
 		// Radius server settings
 		Lock(h->RadiusOptionLock);
 		{
@@ -5246,6 +5350,7 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 		}
 		Unlock(h->RadiusOptionLock);
 
+#ifndef	CEDAR_DESKVPN
 		// Password
 		if (CfgGetByte(f, "HashedPassword", h->HashedPassword, sizeof(h->HashedPassword)) != sizeof(h->HashedPassword))
 		{
@@ -5255,12 +5360,19 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 		{
 			HashPassword(h->SecurePassword, ADMINISTRATOR_USERNAME, "");
 		}
+#else	// CEDAR_DESKVPN
+		Rand(h->HashedPassword, sizeof(h->HashedPassword));
+		Rand(h->SecurePassword, sizeof(h->SecurePassword));
+#endif	// CEDAR_DESKVPN
 
 		// Log Settings
 		Zero(&g, sizeof(g));
+#ifndef	CEDAR_DESKVPN
 		SiLoadHubLogCfg(&g, CfgGetFolder(f, "LogSetting"));
 		SetHubLogSetting(h, &g);
+#endif	CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 		// Online / Offline flag
 		if (h->Cedar->Bridge == false)
 		{
@@ -5270,14 +5382,22 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 		{
 			online = true;
 		}
+#else	// CEDAR_DESKVPN
+		online = true;
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 		// Traffic information
 		SiLoadTraffic(f, "Traffic", h->Traffic);
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 		// Access list
 		SiLoadHubAccessLists(h, CfgGetFolder(f, "AccessList"));
+#endif	// CEDAR_DESKVPN
 
 		// Type of HUB
+#ifndef	CEDAR_DESKVPN
 		hub_old_type = h->Type = CfgGetInt(f, "Type");
 
 		if (s->ServerType == SERVER_TYPE_STANDALONE)
@@ -5296,12 +5416,16 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 				h->Type = HUB_TYPE_FARM_DYNAMIC;
 			}
 		}
+#else	// CEDAR_DESKVPN
+		h->Type = HUB_TYPE_STANDALONE;
+#endif	// CEDAR_DESKVPN
 
 		if (h->Type == HUB_TYPE_FARM_DYNAMIC)
 		{
 			h->CurrentVersion = h->LastVersion = 1;
 		}
 
+#ifndef	CEDAR_DESKVPN
 		// Message
 		{
 			FOLDER *folder = CfgGetFolder(f, "Message");
@@ -5315,7 +5439,9 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 				Free(tmp);
 			}
 		}
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 		// Link list
 		if (h->Type == HUB_TYPE_STANDALONE)
 		{
@@ -5325,7 +5451,9 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 				SiLoadHubLinks(h, CfgGetFolder(f, "CascadeList"));
 			}
 		}
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 		// SecureNAT
 		if (GetServerCapsBool(h->Cedar->Server, "b_support_securenat"))
 		{
@@ -5343,9 +5471,12 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 
 			}
 		}
+#endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 		// Administration options
 		SiLoadHubAdminOptions(h, CfgGetFolder(f, "AdminOption"));
+#endif	// CEDAR_DESKVPN
 
 		// Database
 		if (h->Cedar->Bridge == false)
@@ -5353,6 +5484,7 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 			SiLoadHubDb(h, CfgGetFolder(f, "SecurityAccountDatabase"));
 		}
 
+#ifndef	CEDAR_DESKVPN
 		// Usage status
 		h->LastCommTime = CfgGetInt64(f, "LastCommTime");
 		if (h->LastCommTime == 0)
@@ -5366,6 +5498,7 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 		}
 		h->CreatedTime = CfgGetInt64(f, "CreatedTime");
 		h->NumLogin = CfgGetInt(f, "NumLogin");
+#endif	// CEDAR_DESKVPN
 
 		// Start the operation of the HUB
 		AddHub(c, h);
@@ -11011,10 +11144,14 @@ SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_serve
 	s->SyslogLock = NewLock();
 	s->TasksFromFarmControllerLock = NewLock();
 
+#ifndef	CEDAR_DESKVPN
 	if (bridge)
 	{
 		SetCedarVpnBridge(s->Cedar);
 	}
+#endif	// CEDAR_DESKVPN
+
+#ifndef	CEDAR_DESKVPN
 
 #ifdef OS_WIN32
 	if (IsHamMode() == false)
@@ -11023,11 +11160,15 @@ SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_serve
 	}
 #endif
 
+#endif	// CEDAR_DESKVPN
+
 	s->Keep = StartKeep();
 
+#ifndef	CEDAR_DESKVPN
 	// Log related
 	MakeDir(bridge == false ? SERVER_LOG_DIR_NAME : BRIDGE_LOG_DIR_NAME);
 	s->Logger = NewLog(bridge == false ? SERVER_LOG_DIR_NAME : BRIDGE_LOG_DIR_NAME, SERVER_LOG_PERFIX, LOG_SWITCH_DAY);
+#endif	// CEDAR_DESKVPN
 
 	SLog(s->Cedar, "L_LINE");
 	SLog(s->Cedar, "LS_START_2", s->Cedar->ServerStr, s->Cedar->VerString);
@@ -11050,15 +11191,18 @@ SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_serve
 	}
 
 	// Raise the priority
+#ifndef	CEDAR_DESKVPN
 	if (s->NoHighPriorityProcess == false)
 	{
 		OSSetHighPriority();
 	}
+#endif	// CEDAR_DESKVPN
 
 #ifdef	OS_UNIX
 	UnixSetHighOomScore();
 #endif	// OS_UNIX
 
+#ifndef	CEDAR_DESKVPN
 	if (s->ServerType == SERVER_TYPE_FARM_MEMBER)
 	{
 		// Start a connection to the controller
@@ -11085,6 +11229,7 @@ SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_serve
 
 		s->FarmControllerInited = true;
 	}
+#endif	// CEDAR_DESKVPN
 
 	// Start a in-processlistener 
 	inproc = NewListener(s->Cedar, LISTENER_INPROC, 0);

@@ -167,6 +167,7 @@ struct LOG
 	UINT64 CurrentFilePointer;				// The current file pointer
 	UINT CurrentLogNumber;					// Log file number of the current
 	bool log_number_incremented;
+	bool Flush;
 };
 
 

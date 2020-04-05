@@ -5480,7 +5480,11 @@ void SmEditCrlDlgOnLoad(HWND hWnd, SM_EDIT_CRL *c)
 		return;
 	}
 
+#ifndef	CEDAR_DESKVPN
 	if (CmLoadXFromFileOrSecureCard(hWnd, &x))
+#else	// CEDAR_DESKVPN
+	if (CmLoadX(hWnd, &x))
+#endif	// CEDAR_DESKVPN
 	{
 		UCHAR md5[MD5_SIZE], sha1[SHA1_SIZE];
 
@@ -10016,7 +10020,11 @@ bool SmCaDlgAdd(HWND hWnd, SM_HUB *s)
 		return false;
 	}
 
-	if (CmLoadXFromFileOrSecureCard(hWnd, &x) == false)
+#ifndef	CEDAR_DESKVPN
+	if (CmLoadXFromFileOrSecureCard(hWnd, &x))
+#else	// CEDAR_DESKVPN
+	if (CmLoadX(hWnd, &x))
+#endif	// CEDAR_DESKVPN
 	{
 		return false;
 	}
@@ -13373,11 +13381,13 @@ bool SmRefreshUserInfo(HWND hWnd, SM_SERVER *s, void *param)
 	StrToUni(tmp, sizeof(tmp), t.Name);
 	LvInsertAdd(b, ICO_USER, NULL, 2, _UU("SM_USERINFO_NAME"), tmp);
 
+#ifndef	CEDAR_DESKVPN
 	if (StrLen(t.GroupName) != 0)
 	{
 		StrToUni(tmp, sizeof(tmp), t.GroupName);
 		LvInsertAdd(b, ICO_GROUP, NULL, 2, _UU("SM_USERINFO_GROUP"), tmp);
 	}
+#endif	// CEDAR_DESKVPN
 
 	GetDateTimeStrEx64(tmp, sizeof(tmp), SystemToLocal64(t.CreatedTime), NULL);
 	LvInsertAdd(b, ICO_USER_ADMIN, NULL, 2, _UU("SM_USERINFO_CREATE"), tmp);
@@ -13391,7 +13401,9 @@ bool SmRefreshUserInfo(HWND hWnd, SM_SERVER *s, void *param)
 		LvInsertAdd(b, ICO_WARNING, NULL, 2, _UU("SM_USERINFO_EXPIRE"), tmp);
 	}
 
+#ifndef	CEDAR_DESKVPN
 	SmInsertTrafficInfo(b, &t.Traffic);
+#endif	// CEDAR_DESKVPN
 
 	UniToStru(tmp, t.NumLogin);
 	LvInsertAdd(b, ICO_LINK, NULL, 2, _UU("SM_USERINFO_NUMLOGIN"), tmp);
@@ -13828,6 +13840,9 @@ void SmEditUserDlgInit(HWND hWnd, SM_EDIT_USER *s)
 	SetTextA(hWnd, E_USERNAME, u->Name);
 	SetText(hWnd, E_REALNAME, u->Realname);
 	SetText(hWnd, E_NOTE, u->Note);
+	LimitText(hWnd, E_USERNAME, MAX_USERNAME_LEN / 2);
+	LimitText(hWnd, E_REALNAME, MAX_SIZE / 2);
+	LimitText(hWnd, E_NOTE, MAX_SIZE / 2);
 
 
 	// Expiration date
@@ -13972,6 +13987,17 @@ void SmEditUserDlgInit(HWND hWnd, SM_EDIT_USER *s)
 	}
 
 	SetShow(hWnd, S_HINT, (s->EditMode ? false : true));
+
+#ifdef	CEDAR_DESKVPN
+	Hide(hWnd, IDC_STATIC5);
+	Hide(hWnd, E_GROUP);
+	Hide(hWnd, B_GROUP);
+	Hide(hWnd, S_POLICY_1);
+	Hide(hWnd, S_MACHINE);
+	Hide(hWnd, R_POLICY);
+	Hide(hWnd, B_POLICY);
+	Hide(hWnd, S_GROUP);
+#endif	// CEDAR_DESKVPN
 }
 
 // User edit control update
@@ -14358,7 +14384,11 @@ UINT SmEditUserDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *
 
 		case B_LOAD_CERT:
 			// Specify the certificate
+#ifndef	CEDAR_DESKVPN
 			if (CmLoadXFromFileOrSecureCard(hWnd, &x))
+#else	// CEDAR_DESKVPN
+			if (CmLoadX(hWnd, &x))
+#endif	// CEDAR_DESKVPN
 			{
 UPDATE_CERT:
 				if (s->SetUser.AuthType == AUTHTYPE_USERCERT)
@@ -14550,6 +14580,8 @@ void SmUserListInit(HWND hWnd, SM_USER *s)
 	LvSetStyle(hWnd, L_USER, LVS_EX_GRIDLINES);
 	LvInsertColumn(hWnd, L_USER, 0, _UU("SM_USER_COLUMN_1"), 120);
 	LvInsertColumn(hWnd, L_USER, 1, _UU("SM_USER_COLUMN_2"), 100);
+
+#ifndef	CEDAR_DESKVPN
 	LvInsertColumn(hWnd, L_USER, 2, _UU("SM_USER_COLUMN_3"), 100);
 	LvInsertColumn(hWnd, L_USER, 3, _UU("SM_USER_COLUMN_4"), 130);
 	LvInsertColumn(hWnd, L_USER, 4, _UU("SM_USER_COLUMN_5"), 100);
@@ -14558,6 +14590,12 @@ void SmUserListInit(HWND hWnd, SM_USER *s)
 	LvInsertColumn(hWnd, L_USER, 7, _UU("SM_LICENSE_COLUMN_5"), 120);
 	LvInsertColumn(hWnd, L_USER, 8, _UU("SM_SESS_COLUMN_6"), 100);
 	LvInsertColumn(hWnd, L_USER, 9, _UU("SM_SESS_COLUMN_7"), 100);
+#else	// CEDAR_DESKVPN
+	LvInsertColumn(hWnd, L_USER, 2, _UU("SM_USER_COLUMN_4"), 130);
+	LvInsertColumn(hWnd, L_USER, 3, _UU("SM_USER_COLUMN_5"), 100);
+	LvInsertColumn(hWnd, L_USER, 4, _UU("SM_USER_COLUMN_6"), 90);
+	LvInsertColumn(hWnd, L_USER, 5, _UU("SM_USER_COLUMN_7"), 120);
+#endif	// CEDAR_DESKVPN
 
 	FormatText(hWnd, S_TITLE, s->Hub->HubName);
 
@@ -14683,9 +14721,15 @@ void SmUserListRefresh(HWND hWnd, SM_USER *s)
 				e->Traffic.Send.BroadcastBytes + e->Traffic.Send.UnicastCount);
 		}
 
+#ifndef	CEDAR_DESKVPN
 		LvInsertAdd(b, e->DenyAccess ? ICO_USER_DENY : ICO_USER, NULL, 10,
 			name, e->Realname, group, e->Note, SmGetAuthTypeStr(e->AuthType),
 			num, time, exp, num1, num2);
+#else	// CEDAR_DESKVPN
+		LvInsertAdd(b, e->DenyAccess ? ICO_USER_DENY : ICO_USER, NULL, 6,
+			name, e->Realname, e->Note, SmGetAuthTypeStr(e->AuthType),
+			num, time);
+#endif	// CEDAR_DESKVPN
 	}
 
 	LvInsertEnd(b, hWnd, L_USER);
@@ -16545,7 +16589,11 @@ void SmSaveKeyPairDlgInit(HWND hWnd, SM_SAVE_KEY_PAIR *s)
 		return;
 	}
 
+#ifndef	CEDAR_DESKVPN
 	current = MsRegReadInt(REG_CURRENT_USER, SM_REG_KEY, "SavePkcs12");
+#else	// CEDAR_DESKVPN
+	current = 1;
+#endif	// CEDAR_DESKVPN
 
 	if (current == 1)
 	{
@@ -16559,6 +16607,23 @@ void SmSaveKeyPairDlgInit(HWND hWnd, SM_SAVE_KEY_PAIR *s)
 	{
 		Check(hWnd, R_X509_AND_KEY, true);
 	}
+
+#ifdef	CEDAR_DESKVPN
+	Hide(hWnd, R_X509_AND_KEY);
+	Hide(hWnd, R_SECURE);
+	Hide(hWnd, R_PKCS12);
+	Hide(hWnd, S_ICON1);
+	Hide(hWnd, S_ICON2);
+	Hide(hWnd, S_ICON3);
+	Hide(hWnd, S_STATIC1);
+	Hide(hWnd, S_STATIC2);
+	Hide(hWnd, S_STATIC3);
+	Hide(hWnd, S_STATIC4);
+	Hide(hWnd, S_STATIC5);
+	Hide(hWnd, B_SELECT);
+	Hide(hWnd, B_SECURE_MANAGER);
+	Hide(hWnd, S_INFO);
+#endif	// CEDAR_DESKVPN
 
 	if (MsIsWine())
 	{
@@ -16640,6 +16705,7 @@ void SmSaveKeyPairDlgOnOk(HWND hWnd, SM_SAVE_KEY_PAIR *s)
 		return;
 	}
 
+#ifndef	CEDAR_DESKVPN
 	pkcs12 = 0;
 
 	if (IsChecked(hWnd, R_PKCS12))
@@ -16651,6 +16717,9 @@ void SmSaveKeyPairDlgOnOk(HWND hWnd, SM_SAVE_KEY_PAIR *s)
 		pkcs12 = 2;
 	}
 	MsRegWriteInt(REG_CURRENT_USER, SM_REG_KEY, "SavePkcs12", pkcs12);
+#else	// CEDAR_DESKVPN
+	pkcs12 = 1;
+#endif	// CEDAR_DESKVPN
 
 	if (pkcs12 != 2)
 	{

@@ -509,6 +509,13 @@ void RsaPublicToBin(K *k, void *data);
 BUF *RsaPublicToBuf(K *k);
 K *RsaBinToPublic(void *data, UINT size);
 
+X_CRL *FileToXCrl(char *filename);
+X_CRL *FileToXCrlW(wchar_t *filename);
+X_CRL *BufToXCrl(BUF *b);
+void FreeXCrl(X_CRL *r);
+bool IsXRevokedByXCrl(X *x, X_CRL *r);
+bool IsXRevoked(X *x);
+
 DES_KEY_VALUE *DesNewKeyValue(void *value);
 DES_KEY_VALUE *DesRandKeyValue();
 void DesFreeKeyValue(DES_KEY_VALUE *v);

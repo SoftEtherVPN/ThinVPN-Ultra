@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -8382,7 +8382,7 @@ bool CmLoadKExW(HWND hWnd, K **k, wchar_t *filename, UINT size)
 }
 
 // Read a set of certificate and private key
-bool CmLoadXAndK(HWND hWnd, X **x, K **k)
+bool CmLoadXAndKEx(HWND hWnd, X **x, K **k, wchar_t *filename_x, wchar_t *filename_k, bool p12only)
 {
 	wchar_t *s;
 	bool is_p12;
@@ -8395,7 +8395,15 @@ bool CmLoadXAndK(HWND hWnd, X **x, K **k)
 START_FIRST:
 
 	// Read the certificate
-	s = OpenDlg(hWnd, _UU("DLG_CERT_OR_P12_FILTER"), _UU("DLG_OPEN_CERT"));
+	if (UniIsEmptyStr(filename_x))
+	{
+		s = OpenDlg(hWnd, (p12only ? _UU("DLG_PKCS12_ONLY_FILTER") : _UU("DLG_CERT_OR_P12_FILTER")),
+			(p12only ? _UU("DLG_OPEN_CERT_P12") : _UU("DLG_OPEN_CERT")));
+	}
+	else
+	{
+		s = UniCopyStr(filename_x);
+	}
 	if (s == NULL)
 	{
 		return false;
@@ -8409,6 +8417,12 @@ START_FIRST:
 	else
 	{
 		is_p12 = false;
+	}
+
+	if (p12only && (is_p12 == false))
+	{
+		MsgBoxEx(hWnd, MB_ICONEXCLAMATION, _UU("DLG_BAD_P12"), s);
+		return false;
 	}
 
 	if (is_p12)
@@ -8464,9 +8478,16 @@ START_FIRST:
 			FreeK(*k);
 			FreeP12(p12);
 			FreeBuf(b);
-			if (MsgBox(hWnd, MB_ICONEXCLAMATION | MB_RETRYCANCEL, _UU("DLG_BAD_SIGNATURE")) == IDRETRY)
+			if (UniIsEmptyStr(filename_x))
 			{
-				goto START_FIRST;
+				if (MsgBox(hWnd, MB_ICONEXCLAMATION | MB_RETRYCANCEL, _UU("DLG_BAD_SIGNATURE")) == IDRETRY)
+				{
+					goto START_FIRST;
+				}
+			}
+			else
+			{
+				MsgBox(hWnd, MB_ICONEXCLAMATION, _UU("DLG_BAD_SIGNATURE"));
 			}
 			return false;
 		}
@@ -8495,7 +8516,14 @@ START_FIRST:
 		}
 
 		// Read the secret key
-		s = OpenDlg(hWnd, _UU("DLG_KEY_FILTER"), _UU("DLG_OPEN_KEY_WITH_CERT"));
+		if (UniIsEmptyStr(filename_k) == false)
+		{
+			s = OpenDlg(hWnd, _UU("DLG_KEY_FILTER"), _UU("DLG_OPEN_KEY_WITH_CERT"));
+		}
+		else
+		{
+			s = UniCopyStr(filename_k);
+		}
 		if (s == NULL)
 		{
 			FreeX(x509);
@@ -8541,9 +8569,16 @@ START_FIRST:
 			FreeBuf(b);
 			FreeX(x509);
 			FreeK(key);
-			if (MsgBox(hWnd, MB_ICONEXCLAMATION | MB_RETRYCANCEL, _UU("DLG_BAD_SIGNATURE")) == IDRETRY)
+			if (UniIsEmptyStr(filename_x) || UniIsEmptyStr(filename_k))
 			{
-				goto START_FIRST;
+				if (MsgBox(hWnd, MB_ICONEXCLAMATION | MB_RETRYCANCEL, _UU("DLG_BAD_SIGNATURE")) == IDRETRY)
+				{
+					goto START_FIRST;
+				}
+			}
+			else
+			{
+				MsgBox(hWnd, MB_ICONEXCLAMATION, _UU("DLG_BAD_SIGNATURE"));
 			}
 			return false;
 		}
@@ -8553,6 +8588,10 @@ START_FIRST:
 		*k = key;
 		return true;
 	}
+}
+bool CmLoadXAndK(HWND hWnd, X **x, K **k)
+{
+	return CmLoadXAndKEx(hWnd, x, k, NULL, NULL, false);
 }
 
 // Virtual HUB enumeration start

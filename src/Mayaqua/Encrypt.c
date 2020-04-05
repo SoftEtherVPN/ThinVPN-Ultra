@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Mayaqua Kernel
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -156,6 +156,176 @@ typedef struct CB_PARAM
 {
 	char *password;
 } CB_PARAM;
+
+
+// 証明書が特定のディレクトリの CRL によって無効化されているかどうか確認する
+bool IsXRevoked(X *x)
+{
+	char dirname[MAX_PATH];
+	UINT i;
+	bool ret = false;
+	DIRLIST *t;
+	// 引数チェック
+	if (x == NULL)
+	{
+		return false;
+	}
+
+	GetExeDir(dirname, sizeof(dirname));
+
+	// CRL ファイルの検索
+	t = EnumDir(dirname);
+
+	for (i = 0;i < t->NumFiles;i++)
+	{
+		char *name = t->File[i]->FileName;
+		if (t->File[i]->Folder == false)
+		{
+			if (EndWith(name, ".crl"))
+			{
+				char filename[MAX_PATH];
+				X_CRL *r;
+
+				ConbinePath(filename, sizeof(filename), dirname, name);
+
+				r = FileToXCrl(filename);
+
+				if (r != NULL)
+				{
+					if (IsXRevokedByXCrl(x, r))
+					{
+						ret = true;
+					}
+
+					FreeXCrl(r);
+				}
+			}
+		}
+	}
+
+	FreeDir(t);
+
+	return ret;
+}
+
+// 証明書が CRL によって無効化されているかどうか確認する
+bool IsXRevokedByXCrl(X *x, X_CRL *r)
+{
+#ifdef	OS_WIN32
+	X509_REVOKED tmp;
+	X509_CRL_INFO *info;
+	int index;
+	// 引数チェック
+	if (x == NULL || r == NULL)
+	{
+		return false;
+	}
+
+	Zero(&tmp, sizeof(tmp));
+	tmp.serialNumber = X509_get_serialNumber(x->x509);
+
+	info = r->Crl->crl;
+
+	if (sk_X509_REVOKED_is_sorted(info->revoked) == false)
+	{
+		sk_X509_REVOKED_sort(info->revoked);
+	}
+
+	index = sk_X509_REVOKED_find(info->revoked, &tmp);
+
+	if (index < 0)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+#else	// OS_WIN32
+	return false;
+#endif	// OS_WIN32
+}
+
+// CRL の解放
+void FreeXCrl(X_CRL *r)
+{
+	// 引数チェック
+	if (r == NULL)
+	{
+		return;
+	}
+
+	X509_CRL_free(r->Crl);
+
+	Free(r);
+}
+
+// ファイルを CRL に変換
+X_CRL *FileToXCrl(char *filename)
+{
+	wchar_t *filename_w = CopyStrToUni(filename);
+	X_CRL *ret = FileToXCrlW(filename_w);
+
+	Free(filename_w);
+
+	return ret;
+}
+X_CRL *FileToXCrlW(wchar_t *filename)
+{
+	BUF *b;
+	X_CRL *r;
+	// 引数チェック
+	if (filename == NULL)
+	{
+		return NULL;
+	}
+
+	b = ReadDumpW(filename);
+	if (b == NULL)
+	{
+		return NULL;
+	}
+
+	r = BufToXCrl(b);
+
+	FreeBuf(b);
+
+	return r;
+}
+
+// バッファを CRL に変換
+X_CRL *BufToXCrl(BUF *b)
+{
+	X_CRL *r;
+	X509_CRL *x509crl;
+	BIO *bio;
+	// 引数チェック
+	if (b == NULL)
+	{
+		return NULL;
+	}
+
+	bio = BufToBio(b);
+	if (bio == NULL)
+	{
+		return NULL;
+	}
+
+	x509crl	= NULL;
+
+	if (d2i_X509_CRL_bio(bio, &x509crl) == NULL || x509crl == NULL)
+	{
+		FreeBio(bio);
+		return NULL;
+	}
+
+	r = ZeroMalloc(sizeof(X_CRL));
+	r->Crl = x509crl;
+
+	FreeBio(bio);
+
+	return r;
+}
 
 // Copied from t1_enc.c of OpenSSL
 void Enc_tls1_P_hash(const EVP_MD *md, const unsigned char *sec, int sec_len,

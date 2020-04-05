@@ -3286,10 +3286,12 @@ UINT StSetAcList(ADMIN *a, RPC_AC_LIST *t)
 		return ERR_NOT_SUPPORTED;
 	}
 
+#ifndef	CEDAR_DESKVPN
 	if (GetGlobalServerFlag(GSF_DISABLE_AC) != 0 && LIST_NUM(t->o) >= 1)
 	{
 		return ERR_NOT_SUPPORTED_FUNCTION_ON_OPENSOURCE;
 	}
+#endif	// CEDAR_DESKVPN
 
 	CHECK_RIGHT;
 	NO_SUPPORT_FOR_BRIDGE;
@@ -4734,6 +4736,7 @@ UINT StSetSysLog(ADMIN *a, SYSLOG_SETTING *t)
 
 	SERVER_ADMIN_ONLY;
 
+#ifndef	CEDAR_DESKVPN
 	if (GetGlobalServerFlag(GSF_DISABLE_SYSLOG) != 0 && t->SaveType != SYSLOG_NONE)
 	{
 		return ERR_NOT_SUPPORTED_FUNCTION_ON_OPENSOURCE;
@@ -4743,6 +4746,7 @@ UINT StSetSysLog(ADMIN *a, SYSLOG_SETTING *t)
 	{
 		return ERR_NOT_SUPPORTED;
 	}
+#endif	// CEDAR_DESKVPN
 
 	SiSetSysLogSetting(s, t);
 
@@ -6141,6 +6145,7 @@ UINT StSetUser(ADMIN *a, RPC_SET_USER *t)
 
 	CHECK_RIGHT;
 
+#ifndef	CEDAR_DESKVPN
 	if (GetGlobalServerFlag(GSF_DISABLE_RADIUS_AUTH) != 0)
 	{
 		if (t->AuthType == AUTHTYPE_USERCERT || t->AuthType == AUTHTYPE_RADIUS || t->AuthType == AUTHTYPE_ROOTCERT || t->AuthType == AUTHTYPE_NT)
@@ -6148,6 +6153,7 @@ UINT StSetUser(ADMIN *a, RPC_SET_USER *t)
 			return ERR_NOT_SUPPORTED_AUTH_ON_OPENSOURCE;
 		}
 	}
+#endif	// CEDAR_DESKVPN
 
 	if (StrCmpi(t->Name, "*") == 0)
 	{
@@ -6274,6 +6280,7 @@ UINT StCreateUser(ADMIN *a, RPC_SET_USER *t)
 
 	CHECK_RIGHT;
 
+#ifndef	CEDAR_DESKVPN
 	if (GetGlobalServerFlag(GSF_DISABLE_RADIUS_AUTH) != 0)
 	{
 		if (t->AuthType == AUTHTYPE_USERCERT || t->AuthType == AUTHTYPE_RADIUS || t->AuthType == AUTHTYPE_ROOTCERT || t->AuthType == AUTHTYPE_NT)
@@ -6281,6 +6288,7 @@ UINT StCreateUser(ADMIN *a, RPC_SET_USER *t)
 			return ERR_NOT_SUPPORTED_AUTH_ON_OPENSOURCE;
 		}
 	}
+#endif	// CEDAR_DESKVPN
 
 	if (t->AuthType == AUTHTYPE_USERCERT)
 	{
@@ -8772,10 +8780,12 @@ UINT StSetHubRadius(ADMIN *a, RPC_RADIUS *t)
 		return ERR_NOT_SUPPORTED;
 	}
 
+#ifndef	CEDAR_DESKVPN
 	if (GetGlobalServerFlag(GSF_DISABLE_RADIUS_AUTH) != 0 && IsEmptyStr(t->RadiusServerName) == false)
 	{
 		return ERR_NOT_SUPPORTED_FUNCTION_ON_OPENSOURCE;
 	}
+#endif	// CEDAR_DESKVPN
 
 	CHECK_RIGHT;
 

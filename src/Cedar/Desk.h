@@ -21,7 +21,6 @@
 // 機能無効モード (高度なユーザー認証機能、イベントログ機能、syslog 機能が無効になる)
 //#define	DESK_DISABLE_NEW_FEATURE
 
-#define	CEDAR_DESKVPN_HUBNAME	"DESKTOPVPN"
 
 
 // バージョン情報

@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -108,6 +108,73 @@
 static UINT init_cedar_counter = 0;
 static REF *cedar_log_ref = NULL;
 static LOG *cedar_log;
+
+// 簡易ログを閉じる
+void FreeTinyLog(TINY_LOG *t)
+{
+	// 引数チェック
+	if (t == NULL)
+	{
+		return;
+	}
+
+	FileClose(t->io);
+	DeleteLock(t->Lock);
+	Free(t);
+}
+
+// 簡易ログの書き込み
+void WriteTinyLog(TINY_LOG *t, char *str)
+{
+	BUF *b;
+	char dt[MAX_PATH];
+	// 引数チェック
+	if (t == NULL)
+	{
+		return;
+	}
+
+	GetDateTimeStrMilli64(dt, sizeof(dt), LocalTime64());
+	StrCat(dt, sizeof(dt), ": ");
+
+	b = NewBuf();
+
+	WriteBuf(b, dt, StrLen(dt));
+	WriteBuf(b, str, StrLen(str));
+	WriteBuf(b, "\r\n", 2);
+
+	Lock(t->Lock);
+	{
+		FileWrite(t->io, b->Buf, b->Size);
+		FileFlush(t->io);
+	}
+	Unlock(t->Lock);
+
+	FreeBuf(b);
+}
+
+// 簡易ログの初期化
+TINY_LOG *NewTinyLog()
+{
+	char name[MAX_PATH];
+	SYSTEMTIME st;
+	TINY_LOG *t;
+
+	LocalTime(&st);
+
+	MakeDir(TINY_LOG_DIRNAME);
+
+	Format(name, sizeof(name), TINY_LOG_FILENAME,
+		st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+
+	t = ZeroMalloc(sizeof(TINY_LOG));
+
+	StrCpy(t->FileName, sizeof(t->FileName), name);
+	t->io = FileCreate(name);
+	t->Lock = NewLock();
+
+	return t;
+}
 
 // Check whether there is any EAP-enabled RADIUS configuration
 bool CedarIsThereAnyEapEnabledRadiusConfig(CEDAR *c)

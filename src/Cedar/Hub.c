@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -7304,6 +7304,7 @@ HUB *NewHub(CEDAR *cedar, char *HubName, HUB_OPTION *option)
 	// Create a user list
 	h->UserList = NewUserList();
 
+#ifndef	CEDAR_DESKVPN
 	// Default logging settings
 	h->LogSetting.SavePacketLog = h->LogSetting.SaveSecurityLog = true;
 	h->LogSetting.PacketLogConfig[PACKET_LOG_TCP_CONN] =
@@ -7313,6 +7314,9 @@ HUB *NewHub(CEDAR *cedar, char *HubName, HUB_OPTION *option)
 
 	MakeDir(HUB_SECURITY_LOG_DIR_NAME);
 	MakeDir(HUB_PACKET_LOG_DIR_NAME);
+#else	// CEDAR_DESKVPN
+	h->LogSetting.SavePacketLog = h->LogSetting.SaveSecurityLog = false;
+#endif	// CEDAR_DESKVPN
 
 	// Start the packet logger
 	Format(packet_logger_name, sizeof(packet_logger_name), HUB_PACKET_LOG_FILE_NAME, h->Name);
@@ -7335,11 +7339,13 @@ HUB *NewHub(CEDAR *cedar, char *HubName, HUB_OPTION *option)
 		h->Option->NoArpPolling = true;
 	}
 
+#ifndef	CEDAR_DESKVPN
 	if (h->Option->NoArpPolling == false && h->Option->NoIpTable == false)
 	{
 		StartHubWatchDog(h);
 		h->WatchDogStarted = true;
 	}
+#endif	// CEDAR_DESKVPN
 
 	SLog(h->Cedar, "LS_HUB_START", h->Name);
 

@@ -691,6 +691,10 @@ void ALog(ADMIN *a, HUB *h, char *name, ...)
 		return;
 	}
 
+#ifdef	CEDAR_DESKVPN
+	return;
+#endif	// CEDAR_DESKVPN
+
 	r = a->Rpc;
 
 	va_start(args, name);
@@ -911,6 +915,10 @@ void WriteHubLog(HUB *h, wchar_t *str)
 		return;
 	}
 
+#ifdef	CEDAR_DESKVPN
+	return;
+#endif	// CEDAR_DESKVPN
+
 	s = h->Cedar->Server;
 	syslog_status = SiGetSysLogSaveStatus(s);
 
@@ -958,6 +966,10 @@ void WriteServerLog(CEDAR *c, wchar_t *str)
 	{
 		return;
 	}
+
+#ifdef	CEDAR_DESKVPN
+	return;
+#endif	// CEDAR_DESKVPN
 
 	s = c->Server;
 	if (s == NULL)
@@ -2616,6 +2628,7 @@ void LogThread(THREAD *thread, void *param)
 	char current_logfile_datename[MAX_SIZE];
 	bool last_priority_flag = false;
 	bool log_date_changed = false;
+	bool flag2 = false;
 	// Validate arguments
 	if (thread == NULL || param == NULL)
 	{
@@ -2658,25 +2671,36 @@ void LogThread(THREAD *thread, void *param)
 			UnlockQueue(g->RecordQueue);
 
 #ifdef	OS_WIN32
-			if (num >= LOG_ENGINE_SAVE_START_CACHE_COUNT)
+			if (g->Flush == false)
 			{
-				// Raise the priority
-				if (last_priority_flag == false)
+				if (num >= LOG_ENGINE_SAVE_START_CACHE_COUNT)
 				{
-					Debug("LOG_THREAD: MsSetThreadPriorityRealtime\n");
-					MsSetThreadPriorityRealtime();
-					last_priority_flag = true;
+					// Raise the priority
+					if (last_priority_flag == false)
+					{
+						Debug("LOG_THREAD: MsSetThreadPriorityRealtime\n");
+						MsSetThreadPriorityRealtime();
+						last_priority_flag = true;
+					}
+				}
+
+				if (num < (LOG_ENGINE_SAVE_START_CACHE_COUNT / 2))
+				{
+					// Restore the priority
+					if (last_priority_flag)
+					{
+						Debug("LOG_THREAD: MsSetThreadPriorityIdle\n");
+						MsSetThreadPriorityIdle();
+						last_priority_flag = false;
+					}
 				}
 			}
-
-			if (num < (LOG_ENGINE_SAVE_START_CACHE_COUNT / 2))
+			else
 			{
-				// Restore the priority
-				if (last_priority_flag)
+				if (flag2 == false)
 				{
-					Debug("LOG_THREAD: MsSetThreadPriorityIdle\n");
-					MsSetThreadPriorityIdle();
-					last_priority_flag = false;
+					MsSetThreadPriorityRealtime();
+					flag2 = true;
 				}
 			}
 #endif	// OS_WIN32
@@ -2712,6 +2736,10 @@ void LogThread(THREAD *thread, void *param)
 						}
 						else
 						{
+							if (g->Flush)
+							{
+								FileFlush(io);
+							}
 							g->CurrentFilePointer += (UINT64)b->Size;
 							ClearBuf(b);
 						}
@@ -2746,6 +2774,10 @@ void LogThread(THREAD *thread, void *param)
 							}
 							else
 							{
+								if (g->Flush)
+								{
+									FileFlush(io);
+								}
 								g->CurrentFilePointer += (UINT64)b->Size;
 								ClearBuf(b);
 							}
@@ -2808,6 +2840,10 @@ void LogThread(THREAD *thread, void *param)
 								}
 								else
 								{
+									if (g->Flush)
+									{
+										FileFlush(io);
+									}
 									g->CurrentFilePointer += (UINT64)b->Size;
 									ClearBuf(b);
 								}
