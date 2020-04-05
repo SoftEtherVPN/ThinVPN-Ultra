@@ -2,5 +2,5 @@
 # Copyright (c) SoftEther Corporation. All Rights Reserved
 
 # 番号 識別子 英語表記 ローカル表記 Windowsロケール番号 UNIXロケール文字一覧
-1 en English English 1033 en,us,c
+0 ja Japanese 日本語 1041 ja,jp,sjis,shift_jis,euc
 
