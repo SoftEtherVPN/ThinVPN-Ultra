@@ -13,7 +13,7 @@
 
 // Windows プロダクト ID のキャッシュ
 static char windows_product_id[MAX_PATH] = {0};
-static MACHINE_ID machine_id_cache = {0};
+static WT_MACHINE_ID machine_id_cache = {0};
 static bool machine_id_cached = false;
 
 // セッション接続情報キャッシュの削除
@@ -196,7 +196,7 @@ void WideFreeSessionInfoCache(LIST *o)
 }
 
 // 2 つのマシン ID を比較し、同一のマシンであると判断したら true を返す
-bool WideCompareMachineId(MACHINE_ID *d1, MACHINE_ID *d2)
+bool WideCompareMachineId(WT_MACHINE_ID *d1, WT_MACHINE_ID *d2)
 {
 	UINT n = 0;
 	// 引数チェック
@@ -239,7 +239,7 @@ bool WideCompareMachineId(MACHINE_ID *d1, MACHINE_ID *d2)
 }
 
 // 現在のマシン ID を取得
-void WideGetCurrentMachineId(MACHINE_ID *d)
+void WideGetCurrentMachineId(WT_MACHINE_ID *d)
 {
 	// 引数チェック
 	if (d == NULL)
@@ -250,15 +250,15 @@ void WideGetCurrentMachineId(MACHINE_ID *d)
 	if (machine_id_cached == false)
 	{
 		WideGetCurrentMachineIdMain(d);
-		Copy(&machine_id_cache, d, sizeof(MACHINE_ID));
+		Copy(&machine_id_cache, d, sizeof(WT_MACHINE_ID));
 		machine_id_cached = true;
 	}
 	else
 	{
-		Copy(d, &machine_id_cache, sizeof(MACHINE_ID));
+		Copy(d, &machine_id_cache, sizeof(WT_MACHINE_ID));
 	}
 }
-void WideGetCurrentMachineIdMain(MACHINE_ID *d)
+void WideGetCurrentMachineIdMain(WT_MACHINE_ID *d)
 {
 	char product_id[MAX_PATH];
 	char machine_name[MAX_PATH];
@@ -273,7 +273,7 @@ void WideGetCurrentMachineIdMain(MACHINE_ID *d)
 		return;
 	}
 
-	Zero(d, sizeof(MACHINE_ID));
+	Zero(d, sizeof(WT_MACHINE_ID));
 
 	// プロダクト ID
 	WideGetWindowsProductId(product_id, sizeof(product_id));
@@ -1083,7 +1083,7 @@ UINT WideServerRegistMachine(WIDE *w, char *pcid, X *cert, K *key)
 	PackAddStr(r, "SvcName", w->SvcName);
 	PackAddStr(r, "Pcid", pcid);
 
-	p = WpcCall(wt, "RegistMachine", r, cert, key);
+	p = WtWpcCall(wt, "RegistMachine", r, cert, key);
 	FreePack(r);
 
 	ret = GetErrorFromPack(p);
@@ -1192,7 +1192,7 @@ PACK *WideCall(WIDE *wide, char *function_name, PACK *pack)
 
 	WideServerGetCertAndKey(wide, &server_x, &server_k);
 
-	ret = WpcCall(wt, function_name, pack, server_x, server_k);
+	ret = WtWpcCall(wt, function_name, pack, server_x, server_k);
 
 	FreeX(server_x);
 	FreeK(server_k);
@@ -2125,7 +2125,7 @@ PACK *WideReadSecurePack(char *name)
 	UINT i;
 	PACK *last_p = NULL;
 	UINT64 last_p_timestamp = 0;
-	MACHINE_ID d;
+	WT_MACHINE_ID d;
 	// 引数チェック
 	if (name == NULL)
 	{
@@ -2151,7 +2151,7 @@ PACK *WideReadSecurePack(char *name)
 
 				if (p != NULL)
 				{
-					MACHINE_ID d2;
+					WT_MACHINE_ID d2;
 					UINT64 ts = PackGetInt64(p, "Timestamp");
 					bool b = false;
 
@@ -2226,7 +2226,7 @@ void WideWriteSecurePackEx(char *name, PACK *p, UINT64 timestamp)
 
 	if (p != NULL)
 	{
-		MACHINE_ID d;
+		WT_MACHINE_ID d;
 
 		WideGetCurrentMachineId(&d);
 
@@ -2415,7 +2415,7 @@ void WideGateLoadCertKey(X **cert, K **key)
 		FreeX(*cert);
 		FreeK(*key);
 
-		SiGenerateDefualtCert(cert, key);
+		SiGenerateDefaultCert(cert, key);
 	}
 
 	WideFreeIni(o);
@@ -2442,7 +2442,7 @@ void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id)
 		PackAddData(p, "SessionId", session_id, WT_SESSION_ID_SIZE);
 		WideGatePackGateInfo(p, wt);
 
-		FreePack(WpcCall(wt, "ReportSessionDel", p, wide->GateCert, wide->GateKey));
+		FreePack(WtWpcCall(wt, "ReportSessionDel", p, wide->GateCert, wide->GateKey));
 
 		FreePack(p);
 	}
@@ -2494,7 +2494,7 @@ void WideGateReportSessionAdd(WIDE *wide, TSESSION *s)
 			WideGatePackSession(p, s, 0, 1, NULL);
 			WideGatePackGateInfo(p, wt);
 
-			FreePack(WpcCall(wt, "ReportSessionAdd", p, wide->GateCert, wide->GateKey));
+			FreePack(WtWpcCall(wt, "ReportSessionAdd", p, wide->GateCert, wide->GateKey));
 
 			FreePack(p);
 		}
@@ -2540,7 +2540,7 @@ void WideGateReportSessionList(WIDE *wide)
 		}
 		ReleaseList(sc_list);
 
-		FreePack(WpcCall(wt, "ReportSessionList", p, wide->GateCert, wide->GateKey));
+		FreePack(WtWpcCall(wt, "ReportSessionList", p, wide->GateCert, wide->GateKey));
 
 		FreePack(p);
 	}
@@ -2726,7 +2726,7 @@ BUF *WideServerSaveLocalKeyToBuffer(K *k, X *x)
 	BUF *b, *pb;
 	UCHAR hash[SHA1_SIZE];
 	CRYPT *c;
-	MACHINE_ID mid;
+	WT_MACHINE_ID mid;
 	// 引数チェック
 	if (k == NULL || x == NULL)
 	{
@@ -2772,7 +2772,7 @@ bool WideServerLoadLocalKeyFromBuffer(BUF *buf, K **k, X **x)
 	CRYPT *c;
 	BUF *pb;
 	BUF *buf2;
-	MACHINE_ID mid, current_mid;
+	WT_MACHINE_ID mid, current_mid;
 	// 引数チェック
 	if (buf == NULL || k == NULL || x == NULL)
 	{

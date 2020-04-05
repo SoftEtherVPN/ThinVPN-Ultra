@@ -55,7 +55,7 @@ struct CONNECT_MAIN_THREAD_PARAM
 };
 
 // マシン識別子
-struct MACHINE_ID
+struct WT_MACHINE_ID
 {
 	UCHAR ProductIdHash[SHA1_SIZE];
 	UCHAR MachineNameHash[SHA1_SIZE];
@@ -189,9 +189,9 @@ bool WideGetDontCheckCert(WIDE *w);
 UINT WideGetErrorLevel(UINT code);
 bool WideIsProxyError(UINT code);
 UINT WideGetEnvStr(WIDE *w, char *name, char *ret_str, UINT ret_size);
-void WideGetCurrentMachineId(MACHINE_ID *d);
-void WideGetCurrentMachineIdMain(MACHINE_ID *d);
-bool WideCompareMachineId(MACHINE_ID *d1, MACHINE_ID *d2);
+void WideGetCurrentMachineId(WT_MACHINE_ID *d);
+void WideGetCurrentMachineIdMain(WT_MACHINE_ID *d);
+bool WideCompareMachineId(WT_MACHINE_ID *d1, WT_MACHINE_ID *d2);
 void WideSessionInfoCacheDeleteExpires(LIST *o);
 SESSION_INFO_CACHE *WideSessionInfoCacheGet(LIST *o, char *pcid, UINT64 expire_span);
 void WideSessionInfoCacheAdd(LIST *o, char *pcid, char *hostname, UINT port,

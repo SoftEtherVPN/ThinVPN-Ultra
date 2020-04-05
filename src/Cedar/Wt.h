@@ -45,6 +45,9 @@
 #define ERR_TOO_MANY_CLIENTS				223	// 接続クライアント数が多すぎる
 
 
+// SNI 文字列
+#define WT_SNI_STRING_V2				"wt_v2"
+
 // デフォルトの hamcore 内の Master 証明書のファイル名
 #define HAMCORE_MASTER_CERT_FILENAME	"|Master.cer"
 
@@ -101,22 +104,22 @@
 //////////////////////////////////////////////////////////////////////
 
 // 型一覧
-#include <WT/WtType.h>
+#include <Cedar/WtType.h>
 
 // WideTunnel Gate
-#include <WT/WtGate.h>
+#include <Cedar/WtGate.h>
 
 // WideTunnel Server
-#include <WT/WtServer.h>
+#include <Cedar/WtServer.h>
 
 // WideTunnel Client
-#include <WT/WtClient.h>
+#include <Cedar/WtClient.h>
 
 // Web Procedure Call
-#include <WT/WtWpc.h>
+#include <Cedar/WtWpc.h>
 
 // Wide
-#include <WT/Wide.h>
+#include <Cedar/Wide.h>
 
 
 //////////////////////////////////////////////////////////////////////

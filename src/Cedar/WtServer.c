@@ -480,7 +480,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 	//SetSocketSendRecvBufferSize((int)s, WT_SOCKET_WINDOW_SIZE);
 
 	// SSL 通信の開始
-	if (StartSSLEx(s, NULL, NULL, true) == false)
+	if (StartSSLEx(s, NULL, NULL, true, 0, WT_SNI_STRING_V2) == false)
 	{
 		// 失敗
 		Debug("StartSSL Failed.\n");
@@ -683,7 +683,7 @@ SOCK *WtSockConnect(WT_CONNECT *param, UINT *error_code)
 	switch (param->ProxyType)
 	{
 	case PROXY_DIRECT:
-		sock = TcpIpConnect(param->HostName, param->Port);
+		sock = TcpIpConnect(param->HostName, param->Port, false, false);
 		if (sock == NULL)
 		{
 			err = ERR_CONNECT_FAILED;

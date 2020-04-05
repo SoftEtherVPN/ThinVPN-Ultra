@@ -2070,6 +2070,10 @@ bool MsExecuteExW(wchar_t *exe, wchar_t *arg, void **process_handle)
 }
 bool MsExecuteEx2W(wchar_t *exe, wchar_t *arg, void **process_handle, bool runas)
 {
+	return MsExecuteEx3W(exe, arg, process_handle, runas, false);
+}
+bool MsExecuteEx3W(wchar_t *exe, wchar_t *arg, void **process_handle, bool runas, bool hide)
+{
 	SHELLEXECUTEINFOW info;
 	HANDLE h;
 	// Validate arguments
@@ -2095,7 +2099,7 @@ bool MsExecuteEx2W(wchar_t *exe, wchar_t *arg, void **process_handle, bool runas
 	info.lpFile = exe;
 	info.fMask = SEE_MASK_NOCLOSEPROCESS;
 	info.lpParameters = arg;
-	info.nShow = SW_SHOWNORMAL;
+	info.nShow = (hide ? SW_HIDE : SW_SHOWNORMAL);
 	if (ShellExecuteExW(&info) == false)
 	{
 		return false;

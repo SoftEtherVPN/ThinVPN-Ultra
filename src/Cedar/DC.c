@@ -1128,8 +1128,8 @@ UINT DcDownloadMstscExe(DC *dc, wchar_t *name, UINT name_size, wchar_t *tmp_dir_
 	}
 
 	// ファイルのダウンロード
-	buf = HttpRequest(dc->Wide->wt, &url_data, NULL, &ret,
-		false, NULL, callback, callback_param);
+	buf = HttpRequestEx4(&url_data, NULL, 0, 0, &ret,
+		false, NULL, callback, callback_param, NULL, 0, NULL, 0, NULL, NULL, dc->Wide->wt);
 
 	if (buf != NULL && buf->Size == 0)
 	{

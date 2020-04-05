@@ -40,8 +40,8 @@
 #include <Cedar/SMInner.h>
 #include <Cedar/NMInner.h>
 #include <Cedar/EMInner.h>
-#include <Wt/Wt.h>
-#include <Desk/Desk.h>
+#include <Cedar/Wt.h>
+#include <Cedar/Desk.h>
 #include "DG_Inner.h"
 #include "DU_Inner.h"
 #include "../PenCore/resource.h"

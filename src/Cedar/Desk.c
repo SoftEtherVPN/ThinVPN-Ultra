@@ -394,7 +394,7 @@ RUN_NEW_PROCESS:
 
 			if (MsIsNt())
 			{
-				if (MsExecuteExW(tmp, arg, &u->ProcessHandle, true) == false)
+				if (MsExecuteEx3W(tmp, arg, &u->ProcessHandle, false, true) == false)
 				{
 					u->ProcessHandle = NULL;
 				}

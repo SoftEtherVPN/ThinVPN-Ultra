@@ -201,9 +201,9 @@ PACK *WpcCallEx2(char *url, INTERNET_SETTING *setting, UINT timeout_connect, UIN
 		StrCpy(data.SniString, sizeof(data.SniString), sni_string);
 	}
 
-	recv = HttpRequestEx3(&data, setting, timeout_connect, timeout_comm, &error,
+	recv = HttpRequestEx4(&data, setting, timeout_connect, timeout_comm, &error,
 		false, b->Buf, NULL, NULL, sha1_cert_hash, num_hashes, cancel, max_recv_size,
-		NULL, NULL);
+		NULL, NULL, NULL);
 
 	FreeBuf(b);
 
@@ -709,6 +709,16 @@ BUF *HttpRequestEx3(URL_DATA *data, INTERNET_SETTING *setting,
 					WPC_RECV_CALLBACK *recv_callback, void *recv_callback_param, void *sha1_cert_hash, UINT num_hashes,
 					bool *cancel, UINT max_recv_size, char *header_name, char *header_value)
 {
+	return HttpRequestEx4(data, setting, timeout_connect, timeout_comm, error_code, check_ssl_trust,
+		post_data, recv_callback, recv_callback_param, sha1_cert_hash, (sha1_cert_hash == NULL ? 0 : 1),
+		cancel, max_recv_size, header_name, header_value, NULL);
+}
+BUF *HttpRequestEx4(URL_DATA *data, INTERNET_SETTING *setting,
+					UINT timeout_connect, UINT timeout_comm,
+					UINT *error_code, bool check_ssl_trust, char *post_data,
+					WPC_RECV_CALLBACK *recv_callback, void *recv_callback_param, void *sha1_cert_hash, UINT num_hashes,
+					bool *cancel, UINT max_recv_size, char *header_name, char *header_value, struct WT *wt)
+{
 	WPC_CONNECT con;
 	SOCK *s;
 	HTTP_HEADER *h;
@@ -732,6 +742,13 @@ BUF *HttpRequestEx3(URL_DATA *data, INTERNET_SETTING *setting,
 	if (setting == NULL)
 	{
 		Zero(&wt_setting, sizeof(wt_setting));
+
+		// For DeskVPN
+		if (wt != NULL)
+		{
+			WtGetInternetSetting(wt, &wt_setting);
+		}
+
 		setting = &wt_setting;
 	}
 	if (error_code == NULL)
@@ -803,6 +820,21 @@ BUF *HttpRequestEx3(URL_DATA *data, INTERNET_SETTING *setting,
 			Disconnect(s);
 			ReleaseSock(s);
 			return NULL;
+		}
+
+		if (check_ssl_trust)
+		{
+			if (wt != NULL)
+			{
+				// For DeskVPN
+				if (WtIsTrustedCert(wt, s->RemoteX) == false)
+				{
+					*error_code = ERR_SSL_X509_UNTRUSTED;
+					Disconnect(s);
+					ReleaseSock(s);
+					return NULL;
+				}
+			}
 		}
 
 		if (sha1_cert_hash != NULL && num_hashes >= 1)

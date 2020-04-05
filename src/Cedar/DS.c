@@ -11,7 +11,7 @@
 
 // Build 8600
 
-#include "DeskPch.h"
+#include "CedarPch.h"
 #include "..\PenCore\resource.h"
 
 // 指定された IP アドレスがプライベート IP アドレスかどうかチェックする

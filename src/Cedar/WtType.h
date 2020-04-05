@@ -32,15 +32,15 @@ typedef struct WTS_NEW_TUNNEL_THREAD_PARAM WTS_NEW_TUNNEL_THREAD_PARAM;
 typedef void (WT_ACCEPT_PROC)(THREAD *thread, SOCKIO *sock, void *param);
 
 // WtWpc.h
-typedef struct INTERNET_SETTING INTERNET_SETTING;
-typedef struct URL_DATA URL_DATA;
-typedef struct WPC_ENTRY WPC_ENTRY;
-typedef struct WPC_PACKET WPC_PACKET;
+//typedef struct INTERNET_SETTING INTERNET_SETTING;
+//typedef struct URL_DATA URL_DATA;
+//typedef struct WPC_ENTRY WPC_ENTRY;
+//typedef struct WPC_PACKET WPC_PACKET;
 
 // Wide.h
 typedef struct WIDE WIDE;
 typedef struct SECURE_PACK_FOLDER SECURE_PACK_FOLDER;
-typedef struct MACHINE_ID MACHINE_ID;
+typedef struct WT_MACHINE_ID WT_MACHINE_ID;
 typedef struct WIDE_LOGIN_INFO WIDE_LOGIN_INFO;
 typedef struct CONNECT_MAIN_THREAD_PARAM CONNECT_MAIN_THREAD_PARAM;
 typedef struct SESSION_AND_CLIENT SESSION_AND_CLIENT;

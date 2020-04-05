@@ -868,7 +868,7 @@ void WtgAccept(WT *wt, SOCK *s)
 	SetWantToUseCipher(s, "RC4-MD5");
 
 	// SSL 通信の開始
-	if (StartSSLEx(s, wt->GateCert, wt->GateKey, true) == false)
+	if (StartSSLEx(s, wt->GateCert, wt->GateKey, true, 0, WT_SNI_STRING_V2) == false)
 	{
 		Debug("StartSSL Failed.\n");
 		return;
@@ -1803,7 +1803,7 @@ void WtgStart(WT *wt, X *cert, K *key, UINT port)
 	}
 
 	// メモリサイズの節約
-	SetFifoDefaultReallocMemSize(65536);
+	SetFifoCurrentReallocMemSize(65536);
 
 	wt->GateCert = CloneX(cert);
 	wt->GateKey = CloneK(key);

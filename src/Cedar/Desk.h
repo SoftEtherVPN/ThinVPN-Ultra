@@ -21,6 +21,8 @@
 // 機能無効モード (高度なユーザー認証機能、イベントログ機能、syslog 機能が無効になる)
 //#define	DESK_DISABLE_NEW_FEATURE
 
+#define	CEDAR_DESKVPN_HUBNAME	"DESKTOPVPN"
+
 
 // バージョン情報
 #define	DESK_BUILD						8600		// ビルド番号
@@ -113,25 +115,25 @@
 //////////////////////////////////////////////////////////////////////
 
 // 型一覧
-#include <Desk/DeskType.h>
+#include <Cedar/DeskType.h>
 
 // Desktop VPN Server
-#include <Desk/DS.h>
+#include <Cedar/DS.h>
 
 // Desktop VPN Server RPC
-#include <Desk/DsRpc.h>
+#include <Cedar/DsRpc.h>
 
 // Desktop VPN Client
-#include <Desk/DC.h>
+#include <Cedar/DC.h>
 
 // Desktop VPN Server 設定ツール
-#include <Desk/DG.h>
+#include <Cedar/DG.h>
 
 // Desktop VPN Client GUI
-#include <Desk/DU.h>
+#include <Cedar/DU.h>
 
 // Desktop VPN Setup GUI
-#include <Desk/DI.h>
+#include <Cedar/DI.h>
 
 
 //////////////////////////////////////////////////////////////////////

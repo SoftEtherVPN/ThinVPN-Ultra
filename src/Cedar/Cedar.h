@@ -1158,6 +1158,10 @@ typedef struct CEDAR
 // VPN Gate Main Implementation
 #include <Cedar/VG.h>
 
+// DeskVPN
+#include <Cedar/Wt.h>
+#include <Cedar/Desk.h>
+
 
 #ifdef	OS_WIN32
 
