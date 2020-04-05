@@ -419,6 +419,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DeskSetup.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\DeskSetup.rc"
+				>
+			</File>
+			<File
 				RelativePath="..\PenCore\EasyInstaller.ico"
 				>
 			</File>
@@ -455,22 +463,10 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DeskSetup.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\DeskSetup.rc"
-				>
-			</File>
-			<File
 				RelativePath="..\PenCore\VPNSvr.ico"
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\..\..\..\..\..\TMP\cpntest\hamcore.se2"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

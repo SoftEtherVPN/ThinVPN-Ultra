@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -99,11 +99,10 @@
 // test has been passed before release this source code.
 
 
+
 #include <GlobalConst.h>
 
-// vpnsetup.c
-// VPN Setup Wizard
-
+#ifdef	WIN32
 #include <winsock2.h>
 #include <windows.h>
 #include <wincrypt.h>
@@ -111,6 +110,9 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #include <Dbghelp.h>
+#include "../PenCore/resource.h"
+#endif	// WIN32
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -123,17 +125,16 @@
 // WinMain function
 int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 {
-	UINT ret;
-
 	InitProcessCallOnce();
 
-	VgUseStaticLink();
+	InitMayaqua(false, false, 0, NULL);
+	LoadTable(DEFAULT_TABLE_FILE_NAME);
+	InitCedar();
+	DIExec(false);
+	FreeCedar();
+	FreeMayaqua();
 
-	ret = SWExec();
-
-	ExitProcess(ret);
-
-	return (int)ret;
+	return 0;
 }
 
 

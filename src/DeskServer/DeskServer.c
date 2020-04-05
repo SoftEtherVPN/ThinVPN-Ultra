@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -99,9 +99,6 @@
 // test has been passed before release this source code.
 
 
-// vpnserver.c
-// VPN Server service program
-
 #include <GlobalConst.h>
 
 #define	VPN_EXE
@@ -125,36 +122,69 @@
 #include <Mayaqua/Mayaqua.h>
 #include <Cedar/Cedar.h>
 
-// Process starting function
+static DS *ds = NULL;
+
+// プロセス開始関数
 void StartProcess()
 {
-	// Start the server
+	// サーバーの開始
 	InitCedar();
-	StInit();
-	StStartServer(false);
+
+	if (MsIsUserMode())
+	{
+		DS_INFO info;
+		UINT ret;
+
+		// ユーザーモードの場合、すでにポート 9822 が開かれていないかどうか
+		// チェックする
+		ret = DsGetServiceInfo(&info);
+
+		if (ret == ERR_NO_ERROR)
+		{
+			// すでに動作している
+			if (info.IsUserMode == false)
+			{
+				MsgBoxEx(NULL, MB_ICONEXCLAMATION,
+					_UU("DS_9822_ALREADY_SVC"),
+					info.ExeDirW);
+			}
+			else
+			{
+				MsgBoxEx(NULL, MB_ICONEXCLAMATION,
+					_UU("DS_9822_ALREADY_USER"),
+					info.ExeDirW, info.UserNameW);
+			}
+		}
+		else if (ret == ERR_DESK_RPC_PROTOCOL_ERROR)
+		{
+			// 変なソフトが動作している
+			MsgBox(NULL, MB_ICONEXCLAMATION, _UU("DS_9822_WARNING"));
+		}
+	}
+
+	ds = NewDs(MsIsUserMode());
 }
 
-// Process termination function
+// プロセス終了関数
 void StopProcess()
 {
-	// Stop the server
-	StStopServer();
-	StFree();
+	FreeDs(ds);
+	ds = NULL;
+
+	// サーバーの停止
 	FreeCedar();
 }
 
-// WinMain function
+// WinMain 関数
 int main(int argc, char *argv[])
 {
 	InitProcessCallOnce();
 
-	VgUseStaticLink();
-
 #ifdef	OS_WIN32
-
-	return MsService(GC_SVC_NAME_VPNSERVER, StartProcess, StopProcess, ICO_CASCADE, argv[0]);
+	return MsService("DESKSERVER", StartProcess, StopProcess, ICO_DESKSERVER_TRAY, argv[0]);
 #else	// OS_WIN32
-	return UnixService(argc, argv, "vpnserver", StartProcess, StopProcess);
+	return UnixService(argc, argv, "DESKSERVER", StartProcess, StopProcess);
 #endif	// OS_WIN32
 }
+
 

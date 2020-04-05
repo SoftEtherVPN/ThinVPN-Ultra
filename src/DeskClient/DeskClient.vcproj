@@ -410,10 +410,6 @@
 				RelativePath=".\resource.h"
 				>
 			</File>
-			<File
-				RelativePath=".\DeskClient.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
@@ -421,11 +417,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\Machine.ico"
+				RelativePath=".\DeskClient.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\DeskClient.rc"
+				RelativePath=".\Machine.ico"
 				>
 			</File>
 		</Filter>

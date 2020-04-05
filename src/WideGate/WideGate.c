@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -125,36 +125,36 @@
 #include <Mayaqua/Mayaqua.h>
 #include <Cedar/Cedar.h>
 
-// Process start function
+static WIDE *wide = NULL;
+
+// プロセス開始関数
 void StartProcess()
 {
-	// Start the server
+	// サーバーの開始
 	InitCedar();
-	StInit();
-	StStartServer(true);
+
+	wide = WideGateStart();
 }
 
-// Process stop function
+// プロセス終了関数
 void StopProcess()
 {
-	// Stop the server
-	StStopServer();
-	StFree();
+	WideGateStop(wide);
+	wide = NULL;
+
+	// サーバーの停止
 	FreeCedar();
 }
 
-// WinMain function
+// WinMain 関数
 int main(int argc, char *argv[])
 {
 	InitProcessCallOnce();
 
-	VgUseStaticLink();
-
 #ifdef	OS_WIN32
-	return MsService(GC_SVC_NAME_VPNBRIDGE, StartProcess, StopProcess, ICO_BRIDGE, argv[0]);
+	return MsService("WIDEGATE", StartProcess, StopProcess, ICO_FARM, argv[0]);
 #else	// OS_WIN32
-	return UnixService(argc, argv, "vpnbridge", StartProcess, StopProcess);
+	return UnixService(argc, argv, "WIDEGATE", StartProcess, StopProcess);
 #endif	// OS_WIN32
 }
-
 

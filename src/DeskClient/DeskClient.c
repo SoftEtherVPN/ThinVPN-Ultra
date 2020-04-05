@@ -99,12 +99,19 @@
 // test has been passed before release this source code.
 
 
-// vpncsvc.c
-// VPN Client Service Program
 
 #include <GlobalConst.h>
 
-#define	VPN_EXE
+#ifdef	WIN32
+#include <winsock2.h>
+#include <windows.h>
+#include <wincrypt.h>
+#include <wininet.h>
+#include <shlobj.h>
+#include <commctrl.h>
+#include <Dbghelp.h>
+#include "../PenCore/resource.h"
+#endif	// WIN32
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,33 +122,19 @@
 #include <Mayaqua/Mayaqua.h>
 #include <Cedar/Cedar.h>
 
-// Process start function
-void StartProcess()
-{
-	// Start the client
-	InitCedar();
-	CtStartClient();
-}
-
-// Process termination function
-void StopProcess()
-{
-  	// Stop the client
-	CtStopClient();
-	FreeCedar();
-}
-
 // WinMain function
-int main(int argc, char *argv[])
+int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 {
 	InitProcessCallOnce();
 
-#ifdef	OS_WIN32
+	InitMayaqua(false, false, 0, NULL);
+	LoadTable(DEFAULT_TABLE_FILE_NAME);
+	InitCedar();
+	DUExec();
+	FreeCedar();
+	FreeMayaqua();
 
-	return MsService(GC_SVC_NAME_VPNCLIENT, StartProcess, StopProcess, ICO_MACHINE, argv[0]);
-#else	// OS_WIN32
-	return UnixService(argc, argv, "vpnclient", StartProcess, StopProcess);
-#endif	// OS_WIN32
+	return 0;
 }
 
 

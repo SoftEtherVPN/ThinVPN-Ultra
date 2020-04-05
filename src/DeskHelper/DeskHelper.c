@@ -99,11 +99,10 @@
 // test has been passed before release this source code.
 
 
-// vpncmgr.c
-// VPN Client connection manager program
 
 #include <GlobalConst.h>
 
+#ifdef	WIN32
 #include <winsock2.h>
 #include <windows.h>
 #include <wincrypt.h>
@@ -111,6 +110,9 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #include <Dbghelp.h>
+#include "../PenCore/resource.h"
+#endif	// WIN32
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -126,10 +128,12 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 	InitProcessCallOnce();
 
 	InitMayaqua(false, false, 0, NULL);
+	LoadTable(DEFAULT_TABLE_FILE_NAME);
 	InitCedar();
-	SMExec();
+	DIExec(true);
 	FreeCedar();
 	FreeMayaqua();
+
 	return 0;
 }
 
