@@ -103,7 +103,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_admin.manifest"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest"
 			/>
 		</Configuration>
 		<Configuration
@@ -191,7 +191,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x64_admin.manifest"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x64_user.manifest"
 			/>
 		</Configuration>
 		<Configuration
@@ -286,7 +286,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetPE4 &quot;$(TargetPath)&quot;&#x0D;&#x0A;$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_admin.manifest&#x0D;&#x0A;"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetPE4 &quot;$(TargetPath)&quot;&#x0D;&#x0A;$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -382,7 +382,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x64_admin.manifest"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x64_user.manifest"
 			/>
 		</Configuration>
 	</Configurations>
