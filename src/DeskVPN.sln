@@ -15,7 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hamcore", "hamcore", "{2349
 	ProjectSection(SolutionItems) = preProject
 		bin\hamcore\lang.config = bin\hamcore\lang.config
 		bin\hamcore\time.htm = bin\hamcore\time.htm
-		bin\hamcore\vpn16.exe = bin\hamcore\vpn16.exe
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildFiles", "BuildFiles", "{ECFF92D4-8F03-4DDF-ACEF-9A68589BC282}"
