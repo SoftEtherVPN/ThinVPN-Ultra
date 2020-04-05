@@ -535,8 +535,164 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DC.c"
+				>
+			</File>
+			<File
 				RelativePath=".\DDNS.c"
 				>
+			</File>
+			<File
+				RelativePath=".\Desk.c"
+				>
+			</File>
+			<File
+				RelativePath=".\DG.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\DI.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\DS.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\DsRpc.c"
+				>
+			</File>
+			<File
+				RelativePath=".\DU.c"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\EM.c"
@@ -1023,6 +1179,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Wide.c"
+				>
+			</File>
+			<File
 				RelativePath=".\Win32Com.cpp"
 				>
 				<FileConfiguration
@@ -1146,6 +1306,26 @@
 				RelativePath=".\Wpc.c"
 				>
 			</File>
+			<File
+				RelativePath=".\Wt.c"
+				>
+			</File>
+			<File
+				RelativePath=".\WtClient.c"
+				>
+			</File>
+			<File
+				RelativePath=".\WtGate.c"
+				>
+			</File>
+			<File
+				RelativePath=".\WtServer.c"
+				>
+			</File>
+			<File
+				RelativePath=".\WtWpc.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -1221,7 +1401,51 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DC.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DDNS.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Desk.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DeskType.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DG.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DG_Inner.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DI.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DI_Inner.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DS.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DsRpc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DU.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DU_Inner.h"
 				>
 			</File>
 			<File
@@ -1409,6 +1633,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Wide.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Win32Com.h"
 				>
 			</File>
@@ -1418,6 +1646,30 @@
 			</File>
 			<File
 				RelativePath=".\Wpc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Wt.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WtClient.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WtGate.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WtServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WtType.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WtWpc.h"
 				>
 			</File>
 		</Filter>
