@@ -47,7 +47,7 @@ typedef struct DI_FILE
 // Desktop VPN Server 用インストールファイル一覧
 static DI_FILE di_files_for_desk_server[] =
 {
-	{DI_FILENAME_DESKSERVER,	true,	"DESKSERVER", },
+	{DI_FILENAME_DESKSERVER,	true,	DESK_SERVER_SVC_NAME, },
 	{DI_FILENAME_DESKCONFIG,	false,	NULL, },
 	{DI_FILENAME_DESKSETUP,		false,	NULL, },
 	{DI_FILENAME_DESKHELPER,	false,	NULL, },

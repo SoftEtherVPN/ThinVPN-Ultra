@@ -1680,9 +1680,10 @@ LIST *WideNewSecurePackFolderList()
 {
 	SECURE_PACK_FOLDER *f;
 	LIST *o = NewListFast(NULL);
-	char tmp[MAX_PATH];
-	wchar_t tmp2[MAX_PATH];
+	char tmp[MAX_PATH] = {0};
+	wchar_t tmp2[MAX_PATH] = {0};
 
+#ifndef DESK_SECURE_PACK_EASY_MODE
 	// HKEY_LOCAL_MACHINE\SOFTWARE\SoftEther Corporation\Keywords
 	f = ZeroMalloc(sizeof(SECURE_PACK_FOLDER));
 	f->Type = SECURE_PACK_FOLDER_TYPE_LOCAL_MACHINE;
@@ -1728,6 +1729,22 @@ LIST *WideNewSecurePackFolderList()
 	MakeDirW(f->FolderName);
 	MsSetFileToHiddenW(f->FolderName);
 	Add(o, f);
+#else	// DESK_SECURE_PACK_EASY_MODE
+
+	// HKEY_LOCAL_MACHINE\SOFTWARE\SoftEther Corporation\Keywords
+	f = ZeroMalloc(sizeof(SECURE_PACK_FOLDER));
+	f->Type = SECURE_PACK_FOLDER_TYPE_LOCAL_MACHINE;
+	UniStrCpy(f->FolderName, sizeof(f->FolderName), L"SOFTWARE\\" DESK_PUBLISHER_NAME_UNICODE L"\\Keywords");
+	Add(o, f);
+
+	// HKEY_CURRENT_USER\Software\SoftEther Corporation\Secure Pack
+	f = ZeroMalloc(sizeof(SECURE_PACK_FOLDER));
+	f->Type = SECURE_PACK_FOLDER_TYPE_CURRENT_USER;
+	f->ByMachineOnly = true;
+	UniStrCpy(f->FolderName, sizeof(f->FolderName), L"Software\\" DESK_PUBLISHER_NAME_UNICODE L"\\Secure Pack");
+	Add(o, f);
+
+#endif	// DESK_SECURE_PACK_EASY_MODE
 
 	WtShuffleArray(o->p, LIST_NUM(o));
 

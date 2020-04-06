@@ -12,20 +12,29 @@
 
 
 //// For DeskVPN
-#define DG_REGKEY	"Software\\SoftEther Corporation\\Desktop VPN Server\\Config Tool"
-#define DI_REGKEY	"Software\\SoftEther Corporation\\Desktop VPN Server\\Installer"
+#define DESK_PUBLISHER_NAME_UNICODE		L"IPA CyberLab"				// 元: L"SoftEther Corporation"
+#define DESK_PUBLISHER_NAME_ANSI		"IPA CyberLab"				// 元: "SoftEther Corporation"
+#define	DESK_SECURE_PACK_NAME			"IPA_DESK_SERVER"			// 元: "DESK_SERVER"
+
+#define DESK_SECURE_PACK_EASY_MODE		// 有効にすると簡易モードになる
+
+
+#define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Desktop VPN Server\\Config Tool"
+#define DI_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Desktop VPN Server\\Installer"
 
 #define DI_PRODUCT_SERVER_NAME	"DeskServer"
 #define DI_PRODUCT_CLIENT_NAME	"DeskClient"
 
-#define	DESK_SVC_NAME					"DESK"	// WideTunnel でのサービス名
+#define DESK_SERVER_SVC_NAME			"DESKSERVER"										// Desk Server Windows サービス名
 
-#define DS_RPC_PORT						9822	// Server の RPC ポート
+#define	DESK_SVC_NAME					"DESK"	// WideTunnel 内でのサービス名
+#define DS_RPC_PORT						9823	// Server の RPC ポート					// 元: 9822
+
+// ここから下は おそらくいじらなくて OK
 #define DC_RDP_PORT_START				3500	// Client の RDP ポートの開始番号
 #define DS_URDP_PORT					3456	// User-mode RDP ポート
 #define DS_RDP_PORT						3389	// RDP のデフォルトのポート番号
 
-#define	DESK_SECURE_PACK_NAME			"DESK_SERVER"
 
 
 //// Basic Variables
