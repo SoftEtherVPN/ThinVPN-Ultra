@@ -2874,11 +2874,11 @@ void SiInitConfiguration(SERVER *s)
 	{
 		SLog(s->Cedar, "LS_LOAD_CONFIG_2");
 	}
+
+	s->CfgRw->DontBackup = s->DontBackupConfig;
 #else	// CEDAR_DESKVPN
 	SiLoadInitialConfiguration(s);
 #endif	// CEDAR_DESKVPN
-
-	s->CfgRw->DontBackup = s->DontBackupConfig;
 
 	// The arp_filter in Linux
 	if (GetOsInfo()->OsType == OSTYPE_LINUX)
