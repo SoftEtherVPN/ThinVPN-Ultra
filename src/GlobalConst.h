@@ -15,6 +15,7 @@
 #define DESK_PUBLISHER_NAME_UNICODE		L"IPA CyberLab"				// 元: L"SoftEther Corporation"
 #define DESK_PUBLISHER_NAME_ANSI		"IPA CyberLab"				// 元: "SoftEther Corporation"
 #define	DESK_SECURE_PACK_NAME			"IPA_DESK_SERVER"			// 元: "DESK_SERVER"
+#define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.desktopvpn.com"
 
 #define DESK_SECURE_PACK_EASY_MODE		// 有効にすると簡易モードになる
 

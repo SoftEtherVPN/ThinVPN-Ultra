@@ -2342,7 +2342,7 @@ void DcGenerateHostname(char *hostname, UINT hostname_size, char *pcid)
 
 	StrLower(tmp);
 
-	Format(hostname, hostname_size, "%s.secure.desktopvpn.com", tmp);
+	Format(hostname, hostname_size, DESK_LOCALHOST_DUMMY_FQDN, tmp);
 }
 
 // 新しいポートを開いて Listen する
