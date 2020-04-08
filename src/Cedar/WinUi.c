@@ -10836,6 +10836,7 @@ void WinUiDebugFree()
 // Write a string to the debug file
 void WinUiDebug(wchar_t *str)
 {
+#if 0
 	wchar_t tmp[1024];
 	char dtstr[256];
 	char *buf;
@@ -10881,6 +10882,7 @@ void WinUiDebug(wchar_t *str)
 	Unlock(winui_debug_lock);
 
 	Free(buf);
+#endif
 }
 
 // If the control protrude by large font size, adjust into appropriate size
