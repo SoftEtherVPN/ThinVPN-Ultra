@@ -12634,7 +12634,7 @@ MS_ISLOCKED *MsNewIsLocked()
 	MS_ISLOCKED *d;
 	THREAD *t;
 
-	SleepThread(5000);
+	//SleepThread(5000); // •s—v? 2020/4/8 dnobori
 
 	if (IsNt() == false || ms->nt->WTSRegisterSessionNotification == NULL ||
 		ms->nt->WTSUnRegisterSessionNotification == NULL)

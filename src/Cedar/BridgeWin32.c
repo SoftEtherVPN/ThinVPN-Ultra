@@ -1865,6 +1865,7 @@ bool Win32EthIsSuSupported()
 // Is the Ethernet supported
 bool IsEthSupported()
 {
+#ifndef	CEDAR_DESKVPN
 	bool ret = IsEthSupportedInner();
 
 	if (ret == false)
@@ -1873,6 +1874,9 @@ bool IsEthSupported()
 	}
 
 	return ret;
+#else	// CEDAR_DESKVPN
+	return false;
+#endif	// CEDAR_DESKVPN
 }
 bool IsEthSupportedInner()
 {

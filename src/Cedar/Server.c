@@ -2698,19 +2698,24 @@ void SiLoadInitialConfiguration(SERVER *s)
 	SiInitDefaultHubListForDesktopVPN(s);
 #endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	if (s->Cedar->Bridge == false)
 	{
 		// Create a DDNS client
 		s->DDnsClient = NewDDNSClient(s->Cedar, NULL, NULL);
 	}
-
+#endif	// CEDAR_DESKVPN
 
 	// Set the listener list to default setting
 #ifndef	CEDAR_DESKVPN
 	SiInitListenerList(s);
 #endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	if (s->Cedar->Bridge)
+#else	// CEDAR_DESKVPN
+	if (true)
+#endif	// CEDAR_DESKVPN
 	{
 		// SSTP, OpenVPN, and NAT traversal function can not be used in the bridge environment
 		s->DisableNatTraversal = true;
@@ -11095,9 +11100,9 @@ SERVER *SiNewServer(bool bridge)
 SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_server)
 {
 	SERVER *s;
-	LISTENER *inproc;
-	LISTENER *azure;
-	LISTENER *rudp;
+	LISTENER *inproc = NULL;
+	LISTENER *azure = NULL;
+	LISTENER *rudp = NULL;
 
 	SetGetIpThreadMaxNum(DEFAULT_GETIP_THREAD_MAX_NUM);
 
@@ -11231,6 +11236,7 @@ SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_serve
 	}
 #endif	// CEDAR_DESKVPN
 
+#ifndef	CEDAR_DESKVPN
 	// Start a in-processlistener 
 	inproc = NewListener(s->Cedar, LISTENER_INPROC, 0);
 	ReleaseListener(inproc);
@@ -11255,6 +11261,7 @@ SERVER *SiNewServerEx(bool bridge, bool in_client_inner_server, bool relay_serve
 
 	// Start a VPN-over-DNS listener
 	s->DynListenerDns = NewDynamicListener(s->Cedar, &s->EnableVpnOverDns, LISTENER_DNS, 53);
+#endif	// CEDAR_DESKVPN
 
 
 	SiInitDeadLockCheck(s);

@@ -200,6 +200,7 @@ bool IsNeedWinPcap()
 // Get whether the local-bridging is supported by current OS
 bool IsBridgeSupported()
 {
+#ifndef	CEDAR_DESKVPN
 	UINT type = GetOsInfo()->OsType;
 
 	if (OS_IS_WINDOWS(type))
@@ -223,6 +224,9 @@ bool IsBridgeSupported()
 	{
 		return IsEthSupported();
 	}
+#else	// CEDAR_DESKVPN
+	return false;
+#endif	// CEDAR_DESKVPN
 }
 
 // Delete a local-bridge
