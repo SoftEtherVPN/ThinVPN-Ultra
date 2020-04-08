@@ -1734,14 +1734,14 @@ LIST *WideNewSecurePackFolderList()
 	// HKEY_LOCAL_MACHINE\SOFTWARE\SoftEther Corporation\Keywords
 	f = ZeroMalloc(sizeof(SECURE_PACK_FOLDER));
 	f->Type = SECURE_PACK_FOLDER_TYPE_LOCAL_MACHINE;
-	UniStrCpy(f->FolderName, sizeof(f->FolderName), L"SOFTWARE\\" DESK_PUBLISHER_NAME_UNICODE L"\\Keywords");
+	UniStrCpy(f->FolderName, sizeof(f->FolderName), L"SOFTWARE\\" DESK_PUBLISHER_NAME_UNICODE L"\\Machine ID");
 	Add(o, f);
 
 	// HKEY_CURRENT_USER\Software\SoftEther Corporation\Secure Pack
 	f = ZeroMalloc(sizeof(SECURE_PACK_FOLDER));
 	f->Type = SECURE_PACK_FOLDER_TYPE_CURRENT_USER;
 	f->ByMachineOnly = true;
-	UniStrCpy(f->FolderName, sizeof(f->FolderName), L"Software\\" DESK_PUBLISHER_NAME_UNICODE L"\\Secure Pack");
+	UniStrCpy(f->FolderName, sizeof(f->FolderName), L"Software\\" DESK_PUBLISHER_NAME_UNICODE L"\\Machine ID");
 	Add(o, f);
 
 #endif	// DESK_SECURE_PACK_EASY_MODE
