@@ -11039,6 +11039,7 @@ bool SiCheckCurrentRegion(CEDAR *c, char *r)
 // 
 bool SiIsEnterpriseFunctionsRestrictedOnOpenSource(CEDAR *c)
 {
+#ifndef	CEDAR_DESKVPN
 	char region[128];
 	bool ret = false;
 	// Validate arguments
@@ -11056,6 +11057,9 @@ bool SiIsEnterpriseFunctionsRestrictedOnOpenSource(CEDAR *c)
 	}
 
 	return ret;
+#else	// CEDAR_DESKVPN
+	return false;
+#endif	// CEDAR_DESKVPN
 }
 
 // Update the current region
