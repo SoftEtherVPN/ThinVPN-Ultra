@@ -2456,7 +2456,8 @@ void WideGateLoadCertKey(X **cert, K **key)
 		FreeX(*cert);
 		FreeK(*key);
 
-		SiGenerateDefaultCert(cert, key);
+		Alert("WideGateLoadCertKey failed.", "WideGate");
+		AbortExitEx("WideGateLoadCertKey failed.");
 	}
 
 	WideFreeIni(o);
