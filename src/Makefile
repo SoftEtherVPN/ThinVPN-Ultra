@@ -4,11 +4,11 @@
 
 OPTIONS_COMPILE_DEBUG=-D_DEBUG -DDEBUG -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./ -I./Cedar/ -I./Mayaqua/ -g -fsigned-char
 
-OPTIONS_LINK_DEBUG=-g -fsigned-char -lm -ldl -lrt -lpthread BuildFiles/CrossLib/linux-x86-64bit/libssl.a BuildFiles/CrossLib/linux-x86-64bit/libcrypto.a -lreadline -lncurses -lz
+OPTIONS_LINK_DEBUG=-g -fsigned-char -lm -ldl -lrt BuildFiles/CrossLib/linux-x86-64bit/libssl.a BuildFiles/CrossLib/linux-x86-64bit/libcrypto.a -lpthread -lreadline -lncurses -lz
 
 OPTIONS_COMPILE_RELEASE=-DNDEBUG -DVPN_SPEED -DUNIX -DUNIX_LINUX -DCPU_64 -D_REENTRANT -DREENTRANT -D_THREAD_SAFE -D_THREADSAFE -DTHREAD_SAFE -DTHREADSAFE -D_FILE_OFFSET_BITS=64 -I./ -I./Cedar/ -I./Mayaqua/ -O2 -fsigned-char
 
-OPTIONS_LINK_RELEASE=-O2 -fsigned-char -lm -ldl -lrt -lpthread BuildFiles/CrossLib/linux-x86-64bit/libssl.a BuildFiles/CrossLib/linux-x86-64bit/libcrypto.a -lreadline -lncurses -lz
+OPTIONS_LINK_RELEASE=-O2 -fsigned-char -lm -ldl -lrt BuildFiles/CrossLib/linux-x86-64bit/libssl.a BuildFiles/CrossLib/linux-x86-64bit/libcrypto.a -lpthread -lreadline -lncurses -lz
 
 ifeq ($(DEBUG),YES)
 	OPTIONS_COMPILE=$(OPTIONS_COMPILE_DEBUG)
