@@ -276,14 +276,18 @@ void WideGetCurrentMachineIdMain(WT_MACHINE_ID *d)
 	Zero(d, sizeof(WT_MACHINE_ID));
 
 	// プロダクト ID
+#ifdef	OS_WIN32
 	WideGetWindowsProductId(product_id, sizeof(product_id));
 	Trim(product_id);
 	StrUpper(product_id);
+#endif  // OS_WIN32
 
 	// コンピュータ名
+#ifdef	OS_WIN32
 	MsGetComputerName(machine_name, sizeof(machine_name));
 	Trim(machine_name);
 	StrUpper(machine_name);
+#endif  // OS_WIN32
 
 	// IP アドレス
 	GetMachineIp(&ip);
@@ -291,7 +295,9 @@ void WideGetCurrentMachineIdMain(WT_MACHINE_ID *d)
 
 	// MAC アドレス
 	Zero(mac_address, sizeof(mac_address));
+#ifdef	OS_WIN32
 	MsGetPhysicalMacAddress(mac_address);
+#endif  // OS_WIN32
 
 	// RAM サイズ
 	Zero(&mem, sizeof(mem));
@@ -537,6 +543,7 @@ bool WideServerGetPcid(WIDE *w, char *pcid, UINT size)
 // 接続メインスレッド
 void WideServerConnectMainThread(THREAD *thread, void *param)
 {
+#ifdef	OS_WIN32
 	CONNECT_MAIN_THREAD_PARAM *p;
 	WIDE *w;
 	UINT ret;
@@ -720,6 +727,7 @@ LABEL_RETRY:
 			Wait(p->HaltEvent, interval);
 		}
 	}
+#endif  // OS_WIN32
 }
 
 // 接続スレッド
@@ -836,6 +844,7 @@ bool WideGetDontCheckCert(WIDE *w)
 // 証明書と秘密鍵の新規生成
 void WideServerGenerateCertAndKey(X **cert, K **key)
 {
+#ifdef	OS_WIN32
 	K *private_key, *public_key;
 	NAME *name;
 	wchar_t cn[MAX_PATH], o[MAX_PATH], ou[MAX_PATH];
@@ -869,6 +878,7 @@ void WideServerGenerateCertAndKey(X **cert, K **key)
 	FreeName(name);
 	FreeK(public_key);
 	FreeXSerial(serial);
+#endif  // OS_WIN32
 }
 
 // クライアント接続
@@ -1134,6 +1144,7 @@ UINT WideServerGetLoginInfo(WIDE *w, WIDE_LOGIN_INFO *info)
 // PCID 候補の取得
 UINT WideServerGetPcidCandidate(WIDE *w, char *name, UINT size, char *current_username)
 {
+#ifdef	OS_WIN32
 	PACK *r, *p;
 	char machine_name[MAX_PATH];
 	char computer_name[MAX_PATH];
@@ -1170,6 +1181,9 @@ UINT WideServerGetPcidCandidate(WIDE *w, char *name, UINT size, char *current_us
 	FreePack(p);
 
 	return ret;
+#else   // OS_WIN32
+	return ERR_NOT_SUPPORTED;
+#endif  // OS_WIN32
 }
 
 // WPC の呼び出し
@@ -1803,6 +1817,7 @@ void WideWriteSecurePackMain(UINT type, wchar_t *foldername, char *name, PACK *p
 }
 void WideWriteSecurePackEntry(UINT type, wchar_t *foldername, wchar_t *filename, PACK *p)
 {
+#ifdef	OS_WIN32
 	BUF *b;
 	char filename_a[MAX_PATH];
 	char foldername_a[MAX_PATH];
@@ -1869,6 +1884,7 @@ void WideWriteSecurePackEntry(UINT type, wchar_t *foldername, wchar_t *filename,
 	}
 
 	FreeBuf(b);
+#endif  // OS_WIN32
 }
 
 // Secure Pack を実際に読み込む
@@ -1891,6 +1907,7 @@ PACK *WideReadSecurePackMain(UINT type, wchar_t *foldername, char *name, bool fo
 }
 PACK *WideReadSecurePackEntry(UINT type, wchar_t *foldername, wchar_t *filename)
 {
+#ifdef	OS_WIN32
 	BUF *b = NULL;
 	PACK *p = NULL;
 	char filename_a[MAX_PATH];
@@ -1930,6 +1947,9 @@ PACK *WideReadSecurePackEntry(UINT type, wchar_t *foldername, wchar_t *filename)
 	}
 
 	return p;
+#else   // OS_WIN32
+	return NULL;
+#endif  // OS_WIN32
 }
 
 // バッファを Pack に変換する
@@ -2053,6 +2073,7 @@ BUF *WideWriteSecurePackConvertToBuf(wchar_t *filename, PACK *p)
 // Secure Pack の名前を生成する
 void WideGenerateSecurePackFileName(UINT type, wchar_t *filename, UINT size, wchar_t *foldername, char *name, bool for_user)
 {
+#ifdef	OS_WIN32
 	BUF *b;
 	char product_id[MAX_PATH];
 	char tmp[MAX_PATH];
@@ -2133,6 +2154,7 @@ void WideGenerateSecurePackFileName(UINT type, wchar_t *filename, UINT size, wch
 	FreeBuf(b);
 
 	StrToUni(filename, size, hash_str);
+#endif  // OS_WIN32
 }
 
 // Secure Pack を読み込む
@@ -2276,6 +2298,7 @@ void WideGetWindowsProductId(char *id, UINT size)
 }
 void WideGetWindowsProductIdMain(char *id, UINT size)
 {
+#ifdef	OS_WIN32
 	char *s;
 	// 引数チェック
 	if (id == NULL)
@@ -2302,6 +2325,7 @@ void WideGetWindowsProductIdMain(char *id, UINT size)
 	}
 
 	Free(s);
+#endif  // OS_WIN32
 }
 
 // セッションを Pack する

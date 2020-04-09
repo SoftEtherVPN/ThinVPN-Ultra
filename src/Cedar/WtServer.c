@@ -21,7 +21,9 @@ void WtsSessionMain(TSESSION *s)
 		return;
 	}
 
+#ifdef	OS_WIN32
 	MsSetThreadPriorityRealtime();
+#endif  // OS_WIN32
 
 	SetSockEvent(s->SockEvent);
 

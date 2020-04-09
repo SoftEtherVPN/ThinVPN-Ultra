@@ -106,20 +106,20 @@ void WtShuffleArray(void **p, UINT num)
 }
 
 // noderef.txt のキャッシュ用ファイル名を生成
-void WtGenerateNoderefCacheFilename(char *name, UINT size)
-{
-	char tmp[MAX_PATH];
-	UINT a;
-	UCHAR hash[SHA1_SIZE];
-
-	StrCpy(tmp, sizeof(tmp), MsGetExeFileName());
-	StrUpper(tmp);
-	HashSha1(hash, tmp, StrLen(tmp));
-	Copy(&a, hash, sizeof(UINT));
-
-	Format(tmp, sizeof(tmp), ".noderef-%u.txt", a);
-	ConbinePath(name, size, MsGetTempDir(), tmp);
-}
+//void WtGenerateNoderefCacheFilename(char *name, UINT size)
+//{
+//	char tmp[MAX_PATH];
+//	UINT a;
+//	UCHAR hash[SHA1_SIZE];
+//
+//	StrCpy(tmp, sizeof(tmp), MsGetExeFileName());
+//	StrUpper(tmp);
+//	HashSha1(hash, tmp, StrLen(tmp));
+//	Copy(&a, hash, sizeof(UINT));
+//
+//	Format(tmp, sizeof(tmp), ".noderef-%u.txt", a);
+//	ConbinePath(name, size, MsGetTempDir(), tmp);
+//}
 
 // noderef.txt の解析
 bool WtParseNodeRef(WT *wt, PACK *p, char *entrance, UINT entrance_size, UINT64 *timestamp)
@@ -177,43 +177,43 @@ PACK *WtGetPackFromBuf(WT *wt, BUF *buf)
 	return packet.Pack;
 }
 
-// noderef.txt キャッシュの読み込み
-bool WpcLoadNoderefCache(WT *wt, BUF **buf, char *entrance, UINT entrance_size, UINT64 *timestamp)
-{
-	PACK *p;
-	static UINT dummy = 0;
-	char filename[MAX_PATH];
-	// 引数チェック
-	if (wt == NULL || entrance == NULL || timestamp == NULL || buf == NULL)
-	{
-		return false;
-	}
-
-	WtGenerateNoderefCacheFilename(filename, sizeof(filename));
-
-	*buf = ReadDump(filename);
-	if (*buf == NULL)
-	{
-		return false;
-	}
-
-	p = WtGetPackFromBuf(wt, *buf);
-	if (p == NULL)
-	{
-		FreeBuf(*buf);
-		return false;
-	}
-
-	if (WtParseNodeRef(wt, p, entrance, entrance_size, timestamp) == false)
-	{
-		FreePack(p);
-		FreeBuf(*buf);
-		return false;
-	}
-
-	FreePack(p);
-	return true;
-}
+//// noderef.txt キャッシュの読み込み
+//bool WpcLoadNoderefCache(WT *wt, BUF **buf, char *entrance, UINT entrance_size, UINT64 *timestamp)
+//{
+//	PACK *p;
+//	static UINT dummy = 0;
+//	char filename[MAX_PATH];
+//	// 引数チェック
+//	if (wt == NULL || entrance == NULL || timestamp == NULL || buf == NULL)
+//	{
+//		return false;
+//	}
+//
+//	WtGenerateNoderefCacheFilename(filename, sizeof(filename));
+//
+//	*buf = ReadDump(filename);
+//	if (*buf == NULL)
+//	{
+//		return false;
+//	}
+//
+//	p = WtGetPackFromBuf(wt, *buf);
+//	if (p == NULL)
+//	{
+//		FreeBuf(*buf);
+//		return false;
+//	}
+//
+//	if (WtParseNodeRef(wt, p, entrance, entrance_size, timestamp) == false)
+//	{
+//		FreePack(p);
+//		FreeBuf(*buf);
+//		return false;
+//	}
+//
+//	FreePack(p);
+//	return true;
+//}
 
 // noderef.txt の取得
 bool WpcDownloadNoderef(WT *wt, char *url, BUF **buf, char *entrance, UINT entrance_size, UINT64 *timestamp, UINT *error)

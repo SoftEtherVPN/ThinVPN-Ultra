@@ -12,7 +12,10 @@
 // Build 8600
 
 #include "CedarPch.h"
+
+#ifdef _WIN32
 #include "..\PenCore\resource.h"
+#endif // _WIN32
 
 //// 指定された IP アドレスがプライベート IP アドレスかどうかチェックする
 //bool IsIPPrivate(IP *ip)
@@ -52,6 +55,7 @@
 // Bluetooth データ受信処理メイン
 void DsBluetoothMain(DS *ds, SOCKIO *sock)
 {
+#ifdef	OS_WIN32
 	UINT64 last_save_tick = 0;
 	// 引数チェック
 	if (ds == NULL || sock == NULL)
@@ -150,11 +154,13 @@ void DsBluetoothMain(DS *ds, SOCKIO *sock)
 	}
 
 	DsLog(ds, "DSL_BT_CLOSES");
+#endif  // OS_WIN32
 }
 
 // タスクトレイのアイコンを更新する
 void DsUpdateTaskIcon(DS *ds)
 {
+#ifdef	OS_WIN32
 	HICON hIcon;
 	LIST *o;
 	UINT num = 0;
@@ -229,6 +235,7 @@ void DsUpdateTaskIcon(DS *ds)
 	}
 
 	MsChangeIconOnTrayEx2((void *)hIcon, tmp, NULL, NULL, 0);
+#endif  // OS_WIN32
 }
 
 // ログの種類文字列を取得する
@@ -282,6 +289,7 @@ void DsLogEx(DS *ds, UINT ds_log_type, char *name, ...)
 
 void DsLogMain(DS *ds, UINT ds_log_type, char *name, va_list args)
 {
+#ifdef	OS_WIN32
 	wchar_t buf[MAX_SIZE * 2 + 64];
 	wchar_t buf2[MAX_SIZE * 2];
 	wchar_t *typestr = DsGetLogTypeStr(ds_log_type);
@@ -321,6 +329,7 @@ void DsLogMain(DS *ds, UINT ds_log_type, char *name, va_list args)
 	}
 
 	Debug("DS_LOG: %S\n", buf2);
+#endif  // OS_WIN32
 }
 
 // syslog 送信
@@ -501,6 +510,7 @@ void DsAddRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password)
 // サーバーとしてのメイン処理
 void DsServerMain(DS *ds, SOCKIO *sock)
 {
+#ifdef	OS_WIN32
 	IP client_ip;
 	char client_ip_str[MAX_PATH];
 	UINT client_port;
@@ -1256,6 +1266,7 @@ LABEL_END:
 		// URDP Server の停止
 		DeskStopUrdpServer(ds->UrdpServer);
 	}
+#endif  // OS_WIN32
 }
 
 // 認証失敗報告
@@ -1524,9 +1535,13 @@ DECLARE_SC("GetPcidCandidate", RPC_PCID, DtcGetPcidCandidate, InRpcPcid, OutRpcP
 // PCID 候補の取得
 UINT DtGetPcidCandidate(DS *ds, RPC_PCID *t)
 {
+#ifdef	OS_WIN32
 	Zero(t, sizeof(RPC_PCID));
 
 	return WideServerGetPcidCandidate(ds->Wide, t->Pcid, sizeof(t->Pcid), MsGetUserName());
+#else   // OS_WIN32
+	return ERR_NOT_SUPPORTED;
+#endif  // OS_WIN32
 }
 
 // インターネット接続設定の取得
@@ -1561,6 +1576,7 @@ UINT DtSetInternetSetting(DS *ds, INTERNET_SETTING *t)
 // 状態の取得
 UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 {
+#ifdef	OS_WIN32
 	HUB *h;
 	Zero(t, sizeof(RPC_DS_STATUS));
 
@@ -1608,6 +1624,9 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 	}
 
 	return ERR_NO_ERROR;
+#else   // OS_WIN32
+	return ERR_NOT_SUPPORTED;
+#endif  // OS_WIN32
 }
 
 // PCID の登録
@@ -1716,6 +1735,7 @@ void DsAcceptProc(THREAD *thread, SOCKIO *sock, void *param)
 // RPC 接続
 UINT DtcConnect(char *password, RPC **rpc)
 {
+#ifdef	OS_WIN32
 	SOCK *s;
 	PACK *p;
 	UINT ret;
@@ -1813,11 +1833,15 @@ UINT DtcConnect(char *password, RPC **rpc)
 	ReleaseSock(s);
 
 	return ERR_NO_ERROR;
+#else   // OS_WIN32
+	return ERR_NOT_SUPPORTED;
+#endif  // OS_WIN32
 }
 
 // RPC 処理メインプロシージャ
 void DsRpcMain(DS *ds, SOCK *s)
 {
+#ifdef	OS_WIN32
 	PACK *p;
 	bool ret;
 	UCHAR hashed_password[SHA1_SIZE];
@@ -1890,6 +1914,7 @@ void DsRpcMain(DS *ds, SOCK *s)
 	RpcFree(rpc);
 
 	DsSaveConfig(ds);
+#endif  // OS_WIN32
 }
 
 // リスナースレッド
@@ -2093,6 +2118,7 @@ void DsInitDefaultConfig(DS *ds)
 // 設定の正規化
 void DsNormalizeConfig(DS *ds)
 {
+#ifdef	OS_WIN32
 	// 引数チェック
 	if (ds == NULL)
 	{
@@ -2122,6 +2148,7 @@ void DsNormalizeConfig(DS *ds)
 			MsEnableRemoteDesktop();
 		}
 	}
+#endif  // OS_WIN32
 }
 
 // 設定の読み込み
@@ -2526,7 +2553,11 @@ void DsFreeConfig(DS *ds)
 // レジストリから RDP のポート番号を取得する
 UINT DsGetRdpPortFromRegistry()
 {
+#ifdef	OS_WIN32
 	return MsRegReadInt(REG_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp", "PortNumber");
+#else   // OS_WIN32
+	return 0;
+#endif  // OS_WIN32
 }
 
 // 設定初期化
@@ -2590,6 +2621,7 @@ void DsResetCertProc(WIDE *wide, void *param)
 // マスク値の計算
 UINT64 DsCalcMask(DS *ds)
 {
+#ifdef	OS_WIN32
 	UINT64 ret = 0;
 	// 引数チェック
 	if (ds == NULL)
@@ -2625,6 +2657,9 @@ UINT64 DsCalcMask(DS *ds)
 	}
 
 	return ret;
+#else   // OS_WIN32
+	return 0;
+#endif  // OS_WIN32
 }
 
 // 共有機能が無効化されているかどうか調べる
@@ -2670,6 +2705,7 @@ UINT DsGetCaps(DS *ds)
 // 指定された EXE ファイル名に共有を無効化するシグネチャが書いてあるかどうか検査する
 bool DsCheckShareDisableSignature(wchar_t *exe)
 {
+#ifdef	OS_WIN32
 	IO *io;
 	UINT size;
 	bool ret = false;
@@ -2703,11 +2739,15 @@ bool DsCheckShareDisableSignature(wchar_t *exe)
 	FileClose(io);
 
 	return ret;
+#else   // OS_WIN32
+	return false;
+#endif  // OS_WIN32
 }
 
 // Desktop VPN Server の初期化
 DS *NewDs(bool is_user_mode)
 {
+#ifdef	OS_WIN32
 	DS *ds;
 	X *cert;
 	K *key;
@@ -2794,11 +2834,15 @@ DS *NewDs(bool is_user_mode)
 	DsLog(ds, "DSL_START4");
 
 	return ds;
+#else   // OS_WIN32
+	return NULL;
+#endif  // OS_WIN32
 }
 
 // PowerKeep の設定に変更があった
 void DsUpdatePowerKeepSetting(DS *ds)
 {
+#ifdef	OS_WIN32
 	// 引数チェック
 	if (ds == NULL)
 	{
@@ -2819,6 +2863,7 @@ void DsUpdatePowerKeepSetting(DS *ds)
 		}
 	}
 	Unlock(ds->PowerKeepLock);
+#endif  // OS_WIN32
 }
 
 // 履歴のカウント
@@ -2931,6 +2976,7 @@ void DsUnlockHistory(DS *ds)
 // Desktop VPN Server の解放
 void FreeDs(DS *ds)
 {
+#ifdef	OS_WIN32
 	UINT i;
 	// 引数チェック
 	if (ds == NULL)
@@ -2994,6 +3040,7 @@ void FreeDs(DS *ds)
 	Free(ds);
 
 	FreeWinUi();
+#endif  // OS_WIN32
 }
 
 // 証明書の読み込み

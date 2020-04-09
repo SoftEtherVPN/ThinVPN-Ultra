@@ -60,226 +60,6 @@
 #include "Mon.h"
 
 
-HANDLE PdcOpen()
-{
-	DCB dcb;
-	COMMTIMEOUTS t;
-	HANDLE h = CreateFile("COM6", GENERIC_READ | GENERIC_WRITE,
-		0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
-	if (h == NULL)
-	{
-		return NULL;
-	}
-
-	Zero(&dcb, sizeof(dcb));
-
-	if (GetCommState(h, &dcb) == false)
-	{
-		CloseHandle(h);
-		return NULL;
-	}
-
-	if (BuildCommDCB("baud=600 parity=e data=8 stop=1", &dcb) == false)
-	{
-		CloseHandle(h);
-		return NULL;
-	}
-
-	if (SetCommState(h, &dcb) == false)
-	{
-		CloseHandle(h);
-		return NULL;
-	}
-
-	Zero(&t, sizeof(t));
-	if (GetCommTimeouts(h, &t) == false)
-	{
-		CloseHandle(h);
-		return NULL;
-	}
-
-	t.ReadIntervalTimeout = 1;
-	t.ReadTotalTimeoutConstant = 1;
-	t.ReadTotalTimeoutMultiplier = 0;
-
-	if (SetCommTimeouts(h, &t) == false)
-	{
-		CloseHandle(h);
-		return NULL;
-	}
-
-	return h;
-}
-
-void PdcClose(HANDLE h)
-{
-	CloseHandle(h);
-}
-
-bool PdcIsDempa(UCHAR code)
-{
-	if (code >= 0xc0 && code <= 0xcf)
-	{
-		return true;
-	}
-	return false;
-}
-
-void PdcRecvThread(THREAD *t, void *p)
-{
-	HANDLE h = (HANDLE)p;
-	UINT64 timeout = (1000 * 8 / 600) * 5;
-	UINT64 last = Tick64();
-
-	while (true)
-	{
-		BUF *b = NewBuf();
-		last = Tick64();
-
-		while (true)
-		{
-			// 1 バイト読む
-			UINT ret = 0;
-			UINT64 now;
-			UCHAR buf;
-
-			if (ReadFile(h, &buf, 1, &ret, NULL) == false)
-			{
-				ret = 0;
-			}
-
-			now = Tick64();
-
-			if (ret == 1)
-			{
-				WriteBuf(b, &buf, 1);
-				last = now;
-			}
-
-			if ((now - last) >= timeout)
-			{
-				break;
-			}
-		}
-
-		if (b->Size >= 1)
-		{
-			char tmp[MAX_PATH * 3];
-
-			BinToStrEx(tmp, sizeof(tmp), b->Buf, b->Size);
-
-			if (b->Size != 1 || PdcIsDempa(((UCHAR *)b->Buf)[0]) == false)
-			{
-				Print("[recv %2u] %s\n", b->Size, tmp);
-			}
-		}
-
-		FreeBuf(b);
-	}
-}
-
-void PdcSend(HANDLE h, void *buf, UINT size)
-{
-	UINT ret = 0;
-	WriteFile(h, buf, size, &ret, NULL);
-}
-
-void pdc_sendmode(HANDLE h)
-{
-	while (true)
-	{
-		char tmp[1024];
-		BUF *b;
-
-		Print("*\n");
-		GetLine(tmp, sizeof(tmp));
-
-		if (StrCmpi(tmp, "q") == 0)
-		{
-			return;
-		}
-
-		b = StrToBin(tmp);
-		if (b != NULL)
-		{
-			if (b->Size >= 1)
-			{
-				PdcSend(h, b->Buf, b->Size);
-			}
-
-			FreeBuf(b);
-		}
-	}
-}
-
-bool pdc_is_bad_cmd(UCHAR c)
-{
-	switch (c)
-	{
-	case 0x6E:
-	case 0x6F:
-		return true;
-	}
-	return false;
-}
-
-// Win32 用ファイル I/O データ
-typedef struct WIN32IO
-{
-	HANDLE hFile;
-	bool WriteMode;
-} WIN32IO;
-
-void pdc_randmode(HANDLE h)
-{
-	IO *o = FileCreate("c:\\tmp\\pdclog.log");
-	UINT i;
-	for (i = 0;;i++)
-	{
-		UCHAR c = Rand8();
-
-		if (pdc_is_bad_cmd(c) == false)
-		{
-			Print("0x%X\n", c);
-			PdcSend(h, &c, sizeof(c));
-			FileWrite(o, &c, 1);
-			//SleepThread(256);
-		}
-	}
-}
-
-// PDC Test
-void pdc_test(UINT num, char **arg)
-{
-	HANDLE h = PdcOpen();
-	if (h == NULL)
-	{
-		Print("PdcOpen() Failed.\n");
-		return;
-	}
-
-	NewThread(PdcRecvThread, (void *)h);
-
-	while (true)
-	{
-		char cmd[MAX_PATH];
-
-		Print("PDC>");
-		GetLine(cmd, sizeof(cmd));
-
-		if (StrCmpi(cmd, "s") == 0)
-		{
-			Print("Send Mode\n");
-			pdc_sendmode(h);
-		}
-		else if (StrCmpi(cmd, "r") == 0)
-		{
-			Print("Random Mode\n");
-			pdc_randmode(h);
-		}
-	}
-}
 
 void rdp_test_main(SOCKIO *sio, SOCK *s)
 {
@@ -559,15 +339,18 @@ void c_thread(THREAD *thread, void *param)
 
 void c_handle_selfkill(THREAD *t, void *p)
 {
+#ifdef	OS_WIN32
 	HANDLE h = (HANDLE)p;
 
 	WaitForSingleObject(h, INFINITE);
 	_exit(0);
+#endif  // OS_WIN32
 }
 
 // Client
 void c(UINT num, char **arg)
 {
+#ifdef	OS_WIN32
 	WT *wt = NewWtFromHamcore();
 	UINT code;
 	WT_CONNECT c;
@@ -721,6 +504,7 @@ void c(UINT num, char **arg)
 	WtcStop(wt);
 
 	ReleaseWt(wt);
+#endif  // OS_WIN32
 }
 
 
@@ -1072,6 +856,7 @@ static DS *dss = NULL;
 // プロセス開始関数
 void StartProcess()
 {
+#ifdef	OS_WIN32
 	// サーバーの開始
 	InitCedar();
 
@@ -1108,6 +893,7 @@ void StartProcess()
 	}
 
 	dss = NewDs(MsIsUserMode());
+#endif  // OS_WIN32
 }
 
 // プロセス終了関数
@@ -1123,7 +909,6 @@ void StopProcess()
 
 void test(UINT num, char **arg)
 {
-	Print("%u\n", Win32IsWindow10OrLater());
 }
 
 void cc(UINT num, char **arg)
@@ -1277,23 +1062,31 @@ void dc(UINT num, char **arg)
 
 void dg(UINT num, char **arg)
 {
+#ifdef	OS_WIN32
 	DGExec();
+#endif  // OS_WIN32
 }
 
 void du(UINT num, char **arg)
 {
+#ifdef	OS_WIN32
 	DUExec();
+#endif  // OS_WIN32
 }
 
 void di(UINT num, char **arg)
 {
+#ifdef	OS_WIN32
 	DIExec(false);
+#endif  // OS_WIN32
 }
 
 void diu(UINT num, char **arg)
 {
+#ifdef	OS_WIN32
 	//	DiDebugWithCommandLine("/UNINSTALL:1 /PRODUCT:1 /USERMODE:0 /PATH:\"C:\\Program Files\\Desktop VPN Server\"");
 	DIExec(false);
+#endif  // OS_WIN32
 }
 
 void rsa_test(UINT num, char **arg)
@@ -1340,6 +1133,7 @@ void rsa_test(UINT num, char **arg)
 
 void download_test(UINT num, char **arg)
 {
+#ifdef	OS_WIN32
 	char *pcid;
 	UINT size;
 	UINT ret;
@@ -1416,10 +1210,12 @@ void download_test(UINT num, char **arg)
 	}
 
 	WideClientStop(wide);
+#endif  // OS_WIN32
 }
 
 void ping_test(UINT num, char **arg)
 {
+#ifdef	OS_WIN32
 	char *pcid;
 	UINT count;
 	UINT ret;
@@ -1510,6 +1306,7 @@ void ping_test(UINT num, char **arg)
 	}
 
 	WideClientStop(wide);
+#endif  // OS_WIN32
 }
 
 void fs_dirr_test(BUF *buf, wchar_t *dirname, UINT depth)
@@ -1733,6 +1530,7 @@ void utftouni_test(UINT num, char **arg)
 
 void tcptable_test(UINT num, char **arg)
 {
+#ifdef	OS_WIN32
 	LIST *o;
 
 	o = Win32GetTcpTableListByGetExtendedTcpTable();
@@ -1749,6 +1547,7 @@ void tcptable_test(UINT num, char **arg)
 	Print("Win32GetTcpTableListByGetTcpTable\n");
 	PrintTcpTableList(o);
 	FreeTcpTableList(o);
+#endif  // OS_WIN32
 }
 
 void unitoutf_test(UINT num, char **arg)
@@ -1842,7 +1641,6 @@ TEST_LIST test_list[] =
 	{"ping", ping_test},
 	{"down", download_test},
 	{"clean", clean},
-	{"p", pdc_test},
 	{"sockio", sockio_test},
 	{"rsa", rsa_test},
 	{"fs", fs_test},
