@@ -1614,6 +1614,7 @@ bool WtGateConnectParamCheckSignature(WT_GATE_CONNECT_PARAM *g)
 	BUF *b;
 	K *k;
 	bool ret;
+	UCHAR hash[SHA1_SIZE];
 	// 引数チェック
 	if (g == NULL)
 	{
@@ -1633,7 +1634,10 @@ bool WtGateConnectParamCheckSignature(WT_GATE_CONNECT_PARAM *g)
 		return false;
 	}
 
-	ret = RsaVerify(b->Buf, b->Size, g->Signature, k);
+	HashSha1(hash, b->Buf, b->Size);
+
+	ret = RsaVerify(hash, sizeof(hash), g->Signature, k) ||
+		  RsaVerify(b->Buf, b->Size, g->Signature, k);
 
 	FreeK(k);
 	FreeBuf(b);
