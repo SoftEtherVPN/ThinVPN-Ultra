@@ -440,7 +440,7 @@ LANGLIST *GetBestLangByLangStr(LIST *o, char *str)
 			char *v = LIST_DATA(e->LangList, j);
 
 			if (StartWith(str, v) || StartWith(v, str))
-			{
+			{aa
 				return e;
 			}
 		}
