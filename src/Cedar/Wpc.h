@@ -165,9 +165,9 @@ struct WPC_ENTRY
 struct WPC_PACKET
 {
 	PACK *Pack;								// Pack (data body)
-	//UCHAR Hash[SHA1_SIZE];					// Data hash
-	//X *Cert;								// Certificate
-	//UCHAR Sign[128];						// Digital signature
+	UCHAR Hash[SHA1_SIZE];					// Data hash
+	X *Cert;								// Certificate
+	UCHAR Sign[128];						// Digital signature
 };
 
 // Reception callback

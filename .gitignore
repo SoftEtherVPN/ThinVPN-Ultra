@@ -90,3 +90,7 @@ mayaqua.key
 /src/object
 /src/bin/mkvpn_debugflag.txt
 /src/bin/hamcore/DeskSetup_nosign.exe
+/src/bin/widegate
+/src/abort_error_log.txt
+/src/bin/*.cer
+/src/bin/*.key
