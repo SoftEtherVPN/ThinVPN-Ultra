@@ -159,20 +159,19 @@ PACK *WtGetPackFromBuf(WT *wt, BUF *buf)
 		return NULL;
 	}
 
-	//if (packet.Cert == NULL)
-	//{
-	//	WpcFreePacket(&packet);
-	//	return NULL;
-	//}
+	if (packet.Cert == NULL)
+	{
+		WpcFreePacket(&packet);
+		return NULL;
+	}
 
-	//if (WtIsTrustedCert(wt, packet.Cert) == false)
-	//{
-	//	WpcFreePacket(&packet);
-	//	return NULL;
-	//}
+	if (WtIsTrustedCert(wt, packet.Cert) == false)
+	{
+		WpcFreePacket(&packet);
+		return NULL;
+	}
 
-
-	//FreeX(packet.Cert);
+	FreeX(packet.Cert);
 
 	return packet.Pack;
 }
@@ -285,21 +284,21 @@ PACK *WpcDownloadPack(WT *wt, char *url, BUF **buf)
 		return PackError(ERR_PROTOCOL_ERROR);
 	}
 
-	//if (packet.Cert == NULL)
-	//{
-	//	FreeBuf(recv);
-	//	WpcFreePacket(&packet);
-	//	return PackError(ERR_PROTOCOL_ERROR);
-	//}
+	if (packet.Cert == NULL)
+	{
+		FreeBuf(recv);
+		WpcFreePacket(&packet);
+		return PackError(ERR_PROTOCOL_ERROR);
+	}
 
-	//if (WtIsTrustedCert(wt, packet.Cert) == false)
-	//{
-	//	FreeBuf(recv);
-	//	WpcFreePacket(&packet);
-	//	return PackError(ERR_PROTOCOL_ERROR);
-	//}
+	if (WtIsTrustedCert(wt, packet.Cert) == false)
+	{
+		FreeBuf(recv);
+		WpcFreePacket(&packet);
+		return PackError(ERR_PROTOCOL_ERROR);
+	}
 
-	//FreeX(packet.Cert);
+	FreeX(packet.Cert);
 
 	*buf = recv;
 
@@ -506,19 +505,19 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key)
 
 	FreeBuf(recv);
 
-	//if (packet.Cert == NULL)
-	//{
-	//	WpcFreePacket(&packet);
-	//	return PackError(ERR_PROTOCOL_ERROR);
-	//}
+	if (packet.Cert == NULL)
+	{
+		WpcFreePacket(&packet);
+		return PackError(ERR_PROTOCOL_ERROR);
+	}
 
-	//if (WtIsTrustedCert(wt, packet.Cert) == false)
-	//{
-	//	WpcFreePacket(&packet);
-	//	return PackError(ERR_PROTOCOL_ERROR);
-	//}
+	if (WtIsTrustedCert(wt, packet.Cert) == false)
+	{
+		WpcFreePacket(&packet);
+		return PackError(ERR_PROTOCOL_ERROR);
+	}
 
-	//FreeX(packet.Cert);
+	FreeX(packet.Cert);
 
 	return packet.Pack;
 }

@@ -220,7 +220,7 @@ PACK *WpcCallEx2(char *url, INTERNET_SETTING *setting, UINT timeout_connect, UIN
 
 	FreeBuf(recv);
 
-//	FreeX(packet.Cert);
+	FreeX(packet.Cert);
 
 	return packet.Pack;
 }
@@ -235,7 +235,7 @@ void WpcFreePacket(WPC_PACKET *packet)
 	}
 
 	FreePack(packet->Pack);
-//	FreeX(packet->Cert);
+	FreeX(packet->Cert);
 }
 
 // Parse the packet
