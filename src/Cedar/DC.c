@@ -407,6 +407,7 @@ void DcEraseCandidate(DC *dc)
 // Default.rdp の書き換え (文字列)
 bool DcSetMstscRdpFileStr(char *key_name, char *value)
 {
+#ifdef	OS_WIN32
 	wchar_t name[MAX_PATH];
 	wchar_t key1[MAX_PATH];
 	wchar_t key1_crlf[MAX_PATH];
@@ -519,11 +520,15 @@ bool DcSetMstscRdpFileStr(char *key_name, char *value)
 	Free(s);
 
 	return ret;
+#else   // OS_WIN32
+	return false;
+#endif  // OS_WIN32
 }
 
 // Default.rdp の書き換え (整数)
 bool DcSetMstscRdpFileInt(char *key_name, UINT value)
 {
+#ifdef	OS_WIN32
 	wchar_t name[MAX_PATH];
 	wchar_t key1[MAX_PATH];
 	wchar_t key1_crlf[MAX_PATH];
@@ -589,6 +594,9 @@ bool DcSetMstscRdpFileInt(char *key_name, UINT value)
 	Free(s);
 
 	return ret;
+#else   // OS_WIN32
+	return false;
+#endif  // OS_WIN32
 }
 
 // Default.rdp の初期化
@@ -600,6 +608,7 @@ void DcInitMstscRdpFile()
 // rdp ファイルの書き込み
 bool DcWriteRdpFile(wchar_t *name, wchar_t *s)
 {
+#ifdef	OS_WIN32
 	BUF *b;
 	UCHAR bom[2];
 	bool ret;
@@ -621,6 +630,9 @@ bool DcWriteRdpFile(wchar_t *name, wchar_t *s)
 	FreeBuf(b);
 
 	return ret;
+#else   // OS_WIN32
+	return false;
+#endif  // OS_WIN32
 }
 
 // rdp ファイルの読み込み
@@ -678,6 +690,7 @@ wchar_t *DcReadRdpFile(wchar_t *name, bool *is_empty)
 // プロセスの終了まで待機する
 void DcWaitForProcessExit(void *h)
 {
+#ifdef	OS_WIN32
 	// 引数チェック
 	if (h == NULL)
 	{
@@ -686,11 +699,13 @@ void DcWaitForProcessExit(void *h)
 
 	Win32WaitProcess(h, INFINITE);
 	Win32CloseProcess(h);
+#endif  // OS_WIN32
 }
 
 // URDP Client を起動する
 void *DcRunUrdpClient(char *arg, UINT *process_id, UINT version)
 {
+#ifdef	OS_WIN32
 	wchar_t exe[MAX_PATH];
 	wchar_t arg_w[MAX_SIZE];
 	// 引数チェック
@@ -713,11 +728,15 @@ void *DcRunUrdpClient(char *arg, UINT *process_id, UINT version)
 	}
 
 	return Win32RunEx2W(exe, arg_w, false, process_id);
+#else   // OS_WIN32
+	return NULL;
+#endif  // OS_WIN32
 }
 
 // mstsc を起動する
 void *DcRunMstsc(DC *dc, wchar_t *mstsc_exe, char *arg, char *target, bool disable_share, UINT *process_id, bool *rdp_file_write_failed)
 {
+#ifdef	OS_WIN32
 	wchar_t *arg_w;
 	void *ret;
 	bool write_failed = false;
@@ -772,6 +791,9 @@ void *DcRunMstsc(DC *dc, wchar_t *mstsc_exe, char *arg, char *target, bool disab
 	Free(arg_w);
 
 	return ret;
+#else   // OS_WIN32
+	return NULL;
+#endif  // OS_WIN32
 }
 
 // URDP Client に渡す引数の取得
@@ -856,6 +878,7 @@ UINT DcGetMstscArguments(DC_SESSION *s, wchar_t *mstsc_exe, char *arg, UINT arg_
 // 設定の正規化
 void DcNormalizeConfig(DC *dc)
 {
+#ifdef	OS_WIN32
 	// 引数チェック
 	if (dc == NULL)
 	{
@@ -892,6 +915,7 @@ void DcNormalizeConfig(DC *dc)
 			dc->BluetoothDirInited = true;
 		}
 	}
+#endif  // OS_WIN32
 }
 
 // 現在の設定における mstsc.exe のパスを取得する
@@ -976,6 +1000,7 @@ static MSTSC_FILES mstsc_files[] =
 // mstsc をダウンロードしてパース
 UINT DcDownloadMstsc(DC *dc, WPC_RECV_CALLBACK *callback, void *callback_param)
 {
+#ifdef	OS_WIN32
 	UINT ret;
 	wchar_t mstsc_src[MAX_PATH];
 	wchar_t temp_dir[MAX_PATH];
@@ -1067,11 +1092,15 @@ UINT DcDownloadMstsc(DC *dc, WPC_RECV_CALLBACK *callback, void *callback_param)
 	}
 
 	return ERR_NO_ERROR;
+#else   // OS_WIN32
+	return ERR_NOT_SUPPORTED;
+#endif  // OS_WIN32
 }
 
 // mstsc をダウンロード
 UINT DcDownloadMstscExe(DC *dc, wchar_t *name, UINT name_size, wchar_t *tmp_dir_name, UINT tmp_dir_name_size, WPC_RECV_CALLBACK *callback, void *callback_param)
 {
+#ifdef	OS_WIN32
 	char mstsc_url[MAX_SIZE * 3];
 	char mstsc_referer_url[MAX_SIZE * 3];
 	wchar_t temp_dir[MAX_PATH];
@@ -1154,6 +1183,9 @@ UINT DcDownloadMstscExe(DC *dc, wchar_t *name, UINT name_size, wchar_t *tmp_dir_
 	FreeBuf(buf);
 
 	return ERR_NO_ERROR;
+#else   // OS_WIN32
+	return ERR_NOT_SUPPORTED;
+#endif  // OS_WIN32
 }
 
 // 環境文字列を取得
@@ -1184,6 +1216,7 @@ UINT DcGetEnvStr(DC *dc, char *name, char *str, UINT str_size)
 // 現在の設定における mstsc のバージョンを取得
 UINT DcGetCurrentMstscVersion(DC *dc)
 {
+#ifdef	OS_WIN32
 	if (MsIs64BitWindows() == false)
 	{
 		// 32bit
@@ -1203,6 +1236,9 @@ UINT DcGetCurrentMstscVersion(DC *dc)
 		}
 		return DcGetCurrentMstscVersionInner(dc);
 	}
+#else   // OS_WIN32
+	return 0;
+#endif  // OS_WIN32
 }
 UINT DcGetCurrentMstscVersionInner(DC *dc)
 {
@@ -1225,6 +1261,7 @@ UINT DcGetCurrentMstscVersionInner(DC *dc)
 // mstsc のバージョンを取得
 UINT DcGetMstscVersion(wchar_t *name)
 {
+#ifdef	OS_WIN32
 	if (MsIs64BitWindows() == false)
 	{
 		// 32bit
@@ -1244,9 +1281,13 @@ UINT DcGetMstscVersion(wchar_t *name)
 		}
 		return DcGetMstscVersionInner(name);
 	}
+#else   // OS_WIN32
+	return 0;
+#endif  // OS_WIN32
 }
 UINT DcGetMstscVersionInner(wchar_t *name)
 {
+#ifdef	OS_WIN32
 	UINT v1, v2, v3, v4;
 	UINT os_type = GetOsInfo()->OsType;
 	bool is_nt = OS_IS_WINDOWS_NT(os_type);
@@ -1277,11 +1318,15 @@ UINT DcGetMstscVersionInner(wchar_t *name)
 
 	// より古いバージョン
 	return 0;
+#else   // OS_WIN32
+	return 0;
+#endif  // OS_WIN32
 }
 
 // system32 上の mstsc ファイル名を取得
 void DcGetMstscPathOnSystem32(wchar_t *name, UINT size)
 {
+#ifdef	OS_WIN32
 	// 引数チェック
 	if (name == NULL)
 	{
@@ -1289,11 +1334,13 @@ void DcGetMstscPathOnSystem32(wchar_t *name, UINT size)
 	}
 
 	ConbinePathW(name, size, MsGetSystem32DirW(), L"mstsc.exe");
+#endif  // OS_WIN32
 }
 
 // system32 ディレクトリに mstsc がインストールされているかどうか確認
 bool DcIsMstscInstalledOnSystem32()
 {
+#ifdef	OS_WIN32
 	if (MsIs64BitWindows() == false)
 	{
 		// 32bit
@@ -1314,6 +1361,9 @@ bool DcIsMstscInstalledOnSystem32()
 
 		return DcIsMstscInstalledOnSystem32Inner();
 	}
+#else   // OS_WIN32
+	return false;
+#endif  // OS_WIN32
 }
 bool DcIsMstscInstalledOnSystem32Inner()
 {
@@ -2366,6 +2416,7 @@ SOCK *DcListen()
 // 接続メイン
 UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection)
 {
+#ifdef	OS_WIN32
 	PACK *p;
 	UINT ret;
 	bool b;
@@ -2597,6 +2648,9 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 	SockIoSetTimeout(sock, INFINITE);
 
 	return ERR_NO_ERROR;
+#else   // OS_WIN32
+	return ERR_NOT_SUPPORTED;
+#endif  // OS_WIN32
 }
 
 // 接続

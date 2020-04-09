@@ -16,6 +16,7 @@
 // AppData ディレクトリの取得
 void DeskGetAppDataDir(wchar_t *name, UINT name_size)
 {
+#ifdef	OS_WIN32
 	// 引数チェック
 	if (name == NULL)
 	{
@@ -24,11 +25,13 @@ void DeskGetAppDataDir(wchar_t *name, UINT name_size)
 
 	ConbinePathW(name, name_size, MsGetPersonalAppDataDirW(), L"Desktop VPN Settings");
 	MakeDirW(name);
+#endif  // OS_WIN32
 }
 
 // AppData ディレクトリの取得 (古い)
 void DeskGetAppDataDirOld(wchar_t *name, UINT name_size)
 {
+#ifdef	OS_WIN32
 	// 引数チェック
 	if (name == NULL)
 	{
@@ -36,6 +39,7 @@ void DeskGetAppDataDirOld(wchar_t *name, UINT name_size)
 	}
 
 	ConbinePathW(name, name_size, MsGetPersonalAppDataDirW(), L"Desktop VPN Datas");
+#endif  // OS_WIN32
 }
 
 // マシンキーの取得
@@ -44,7 +48,7 @@ void DeskGetMachineKey(void *data)
 	BUF *b;
 	char name[64];
 	char ip_str[64];
-	char product_id[MAX_PATH];
+	char product_id[MAX_PATH] = {0};
 	IP ip;
 	OS_INFO *osinfo;
 	// 引数チェック
@@ -53,7 +57,9 @@ void DeskGetMachineKey(void *data)
 		return;
 	}
 
+#ifdef	OS_WIN32
 	WideGetWindowsProductId(product_id, sizeof(product_id));
+#endif  // OS_WIN32
 
 	b = NewBuf();
 	GetMachineName(name, sizeof(name));
@@ -254,6 +260,7 @@ bool DeskWaitReadyForUrdpServer()
 // RPC が有効になるまで待つ
 bool DeskWaitReadyForDeskServerRpc(void *hWnd)
 {
+#ifdef	OS_WIN32
 	UINT64 start_time = Tick64();
 
 	while (true)
@@ -277,19 +284,24 @@ bool DeskWaitReadyForDeskServerRpc(void *hWnd)
 			return true;
 		}
 	}
+#else   // OS_WIN32
+	return false;
+#endif  // OS_WIN32
 }
 
 // urdpserver.exe の名前を取得
 void DeskGetUrdpServerExeName(wchar_t *name, UINT size, UINT version)
 {
-	UINT id;
+	UINT id = 0;
 	// 引数チェック
 	if (name == NULL)
 	{
 		return;
 	}
 
+#ifdef	OS_WIN32
 	id = MsGetCurrentTerminalSessionId();
+#endif  // OS_WIN32
 
 	//UniFormat(name, size, L"urdpserver_%u.exe", id);
 	if (version == 2)
@@ -305,6 +317,7 @@ void DeskGetUrdpServerExeName(wchar_t *name, UINT size, UINT version)
 // 古い URDP Server のプロセスを停止させる
 void DeskTerminateOldUrdpProcesses(UINT version)
 {
+#ifdef	OS_WIN32
 	UINT i;
 	wchar_t exe[MAX_PATH];
 	LIST *o = MsGetProcessList();
@@ -322,6 +335,7 @@ void DeskTerminateOldUrdpProcesses(UINT version)
 	}
 
 	MsFreeProcessList(o);
+#endif  // OS_WIN32
 }
 
 // RUDP Server を Program Files ディレクトリにインストールする
@@ -342,12 +356,15 @@ bool DeskInstallRudpServerToProgramFilesDir()
 // Program Files 内の RUDP Server をインストールすべきディレクトリ名の取得
 void DeskGetRudpServerProgramFilesDir(wchar_t *dir, UINT size)
 {
+#ifdef	OS_WIN32
 	CombinePathW(dir, size, MsGetProgramFilesDirW(), L"Common Files\\Desktop VPN Server RUDP Helper");
+#endif  // OS_WIN32
 }
 
 // URDP Server の開始
 void DeskStartUrdpServer(URDP_SERVER *u, UINT version)
 {
+#ifdef	OS_WIN32
 	wchar_t exe[MAX_PATH];
 	// 引数チェック
 	if (u == NULL)
@@ -418,11 +435,13 @@ RUN_NEW_PROCESS:
 		u->Counter++;
 	}
 	Unlock(u->Lock);
+#endif  // OS_WIN32
 }
 
 // URDP Server の停止
 void DeskStopUrdpServer(URDP_SERVER *u)
 {
+#ifdef	OS_WIN32
 	// 引数チェック
 	if (u == NULL)
 	{
@@ -447,6 +466,7 @@ void DeskStopUrdpServer(URDP_SERVER *u)
 		}
 	}
 	Unlock(u->Lock);
+#endif  // OS_WIN32
 }
 
 // URDP Server 管理の初期化
@@ -477,6 +497,7 @@ void DeskFreeUrdpServer(URDP_SERVER *u)
 // URDP ファイルの初期化
 bool DeskInitUrdpFiles(wchar_t *dst_dir, bool rudp_server_manifest, bool overwrite)
 {
+#ifdef	OS_WIN32
 	wchar_t dst[MAX_PATH];
 
 	if (dst_dir == NULL)
@@ -597,11 +618,15 @@ bool DeskInitUrdpFiles(wchar_t *dst_dir, bool rudp_server_manifest, bool overwri
 	}
 
 	return true;
+#else   // OS_WIN32
+	return false;
+#endif  // OS_WIN32
 }
 
 // UAC の設定を緩和する
 void DeskMitigateUacSetting()
 {
+#ifdef	OS_WIN32
 	if (MsIsVista() == false)
 	{
 		return;
@@ -610,11 +635,13 @@ void DeskMitigateUacSetting()
 	MsRegWriteInt(REG_LOCAL_MACHINE,
 		"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System",
 		"PromptOnSecureDesktop", 0);
+#endif  // OS_WIN32
 }
 
 // UAC の設定が厳しいかどうか取得する
 bool DeskIsUacSettingStrict()
 {
+#ifdef	OS_WIN32
 	if (MsIsVista() == false)
 	{
 		return false;
@@ -628,4 +655,7 @@ bool DeskIsUacSettingStrict()
 	}
 
 	return true;
+#else   // OS_WIN32
+	return false;
+#endif  // OS_WIN32
 }
