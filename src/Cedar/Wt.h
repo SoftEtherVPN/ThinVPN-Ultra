@@ -52,6 +52,10 @@
 // ローカルディレクトリの EntryPoint のファイル名
 #define LOCAL_ENTRY_POINT_FILENAME		"@EntryPoint.dat"
 
+#define ENTRANCE_URL_TIME_REPLACE_TAG	"__TIME__"
+
+#define ENTRANCE_URL_TIME_UPDATE_MSECS	(5 * 60 * 1000)		// 5 分間ごとに更新
+
 // ポート番号
 #define WT_PORT					443
 

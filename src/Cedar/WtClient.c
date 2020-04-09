@@ -296,19 +296,8 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 
 	SystemTime(&tm);
 
-	// 2034 年以降の Fail Safe (2038 年問題への対応)
-	if (tm.wYear < 2034 && connect->DontCheckCert == false)
+	if (connect->DontCheckCert == false)
 	{
-		// 証明書の有効期限のチェック
-		if (CheckXDateNow(s->RemoteX) == false)
-		{
-			// 失敗
-			Debug("CheckXDateNow Failed.\n");
-			Disconnect(s);
-			ReleaseSock(s);
-			return ERR_SSL_X509_EXPIRED;
-		}
-
 		// 証明書のチェック
 		if (WtIsTrustedCert(wt, s->RemoteX) == false)
 		{

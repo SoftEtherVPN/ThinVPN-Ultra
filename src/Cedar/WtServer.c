@@ -490,18 +490,8 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 
 	SystemTime(&tm);
 
-	if (tm.wYear < 2034 && session->ConnectParam->DontCheckCert == false)
+	if (session->ConnectParam->DontCheckCert == false)
 	{
-		// 2034 年以降の Fail Safe (2038 年問題への対応)
-		// 証明書の有効期限のチェック
-		if (CheckXDateNow(s->RemoteX) == false)
-		{
-			// 失敗
-			Debug("CheckXDateNow Failed.\n");
-			session->ErrorCode = ERR_SSL_X509_EXPIRED;
-			return;
-		}
-
 		// 証明書のチェック
 		if (WtIsTrustedCert(wt, s->RemoteX) == false)
 		{

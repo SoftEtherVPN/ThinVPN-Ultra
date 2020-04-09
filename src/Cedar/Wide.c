@@ -2858,6 +2858,10 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size)
 	char url_tmp[MAX_SIZE];
 	X *cert_tmp;
 
+	UINT64 now = SystemTime64();
+
+	UINT64 secs = now / (UINT64)ENTRANCE_URL_TIME_UPDATE_MSECS;
+
 	BUF *buf = ReadDump(LOCAL_ENTRY_POINT_FILENAME);
 
 	Zero(url_tmp, sizeof(url_tmp));
@@ -2906,7 +2910,11 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size)
 
 	if (url != NULL)
 	{
-		StrCpy(url, url_size, url_tmp);
+		char secs_str[MAX_SIZE];
+
+		ToStr64(secs_str, secs);
+
+		ReplaceStrEx(url, url_size, url_tmp, ENTRANCE_URL_TIME_REPLACE_TAG, secs_str, false);
 	}
 
 	if (cert != NULL)

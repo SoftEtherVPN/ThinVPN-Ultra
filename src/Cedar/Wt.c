@@ -864,16 +864,16 @@ bool WtIsTrustedCert(WT *wt, X *cert)
 		return false;
 	}
 
-	if (CheckXDateNow(cert) == false)
-	{
-		// 有効期限切れ
-		return false;
-	}
-
 	if (CompareX(wt->MasterCert, cert))
 	{
 		// マスター証明書
 		return true;
+	}
+
+	if (CheckXDateNow(cert) == false)
+	{
+		// 有効期限切れ
+		return false;
 	}
 
 	if (CheckX(cert, wt->MasterCert))
