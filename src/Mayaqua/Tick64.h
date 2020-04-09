@@ -106,7 +106,12 @@
 #define	TICK64_H
 
 // Maximum number of correction list entries
+
+#ifndef	CEDAR_DESKVPN
 #define	MAX_ADJUST_TIME				1024
+#else	// CEDAR_DESKVPN
+#define	MAX_ADJUST_TIME				32
+#endif	// CEDAR_DESKVPN
 
 // Correction list entry
 struct ADJUST_TIME
