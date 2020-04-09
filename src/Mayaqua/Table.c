@@ -448,6 +448,16 @@ LANGLIST *GetBestLangByLangStr(LIST *o, char *str)
 
 	ret = GetBestLangByName(o, "en");
 
+	if (ret == NULL)
+	{
+		for (i = 0;i < LIST_NUM(o);i++)
+		{
+			LANGLIST *e = LIST_DATA(o, i);
+
+			return e;
+		}
+	}
+
 	return ret;
 }
 
