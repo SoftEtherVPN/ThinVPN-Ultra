@@ -9225,7 +9225,7 @@ CANCEL *UnixNewCancel()
 void UnixJoinSockToSockEvent(SOCK *sock, SOCK_EVENT *event)
 {
 	// Validate arguments
-	if (sock == NULL || event == NULL || sock->AsyncMode)
+	if (sock == NULL || event == NULL || sock->AsyncMode || sock->Disconnecting)
 	{
 		return;
 	}
