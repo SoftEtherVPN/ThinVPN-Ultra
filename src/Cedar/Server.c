@@ -5375,7 +5375,7 @@ void SiLoadHubCfg(SERVER *s, FOLDER *f, char *name)
 #ifndef	CEDAR_DESKVPN
 		SiLoadHubLogCfg(&g, CfgGetFolder(f, "LogSetting"));
 		SetHubLogSetting(h, &g);
-#endif	CEDAR_DESKVPN
+#endif	// CEDAR_DESKVPN
 
 #ifndef	CEDAR_DESKVPN
 		// Online / Offline flag

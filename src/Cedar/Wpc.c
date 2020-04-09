@@ -720,7 +720,7 @@ BUF *HttpRequestEx4(URL_DATA *data, INTERNET_SETTING *setting,
 					UINT timeout_connect, UINT timeout_comm,
 					UINT *error_code, bool check_ssl_trust, char *post_data,
 					WPC_RECV_CALLBACK *recv_callback, void *recv_callback_param, void *sha1_cert_hash, UINT num_hashes,
-					bool *cancel, UINT max_recv_size, char *header_name, char *header_value, struct WT *wt)
+					bool *cancel, UINT max_recv_size, char *header_name, char *header_value, WT *wt)
 {
 	WPC_CONNECT con;
 	SOCK *s;

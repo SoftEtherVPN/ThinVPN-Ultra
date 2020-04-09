@@ -1069,6 +1069,7 @@ typedef struct CEDAR
 
 // Type
 #include <Cedar/CedarType.h>
+#include <Cedar/WtType.h>
 // Account Manager
 #include <Cedar/Account.h>
 // Listener module

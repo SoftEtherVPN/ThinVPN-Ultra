@@ -79,7 +79,10 @@ struct DS
 	bool SupportEventLog;				// イベントログをサポートしているかどうか
 	LIST *History;						// 接続受付履歴
 	LIST *RadiusCacheList;				// Radius キャッシュリスト
+
+#ifdef OS_WIN32
 	MS_ISLOCKED *IsLocked;				// ロックされているかどうかの状態管理
+#endif // OS_WIN32
 
 	// 設定データ
 	bool PowerKeep;						// 電源維持機能を使用するかどうか
