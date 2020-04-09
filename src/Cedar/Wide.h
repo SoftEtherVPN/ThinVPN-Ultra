@@ -200,6 +200,8 @@ void WideSessionInfoCacheDel(LIST *o, char *pcid);
 LIST *WideInitSessionInfoCache();
 void WideFreeSessionInfoCache(LIST *o);
 
+void WideLoadEntryPoint(X **cert, char *url, UINT url_size);
+
 
 // WideClient
 WIDE *WideClientStart(char *svc_name, UINT se_lang);

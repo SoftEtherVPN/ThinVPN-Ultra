@@ -2852,3 +2852,70 @@ bool WideServerLoadLocalKeyFromBuffer(BUF *buf, K **k, X **x)
 	return true;
 }
 
+// ローカルディレクトリの EnterPoint.txt を読み込む (2020 年改造の新方式)
+void WideLoadEntryPoint(X **cert, char *url, UINT url_size)
+{
+	char url_tmp[MAX_SIZE];
+	X *cert_tmp;
+
+	BUF *buf = ReadDump(LOCAL_ENTRY_POINT_FILENAME);
+
+	Zero(url_tmp, sizeof(url_tmp));
+
+	if (buf == NULL)
+	{
+		Alert("Failed to find the local EntryPoint.dat file. Please re-install the software.", DESK_PROTUCE_NAME_SUITE);
+		_exit(1);
+	}
+
+	cert_tmp = BufToX(buf, true);
+
+	if (cert_tmp == NULL)
+	{
+		Alert("Failed to parse the local EntryPoint.dat file. Please re-install the software.", DESK_PROTUCE_NAME_SUITE);
+		_exit(1);
+	}
+
+	SeekBufToBegin(buf);
+
+	ClearStr(url, url_size);
+
+	while (true)
+	{
+		char *line = CfgReadNextLine(buf);
+		if (line == NULL)
+		{
+			break;
+		}
+
+		if (StartWith(line, "http://") || StartWith(line, "https://"))
+		{
+			StrCpy(url_tmp, sizeof(url_tmp), line);
+		}
+
+		Free(line);
+	}
+
+	FreeBuf(buf);
+
+	if (IsEmptyStr(url_tmp))
+	{
+		Alert("Failed to parse the local EntryPoint.dat file. Please re-install the software.", DESK_PROTUCE_NAME_SUITE);
+		_exit(1);
+	}
+
+	if (url != NULL)
+	{
+		StrCpy(url, url_size, url_tmp);
+	}
+
+	if (cert != NULL)
+	{
+		*cert = cert_tmp;
+	}
+	else
+	{
+		FreeX(cert_tmp);
+	}
+}
+

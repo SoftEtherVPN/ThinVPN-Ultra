@@ -889,12 +889,9 @@ bool WtIsTrustedCert(WT *wt, X *cert)
 WT *NewWtFromHamcore()
 {
 	WT *wt;
-	X *master_cert = FileToX(HAMCORE_MASTER_CERT_FILENAME);
+	X *master_cert;
 
-	if (master_cert == NULL)
-	{
-		return NULL;
-	}
+	WideLoadEntryPoint(&master_cert, NULL, 0);
 
 	wt = NewWt(master_cert);
 

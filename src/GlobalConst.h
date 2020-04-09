@@ -12,6 +12,8 @@
 
 
 //// For DeskVPN
+#define	DESK_PROTUCE_NAME_SUITE			"Desktop VPN"
+
 #define DESK_PUBLISHER_NAME_UNICODE		L"IPA CyberLab"				// 元: L"SoftEther Corporation"
 #define DESK_PUBLISHER_NAME_ANSI		"IPA CyberLab"				// 元: "SoftEther Corporation"
 #define	DESK_SECURE_PACK_NAME			"IPA_DESK_SERVER"			// 元: "DESK_SERVER"

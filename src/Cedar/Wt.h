@@ -48,15 +48,9 @@
 // SNI 文字列
 #define WT_SNI_STRING_V2				"wt_v2"
 
-// デフォルトの hamcore 内の Master 証明書のファイル名
-#define HAMCORE_MASTER_CERT_FILENAME	"|Master.cer"
 
-// NodeRefUrl.txt のファイル名
-#define HAMCORE_NODEREFURL_FILENAME		"|NodeRefUrl.txt"
-#define HAMCORE_NODEREFURL_FILENAME2	"@NodeRefUrl.txt"
-
-// ローカルの Entrance URL のファイル名
-#define LOCAL_ENTRANCE_URL_FILENAME		"@Entrance.txt"
+// ローカルディレクトリの EntryPoint のファイル名
+#define LOCAL_ENTRY_POINT_FILENAME		"@EntryPoint.dat"
 
 // ポート番号
 #define WT_PORT					443

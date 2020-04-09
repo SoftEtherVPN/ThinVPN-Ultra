@@ -37,228 +37,25 @@ UINT WpcCommCheck(WT *wt)
 // Entrance URL を取得 (キャッシュ付き)
 UINT WpcGetEntranceUrlEx(WT *wt, char *entrance, UINT entrance_size, UINT cache_expires)
 {
-	UINT ret;
-	// 引数チェック
-	if (wt == NULL || entrance == NULL)
-	{
-		return ERR_INTERNAL_ERROR;
-	}
+	WideLoadEntryPoint(NULL, entrance, entrance_size);
 
-	if (IsEmptyStr(wt->FixedEntranceUrl) == false)
-	{
-		StrCpy(entrance, entrance_size, wt->FixedEntranceUrl);
-		return ERR_NO_ERROR;
-	}
-
-	if (WpcGetEntranceUrlFromLocalFile(wt, entrance, entrance_size))
-	{
-		return ERR_NO_ERROR;
-	}
-
-	Lock(wt->EntranceCacheLock);
-	{
-		if ((wt->EntranceCacheTimestamp + (UINT64)cache_expires) > Tick64() && wt->EntranceCacheTimestamp != 0)
-		{
-			StrCpy(entrance, entrance_size, wt->EntranceCache);
-			ret = ERR_NO_ERROR;
-		}
-		else
-		{
-			ret = WpcGetEntranceUrl(wt, entrance, entrance_size);
-			if (ret == ERR_NO_ERROR)
-			{
-				wt->EntranceCacheTimestamp = Tick64();
-				StrCpy(wt->EntranceCache, sizeof(wt->EntranceCache), entrance);
-			}
-		}
-	}
-	Unlock(wt->EntranceCacheLock);
-
-	return ret;
+	return ERR_NO_ERROR;
 }
 
 // Entrance URL を取得 (ローカルディレクトリから)
 bool WpcGetEntranceUrlFromLocalFile(WT *wt, char *entrance, UINT entrance_size)
 {
-	BUF *b;
-	bool ret = false;
-	char *s;
-	// 引数チェック
-	if (wt == NULL || entrance == NULL)
-	{
-		return false;
-	}
+	WideLoadEntryPoint(NULL, entrance, entrance_size);
 
-	b = ReadDump(LOCAL_ENTRANCE_URL_FILENAME);
-	if (b == NULL)
-	{
-		return false;
-	}
-
-	while (true)
-	{
-		s = CfgReadNextLine(b);
-
-		if (s == NULL)
-		{
-			break;
-		}
-
-		Trim(s);
-
-		if (IsEmptyStr(s) == false)
-		{
-			StrCpy(entrance, entrance_size, s);
-
-			ret = true;
-		}
-
-		Free(s);
-	}
-
-	FreeBuf(b);
-
-	return ret;
+	return true;
 }
 
 // Entrance URL を取得
 UINT WpcGetEntranceUrl(WT *wt, char *entrance, UINT entrance_size)
 {
-	LIST *o;
-	UINT64 cache_timestamp = 0;
-	char cache_entrance[MAX_PATH];
-	BUF *cache_buf = NULL;
-	UINT64 download_timestamp = 0;
-	char download_entrance[MAX_PATH];
-	BUF *download_buf = NULL;
-	UINT i;
-	UINT err;
-	UINT64 start_tick;
-	// 引数チェック
-	if (wt == NULL || entrance == NULL)
-	{
-		return ERR_INTERNAL_ERROR;
-	}
-
-	// キャッシュのデータを取得
-	if (WpcLoadNoderefCache(wt, &cache_buf, cache_entrance, sizeof(cache_entrance),
-		&cache_timestamp))
-	{
-		FreeBuf(cache_buf);
-	}
-	else
-	{
-		cache_timestamp = 0;
-	}
-
-	// インターネットからダウンロード
-	o = WtLoadNodeRefUrlList();
-
-	err = ERR_CONNECT_FAILED;
-
-	start_tick = Tick64();
-
-	for (i = 0;i < LIST_NUM(o);i++)
-	{
-		char *url = LIST_DATA(o, i);
-		UINT error_code;
-
-		download_timestamp = 0;
-		if (WpcDownloadNoderef(wt, url, &download_buf, download_entrance,
-			sizeof(download_entrance), &download_timestamp, &error_code) == false)
-		{
-			err = error_code;
-			if (WideIsProxyError(err))
-			{
-				// Proxy が原因のエラーの場合は直ちに終了する
-				break;
-			}
-		}
-		else
-		{
-			err = ERR_NO_ERROR;
-			break;
-		}
-
-		if ((start_tick + 20000ULL) <= Tick64())
-		{
-			break;
-		}
-	}
-
-	if (download_timestamp == 0)
-	{
-		// ダウンロード失敗
-		WtFreeNodeRefUrlList(o);
-		return err;
-	}
-
-	if (download_timestamp >= cache_timestamp)
-	{
-		// キャッシュに保存
-		char cache_filename[MAX_PATH];
-
-		WtGenerateNoderefCacheFilename(cache_filename, sizeof(cache_filename));
-		DumpBuf(download_buf, cache_filename);
-
-		StrCpy(entrance, entrance_size, download_entrance);
-	}
-	else
-	{
-		StrCpy(entrance, entrance_size, cache_entrance);
-	}
-
-	FreeBuf(download_buf);
-
-	WtFreeNodeRefUrlList(o);
+	WideLoadEntryPoint(NULL, entrance, entrance_size);
 
 	return ERR_NO_ERROR;
-}
-
-// noderef.txt リストの読み込み
-LIST *WtLoadNodeRefUrlList()
-{
-	BUF *buf;
-	LIST *o;
-
-	buf = ReadDump(HAMCORE_NODEREFURL_FILENAME2);
-
-	if (buf == NULL)
-	{
-		buf = ReadDump(HAMCORE_NODEREFURL_FILENAME);
-	}
-	if (buf == NULL)
-	{
-		return NULL;
-	}
-
-	o = NewListFast(NULL);
-
-	while (true)
-	{
-		char *s = CfgReadNextLine(buf);
-		if (s == NULL)
-		{
-			break;
-		}
-
-		Trim(s);
-
-		if (IsEmptyStr(s) == false)
-		{
-			Add(o, s);
-		}
-		else
-		{
-			Free(s);
-		}
-	}
-
-	FreeBuf(buf);
-
-	WtShuffleArray(o->p, LIST_NUM(o));
-
-	return o;
 }
 
 // noderef.txt リストの解放
