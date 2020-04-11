@@ -903,7 +903,7 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 		PackAddInt(r, "Ver", ver);
 		PackAddInt(r, "Build", build);
 		PackAddData(r, "ClientId", w->ClientId, sizeof(w->ClientId));
-		p = WideCall(w, "ClientConnect", r);
+		p = WideCall(w, "ClientConnect", r, false);
 		FreePack(r);
 
 		ret = GetErrorFromPack(p);
@@ -976,7 +976,7 @@ UINT WideServerConnect(WIDE *w, WT_CONNECT *c)
 	r = NewPack();
 
 	PackAddInt64(r, "ServerMask64", w->ServerMask64);
-	p = WideCall(w, "ServerConnect", r);
+	p = WideCall(w, "ServerConnect", r, false);
 	FreePack(r);
 
 	ret = GetErrorFromPack(p);
@@ -1024,7 +1024,7 @@ UINT WideGetEnvStr(WIDE *w, char *name, char *ret_str, UINT ret_size)
 	r = NewPack();
 	PackAddStr(r, "Name", name);
 
-	p = WideCall(w, "GetEnvStr", r);
+	p = WideCall(w, "GetEnvStr", r, false);
 	FreePack(r);
 
 	ret = GetErrorFromPack(p);
@@ -1056,7 +1056,7 @@ UINT WideServerRenameMachine(WIDE *w, char *new_name)
 	r = NewPack();
 	PackAddStr(r, "NewName", new_name);
 
-	p = WideCall(w, "RenameMachine", r);
+	p = WideCall(w, "RenameMachine", r, false);
 	FreePack(r);
 
 	ret = GetErrorFromPack(p);
@@ -1093,7 +1093,7 @@ UINT WideServerRegistMachine(WIDE *w, char *pcid, X *cert, K *key)
 	PackAddStr(r, "SvcName", w->SvcName);
 	PackAddStr(r, "Pcid", pcid);
 
-	p = WtWpcCall(wt, "RegistMachine", r, cert, key);
+	p = WtWpcCall(wt, "RegistMachine", r, cert, key, false);
 	FreePack(r);
 
 	ret = GetErrorFromPack(p);
@@ -1115,7 +1115,7 @@ UINT WideServerGetLoginInfo(WIDE *w, WIDE_LOGIN_INFO *info)
 	}
 
 	r = NewPack();
-	p = WideCall(w, "GetLoginInfo", r);
+	p = WideCall(w, "GetLoginInfo", r, false);
 	FreePack(r);
 
 	ret = GetErrorFromPack(p);
@@ -1168,7 +1168,7 @@ UINT WideServerGetPcidCandidate(WIDE *w, char *name, UINT size, char *current_us
 	PackAddStr(r, "ComputerName", computer_name);
 	PackAddStr(r, "UserName", current_username);
 
-	p = WideCall(w, "GetPcidCandidate", r);
+	p = WideCall(w, "GetPcidCandidate", r, false);
 	FreePack(r);
 
 	ret = GetErrorFromPack(p);
@@ -1187,7 +1187,7 @@ UINT WideServerGetPcidCandidate(WIDE *w, char *name, UINT size, char *current_us
 }
 
 // WPC の呼び出し
-PACK *WideCall(WIDE *wide, char *function_name, PACK *pack)
+PACK *WideCall(WIDE *wide, char *function_name, PACK *pack, bool global_ip_only)
 {
 	WT *wt;
 	X *server_x = NULL;
@@ -1206,7 +1206,7 @@ PACK *WideCall(WIDE *wide, char *function_name, PACK *pack)
 
 	WideServerGetCertAndKey(wide, &server_x, &server_k);
 
-	ret = WtWpcCall(wt, function_name, pack, server_x, server_k);
+	ret = WtWpcCall(wt, function_name, pack, server_x, server_k, global_ip_only);
 
 	FreeX(server_x);
 	FreeK(server_k);
@@ -2484,7 +2484,7 @@ void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id)
 		PackAddData(p, "SessionId", session_id, WT_SESSION_ID_SIZE);
 		WideGatePackGateInfo(p, wt);
 
-		FreePack(WtWpcCall(wt, "ReportSessionDel", p, wide->GateCert, wide->GateKey));
+		FreePack(WtWpcCall(wt, "ReportSessionDel", p, wide->GateCert, wide->GateKey, true));
 
 		FreePack(p);
 	}
@@ -2536,7 +2536,7 @@ void WideGateReportSessionAdd(WIDE *wide, TSESSION *s)
 			WideGatePackSession(p, s, 0, 1, NULL);
 			WideGatePackGateInfo(p, wt);
 
-			FreePack(WtWpcCall(wt, "ReportSessionAdd", p, wide->GateCert, wide->GateKey));
+			FreePack(WtWpcCall(wt, "ReportSessionAdd", p, wide->GateCert, wide->GateKey, true));
 
 			FreePack(p);
 		}
@@ -2582,7 +2582,7 @@ void WideGateReportSessionList(WIDE *wide)
 		}
 		ReleaseList(sc_list);
 
-		FreePack(WtWpcCall(wt, "ReportSessionList", p, wide->GateCert, wide->GateKey));
+		FreePack(WtWpcCall(wt, "ReportSessionList", p, wide->GateCert, wide->GateKey, true));
 
 		FreePack(p);
 	}

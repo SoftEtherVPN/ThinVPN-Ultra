@@ -25,7 +25,7 @@ UINT WpcCommCheck(WT *wt)
 	p = NewPack();
 	PackAddStr(p, "str", "hello");
 
-	r = WtWpcCall(wt, "CommCheck", p, NULL, NULL);
+	r = WtWpcCall(wt, "CommCheck", p, NULL, NULL, false);
 	FreePack(p);
 
 	ret = GetErrorFromPack(r);
@@ -452,7 +452,7 @@ void WtGetInternetSetting(WT *wt, INTERNET_SETTING *setting)
 	Unlock(wt->Lock);
 }
 
-PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key)
+PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only)
 {
 	URL_DATA data;
 	char url[MAX_PATH];
@@ -487,8 +487,8 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key)
 	WriteBufInt(b, 0);
 	SeekBuf(b, 0, 0);
 
-	recv = HttpRequestEx4(&data, NULL, 0, 0, &error,
-		wt->CheckSslTrust, b->Buf, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, wt);
+	recv = HttpRequestEx5(&data, NULL, 0, 0, &error,
+		wt->CheckSslTrust, b->Buf, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, wt, global_ip_only);
 
 	FreeBuf(b);
 

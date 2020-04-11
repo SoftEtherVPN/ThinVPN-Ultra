@@ -183,7 +183,7 @@ PACK *WideReadSecurePackConvertFromBuf(wchar_t *filename, BUF *src);
 LIST *WideNewSecurePackFolderList();
 void WideFreeSecurePackFolderList(LIST *o);
 void WideGenerateSecurePackFileName(UINT type, wchar_t *filename, UINT size, wchar_t *foldername, char *name, bool for_user);
-PACK *WideCall(WIDE *wide, char *function_name, PACK *pack);
+PACK *WideCall(WIDE *wide, char *function_name, PACK *pack, bool global_ip_only);
 void WideSetDontCheckCert(WIDE *w, bool dont_check_cert);
 bool WideGetDontCheckCert(WIDE *w);
 UINT WideGetErrorLevel(UINT code);

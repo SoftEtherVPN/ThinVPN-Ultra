@@ -108,7 +108,7 @@ bool WpcGetEntranceUrlFromLocalFile(WT *wt, char *entrance, UINT entrance_size);
 UINT WpcCommCheck(WT *wt);
 void WtSetDefaultEntranceUrlCacheExpireSpan(WT *wt, UINT span);
 
-PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key);
+PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only);
 
 #endif	// WTWPC_H
 
