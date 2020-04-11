@@ -870,9 +870,12 @@ void WtgAccept(WT *wt, SOCK *s)
 	SetWantToUseCipher(s, "RC4-MD5");
 
 	// SSL 通信の開始
-	if (StartSSLEx(s, wt->GateCert, wt->GateKey, true, 0, WT_SNI_STRING_V2) == false)
+	if (StartSSLEx(s, wt->GateCert, wt->GateKey, true, 0, NULL) == false)
 	{
 		Debug("StartSSL Failed.\n");
+
+		AddNoSsl(wt->Cedar, &s->RemoteIP);
+
 		return;
 	}
 
@@ -882,6 +885,8 @@ void WtgAccept(WT *wt, SOCK *s)
 		Debug("WtgDownloadSignature Failed.\n");
 		return;
 	}
+
+	DecrementNoSsl(wt->Cedar, &s->RemoteIP, 2);
 
 	// Hello パケットのアップロード
 	if (WtgUploadHello(wt, s, session_id) == false)

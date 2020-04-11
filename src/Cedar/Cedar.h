@@ -471,8 +471,8 @@
 #define	DOS_TABLE_EXPIRES_FIRST		250				// Initial value of the expiration date of DOS attack list
 #define	DOS_TABLE_EXPIRES_MAX		1000			// Maximum value of the expiration date of DOS attack list
 #define	DOS_TABLE_REFRESH_INTERVAL	(10 * 1000)		// Interval to update the DOS attack list
-#define	DOS_TABLE_MAX_LIMIT_PER_IP	16				// Accessible number per an IP
-#define	DOS_TABLE_EXPIRES_TOTAL		(3000 * 1000)	// Time to force delete the entry
+#define	DOS_TABLE_MAX_LIMIT_PER_IP	32				// Accessible number per an IP
+#define	DOS_TABLE_EXPIRES_TOTAL		(3 * 60 * 1000)	// Time to force delete the entry
 
 
 // Protocol to be used for the listener
