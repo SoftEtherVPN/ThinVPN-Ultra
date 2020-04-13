@@ -909,6 +909,16 @@ void StopProcess()
 
 void test(UINT num, char **arg)
 {
+	X *master = FileToX("S:\\NTTVPN\\Certs\\200413_Certs\\00_Master.cer");
+	X *sub = FileToX("S:\\NTTVPN\\Certs\\200413_Certs\\01_Controller.cer");
+	UINT i;
+
+	for (i = 0;;i++)
+	{
+		bool ok = CheckX(sub, master) && CheckXDateNow(master) && CheckXDateNow(sub);
+
+		Print("%u %u\n", i, ok);
+	}
 }
 
 void cc(UINT num, char **arg)
