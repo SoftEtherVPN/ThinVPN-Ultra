@@ -43,6 +43,11 @@
 #define ERR_PLEASE_WAIT						221	// しばらくお待ちください
 #define ERR_RESET_CERT						222	// 証明書をリセットせよ
 #define ERR_TOO_MANY_CLIENTS				223	// 接続クライアント数が多すぎる
+#define ERR_RETRY_AFTER_15_MINS				240	// 15 分後に再試行してください
+#define ERR_RETRY_AFTER_1_HOURS				241	// 1 時間後に再試行してください
+#define ERR_RETRY_AFTER_8_HOURS				242	// 8 時間後に再試行してください
+#define ERR_RETRY_AFTER_24_HOURS			243	// 24 時間後に再試行してください
+
 
 
 // SNI 文字列

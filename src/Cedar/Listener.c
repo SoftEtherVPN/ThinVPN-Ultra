@@ -927,6 +927,13 @@ void CleanupListener(LISTENER *r)
 		return;
 	}
 
+	// Release the DOS attack list
+	for (i = 0;i < LIST_NUM(r->DosList);i++)
+	{
+		DOS *d = LIST_DATA(r->DosList, i);
+		Free(d);
+	}
+	ReleaseList(r->DosList);
 
 	if (r->Sock != NULL)
 	{
@@ -1076,6 +1083,7 @@ LISTENER *NewListenerEx5(CEDAR *cedar, UINT proto, UINT port, THREAD_PROC *proc,
 	r->Port = port;
 	r->Event = NewEvent();
 
+	r->DosList = NewList(CompareDos);
 
 	r->LocalOnly = local_only;
 	r->ShadowIPv6 = shadow_ipv6;

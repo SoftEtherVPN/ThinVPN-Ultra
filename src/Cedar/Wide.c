@@ -720,6 +720,29 @@ LABEL_RETRY:
 				interval *= 50;
 			}
 
+			switch (w->ServerErrorCode)
+			{
+			case ERR_RETRY_AFTER_15_MINS:
+				// 15 分後に再試行してください
+				interval = 15 * 60 * 1000;
+				break;
+
+			case ERR_RETRY_AFTER_1_HOURS:
+				// 1 時間後に再試行してください
+				interval = 1 * 60 * 60 * 1000;
+				break;
+
+			case ERR_RETRY_AFTER_8_HOURS:
+				// 8 時間後に再試行してください
+				interval = 8 * 60 * 60 * 1000;
+				break;
+
+			case ERR_RETRY_AFTER_24_HOURS:
+				// 24 時間後に再試行してください
+				interval = 24 * 60 * 60 * 1000;
+				break;
+			}
+
 			interval = (UINT)((UINT64)interval * (UINT64)(Rand32() % 1000) / 1500ULL);
 
 			Debug("Wait %u msec for retry...\n", interval);
