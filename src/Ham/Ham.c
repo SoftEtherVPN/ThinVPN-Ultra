@@ -273,11 +273,11 @@ void t(UINT num, char **arg)
 	c.UseCompress = false;
 
 	c.GateConnectParam = ZeroMalloc(sizeof(WT_GATE_CONNECT_PARAM));
-	c.GateConnectParam->Cert = FileToX("S:\\WT\\Cert\\widecontrol.widetunnel.net.cer");
-	if (c.GateConnectParam->Cert == NULL)
-	{
-		c.GateConnectParam->Cert = FileToX("@widecontrol.widetunnel.net.cer");
-	}
+	//c.GateConnectParam->Cert = FileToX("S:\\WT\\Cert\\widecontrol.widetunnel.net.cer");
+	//if (c.GateConnectParam->Cert == NULL)
+	//{
+	//	c.GateConnectParam->Cert = FileToX("@widecontrol.widetunnel.net.cer");
+	//}
 	c.GateConnectParam->Expires = SystemTime64() + 100000;
 	StrCpy(c.GateConnectParam->Msid, sizeof(c.GateConnectParam->Msid), "TEST");
 
@@ -674,26 +674,6 @@ void sockio_test(UINT num, char **arg)
 
 void noderef(UINT num, char **arg)
 {
-	X *cert = FileToX("S:\\wt\\Cert\\master.cer");
-	K *key = FileToK("S:\\wt\\Cert\\master.key", true, NULL);
-	PACK *p;
-	BUF *b;
-
-	p = NewPack();
-	PackAddInt64(p, "TimeStamp", SystemTime64());
-	PackAddStr(p, "Entrance", "https://deskvc1.softether.jp/widecontrol/entrance.aspx");
-	b = WpcGeneratePacket(p, cert, key);
-
-	SeekBuf(b, b->Size, 0);
-	WriteBufInt(b, 0);
-	SeekBuf(b, 0, 0);
-
-	Print("%s\n", b->Buf);
-
-	FreeBuf(b);
-	FreePack(p);
-	FreeX(cert);
-	FreeK(key);
 }
 
 void clean(UINT num, char **arg)

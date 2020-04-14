@@ -934,27 +934,16 @@ void WtgAccept(WT *wt, SOCK *s)
 		FreePack(p);
 
 		// 接続パラメータの電子署名のチェック
-		if (WtGateConnectParamCheckSignature(&param) == false)
+		if (WtGateConnectParamCheckSignature(wt->Wide, &param) == false)
 		{
-			FreeX(param.Cert);
 			WtgSendError(s, ERR_PROTOCOL_ERROR);
 			Debug("WtGateConnectParamCheckSignature Failed.\n");
-			return;
-		}
-
-		// 接続パラメータの証明書が信頼できるかどうかチェック
-		if (WtIsTrustedCert(wt, param.Cert) == false)
-		{
-			FreeX(param.Cert);
-			WtgSendError(s, ERR_PROTOCOL_ERROR);
-			Debug("WtIsTrustedCert Failed.\n");
 			return;
 		}
 
 		// GateID のチェック
 		if (Cmp(wt->GateId, param.GateId, SHA1_SIZE) != 0)
 		{
-			FreeX(param.Cert);
 			WtgSendError(s, ERR_PROTOCOL_ERROR);
 			Debug("Cmp GateID Failed.\n");
 			return;
@@ -963,14 +952,10 @@ void WtgAccept(WT *wt, SOCK *s)
 		// 有効期限のチェック
 		if (param.Expires < SystemTime64())
 		{
-			FreeX(param.Cert);
 			WtgSendError(s, ERR_PROTOCOL_ERROR);
 			Debug("Expires Failed.\n");
 			return;
 		}
-
-		FreeX(param.Cert);
-		param.Cert = NULL;
 
 		code = ERR_NO_ERROR;
 
@@ -1614,14 +1599,15 @@ bool WtgDownloadSignature(SOCK *s)
 }
 
 // WT_GATE_CONNECT_PARAM の電子署名をチェック
-bool WtGateConnectParamCheckSignature(WT_GATE_CONNECT_PARAM *g)
+bool WtGateConnectParamCheckSignature(WIDE *wide, WT_GATE_CONNECT_PARAM *g)
 {
 	BUF *b;
-	K *k;
-	bool ret;
+	bool ret = false;
 	UCHAR hash[SHA1_SIZE];
+	BUF *b2;
+	char secret_key[64];
 	// 引数チェック
-	if (g == NULL)
+	if (wide == NULL || g == NULL)
 	{
 		return false;
 	}
@@ -1632,19 +1618,30 @@ bool WtGateConnectParamCheckSignature(WT_GATE_CONNECT_PARAM *g)
 		return false;
 	}
 
-	k = GetKFromX(g->Cert);
-	if (k == NULL)
+	// 署名検証
+	if (WideGateGetControllerGateSecretKey(wide, secret_key, sizeof(secret_key)))
 	{
-		FreeBuf(b);
-		return false;
+		b2 = NewBuf();
+		WriteBuf(b2, secret_key, StrLen(secret_key));
+		WriteBuf(b2, b->Buf, b->Size);
+
+		HashSha1(hash, b2->Buf, b2->Size);
+
+		FreeBuf(b2);
+
+		if (Cmp(hash, g->Signature2, SHA1_SIZE) == 0)
+		{
+			ret = true;
+		}
+	}
+	else
+	{
+		// 何らかの原因で Controller からの secret_key の取得に失敗している場合
+		// はチェックをしない (fail safe)
+		WHERE;
+		ret = true;
 	}
 
-	HashSha1(hash, b->Buf, b->Size);
-
-	ret = RsaVerify(hash, sizeof(hash), g->Signature, k) ||
-		  RsaVerify(b->Buf, b->Size, g->Signature, k);
-
-	FreeK(k);
 	FreeBuf(b);
 
 	return ret;
@@ -1675,16 +1672,9 @@ bool WtGateConnectParamFromPack(WT_GATE_CONNECT_PARAM *g, PACK *p)
 		return false;
 	}
 
-	if (PackGetData2(p, "Signature", g->Signature, sizeof(g->Signature)) == false)
+	if (PackGetData2(p, "Signature2", g->Signature2, sizeof(g->Signature2)) == false)
 	{
-		Debug("if (PackGetData2(p, Signature, g->Signature, sizeof(g->Signature)) == false)\n");
-		return false;
-	}
-
-	g->Cert = PackGetX(p, "Cert");
-	if (g->Cert == NULL)
-	{
-		Debug("if (g->Cert == NULL)\n");
+		Debug("if (PackGetData2(p, Signature2, g->Signature2, sizeof(g->Signature2)) == false)\n");
 		return false;
 	}
 
@@ -1703,8 +1693,7 @@ void WtGateConnectParamToPack(PACK *p, WT_GATE_CONNECT_PARAM *g)
 	PackAddStr(p, "Msid", g->Msid);
 	PackAddInt64(p, "Expires", g->Expires);
 	PackAddData(p, "GateId", g->GateId, sizeof(g->GateId));
-	PackAddData(p, "Signature", g->Signature, sizeof(g->Signature));
-	PackAddX(p, "Cert", g->Cert);
+	PackAddData(p, "Signature2", g->Signature2, sizeof(g->Signature2));
 }
 
 // WT_GATE_CONNECT_PARAM の内容をバッファに変換
@@ -1725,26 +1714,6 @@ BUF *WtGateConnectParamPayloadToBuf(WT_GATE_CONNECT_PARAM *g)
 	return b;
 }
 
-// WT_GATE_CONNECT_PARAM の作成
-WT_GATE_CONNECT_PARAM *WtNewGateConnectParam(char *msid, UINT64 expires, UCHAR *gateid, X *cert, UCHAR *signature)
-{
-	WT_GATE_CONNECT_PARAM *p;
-	// 引数チェック
-	if (msid == 0 || gateid == 0 || cert == 0 || signature == 0)
-	{
-		return NULL;
-	}
-
-	p = ZeroMalloc(sizeof(WT_GATE_CONNECT_PARAM));
-	StrCpy(p->Msid, sizeof(p->Msid), msid);
-	p->Expires = expires;
-	Copy(p->GateId, gateid, SHA1_SIZE);
-	p->Cert = CloneX(cert);
-	Copy(p->Signature, signature, 128);
-
-	return p;
-}
-
 // WT_GATE_CONNECT_PARAM のクローン
 WT_GATE_CONNECT_PARAM *WtCloneGateConnectParam(WT_GATE_CONNECT_PARAM *p)
 {
@@ -1757,7 +1726,6 @@ WT_GATE_CONNECT_PARAM *WtCloneGateConnectParam(WT_GATE_CONNECT_PARAM *p)
 
 	ret = ZeroMalloc(sizeof(WT_GATE_CONNECT_PARAM));
 	Copy(ret, p, sizeof(WT_GATE_CONNECT_PARAM));
-	ret->Cert = CloneX(p->Cert);
 
 	return ret;
 }
@@ -1765,7 +1733,6 @@ WT_GATE_CONNECT_PARAM *WtCloneGateConnectParam(WT_GATE_CONNECT_PARAM *p)
 // WT_GATE_CONNECT_PARAM の解放
 void WtFreeGateConnectParam(WT_GATE_CONNECT_PARAM *p)
 {
-	FreeX(p->Cert);
 	Free(p);
 }
 

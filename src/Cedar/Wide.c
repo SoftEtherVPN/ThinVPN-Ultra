@@ -702,7 +702,6 @@ LABEL_RETRY:
 			WtsStop(s);
 			WtReleaseSession(s);
 
-			FreeX(c.GateConnectParam->Cert);
 			Free(c.GateConnectParam);
 		}
 
@@ -1093,7 +1092,7 @@ UINT WideServerRegistMachine(WIDE *w, char *pcid, X *cert, K *key)
 	PackAddStr(r, "SvcName", w->SvcName);
 	PackAddStr(r, "Pcid", pcid);
 
-	p = WtWpcCall(wt, "RegistMachine", r, cert, key, false);
+	p = WtWpcCallWithCertAndKey(wt, "RegistMachine", r, cert, key, false);
 	FreePack(r);
 
 	ret = GetErrorFromPack(p);
@@ -1206,7 +1205,7 @@ PACK *WideCall(WIDE *wide, char *function_name, PACK *pack, bool global_ip_only)
 
 	WideServerGetCertAndKey(wide, &server_x, &server_k);
 
-	ret = WtWpcCall(wt, function_name, pack, server_x, server_k, global_ip_only);
+	ret = WtWpcCallWithCertAndKey(wt, function_name, pack, server_x, server_k, global_ip_only);
 
 	FreeX(server_x);
 	FreeK(server_k);
@@ -2480,15 +2479,42 @@ void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id)
 	Lock(wide->LockReport);
 	{
 		PACK *p = NewPack();
+		PACK *ret = NULL;
+
+		PackAddStr(p, "GateKey", wide->GateKeyStr);
 
 		PackAddData(p, "SessionId", session_id, WT_SESSION_ID_SIZE);
 		WideGatePackGateInfo(p, wt);
 
-		FreePack(WtWpcCall(wt, "ReportSessionDel", p, wide->GateCert, wide->GateKey, true));
+		ret = WtWpcCallWithCertAndKey(wt, "ReportSessionDel", p, wide->GateCert, wide->GateKey, true);
+
+		if (ret != NULL)
+		{
+			WideGateSetControllerGateSecretKeyFromPack(wide, ret);
+			FreePack(ret);
+		}
 
 		FreePack(p);
 	}
 	Unlock(wide->LockReport);
+}
+
+void WideGateSetControllerGateSecretKeyFromPack(WIDE *wide, PACK *p)
+{
+	char controller_gate_secret_key[64] = {0};
+
+	if (wide == NULL || p == NULL)
+	{
+		return;
+	}
+
+	if (PackGetStr(p, "ControllerGateSecretKey", controller_gate_secret_key, sizeof(controller_gate_secret_key)))
+	{
+		if (IsEmptyStr(controller_gate_secret_key) == false)
+		{
+			WideGateSetControllerGateSecretKey(wide, controller_gate_secret_key);
+		}
+	}
 }
 
 // セッション追加の報告
@@ -2532,11 +2558,20 @@ void WideGateReportSessionAdd(WIDE *wide, TSESSION *s)
 		Lock(wide->LockReport);
 		{
 			PACK *p = NewPack();
+			PACK *ret = NULL;
+
+			PackAddStr(p, "GateKey", wide->GateKeyStr);
 
 			WideGatePackSession(p, s, 0, 1, NULL);
 			WideGatePackGateInfo(p, wt);
 
-			FreePack(WtWpcCall(wt, "ReportSessionAdd", p, wide->GateCert, wide->GateKey, true));
+			ret = WtWpcCallWithCertAndKey(wt, "ReportSessionAdd", p, wide->GateCert, wide->GateKey, true);
+
+			if (ret != NULL)
+			{
+				WideGateSetControllerGateSecretKeyFromPack(wide, ret);
+				FreePack(ret);
+			}
 
 			FreePack(p);
 		}
@@ -2560,8 +2595,11 @@ void WideGateReportSessionList(WIDE *wide)
 	Lock(wide->LockReport);
 	{
 		PACK *p = NewPack();
+		PACK *ret = NULL;
 		UINT i;
 		UINT num;
+
+		PackAddStr(p, "GateKey", wide->GateKeyStr);
 
 		// SC List 初期化
 		sc_list = NewListFast(NULL);
@@ -2582,7 +2620,13 @@ void WideGateReportSessionList(WIDE *wide)
 		}
 		ReleaseList(sc_list);
 
-		FreePack(WtWpcCall(wt, "ReportSessionList", p, wide->GateCert, wide->GateKey, true));
+		ret = WtWpcCallWithCertAndKey(wt, "ReportSessionList", p, wide->GateCert, wide->GateKey, true);
+
+		if (ret != NULL)
+		{
+			WideGateSetControllerGateSecretKeyFromPack(wide, ret);
+			FreePack(ret);
+		}
 
 		FreePack(p);
 	}
@@ -2661,6 +2705,7 @@ void WideGateReportThread(THREAD *thread, void *param)
 WIDE *WideGateStart()
 {
 	WIDE *w;
+	LIST *o;
 
 	w = ZeroMalloc(sizeof(WIDE));
 
@@ -2671,6 +2716,20 @@ WIDE *WideGateStart()
 	w->LockReport = NewLock();
 	w->SettingLock = NewLock();
 	w->ReportIntervalLock = NewLock();
+	w->SecretKeyLock = NewLock();
+
+	o = WideGateLoadIni();
+	if (o != NULL)
+	{
+		char *gate_key = IniStrValue(o, "GateKey");
+
+		if (IsEmptyStr(gate_key) == false)
+		{
+			StrCpy(w->GateKeyStr, sizeof(w->GateKeyStr), gate_key);
+		}
+
+		WideFreeIni(o);
+	}
 
 	// 証明書の読み込み
 	WideGateLoadCertKey(&w->GateCert, &w->GateKey);
@@ -2710,12 +2769,50 @@ void WideGateStop(WIDE *wide)
 	DeleteLock(wide->LockReport);
 	DeleteLock(wide->SettingLock);
 	DeleteLock(wide->ReportIntervalLock);
+	DeleteLock(wide->SecretKeyLock);
 	FreeX(wide->GateCert);
 	FreeK(wide->GateKey);
 
 	ReleaseWt(wide->wt);
 
 	Free(wide);
+}
+
+void WideGateSetControllerGateSecretKey(WIDE *wide, char *key)
+{
+	if (wide == NULL || key == NULL || IsEmptyStr(key))
+	{
+		return;
+	}
+
+	Lock(wide->SecretKeyLock);
+	{
+		StrCpy(wide->ControllerGateSecretKey, sizeof(wide->ControllerGateSecretKey), key);
+	}
+	Unlock(wide->SecretKeyLock);
+}
+
+bool WideGateGetControllerGateSecretKey(WIDE *wide, char *key, UINT key_size)
+{
+	if (wide == NULL || key == NULL)
+	{
+		return false;
+	}
+
+	key[0] = 0;
+
+	Lock(wide->SecretKeyLock);
+	{
+		StrCpy(key, key_size, wide->ControllerGateSecretKey);
+	}
+	Unlock(wide->SecretKeyLock);
+
+	if (IsEmptyStr(key))
+	{
+		return false;
+	}
+
+	return true;
 }
 
 // ini の解放

@@ -159,20 +159,6 @@ PACK *WtGetPackFromBuf(WT *wt, BUF *buf)
 		return NULL;
 	}
 
-	if (packet.Cert == NULL)
-	{
-		WpcFreePacket(&packet);
-		return NULL;
-	}
-
-	if (WtIsTrustedCert(wt, packet.Cert) == false)
-	{
-		WpcFreePacket(&packet);
-		return NULL;
-	}
-
-	FreeX(packet.Cert);
-
 	return packet.Pack;
 }
 
@@ -213,97 +199,6 @@ PACK *WtGetPackFromBuf(WT *wt, BUF *buf)
 //	FreePack(p);
 //	return true;
 //}
-
-// noderef.txt の取得
-bool WpcDownloadNoderef(WT *wt, char *url, BUF **buf, char *entrance, UINT entrance_size, UINT64 *timestamp, UINT *error)
-{
-	PACK *p;
-	UINT err;
-	static UINT dummy = 0;
-	// 引数チェック
-	if (wt == NULL || url == NULL || entrance == NULL || timestamp == NULL || buf == NULL)
-	{
-		return false;
-	}
-	if (error == NULL)
-	{
-		error = &dummy;
-	}
-
-	p = WpcDownloadPack(wt, url, buf);
-	err = GetErrorFromPack(p);
-	if (err != ERR_NO_ERROR)
-	{
-		FreePack(p);
-		*error = err;
-		FreeBuf(*buf);
-		return false;
-	}
-
-	if (WtParseNodeRef(wt, p, entrance, entrance_size, timestamp) == false)
-	{
-		FreePack(p);
-		FreeBuf(*buf);
-		*error = ERR_PROTOCOL_ERROR;
-		return false;
-	}
-
-	FreePack(p);
-	return true;
-}
-
-// WPC Pack の取得
-PACK *WpcDownloadPack(WT *wt, char *url, BUF **buf)
-{
-	URL_DATA data;
-	BUF *recv;
-	UINT error;
-	WPC_PACKET packet;
-	// 引数チェック
-	if (wt == NULL || url == NULL)
-	{
-		return PackError(ERR_INTERNAL_ERROR);
-	}
-
-	if (ParseUrl(&data, url, false, NULL) == false)
-	{
-		return PackError(ERR_INTERNAL_ERROR);
-	}
-
-	recv = HttpRequestEx4(&data, NULL, 0, 0, &error,
-		wt->CheckSslTrust, NULL, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, wt);
-
-	if (recv == NULL)
-	{
-		return PackError(error);
-	}
-
-	if (WpcParsePacket(&packet, recv) == false)
-	{
-		FreeBuf(recv);
-		return PackError(ERR_PROTOCOL_ERROR);
-	}
-
-	if (packet.Cert == NULL)
-	{
-		FreeBuf(recv);
-		WpcFreePacket(&packet);
-		return PackError(ERR_PROTOCOL_ERROR);
-	}
-
-	if (WtIsTrustedCert(wt, packet.Cert) == false)
-	{
-		FreeBuf(recv);
-		WpcFreePacket(&packet);
-		return PackError(ERR_PROTOCOL_ERROR);
-	}
-
-	FreeX(packet.Cert);
-
-	*buf = recv;
-
-	return packet.Pack;
-}
 
 // デフォルトの Entrance URL のキャッシュの有効期限の設定
 void WtSetDefaultEntranceUrlCacheExpireSpan(WT *wt, UINT span)
@@ -452,7 +347,39 @@ void WtGetInternetSetting(WT *wt, INTERNET_SETTING *setting)
 	Unlock(wt->Lock);
 }
 
-PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only)
+PACK *WtWpcCallWithCertAndKey(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only)
+{
+	BUF *k_buf;
+	if (wt == NULL || function_name == NULL || pack == NULL)
+	{
+		return PackError(ERR_INTERNAL_ERROR);
+	}
+
+	if (cert != NULL && key != NULL)
+	{
+		UCHAR host_key[SHA1_SIZE] = {0};
+		UCHAR host_secret[SHA1_SIZE] = {0};
+
+		GetXDigest(cert, host_key, true);
+
+		k_buf = KToBuf(key, false, NULL);
+
+		if (k_buf != NULL)
+		{
+			HashSha1(host_secret, k_buf->Buf, k_buf->Size);
+		}
+
+		FreeBuf(k_buf);
+
+		return WtWpcCall(wt, function_name, pack, host_key, host_secret, global_ip_only);
+	}
+	else
+	{
+		return WtWpcCall(wt, function_name, pack, NULL, NULL, global_ip_only);
+	}
+}
+
+PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only)
 {
 	URL_DATA data;
 	char url[MAX_PATH];
@@ -477,7 +404,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool g
 
 	PackAddStr(pack, "function", function_name);
 
-	b = WpcGeneratePacket(pack, cert, key);
+	b = WpcGeneratePacket(pack, host_key, host_secret);
 	if (b == NULL)
 	{
 		return PackError(ERR_INTERNAL_ERROR);
@@ -504,20 +431,6 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool g
 	}
 
 	FreeBuf(recv);
-
-	if (packet.Cert == NULL)
-	{
-		WpcFreePacket(&packet);
-		return PackError(ERR_PROTOCOL_ERROR);
-	}
-
-	if (WtIsTrustedCert(wt, packet.Cert) == false)
-	{
-		WpcFreePacket(&packet);
-		return PackError(ERR_PROTOCOL_ERROR);
-	}
-
-	FreeX(packet.Cert);
 
 	return packet.Pack;
 }

@@ -18,8 +18,7 @@ struct WT_GATE_CONNECT_PARAM
 	char Msid[WT_MSID_SIZE];			// MSID
 	UINT64 Expires;						// 有効期限
 	UCHAR GateId[SHA1_SIZE];			// ゲートウェイ ID
-	X *Cert;							// コントローラ証明書
-	UCHAR Signature[128];				// 署名
+	UCHAR Signature2[SHA1_SIZE];		// 署名
 };
 
 // TCP コネクション
@@ -111,7 +110,7 @@ struct TSESSION
 // 関数プロトタイプ
 bool WtGateConnectParamFromPack(WT_GATE_CONNECT_PARAM *g, PACK *p);
 BUF *WtGateConnectParamPayloadToBuf(WT_GATE_CONNECT_PARAM *g);
-bool WtGateConnectParamCheckSignature(WT_GATE_CONNECT_PARAM *g);
+bool WtGateConnectParamCheckSignature(WIDE *wide, WT_GATE_CONNECT_PARAM *g);
 void WtGateConnectParamToPack(PACK *p, WT_GATE_CONNECT_PARAM *g);
 void WtgStart(WT *wt, X *cert, K *key, UINT port);
 void WtgStop(WT *wt);
@@ -153,7 +152,6 @@ void WtDisconnectTTcp(TTCP *ttcp);
 void WtFreeTunnel(TUNNEL *t);
 void WtFreeTTcp(TTCP *ttcp);
 void WtInsertNewBlockToQueue(QUEUE *dest_queue, TTCP *dest_ttcp, UINT src_tunnel_id, void *data, UINT size);
-WT_GATE_CONNECT_PARAM *WtNewGateConnectParam(char *msid, UINT64 expires, UCHAR *gateid, X *cert, UCHAR *signature);
 WT_GATE_CONNECT_PARAM *WtCloneGateConnectParam(WT_GATE_CONNECT_PARAM *p);
 void WtFreeGateConnectParam(WT_GATE_CONNECT_PARAM *p);
 void WtGenerateClientIdFromIP(UCHAR *client_id, IP *ip);

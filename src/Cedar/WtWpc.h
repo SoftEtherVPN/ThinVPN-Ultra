@@ -93,8 +93,6 @@ void WtSetEntranceUrl(WT *wt, char *url);
 void WtGetEntranceUrl(WT *wt, char *url, UINT url_size);
 void WtSetInternetSetting(WT *wt, INTERNET_SETTING *setting);
 void WtGetInternetSetting(WT *wt, INTERNET_SETTING *setting);
-PACK *WpcDownloadPack(WT *wt, char *url, BUF **buf);
-bool WpcDownloadNoderef(WT *wt, char *url, BUF **buf, char *entrance, UINT entrance_size, UINT64 *timestamp, UINT *error);
 //bool WpcLoadNoderefCache(WT *wt, BUF **buf, char *entrance, UINT entrance_size, UINT64 *timestamp);
 //void WtGenerateNoderefCacheFilename(char *name, UINT size);
 void WtShuffleArray(void **p, UINT num);
@@ -108,7 +106,8 @@ bool WpcGetEntranceUrlFromLocalFile(WT *wt, char *entrance, UINT entrance_size);
 UINT WpcCommCheck(WT *wt);
 void WtSetDefaultEntranceUrlCacheExpireSpan(WT *wt, UINT span);
 
-PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only);
+PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only);
+PACK *WtWpcCallWithCertAndKey(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only);
 
 #endif	// WTWPC_H
 

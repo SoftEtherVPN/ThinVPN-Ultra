@@ -137,6 +137,9 @@ struct WIDE
 	UINT64 NextReportTick;
 	UINT64 NextReportTick2;
 	UINT64 LastReportTick;
+	LOCK *SecretKeyLock;
+	char ControllerGateSecretKey[64];
+	char GateKeyStr[64];
 
 	// WideServer
 	LOCK *ReconnectLock;
@@ -265,6 +268,9 @@ void WideGateReportThread(THREAD *thread, void *param);
 void WideGateReportSessionList(WIDE *wide);
 void WideGateReportSessionAdd(WIDE *wide, TSESSION *s);
 void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id);
+void WideGateSetControllerGateSecretKey(WIDE *wide, char *key);
+bool WideGateGetControllerGateSecretKey(WIDE *wide, char *key, UINT key_size);
+void WideGateSetControllerGateSecretKeyFromPack(WIDE *wide, PACK *p);
 
 #endif	// WIDE_H
 

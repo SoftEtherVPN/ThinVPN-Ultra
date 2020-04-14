@@ -180,7 +180,7 @@ PACK *WpcCallEx2(char *url, INTERNET_SETTING *setting, UINT timeout_connect, UIN
 
 	PackAddStr(pack, "function", function_name);
 
-	b = WpcGeneratePacket(pack, cert, key);
+	b = WpcGeneratePacket(pack, NULL, NULL);
 	if (b == NULL)
 	{
 		return PackError(ERR_INTERNAL_ERROR);
@@ -220,8 +220,6 @@ PACK *WpcCallEx2(char *url, INTERNET_SETTING *setting, UINT timeout_connect, UIN
 
 	FreeBuf(recv);
 
-	FreeX(packet.Cert);
-
 	return packet.Pack;
 }
 
@@ -235,7 +233,6 @@ void WpcFreePacket(WPC_PACKET *packet)
 	}
 
 	FreePack(packet->Pack);
-	FreeX(packet->Cert);
 }
 
 // Parse the packet
@@ -263,8 +260,6 @@ bool WpcParsePacket(WPC_PACKET *packet, BUF *buf)
 		packet->Pack = BufToPack(b);
 		FreeBuf(b);
 
-		ret = true;
-
 		if (packet->Pack != NULL)
 		{
 			BUF *b;
@@ -280,60 +275,6 @@ bool WpcParsePacket(WPC_PACKET *packet, BUF *buf)
 					ret = false;
 					FreePack(packet->Pack);
 				}
-				else
-				{
-					BUF *b;
-
-					Copy(packet->Hash, hash, SHA1_SIZE);
-
-					b = WpcDataEntryToBuf(WpcFindDataEntry(o, "CERT"));
-
-					if (b != NULL)
-					{
-						X *cert = BufToX(b, false);
-						if (cert == NULL)
-						{
-							ret = false;
-							FreePack(packet->Pack);
-						}
-						else
-						{
-							BUF *b = WpcDataEntryToBuf(WpcFindDataEntry(o, "SIGN"));
-
-							if (b == NULL || (b->Size != 128))
-							{
-								ret = false;
-								FreeX(cert);
-								FreePack(packet->Pack);
-							}
-							else
-							{
-								K *k = GetKFromX(cert);
-								UCHAR hash2[SHA1_SIZE];
-
-								HashSha1(hash2, hash, SHA1_SIZE);
-
-								if (RsaVerify(hash2, SHA1_SIZE, b->Buf, k) == false &&
-									RsaVerify(hash, SHA1_SIZE, b->Buf, k) == false)
-								{
-									ret = false;
-									FreeX(cert);
-									FreePack(packet->Pack);
-								}
-								else
-								{
-									packet->Cert = cert;
-									Copy(packet->Sign, b->Buf, 128);
-								}
-
-								FreeK(k);
-							}
-
-							FreeBuf(b);
-						}
-						FreeBuf(b);
-					}
-				}
 				FreeBuf(b);
 			}
 		}
@@ -345,12 +286,10 @@ bool WpcParsePacket(WPC_PACKET *packet, BUF *buf)
 }
 
 // Generate the packet
-BUF *WpcGeneratePacket(PACK *pack, X *cert, K *key)
+BUF *WpcGeneratePacket(PACK *pack, UCHAR *host_key, UCHAR *host_secret)
 {
 	UCHAR hash[SHA1_SIZE];
 	BUF *pack_data;
-	BUF *cert_data = NULL;
-	BUF *sign_data = NULL;
 	BUF *b;
 	// Validate arguments
 	if (pack == NULL)
@@ -361,32 +300,18 @@ BUF *WpcGeneratePacket(PACK *pack, X *cert, K *key)
 	pack_data = PackToBuf(pack);
 	HashSha1(hash, pack_data->Buf, pack_data->Size);
 
-	if (cert != NULL && key != NULL)
-	{
-		UCHAR sign[128];
-		cert_data = XToBuf(cert, false);
-
-		RsaSign(sign, hash, sizeof(hash), key);
-
-		sign_data = NewBuf();
-		WriteBuf(sign_data, sign, sizeof(sign));
-		SeekBuf(sign_data, 0, 0);
-	}
-
 	b = NewBuf();
 
 	WpcAddDataEntryBin(b, "PACK", pack_data->Buf, pack_data->Size);
 	WpcAddDataEntryBin(b, "HASH", hash, sizeof(hash));
 
-	if (cert_data != NULL)
+	if (host_key != NULL && host_secret != NULL)
 	{
-		WpcAddDataEntryBin(b, "CERT", cert_data->Buf, cert_data->Size);
-		WpcAddDataEntryBin(b, "SIGN", sign_data->Buf, sign_data->Size);
+		WpcAddDataEntryBin(b, "HOSTKEY", host_key, SHA1_SIZE);
+		WpcAddDataEntryBin(b, "HOSTSECRET", host_secret, SHA1_SIZE);
 	}
 
 	FreeBuf(pack_data);
-	FreeBuf(cert_data);
-	FreeBuf(sign_data);
 
 	SeekBuf(b, 0, 0);
 

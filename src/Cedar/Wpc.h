@@ -166,8 +166,10 @@ struct WPC_PACKET
 {
 	PACK *Pack;								// Pack (data body)
 	UCHAR Hash[SHA1_SIZE];					// Data hash
-	X *Cert;								// Certificate
-	UCHAR Sign[128];						// Digital signature
+	//X *Cert;								// Certificate
+	//UCHAR Sign[128];						// Digital signature
+	UCHAR HostKey[SHA1_SIZE];
+	UCHAR HostSecret[SHA1_SIZE];
 };
 
 // Reception callback
@@ -222,7 +224,7 @@ LIST *WpcParseDataEntry(BUF *b);
 void WpcFreeDataEntryList(LIST *o);
 WPC_ENTRY *WpcFindDataEntry(LIST *o, char *name);
 BUF *WpcDataEntryToBuf(WPC_ENTRY *e);
-BUF *WpcGeneratePacket(PACK *pack, X *cert, K *key);
+BUF *WpcGeneratePacket(PACK *pack, UCHAR *host_key, UCHAR *host_secret);
 bool WpcParsePacket(WPC_PACKET *packet, BUF *buf);
 void WpcFreePacket(WPC_PACKET *packet);
 PACK *WpcCall(char *url, INTERNET_SETTING *setting, UINT timeout_connect, UINT timeout_comm,
