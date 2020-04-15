@@ -81,7 +81,12 @@
 // トンネリング通信関係
 #define WT_TUNNEL_TIMEOUT		(30 * 1000)				// トンネル通信のタイムアウト時間
 #define WT_TUNNEL_KEEPALIVE		(10 * 1000)				// トンネル通信のキープアライブ時間
+
+#define WT_TUNNEL_TIMEOUT_HARD_MAX		(10 * 60 * 1000)		// トンネル通信のタイムアウト時間
+#define WT_TUNNEL_KEEPALIVE_HARD_MAX	(10 * 60 * 1000)		// トンネル通信のキープアライブ時間
+
 #define WT_TUNNEL_USED_EXPIRES	(360 * 1000)			// 同一のトンネル ID を再利用しない間隔
+
 
 // WPC 通信関係
 #define WT_WPC_DEFAULT_ENTRANCE_CACHE_SPAN	(30 * 60 * 1000)	// デフォルトの Entrance URL のキャッシュ時間

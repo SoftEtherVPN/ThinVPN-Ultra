@@ -2740,6 +2740,10 @@ void WideGateLoadAggressiveTimeoutSettings(WIDE *wide)
 		v2 = WideGateGetIniEntry("TunnelKeepAlive");
 		v3 = WideGateGetIniEntry("TunnelUseAggressiveTimeout");
 
+		// 異常に大きい値が ini ファイルに設定されるリスクの軽減
+		v1 = MIN(v1, WT_TUNNEL_TIMEOUT_HARD_MAX);
+		v2 = MIN(v2, WT_TUNNEL_KEEPALIVE_HARD_MAX);
+
 		if (v1 && v2)
 		{
 			wide->GateTunnelTimeout = v1;
