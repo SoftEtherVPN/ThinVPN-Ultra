@@ -468,6 +468,9 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 	PACK *p;
 	UINT code;
 	SYSTEMTIME tm;
+	UINT tunnel_timeout = WT_TUNNEL_TIMEOUT;
+	UINT tunnel_keepalive = WT_TUNNEL_KEEPALIVE;
+	bool tunnel_use_aggressive_timeout = false;
 
 	// 引数チェック
 	if (session == NULL || s == NULL)
@@ -538,6 +541,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 	PackAddBool(p, "request_initial_pack", true);
 	WtGateConnectParamToPack(p, session->ConnectParam->GateConnectParam);
 	PackAddBool(p, "use_compress", session->ConnectParam->UseCompress);
+	PackAddBool(p, "support_timeout_param", true);
 	if (wt->Wide != NULL)
 	{
 		PackAddInt(p, "se_lang", wt->Wide->SeLang);
@@ -573,7 +577,19 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 	}
 	FreePack(p);
 
-	session->GateTcp = WtNewTTcp(s, session->ConnectParam->UseCompress);
+	{
+		UINT tunnel_timeout2 = PackGetInt(p, "tunnel_timeout");
+		UINT tunnel_keepalive2 = PackGetInt(p, "tunnel_keepalive");
+		bool tunnel_use_aggressive_timeout2 = PackGetBool(p, "tunnel_use_aggressive_timeout");
+		if (tunnel_timeout2 && tunnel_timeout2)
+		{
+			tunnel_timeout = tunnel_timeout2;
+			tunnel_keepalive = tunnel_keepalive2;
+			tunnel_use_aggressive_timeout = tunnel_use_aggressive_timeout2;
+		}
+	}
+
+	session->GateTcp = WtNewTTcp(s, session->ConnectParam->UseCompress, tunnel_timeout, tunnel_keepalive, tunnel_use_aggressive_timeout);
 	session->GateTcp->MultiplexMode = true;
 
 	SetTimeout(s, TIMEOUT_INFINITE);

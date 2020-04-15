@@ -141,6 +141,14 @@ struct WIDE
 	char ControllerGateSecretKey[64];
 	char GateKeyStr[64];
 
+
+	// 2020/4/15 追加 アグレッシブタイムアウト機能
+	LOCK *AggressiveTimeoutLock;
+	UINT GateTunnelTimeout;
+	UINT GateTunnelKeepAlive;
+	bool GateTunnelUseAggressiveTimeout;
+
+	UINT64 GateTunnelTimeoutLastLoadTick;
 	// WideServer
 	LOCK *ReconnectLock;
 	X *ServerX;
@@ -271,6 +279,9 @@ void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id);
 void WideGateSetControllerGateSecretKey(WIDE *wide, char *key);
 bool WideGateGetControllerGateSecretKey(WIDE *wide, char *key, UINT key_size);
 void WideGateSetControllerGateSecretKeyFromPack(WIDE *wide, PACK *p);
+
+void WideGateLoadAggressiveTimeoutSettings(WIDE *wide);
+void WideGateLoadAggressiveTimeoutSettingsWithInterval(WIDE *wide);
 
 #endif	// WIDE_H
 

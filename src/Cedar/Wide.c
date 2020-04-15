@@ -2724,6 +2724,59 @@ void WideGateReportThread(THREAD *thread, void *param)
 	}
 }
 
+// 2020/4/15 追加 アグレッシブタイムアウト機能
+// 注意! ファイル I/O を伴うので時々チェックすること
+void WideGateLoadAggressiveTimeoutSettings(WIDE *wide)
+{
+	UINT v1, v2, v3;
+	if (wide == NULL)
+	{
+		return;
+	}
+
+	Lock(wide->AggressiveTimeoutLock);
+	{
+		v1 = WideGateGetIniEntry("TunnelTimeout");
+		v2 = WideGateGetIniEntry("TunnelKeepAlive");
+		v3 = WideGateGetIniEntry("TunnelUseAggressiveTimeout");
+
+		if (v1 && v2)
+		{
+			wide->GateTunnelTimeout = v1;
+			wide->GateTunnelKeepAlive = v2;
+			wide->GateTunnelUseAggressiveTimeout = v3 ? true : false;
+		}
+		else
+		{
+			wide->GateTunnelTimeout = WT_TUNNEL_TIMEOUT;
+			wide->GateTunnelKeepAlive = WT_TUNNEL_KEEPALIVE;
+			wide->GateTunnelUseAggressiveTimeout = false;
+		}
+	}
+	Unlock(wide->AggressiveTimeoutLock);
+}
+
+// 2020/4/15 追加 アグレッシブタイムアウト設定を時々読み込む
+void WideGateLoadAggressiveTimeoutSettingsWithInterval(WIDE *wide)
+{
+	UINT64 now = Tick64();
+	if (wide == NULL)
+	{
+		return;
+	}
+
+	Lock(wide->AggressiveTimeoutLock);
+	{
+		if (wide->GateTunnelTimeoutLastLoadTick == 0 || (wide->GateTunnelTimeoutLastLoadTick + 10000ULL) <= now)
+		{
+			wide->GateTunnelTimeoutLastLoadTick = now;
+
+			WideGateLoadAggressiveTimeoutSettings(wide);
+		}
+	}
+	Unlock(wide->AggressiveTimeoutLock);
+}
+
 // WideGate の開始
 WIDE *WideGateStart()
 {
@@ -2754,8 +2807,19 @@ WIDE *WideGateStart()
 		WideFreeIni(o);
 	}
 
+	w->AggressiveTimeoutLock = NewLock();
+
+	w->GateTunnelTimeout = WT_TUNNEL_TIMEOUT;
+	w->GateTunnelKeepAlive = WT_TUNNEL_KEEPALIVE;
+	w->GateTunnelUseAggressiveTimeout = false;
+
+	// 2020/4/15 追加 アグレッシブタイムアウト機能
+	WideGateLoadAggressiveTimeoutSettings(w);
+
 	// 証明書の読み込み
 	WideGateLoadCertKey(&w->GateCert, &w->GateKey);
+
+	// Timeout 設定の読み込み
 
 	// Gate の開始
 	WtgStart(w->wt, w->GateCert, w->GateKey, WT_PORT);
@@ -2793,6 +2857,7 @@ void WideGateStop(WIDE *wide)
 	DeleteLock(wide->SettingLock);
 	DeleteLock(wide->ReportIntervalLock);
 	DeleteLock(wide->SecretKeyLock);
+	DeleteLock(wide->AggressiveTimeoutLock);
 	FreeX(wide->GateCert);
 	FreeK(wide->GateKey);
 

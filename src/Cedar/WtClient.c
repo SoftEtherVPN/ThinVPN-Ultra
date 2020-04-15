@@ -268,6 +268,10 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 	THREAD *thread;
 	UINT zero = 0;
 	SYSTEMTIME tm;
+	UINT tunnel_timeout = WT_TUNNEL_TIMEOUT;
+	UINT tunnel_keepalive = WT_TUNNEL_KEEPALIVE;
+	bool tunnel_use_aggressive_timeout = false;
+
 	// 引数チェック
 	if (wt == NULL || connect == NULL || sockio == NULL)
 	{
@@ -353,6 +357,7 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 	PackAddData(p, "session_id", connect->SessionId, WT_SESSION_ID_SIZE);
 	PackAddInt(p, "ver", ver);
 	PackAddInt(p, "build", build);
+	PackAddBool(p, "support_timeout_param", true);
 	if (wt->Wide != NULL)
 	{
 		PackAddInt(p, "se_lang", wt->Wide->SeLang);
@@ -391,13 +396,25 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 	}
 	FreePack(p);
 
+	{
+		UINT tunnel_timeout2 = PackGetInt(p, "tunnel_timeout");
+		UINT tunnel_keepalive2 = PackGetInt(p, "tunnel_keepalive");
+		bool tunnel_use_aggressive_timeout2 = PackGetBool(p, "tunnel_use_aggressive_timeout");
+		if (tunnel_timeout2 && tunnel_timeout2)
+		{
+			tunnel_timeout = tunnel_timeout2;
+			tunnel_keepalive = tunnel_keepalive2;
+			tunnel_use_aggressive_timeout = tunnel_use_aggressive_timeout2;
+		}
+	}
+
 	SetTimeout(s, TIMEOUT_INFINITE);
 
 	session = WtcNewSession(wt, s);
 	*sockio = session->ClientTunnel->SockIo;
 	AddRef((*sockio)->Ref);
 
-	session->GateTcp = WtNewTTcp(s, connect->UseCompress);
+	session->GateTcp = WtNewTTcp(s, connect->UseCompress, tunnel_timeout, tunnel_keepalive, tunnel_use_aggressive_timeout);
 
 	thread = NewThread(WtcSessionMainThread, session);
 	WaitThreadInit(thread);

@@ -190,7 +190,7 @@ bool WtIsTTcpDisconnected(TSESSION *s, TTCP *ttcp)
 
 	if (ttcp->Disconnected == false)
 	{
-		if ((ttcp->LastCommTime + (UINT64)WT_TUNNEL_TIMEOUT) < s->Tick)
+		if ((ttcp->LastCommTime + (UINT64)ttcp->TunnelTimeout) < s->Tick)
 		{
 			ttcp->Disconnected = true;
 		}
@@ -287,7 +287,7 @@ void WtMakeSendDataTTcp(TSESSION *s, TTCP *ttcp, QUEUE *blockqueue)
 		ttcp->LastKeepAliveTime = s->Tick;
 	}
 
-	if ((ttcp->LastKeepAliveTime + (UINT64)WT_TUNNEL_KEEPALIVE) < s->Tick)
+	if ((ttcp->LastKeepAliveTime + (UINT64)ttcp->TunnelKeepAlive) < s->Tick)
 	{
 		i = Endian32(0);
 
@@ -710,7 +710,12 @@ void WtSendTTcp(TSESSION *s, TTCP *ttcp)
 			// 送信完了
 			ReadFifo(fifo, NULL, size);
 
-			ttcp->LastCommTime = s->Tick;
+			if (ttcp->TunnelUseAggressiveTimeout == false)
+			{
+				// アグレッシブ・タイムアウト有効時はデータ送信時には LastCommTime は更新しません
+				ttcp->LastCommTime = s->Tick;
+			}
+
 			s->StateChangedFlag = true;
 		}
 	}
@@ -765,7 +770,7 @@ TTCP_DISCONNECTED:
 	else if (size == SOCK_LATER)
 	{
 		// 受信待ち
-		if ((s->Tick > ttcp->LastCommTime) && ((s->Tick - ttcp->LastCommTime) >= (UINT64)WT_TUNNEL_TIMEOUT))
+		if ((s->Tick > ttcp->LastCommTime) && ((s->Tick - ttcp->LastCommTime) >= (UINT64)ttcp->TunnelTimeout))
 		{
 			// タイムアウト発生
 			goto TTCP_DISCONNECTED;
@@ -850,6 +855,12 @@ void WtgAccept(WT *wt, SOCK *s)
 	bool use_compress = false;
 	TSESSION *session = NULL;
 	char ip_str[MAX_PATH];
+	bool support_timeout_param = false;
+
+	UINT tunnel_timeout = WT_TUNNEL_TIMEOUT;
+	UINT tunnel_keepalive = WT_TUNNEL_KEEPALIVE;
+	bool tunnel_use_aggressive_timeout = false;
+
 	// 引数チェック
 	if (wt == NULL || s == NULL)
 	{
@@ -910,6 +921,17 @@ void WtgAccept(WT *wt, SOCK *s)
 		FreePack(p);
 		WtgSendError(s, ERR_PROTOCOL_ERROR);
 		return;
+	}
+
+	support_timeout_param = PackGetBool(p, "support_timeout_param");
+
+	if (support_timeout_param)
+	{
+		WideGateLoadAggressiveTimeoutSettingsWithInterval(wt->Wide);
+
+		tunnel_timeout = wt->Wide->GateTunnelTimeout;
+		tunnel_keepalive = wt->Wide->GateTunnelKeepAlive;
+		tunnel_use_aggressive_timeout = wt->Wide->GateTunnelUseAggressiveTimeout;
 	}
 
 	Debug("method: %s\n", method);
@@ -984,7 +1006,7 @@ void WtgAccept(WT *wt, SOCK *s)
 			if (exists == false)
 			{
 				// セッションの作成
-				TSESSION *sess = WtgNewSession(wt, s, param.Msid, session_id, use_compress, request_initial_pack);
+				TSESSION *sess = WtgNewSession(wt, s, param.Msid, session_id, use_compress, request_initial_pack, tunnel_timeout, tunnel_keepalive, tunnel_use_aggressive_timeout);
 
 				sess->ServerMask64 = server_mask_64;
 
@@ -1011,6 +1033,9 @@ void WtgAccept(WT *wt, SOCK *s)
 		// 接続成功。
 		p = NewPack();
 		PackAddInt(p, "code", ERR_NO_ERROR);
+		PackAddInt(p, "tunnel_timeout", tunnel_timeout);
+		PackAddInt(p, "tunnel_keepalive", tunnel_keepalive);
+		PackAddInt(p, "tunnel_use_aggressive_timeout", tunnel_use_aggressive_timeout);
 		HttpServerSend(s, p);
 		FreePack(p);
 
@@ -1097,6 +1122,9 @@ void WtgAccept(WT *wt, SOCK *s)
 
 		p = NewPack();
 		PackAddInt(p, "code", ERR_NO_ERROR);
+		PackAddInt(p, "tunnel_timeout", tunnel_timeout);
+		PackAddInt(p, "tunnel_keepalive", tunnel_keepalive);
+		PackAddInt(p, "tunnel_use_aggressive_timeout", tunnel_use_aggressive_timeout);
 		HttpServerSend(s, p);
 		FreePack(p);
 
@@ -1111,7 +1139,7 @@ void WtgAccept(WT *wt, SOCK *s)
 
 			Debug("New Tunnel: %u\n", tunnel_id);
 
-			ttcp = WtNewTTcp(s, use_compress);
+			ttcp = WtNewTTcp(s, use_compress, tunnel_timeout, tunnel_keepalive, tunnel_use_aggressive_timeout);
 
 			tunnel = WtNewTunnel(ttcp, tunnel_id, NULL);
 			Copy(tunnel->ClientId, client_id, sizeof(client_id));
@@ -1233,7 +1261,7 @@ TUNNEL *WtNewTunnel(TTCP *client_tcp, UINT tunnel_id, SOCKIO *sockio)
 }
 
 // Gate 上のセッションの作成
-TSESSION *WtgNewSession(WT *wt, SOCK *sock, char *msid, void *session_id, bool use_compress, bool request_initial_pack)
+TSESSION *WtgNewSession(WT *wt, SOCK *sock, char *msid, void *session_id, bool use_compress, bool request_initial_pack, UINT tunnel_timeout, UINT tunnel_keepalive, bool tunnel_use_aggressive_timeout)
 {
 	TSESSION *s;
 	// 引数チェック
@@ -1249,7 +1277,7 @@ TSESSION *WtgNewSession(WT *wt, SOCK *sock, char *msid, void *session_id, bool u
 	StrCpy(s->Msid, sizeof(s->Msid), msid);
 	Copy(s->SessionId, session_id, WT_SESSION_ID_SIZE);
 	s->EstablishedTick = Tick64();
-	s->ServerTcp = WtNewTTcp(sock, use_compress);
+	s->ServerTcp = WtNewTTcp(sock, use_compress, tunnel_timeout, tunnel_keepalive, tunnel_use_aggressive_timeout);
 	s->ServerTcp->MultiplexMode = true;
 	s->BlockQueue = NewQueue();
 	s->SockEvent = NewSockEvent();
@@ -1375,7 +1403,7 @@ void WtFreeTTcp(TTCP *ttcp)
 }
 
 // TTCP の作成
-TTCP *WtNewTTcp(SOCK *s, bool use_compress)
+TTCP *WtNewTTcp(SOCK *s, bool use_compress, UINT tunnel_timeout, UINT tunnel_keepalive, bool tunnel_use_aggressive_timeout)
 {
 	TTCP *t;
 	// 引数チェック
@@ -1393,6 +1421,9 @@ TTCP *WtNewTTcp(SOCK *s, bool use_compress)
 	t->RecvFifo = NewFifo();
 	t->SendFifo = NewFifo();
 	t->UseCompress = use_compress;
+	t->TunnelTimeout = tunnel_timeout;
+	t->TunnelKeepAlive = tunnel_keepalive;
+	t->TunnelUseAggressiveTimeout = tunnel_use_aggressive_timeout;
 	AddRef(s->ref);
 
 	return t;

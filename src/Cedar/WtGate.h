@@ -40,6 +40,10 @@ struct TTCP
 	bool UseCompress;					// 圧縮の使用
 	bool MultiplexMode;					// 多重化モード
 	bool DisconnectSignalReceived;		// 切断信号を受信したかどうか
+
+	UINT TunnelTimeout;
+	UINT TunnelKeepAlive;
+	bool TunnelUseAggressiveTimeout;
 };
 
 // データブロック
@@ -119,10 +123,10 @@ bool WtgSendError(SOCK *s, UINT code);
 bool WtgDownloadSignature(SOCK *s);
 bool WtgUploadHello(WT *wt, SOCK *s, void *session_id);
 int WtgCompareSession(void *p1, void *p2);
-TSESSION *WtgNewSession(WT *wt, SOCK *sock, char *msid, void *session_id, bool use_compress, bool request_initial_pack);
+TSESSION *WtgNewSession(WT *wt, SOCK *sock, char *msid, void *session_id, bool use_compress, bool request_initial_pack, UINT tunnel_timeout, UINT tunnel_keepalive, bool tunnel_use_aggressive_timeout);
 void WtReleaseSession(TSESSION *s);
 void WtCleanupSession(TSESSION *s);
-TTCP *WtNewTTcp(SOCK *s, bool use_compress);
+TTCP *WtNewTTcp(SOCK *s, bool use_compress, UINT tunnel_timeout, UINT tunnel_keepalive, bool tunnel_use_aggressive_timeout);
 void WtFreeTTcp(TTCP *ttcp);
 int WtgCompareTunnel(void *p1, void *p2);
 TUNNEL *WtgSearchTunnelById(LIST *o, UINT id);
