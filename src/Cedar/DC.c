@@ -753,7 +753,7 @@ void *DcRunMstsc(DC *dc, wchar_t *mstsc_exe, char *arg, char *target, bool disab
 	write_failed = !(DcSetMstscRdpFileInt("redirectdrives", (dc->MstscUseShareDisk && (!disable_share)) ? 1 : 0));
 	DcSetMstscRdpFileInt("redirectprinters", (dc->MstscUseSharePrinter && (!disable_share)) ? 1 : 0);
 	DcSetMstscRdpFileInt("redirectcomports", (dc->MstscUseShareComPort && (!disable_share)) ? 1 : 0);
-	DcSetMstscRdpFileInt("redirectclipboard", (dc->MstscUseShareClipboard) ? 1 : 0);
+	DcSetMstscRdpFileInt("redirectclipboard", (dc->MstscUseShareClipboard && (!disable_share)) ? 1 : 0);
 	DcSetMstscRdpFileStr("drivestoredirect", (dc->MstscUseShareDisk && (!disable_share)) ? "*" : "");
 	if (disable_share)
 	{
@@ -814,7 +814,7 @@ UINT DcGetUrdpClientArguments(DC_SESSION *s, char *arg, UINT arg_size, bool disa
 			StrCat(arg, arg_size, " -noclipboard");
 		}
 
-		if (disable_share)
+		if (disable_share || (s->Dc->MstscUseShareDisk == false))
 		{
 			StrCat(arg, arg_size, " -nofileshare");
 		}
