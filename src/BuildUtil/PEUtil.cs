@@ -151,7 +151,7 @@ namespace BuildUtil
 			SetPEVersionTo4(data);
 
 			int i;
-			for (i = 0;; i++)
+			for (i = 0; ; i++)
 			{
 				try
 				{
@@ -231,8 +231,25 @@ namespace BuildUtil
 					throw new ApplicationException("mt.exe Manifest Processing for '" + exe + "' Failed.");
 				}
 
+				ex = null;
+
 				// Revert to the original file
-				IO.FileCopy(exeTmp, exe);
+				for (i = 0; i < 20; i++)
+				{
+					try
+					{
+						IO.FileCopy(exeTmp, exe);
+						ex = null;
+
+						break;
+					}
+					catch (Exception ex2)
+					{
+						ex = ex2;
+					}
+
+					ThreadObj.Sleep(Secure.Rand31i() % 50);
+				}
 
 				// Restore the date and time
 				File.SetCreationTime(exe, fi.CreationTime);
