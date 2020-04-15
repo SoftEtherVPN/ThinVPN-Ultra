@@ -714,19 +714,6 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 	svc_type = ds->ServiceType;
 
-	ds_caps = DsGetCaps(ds);
-	if (has_urdp2_client)
-	{
-		ds_caps |= DS_CAPS_SUPPORT_URDP2;
-		urdp_version = 2;
-	}
-	else
-	{
-		// RUDP 1 サポートは終了しました
-		DsSendError(sock, ERR_NOT_SUPPORTED);
-		return;
-	}
-
 	// 認証パラメータを送信
 	p = NewPack();
 	if (ds->UseAdvancedSecurity == false)
@@ -742,6 +729,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	PackAddData(p, "Rand", rand, sizeof(rand));
 	PackAddData(p, "MachineKey", machine_key, sizeof(machine_key));
 
+	ds_caps = DsGetCaps(ds);
+	if (has_urdp2_client)
+	{
+		ds_caps |= DS_CAPS_SUPPORT_URDP2;
+		urdp_version = 2;
+	}
 	PackAddInt(p, "DsCaps", ds_caps);
 
 	PackAddBool(p, "IsShareDisabled", is_share_disabled);

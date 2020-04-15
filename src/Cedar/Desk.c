@@ -516,23 +516,23 @@ bool DeskInitUrdpFiles(wchar_t *dst_dir, bool rudp_server_manifest, bool overwri
 		}
 	}
 
-	//ConbinePathW(dst, sizeof(dst), dst_dir, L"logmessages.dll");
-	//if (overwrite || IsFileExistsW(dst) == false)
-	//{
-	//	if (FileCopyW(L"|logmessages.dll", dst) == false)
-	//	{
-	//		return false;
-	//	}
-	//}
+	ConbinePathW(dst, sizeof(dst), dst_dir, L"logmessages.dll");
+	if (overwrite || IsFileExistsW(dst) == false)
+	{
+		if (FileCopyW(L"|logmessages.dll", dst) == false)
+		{
+			return false;
+		}
+	}
 
-	//ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpclient.exe");
-	//if (overwrite || IsFileExistsW(dst) == false)
-	//{
-	//	if (FileCopyW(L"|urdpclient.exe", dst) == false)
-	//	{
-	//		return false;
-	//	}
-	//}
+	ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpclient.exe");
+	if (overwrite || IsFileExistsW(dst) == false)
+	{
+		if (FileCopyW(L"|urdpclient.exe", dst) == false)
+		{
+			return false;
+		}
+	}
 
 	ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpclient2.exe");
 	if (overwrite || IsFileExistsW(dst) == false)
@@ -543,23 +543,23 @@ bool DeskInitUrdpFiles(wchar_t *dst_dir, bool rudp_server_manifest, bool overwri
 		}
 	}
 
-	//ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpconfig.exe");
-	//if (overwrite || IsFileExistsW(dst) == false)
-	//{
-	//	if (FileCopyW(L"|urdpconfig.exe", dst) == false)
-	//	{
-	//		return false;
-	//	}
-	//}
+	ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpconfig.exe");
+	if (overwrite || IsFileExistsW(dst) == false)
+	{
+		if (FileCopyW(L"|urdpconfig.exe", dst) == false)
+		{
+			return false;
+		}
+	}
 
-	//ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpserver.exe");
-	//if (overwrite || IsFileExistsW(dst) == false)
-	//{
-	//	if (FileCopyW(L"|urdpserver.exe", dst) == false)
-	//	{
-	//		return false;
-	//	}
-	//}
+	ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpserver.exe");
+	if (overwrite || IsFileExistsW(dst) == false)
+	{
+		if (FileCopyW(L"|urdpserver.exe", dst) == false)
+		{
+			return false;
+		}
+	}
 
 	ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpserver2.exe");
 	if (overwrite || IsFileExistsW(dst) == false)
@@ -572,14 +572,14 @@ bool DeskInitUrdpFiles(wchar_t *dst_dir, bool rudp_server_manifest, bool overwri
 
 	if (rudp_server_manifest)
 	{
-		//ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpserver.exe.manifest");
-		//if (overwrite || IsFileExistsW(dst) == false)
-		//{
-		//	if (FileCopyW(L"|urdpserver.exe.manifest", dst) == false)
-		//	{
-		//		return false;
-		//	}
-		//}
+		ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpserver.exe.manifest");
+		if (overwrite || IsFileExistsW(dst) == false)
+		{
+			if (FileCopyW(L"|urdpserver.exe.manifest", dst) == false)
+			{
+				return false;
+			}
+		}
 
 		ConbinePathW(dst, sizeof(dst), dst_dir, L"urdpserver2.exe.manifest");
 		if (overwrite || IsFileExistsW(dst) == false)
@@ -591,14 +591,14 @@ bool DeskInitUrdpFiles(wchar_t *dst_dir, bool rudp_server_manifest, bool overwri
 		}
 	}
 
-	//ConbinePathW(dst, sizeof(dst), dst_dir, L"wm_hooks.dll");
-	//if (overwrite || IsFileExistsW(dst) == false)
-	//{
-	//	if (FileCopyW(L"|wm_hooks.dll", dst) == false)
-	//	{
-	//		return false;
-	//	}
-	//}
+	ConbinePathW(dst, sizeof(dst), dst_dir, L"wm_hooks.dll");
+	if (overwrite || IsFileExistsW(dst) == false)
+	{
+		if (FileCopyW(L"|wm_hooks.dll", dst) == false)
+		{
+			return false;
+		}
+	}
 
 	ConbinePathW(dst, sizeof(dst), dst_dir, L"hookldr.exe");
 	if (overwrite || IsFileExistsW(dst) == false)

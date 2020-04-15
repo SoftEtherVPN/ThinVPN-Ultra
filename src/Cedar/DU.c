@@ -950,27 +950,22 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 			if (s->DsCaps & DS_CAPS_SUPPORT_URDP2)
 			{
 				urdp_version = 2;
+			}
 
-				// URDP
-				ret = DcGetUrdpClientArguments(s, arg, sizeof(arg), s->IsShareDisabled, urdp_version);
+			// URDP
+			ret = DcGetUrdpClientArguments(s, arg, sizeof(arg), s->IsShareDisabled, urdp_version);
 
-				if (ret == ERR_NO_ERROR)
+			if (ret == ERR_NO_ERROR)
+			{
+				process = DcRunUrdpClient(arg, &process_id, urdp_version);
+
+				if (process != NULL)
 				{
-					process = DcRunUrdpClient(arg, &process_id, urdp_version);
-
-					if (process != NULL)
+					if (urdp_version <= 1)
 					{
-						if (urdp_version <= 1)
-						{
-							msg = DuUrdpMsgStart(t);
-						}
+						msg = DuUrdpMsgStart(t);
 					}
 				}
-			}
-			else
-			{
-				// RUDP 1.x 系のサポートは削除しました
-				ret = ERR_NOT_SUPPORTED;
 			}
 		}
 
