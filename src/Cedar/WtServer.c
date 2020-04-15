@@ -575,7 +575,6 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 		session->ErrorCode = code;
 		return;
 	}
-	FreePack(p);
 
 	{
 		UINT tunnel_timeout2 = PackGetInt(p, "tunnel_timeout");
@@ -588,6 +587,8 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 			tunnel_use_aggressive_timeout = tunnel_use_aggressive_timeout2;
 		}
 	}
+
+	FreePack(p);
 
 	session->GateTcp = WtNewTTcp(s, session->ConnectParam->UseCompress, tunnel_timeout, tunnel_keepalive, tunnel_use_aggressive_timeout);
 	session->GateTcp->MultiplexMode = true;

@@ -394,7 +394,6 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 		ReleaseSock(s);
 		return code;
 	}
-	FreePack(p);
 
 	{
 		UINT tunnel_timeout2 = PackGetInt(p, "tunnel_timeout");
@@ -407,6 +406,8 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 			tunnel_use_aggressive_timeout = tunnel_use_aggressive_timeout2;
 		}
 	}
+
+	FreePack(p);
 
 	SetTimeout(s, TIMEOUT_INFINITE);
 
