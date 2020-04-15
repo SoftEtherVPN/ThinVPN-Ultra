@@ -581,7 +581,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 		UINT tunnel_timeout2 = PackGetInt(p, "tunnel_timeout");
 		UINT tunnel_keepalive2 = PackGetInt(p, "tunnel_keepalive");
 		bool tunnel_use_aggressive_timeout2 = PackGetBool(p, "tunnel_use_aggressive_timeout");
-		if (tunnel_timeout2 && tunnel_timeout2)
+		if (tunnel_timeout2 && tunnel_keepalive2)
 		{
 			tunnel_timeout = tunnel_timeout2;
 			tunnel_keepalive = tunnel_keepalive2;
