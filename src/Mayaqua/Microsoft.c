@@ -7371,12 +7371,9 @@ bool MsEnableRemoteDesktop()
 
 	if (MsIsVista())
 	{
-		if (MsRegWriteInt(REG_LOCAL_MACHINE,
+		MsRegWriteInt(REG_LOCAL_MACHINE,
 			"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
-			"UserAuthentication", 0) == false)
-		{
-			return false;
-		}
+			"UserAuthentication", 0);
 	}
 
 	return true;
@@ -7416,6 +7413,8 @@ bool MsIsRemoteDesktopEnabled()
 			}
 			else
 			{
+				/*
+				// 2020/4/15 Do not check UserAuthentication flag anymore
 				if (MsRegReadInt(REG_LOCAL_MACHINE,
 					"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
 					"UserAuthentication"))
@@ -7425,7 +7424,9 @@ bool MsIsRemoteDesktopEnabled()
 				else
 				{
 					return true;
-				}
+				}*/
+
+				return true;
 			}
 		}
 	}
