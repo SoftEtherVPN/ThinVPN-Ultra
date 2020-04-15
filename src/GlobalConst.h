@@ -35,7 +35,7 @@
 
 // ここから下は おそらくいじらなくて OK
 #define DC_RDP_PORT_START				3500	// Client の RDP ポートの開始番号
-#define DS_URDP_PORT					3456	// User-mode RDP ポート
+#define DS_URDP_PORT					3457	// User-mode RDP ポート
 #define DS_RDP_PORT						3389	// RDP のデフォルトのポート番号
 
 
