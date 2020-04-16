@@ -48,6 +48,13 @@
 #define	GC_REG_COMPANY_NAME			"Thin Telework"
 
 
+// Installer 関係
+#define SW_NAME_NTTSERVER			"nttserver"
+#define SW_LONG_NTTSERVER			L"Thin Telework Server"
+
+#define SW_NAME_NTTCLIENT			"nttclient"
+#define SW_LONG_NTTCLIENT			L"Thin Telework Client"
+
 
 // インストールするファイル名
 #define DI_FILENAME_DESKCLIENT		L"NttClient.exe"

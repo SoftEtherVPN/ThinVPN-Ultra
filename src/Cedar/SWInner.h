@@ -145,6 +145,8 @@
 #define	SW_CMP_VPN_SMGR				4	// VPN Server Manager (Tools Only)
 #define	SW_CMP_VPN_CMGR				5	// VPN Client Manager (Tools Only)
 
+#define SW_CMP_NTT_SERVER			11	// Thin Telework Server
+#define SW_CMP_NTT_CLIENT			12	// Thin Telework Client
 
 
 // Exit code

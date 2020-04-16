@@ -6254,6 +6254,21 @@ void SwDefineComponents(SW *sw)
 		"vpncmd_x64.exe",
 		"hamcore.se2",
 	};
+
+	char *ntt_server_files[] =
+	{
+		"NttServer.exe",
+		"NttConfig.exe",
+		"hamcore.se2",
+	};
+
+	char *ntt_client_files[] =
+	{
+		"NttClient.exe",
+		"NttConfig.exe",
+		"hamcore.se2",
+	};
+
 	// Validate arguments
 	if (sw == NULL)
 	{
