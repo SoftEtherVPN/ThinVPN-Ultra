@@ -21,12 +21,7 @@
 #define	DS_LOG_WARNING				1	// 警告
 #define	DS_LOG_ERROR				2	// エラー
 
-// イベントログのソース名
-#define	DS_EVENTLOG_SOURCE_NAME		L"Desktop VPN Server"
-
 // 定数
-#define DS_RPC_VER_SIGNATURE_STR	"Desktop VPN Server Configuration Procotol (localhost only)"
-#define DS_CONFIG_FILENAME			"@desk_server.config"
 #define DS_PASSWORD_ENCRYPT_KEY		"pass_key"
 #define DS_SEND_ERROR_AND_WAIT_SPAN	(3 * 1000)
 #define DS_LOG_DIRNAME				"@server_log"

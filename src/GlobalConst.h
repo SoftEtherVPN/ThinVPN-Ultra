@@ -35,6 +35,16 @@
 #define	DESK_SVC_NAME					"DESK"	// WideTunnel 内でのサービス名
 #define DS_RPC_PORT						9823	// Server の RPC ポート					// 元: 9822
 
+// イベントログのソース名
+#define	DS_EVENTLOG_SOURCE_NAME		L"Thin Telework Server"
+
+// 定数
+#define DS_RPC_VER_SIGNATURE_STR	"Thin Telework Server Configuration Procotol (localhost only)"
+#define DS_CONFIG_FILENAME			"@ThinServer.config"
+
+#define	GC_REG_COMPANY_NAME			"Thin Telework"
+
+
 
 // インストールするファイル名
 #define DI_FILENAME_DESKCLIENT		L"NttClient.exe"
@@ -90,18 +100,14 @@
 
 
 
-//// Registry
-
-#define	GC_REG_COMPANY_NAME			"SoftEther Project"
-
 
 
 
 //// Setup Wizard
 
 #define	GC_SW_UIHELPER_REGVALUE		"SoftEther VPN Client UI Helper"
-#define	GC_SW_SOFTETHER_PREFIX		"se"
-#define	GC_SW_SOFTETHER_PREFIX_W	L"se"
+#define	GC_SW_SOFTETHER_PREFIX		""
+#define	GC_SW_SOFTETHER_PREFIX_W	L""
 
 
 

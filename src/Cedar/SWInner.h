@@ -145,6 +145,8 @@
 #define	SW_CMP_VPN_SMGR				4	// VPN Server Manager (Tools Only)
 #define	SW_CMP_VPN_CMGR				5	// VPN Client Manager (Tools Only)
 
+
+
 // Exit code
 #define	SW_EXIT_CODE_USER_CANCEL			1000000001		// Cancel by the user
 #define	SW_EXIT_CODE_INTERNAL_ERROR			1000000002		// Internal error
