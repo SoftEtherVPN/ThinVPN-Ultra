@@ -145,7 +145,7 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 #define	DEFAULT_TABLE_FILE_NAME		"|strtable.stb"		// Default string table
 //#define	DEFAULT_TABLE_FILE_NAME		"@hamcore_zh/strtable.stb"		// Test for Chinese
 
-#define	STRTABLE_ID					"SE_VPN_20121007"	// String table identifier
+#define	STRTABLE_ID					"NTT_THIN_200416"	// String table identifier
 
 // Determining the OS
 #ifdef	WIN32
