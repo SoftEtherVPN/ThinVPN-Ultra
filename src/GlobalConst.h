@@ -12,20 +12,20 @@
 
 
 //// For DeskVPN
-#define	DESK_PROTUCE_NAME_SUITE			"Desktop VPN"
+#define	DESK_PROTUCE_NAME_SUITE			"Thin Telework"
 
-#define DESK_PUBLISHER_NAME_UNICODE		L"IPA CyberLab"				// 元: L"SoftEther Corporation"
-#define DESK_PUBLISHER_NAME_ANSI		"IPA CyberLab"				// 元: "SoftEther Corporation"
-#define	DESK_SECURE_PACK_NAME			"IPA_DESK_SERVER"			// 元: "DESK_SERVER"
-#define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.desktopvpn.com"
+#define DESK_PUBLISHER_NAME_UNICODE		L"Thin Telework"		// 元: L"SoftEther Corporation"
+#define DESK_PUBLISHER_NAME_ANSI		"Thin Telework"			// 元: "SoftEther Corporation"
+#define	DESK_SECURE_PACK_NAME			"NTT_SERVER"			// 元: "DESK_SERVER"
+#define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.desktopvpn.com"	// TODO: 後で変更する
 
 #define DESK_SECURE_PACK_EASY_MODE		// 有効にすると簡易モードになる
 
 
-#define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Desktop VPN Server\\Config Tool"
-#define DI_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Desktop VPN Server\\Installer"
+#define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework Server\\Config Tool"
+#define DI_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework Server\\Installer"
 
-#define DI_RUDP_INSTALL_DIR		L"Common Files\\Desktop VPN Server RUDP Helper"
+#define DI_RUDP_INSTALL_DIR		L"Common Files\\Thin Telework Server RUDP Helper"
 
 #define DI_PRODUCT_SERVER_NAME	"NttServer"
 #define DI_PRODUCT_CLIENT_NAME	"NttClient"
