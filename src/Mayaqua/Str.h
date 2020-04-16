@@ -245,6 +245,8 @@ void ClearStr(char *str, UINT str_size);
 void SetStrCaseAccordingToBits(char *str, UINT bits);
 char *UrlDecode(char *url_str);
 
+bool CheckPasswordComplexity(char *str);
+
 
 // *** JSON strings support
 // Original source code from Parson ( http://kgabis.github.com/parson/ )

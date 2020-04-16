@@ -579,7 +579,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	pingmode = PackGetBool(p, "PingMode");
 	downloadmode = PackGetBool(p, "downloadmode");
 	download_size = PackGetInt(p, "download_size");
-	bluetooth_mode = PackGetBool(p, "bluetooth_mode");
+	bluetooth_mode = false;//PackGetBool(p, "bluetooth_mode");
 	first_connection = PackGetBool(p, "FirstConnection");
 	has_urdp2_client = PackGetBool(p, "HasURDP2Client");
 
@@ -770,6 +770,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	if (ds->UseAdvancedSecurity == false)
 	{
 		HUB *hub = GetHub(ds->Server->Cedar, CEDAR_DESKVPN_HUBNAME);
+		bool is_password_empty = false;
 
 		// IP アドレスを確認する
 		if (IsIpDeniedByAcList(&client_ip, hub->HubDb->AcList))
@@ -792,20 +793,45 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		if (ds->AuthType == DESK_AUTH_NONE)
 		{
 			// 認証無し
-			ret = true;
+			is_password_empty = true;
 		}
 		else if (ds->AuthType == DESK_AUTH_PASSWORD)
 		{
 			UCHAR secure_password_2[SHA1_SIZE];
 
-			// パスワード認証
-			SecurePassword(secure_password_2, ds->AuthPassword, rand);
+			UCHAR zero_hash[SHA1_SIZE];
 
-			if (Cmp(secure_password, secure_password_2, SHA1_SIZE) == 0)
+			HashSha1(zero_hash, NULL, 0);
+
+			if (Cmp(zero_hash, secure_password_2, SHA1_SIZE) == 0 ||
+				IsZero(secure_password_2, SHA1_SIZE))
 			{
-				// パスワード一致
-				ret = true;
+				// パスワードがなぜか設定されていない
+				is_password_empty = true;
 			}
+			else
+			{
+				// パスワード認証
+				SecurePassword(secure_password_2, ds->AuthPassword, rand);
+
+				if (Cmp(secure_password, secure_password_2, SHA1_SIZE) == 0)
+				{
+					// パスワード一致
+					ret = true;
+				}
+			}
+		}
+
+		if (is_password_empty)
+		{
+			// アクセス拒否 - パスワード未設定
+			if (first_connection)
+			{
+				DsLogEx(ds, DS_LOG_ERROR, "DSL_AUTH_ANONYMOUS_NG", tunnel_id);
+				DsReportAuthFailed(ds, tunnel_id, &client_ip, client_host);
+			}
+			DsSendError(sock, ERR_DESK_PASSWORD_NOT_SET);
+			FreePack(p);
 		}
 
 		if (ret == false)

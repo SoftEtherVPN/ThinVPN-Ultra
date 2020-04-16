@@ -109,6 +109,7 @@ UINT DgPassword2DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void 
 		SetIcon(hWnd, 0, ICO_KEY);
 		DlgFont(hWnd, S_1, (_GETLANG() == 0 ? 18 : 14), true);
 		DlgFont(hWnd, S_2, 11, false);
+		DlgFont(hWnd, IDOK, 0, true);
 
 		SetShow(hWnd, S_LANG_JP, _GETLANG() == 0);
 		SetShow(hWnd, S_LANG_EN, _GETLANG() != 0);
@@ -980,6 +981,16 @@ void DgAuthDlgOnOk(HWND hWnd, DG *dg)
 		{
 			if (StrCmp(pass, HIDDEN_PASSWORD) != 0)
 			{
+				if (CheckPasswordComplexity(pass) == false)
+				{
+					if (MsgBox(hWnd, MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION,
+						_UU("DG_PASSWORD_POLICY_ERROR")) == IDNO)
+					{
+						FocusEx(hWnd, E_PASSWORD1);
+						return;
+					}
+				}
+
 				HashSha1(t.AuthPassword, pass, StrLen(pass));
 
 				t.AuthType = DESK_AUTH_PASSWORD;
@@ -1000,6 +1011,18 @@ void DgAuthDlgOnOk(HWND hWnd, DG *dg)
 #else	// DESK_DISABLE_NEW_FEATURE
 	t.UseAdvancedSecurity = false;
 #endif	// DESK_DISABLE_NEW_FEATURE
+
+	if (t.UseAdvancedSecurity == false && t.AuthType == DESK_AUTH_NONE)
+	{
+		if (MsgBox(hWnd, MB_YESNO | MB_ICONEXCLAMATION, _UU("DG_AUTH_NO_PASSWORD")) == IDYES)
+		{
+			Check(hWnd, C_USE_AUTH, true);
+			SetTextA(hWnd, E_PASSWORD2, "");
+			SetTextA(hWnd, E_PASSWORD1, "");
+			FocusEx(hWnd, E_PASSWORD1);
+			return;
+		}
+	}
 
 	if (CALL(hWnd, DtcSetConfig(dg->Rpc, &t)) == false)
 	{

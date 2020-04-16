@@ -13751,6 +13751,7 @@ void SmEditUserDlgOk(HWND hWnd, SM_EDIT_USER *s)
 {
 	RPC_SET_USER t;
 	RPC_SET_USER *u;
+	char tmp1[MAX_SIZE];
 	// Validate arguments
 	if (hWnd == NULL || s == NULL)
 	{
@@ -13758,6 +13759,35 @@ void SmEditUserDlgOk(HWND hWnd, SM_EDIT_USER *s)
 	}
 
 	SmEditUserDlgUpdate(hWnd, s);
+
+	switch (s->SetUser.AuthType)
+	{
+	case AUTHTYPE_ANONYMOUS:
+		if (MsgBox(hWnd, MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION,
+			_UU("DG_AUTH_ANONYMOUS_WARNING")) == IDNO)
+		{
+			FocusEx(hWnd, L_AUTH);
+			return;
+		}
+		break;
+
+	case AUTHTYPE_PASSWORD:
+		GetTxtA(hWnd, E_PASSWORD1, tmp1, sizeof(tmp1));
+
+		if (StrCmp(tmp1, HIDDEN_PASSWORD) != 0)
+		{
+			if (CheckPasswordComplexity(tmp1) == false)
+			{
+				if (MsgBox(hWnd, MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION,
+					_UU("DG_PASSWORD_POLICY_ERROR")) == IDNO)
+				{
+					FocusEx(hWnd, E_PASSWORD1);
+					return;
+				}
+			}
+		}
+		break;
+	}
 
 	Zero(&t, sizeof(t));
 	u = &s->SetUser;
@@ -14190,7 +14220,7 @@ void SmEditUserDlgUpdate(HWND hWnd, SM_EDIT_USER *s)
 	case AUTHTYPE_PASSWORD:
 		GetTxtA(hWnd, E_PASSWORD1, tmp1, sizeof(tmp1));
 		GetTxtA(hWnd, E_PASSWORD2, tmp2, sizeof(tmp2));
-		if (StrCmp(tmp1, tmp2) != 0)
+		if (StrCmp(tmp1, tmp2) != 0 || StrLen(tmp1) == 0)
 		{
 			ok = false;
 		}

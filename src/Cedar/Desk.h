@@ -69,6 +69,7 @@
 #define	ERR_DESK_DONT_USE_RDP_FILE		320		// .rdp ファイルを指定しないでください
 #define	ERR_DESK_RDP_FILE_WRITE_ERROR	321		// .rdp ファイルに書き込めない
 #define	ERR_DESK_NEED_WINXP				322		// Windows XP 以降が必要
+#define ERR_DESK_PASSWORD_NOT_SET		323		// パスワード未設定
 
 
 // DC 関係パラメータ

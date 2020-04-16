@@ -134,6 +134,58 @@ static BYTESTR bytestr[] =
 	{0, "Bytes"},
 };
 
+bool CheckPasswordComplexity(char *str)
+{
+	UINT len;
+	UINT i;
+	UINT type0 = 0;
+	UINT type1 = 0;
+	UINT type2 = 0;
+	UINT type3 = 0;
+	if (str == NULL)
+	{
+		return false;
+	}
+
+	len = StrLen(str);
+
+	if (len < 8)
+	{
+		return false;
+	}
+
+	for (i = 0;i < len;i++)
+	{
+		char c = str[i];
+
+		if (c >= 'a' && c <= 'z')
+		{
+			type0 = 1;
+		}
+		else if (c >= 'A' && c <= 'Z')
+		{
+			type1 = 1;
+		}
+		else if (c >= '0' && c <= '9')
+		{
+			type2 = 1;
+		}
+		else
+		{
+			type3 = 1;
+		}
+	}
+
+	if ((type0 + type1 + type2 + type3) >= 3)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 // Decode URL string
 char *UrlDecode(char *url_str)
 {
