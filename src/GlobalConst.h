@@ -35,6 +35,20 @@
 #define	DESK_SVC_NAME					"DESK"	// WideTunnel 内でのサービス名
 #define DS_RPC_PORT						9823	// Server の RPC ポート					// 元: 9822
 
+
+// インストールするファイル名
+#define DI_FILENAME_DESKCLIENT		L"DeskClient.exe"
+#define DI_FILENAME_DESKCONFIG		L"DeskConfig.exe"
+#define DI_FILENAME_DESKSERVER		L"DeskServer.exe"
+#define DI_FILENAME_DESKSETUP		L"DeskSetup.exe"
+#define	DI_FILENAME_DESKHELPER		L"DeskHelper.exe"
+#define DI_FILENAME_HAMCORE			L"hamcore.se2"
+
+// 関係するファイル名
+#define DI_FILENAME_SETUPINI		L"@DeskSetup.ini"
+
+
+
 // ここから下は おそらくいじらなくて OK
 #define DC_RDP_PORT_START				3500	// Client の RDP ポートの開始番号
 #define DS_URDP_PORT					3457	// User-mode RDP ポート

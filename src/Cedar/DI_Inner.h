@@ -24,16 +24,6 @@
 // ファイルロック解除タイムアウト
 #define	DI_FILE_UNLOCK_TIMEOUT	(5 * 1000)
 
-// インストールするファイル名
-#define DI_FILENAME_DESKCLIENT		L"DeskClient.exe"
-#define DI_FILENAME_DESKCONFIG		L"DeskConfig.exe"
-#define DI_FILENAME_DESKSERVER		L"DeskServer.exe"
-#define DI_FILENAME_DESKSETUP		L"DeskSetup.exe"
-#define	DI_FILENAME_DESKHELPER		L"DeskHelper.exe"
-#define DI_FILENAME_HAMCORE			L"hamcore.se2"
-
-// 関係するファイル名
-#define DI_FILENAME_SETUPINI		L"@DeskSetup.ini"
 
 // インストールするファイル
 typedef struct DI_FILE
