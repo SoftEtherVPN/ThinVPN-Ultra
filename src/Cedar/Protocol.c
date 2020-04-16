@@ -7368,18 +7368,7 @@ bool ServerDownloadSignature(CONNECTION *c, char **error_detail_str)
 
 					if (c->FirstSock->RemoteIP.addr[0] == 127)
 					{
-						if (StrCmpi(h->Target, HTTP_SAITAMA) == 0)
-						{
-							// Saitama (joke)
-							FreeHttpHeader(h);
-							h = NewHttpHeader("HTTP/1.1", "202", "OK");
-							AddHttpValue(h, NewHttpValue("Content-Type", HTTP_CONTENT_TYPE3));
-							AddHttpValue(h, NewHttpValue("Connection", "Keep-Alive"));
-							AddHttpValue(h, NewHttpValue("Keep-Alive", HTTP_KEEP_ALIVE));
-							PostHttp(s, h, Saitama, SizeOfSaitama());
-							b = true;
-						}
-						else if (StartWith(h->Target, HTTP_PICTURES))
+						if (StartWith(h->Target, HTTP_PICTURES))
 						{
 							BUF *buf;
 

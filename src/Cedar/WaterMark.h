@@ -116,10 +116,7 @@
 
 // Digital watermark
 extern BYTE WaterMark[];
-extern BYTE Saitama[];
-
 UINT SizeOfWaterMark();
-UINT SizeOfSaitama();
 
 #define	MAX_WATERMARK_SIZE		(SizeOfWaterMark() + HTTP_PACK_RAND_SIZE_MAX * 2)
 
