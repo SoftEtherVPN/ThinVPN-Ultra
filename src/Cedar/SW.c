@@ -238,7 +238,7 @@ bool SwCompileSfx(LIST *o, wchar_t *dst_filename)
 	{
 		// Generate the setup.exe file in the Temp directory
 		ConbinePathW(exe_filename, sizeof(exe_filename), MsGetMyTempDirW(), L"setup.exe");
-		if (FileCopyW(L"|vpnsetup_nosign.exe", exe_filename))
+		if (FileCopyW(SW_SETUP_NOSIGN_EXESRC, exe_filename))
 		{
 			// Resource updating start
 			HANDLE h = _BeginUpdateResourceW(exe_filename, false);
@@ -526,7 +526,7 @@ bool SwSfxExtractProcess(HWND hWnd, bool *hide_error_msg)
 
 		ConbinePathW(tmp_filename, sizeof(tmp_filename), MsGetMyTempDirW(), filename_w);
 
-		if (EndWith(filename, "vpnsetup.exe"))
+		if (EndWith(filename, "setup.exe"))
 		{
 			UniStrCpy(exec_filename, sizeof(exec_filename), tmp_filename);
 		}
@@ -2492,11 +2492,11 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 
 	// Add the Setup program (themselves) to the copy list
 	Add(t->CopyTasks, (setup_exe = SwNewCopyTask(src_setup_exe_filename,
-		L"vpnsetup.exe", src_setup_exe_dir, sw->InstallDir, true, true)));
+		SW_SETUP_EXE_X86, src_setup_exe_dir, sw->InstallDir, true, true)));
 
 	// Add vpnsetup_x64.exe to the copy list
-	Add(t->CopyTasks, (setup_exe_x64 = SwNewCopyTask(L"vpnsetup_x64.exe",
-		L"vpnsetup_x64.exe", src_setup_exe_dir, sw->InstallDir, true, true)));
+	Add(t->CopyTasks, (setup_exe_x64 = SwNewCopyTask(SW_SETUP_EXE_X64,
+		SW_SETUP_EXE_X64, src_setup_exe_dir, sw->InstallDir, true, true)));
 
 	// Generate the file processing list for each component
 	if (c->Id == SW_CMP_VPN_SERVER)
@@ -2547,12 +2547,12 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, NULL, NULL, 0, dir_app_program,
 			_UU("SW_LINK_NAME_VPNCMD"),
 			_UU("SW_LINK_NAME_VPNCMD_COMMENT"), false));
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnserver->DstFileName, L"/traffic", L"vpnsetup.exe", 2, dir_admin_tools,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnserver->DstFileName, L"/traffic", SW_SETUP_EXE_X86, 2, dir_admin_tools,
 			_UU("SW_LINK_NAME_TRAFFIC"),
 			_UU("SW_LINK_NAME_TRAFFIC_COMMENT"), false));
 
 		// Programs\PacketiX VPN Server\Configuration tool
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnserver->DstFileName, L"/tcp", L"vpnsetup.exe", 3, dir_config_program,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnserver->DstFileName, L"/tcp", SW_SETUP_EXE_X86, 3, dir_config_program,
 			_UU("SW_LINK_NAME_TCP"),
 			_UU("SW_LINK_NAME_TCP_COMMENT"), false));
 
@@ -2565,7 +2565,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 			if (sw->IsSystemMode)
 			{
 				// Debugging information collecting tool
-				Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, L"/debug", L"vpnsetup.exe", 4, dir_admin_tools,
+				Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, L"/debug", SW_SETUP_EXE_X86, 4, dir_admin_tools,
 					_UU("SW_LINK_NAME_DEBUG"),
 					_UU("SW_LINK_NAME_DEBUG_COMMENT"), false));
 			}
@@ -2627,12 +2627,12 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, NULL, NULL, 0, dir_app_program,
 			_UU("SW_LINK_NAME_VPNCMD"),
 			_UU("SW_LINK_NAME_VPNCMD_COMMENT"), false));
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnbridge->DstFileName, L"/traffic", L"vpnsetup.exe", 2, dir_admin_tools,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnbridge->DstFileName, L"/traffic", SW_SETUP_EXE_X86, 2, dir_admin_tools,
 			_UU("SW_LINK_NAME_TRAFFIC"),
 			_UU("SW_LINK_NAME_TRAFFIC_COMMENT"), false));
 
 		// Programs\PacketiX VPN Bridge\Configuration tool
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnbridge->DstFileName, L"/tcp", L"vpnsetup.exe", 3, dir_config_program,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnbridge->DstFileName, L"/tcp", SW_SETUP_EXE_X86, 3, dir_config_program,
 			_UU("SW_LINK_NAME_TCP"),
 			_UU("SW_LINK_NAME_TCP_COMMENT"), false));
 
@@ -2645,7 +2645,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 			if (sw->IsSystemMode)
 			{
 				// Debugging information collecting tool
-				Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, L"/debug", L"vpnsetup.exe", 4, dir_admin_tools,
+				Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, L"/debug", SW_SETUP_EXE_X86, 4, dir_admin_tools,
 					_UU("SW_LINK_NAME_DEBUG"),
 					_UU("SW_LINK_NAME_DEBUG_COMMENT"), false));
 			}
@@ -2753,18 +2753,18 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmgr->DstFileName, NULL, NULL, 0, dir_app_program,
 			_UU("SW_LINK_NAME_VPNCMGR_FULL"),
 			_UU("SW_LINK_NAME_VPNCMGR_COMMENT"), false));
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmgr->DstFileName, L"/remote", L"vpnsetup.exe", 1, dir_app_program,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmgr->DstFileName, L"/remote", SW_SETUP_EXE_X86, 1, dir_app_program,
 			_UU("SW_LINK_NAME_VPNCMGR2_FULL"),
 			_UU("SW_LINK_NAME_VPNCMGR2_COMMENT"), false));
 		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, NULL, NULL, 0, dir_app_program,
 			_UU("SW_LINK_NAME_VPNCMD"),
 			_UU("SW_LINK_NAME_VPNCMD_COMMENT"), false));
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnclient->DstFileName, L"/traffic", L"vpnsetup.exe", 2, dir_admin_tools,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnclient->DstFileName, L"/traffic", SW_SETUP_EXE_X86, 2, dir_admin_tools,
 			_UU("SW_LINK_NAME_TRAFFIC"),
 			_UU("SW_LINK_NAME_TRAFFIC_COMMENT"), false));
 
 		// Programs\PacketiX VPN Client\Configuration Tools
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnclient->DstFileName, L"/tcp", L"vpnsetup.exe", 3, dir_config_program,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpnclient->DstFileName, L"/tcp", SW_SETUP_EXE_X86, 3, dir_config_program,
 			_UU("SW_LINK_NAME_TCP"),
 			_UU("SW_LINK_NAME_TCP_COMMENT"), false));
 
@@ -2777,7 +2777,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 			if (sw->IsSystemMode)
 			{
 				// Debugging information collecting tool
-				Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, L"/debug", L"vpnsetup.exe", 4, dir_admin_tools,
+				Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, L"/debug", SW_SETUP_EXE_X86, 4, dir_admin_tools,
 					_UU("SW_LINK_NAME_DEBUG"),
 					_UU("SW_LINK_NAME_DEBUG_COMMENT"), false));
 			}
@@ -2786,11 +2786,11 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 		// Programs\PacketiX VPN Client\System administrators tool
 		if (MsIsNt())
 		{
-			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, L"vpnsetup.exe", L"/easy:true", L"vpnsetup.exe", 12, dir_admin_tools,
+			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, L"vpnsetup.exe", L"/easy:true", SW_SETUP_EXE_X86, 12, dir_admin_tools,
 				_UU("SW_LINK_NAME_EASYINSTALLER"),
 				_UU("SW_LINK_NAME_EASYINSTALLER_COMMENT"), false));
 
-			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, L"vpnsetup.exe", L"/web:true", L"vpnsetup.exe", 1, dir_admin_tools,
+			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, L"vpnsetup.exe", L"/web:true", SW_SETUP_EXE_X86, 1, dir_admin_tools,
 				_UU("SW_LINK_NAME_WEBINSTALLER"),
 				_UU("SW_LINK_NAME_WEBINSTALLER_COMMENT"), false));
 		}
@@ -2857,15 +2857,15 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 
 		//// Definition of the shortcuts
 		// Desktop and Start menu
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmgr->DstFileName, L"/remote", L"vpnsetup.exe", 1, dir_desktop,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmgr->DstFileName, L"/remote", SW_SETUP_EXE_X86, 1, dir_desktop,
 			_UU(sw->IsSystemMode ? "SW_LINK_NAME_VPNCMGRTOOLS_SHORT" : "SW_LINK_NAME_VPNCMGRTOOLS_SHORT_UM"),
 			_UU("SW_LINK_NAME_VPNCMGR2_COMMENT"), true));
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmgr->DstFileName, L"/remote", L"vpnsetup.exe", 1, dir_startmenu,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmgr->DstFileName, L"/remote", SW_SETUP_EXE_X86, 1, dir_startmenu,
 			_UU(sw->IsSystemMode ? "SW_LINK_NAME_VPNCMGRTOOLS_SHORT" : "SW_LINK_NAME_VPNCMGRTOOLS_SHORT_UM"),
 			_UU("SW_LINK_NAME_VPNCMGR2_COMMENT"), true));
 
 		// Programs\PacketiX VPN Client Manager (Tools Only)
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmgr->DstFileName, L"/remote", L"vpnsetup.exe", 1, dir_app_program,
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmgr->DstFileName, L"/remote", SW_SETUP_EXE_X86, 1, dir_app_program,
 			_UU("SW_LINK_NAME_VPNCMGR2_FULL"),
 			_UU("SW_LINK_NAME_VPNCMGR2_COMMENT"), false));
 		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, vpncmd->DstFileName, NULL, NULL, 0, dir_app_program,
@@ -2886,7 +2886,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 		UniFormat(tmp1, sizeof(tmp1), _UU("SW_LINK_NAME_LANGUAGE"), c->Title);
 		UniFormat(tmp2, sizeof(tmp2), _UU("SW_LINK_NAME_LANGUAGE_COMMENT"), c->Title);
 		Add(t->LinkTasks, SwNewLinkTask(setup_exe->DstDir, setup_exe->DstFileName, L"/language:yes",
-			L"vpnsetup.exe", 10, dir_config_language,
+			SW_SETUP_EXE_X86, 10, dir_config_language,
 			tmp1,
 			tmp2, false));
 	}
@@ -3194,7 +3194,7 @@ bool SwInstallMain(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c)
 						void *proc_handle = NULL;
 						wchar_t exe[MAX_PATH];
 
-						CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), L"vpnsetup_x64.exe");
+						CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), SW_SETUP_EXE_X64);
 
 						if (MsExecuteEx2W(exe, L"/SUINSTMODE:yes", &proc_handle, true))
 						{
@@ -3866,7 +3866,7 @@ LABEL_REGISTER_UNINSTALL:
 
 		Format(install_date, sizeof(install_date), "%04u/%02u/%02u", st.wYear, st.wMonth, st.wDay);
 
-		CombinePathW(dst_setup_exe, sizeof(dst_setup_exe), sw->InstallDir, L"vpnsetup.exe");
+		CombinePathW(dst_setup_exe, sizeof(dst_setup_exe), sw->InstallDir, SW_SETUP_EXE_X86);
 
 		Format(uninstall_keyname, sizeof(uninstall_keyname),
 			"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\softether_" GC_SW_SOFTETHER_PREFIX "%s", c->Name);

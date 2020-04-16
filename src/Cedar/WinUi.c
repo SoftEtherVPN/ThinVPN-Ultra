@@ -3839,7 +3839,7 @@ UINT AboutDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 			{
 				wchar_t path[MAX_SIZE];
 
-				CombinePathW(path, sizeof(path), MsGetExeDirNameW(), L"vpnsetup.exe");
+				CombinePathW(path, sizeof(path), MsGetExeDirNameW(), SW_SETUP_EXE_X86);
 
 				if (IsFileExistsW(path))
 				{

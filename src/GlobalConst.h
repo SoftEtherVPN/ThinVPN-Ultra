@@ -64,6 +64,10 @@
 #define	DI_FILENAME_DESKHELPER		L"NttHelper.exe"
 #define DI_FILENAME_HAMCORE			L"hamcore.se2"
 
+#define SW_SETUP_NOSIGN_EXESRC		L"|nttsetup_nosign.exe"
+#define SW_SETUP_EXE_X86			L"nttsetup.exe"
+#define SW_SETUP_EXE_X64			L"nttsetup_x64.exe"
+
 // 関係するファイル名
 #define DI_FILENAME_SETUPINI		L"@NttSetup.ini"
 
