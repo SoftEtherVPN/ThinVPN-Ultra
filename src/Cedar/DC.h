@@ -13,7 +13,6 @@
 #define DC_H
 
 // 定数
-#define	DC_CONFIG_FILENAME				L"desk_client.config"
 #define DC_BLUETOOTH_FLAG_FILENAME		"@bluetooth.dat"
 #define DC_BLUETOOTH_MAX_FILESIZE		(10 * 1024 * 1024)
 #define DC_BLUETOOTH_POLLING_INTERVAL	10

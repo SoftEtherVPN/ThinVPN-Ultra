@@ -41,6 +41,7 @@
 // 定数
 #define DS_RPC_VER_SIGNATURE_STR	"Thin Telework Server Configuration Procotol (localhost only)"
 #define DS_CONFIG_FILENAME			"@ThinServer.config"
+#define	DC_CONFIG_FILENAME			L"ThinClient.config"
 
 #define	GC_REG_COMPANY_NAME			"Thin Telework"
 
