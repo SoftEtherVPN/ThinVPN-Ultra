@@ -357,7 +357,7 @@ bool DeskInstallRudpServerToProgramFilesDir()
 void DeskGetRudpServerProgramFilesDir(wchar_t *dir, UINT size)
 {
 #ifdef	OS_WIN32
-	CombinePathW(dir, size, MsGetProgramFilesDirW(), L"Common Files\\Desktop VPN Server RUDP Helper");
+	CombinePathW(dir, size, MsGetProgramFilesDirW(), DI_RUDP_INSTALL_DIR);
 #endif  // OS_WIN32
 }
 

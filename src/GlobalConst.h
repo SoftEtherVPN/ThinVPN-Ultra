@@ -25,6 +25,8 @@
 #define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Desktop VPN Server\\Config Tool"
 #define DI_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Desktop VPN Server\\Installer"
 
+#define DI_RUDP_INSTALL_DIR		L"Common Files\\Desktop VPN Server RUDP Helper"
+
 #define DI_PRODUCT_SERVER_NAME	"DeskServer"
 #define DI_PRODUCT_CLIENT_NAME	"DeskClient"
 
