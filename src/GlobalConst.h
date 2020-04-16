@@ -35,6 +35,8 @@
 #define	DESK_SVC_NAME					"DESK"	// WideTunnel 内でのサービス名
 #define DS_RPC_PORT						9823	// Server の RPC ポート					// 元: 9822
 
+#define	SW_SINGLE_INSTANCE_NAME				"ThinTelework_Setup_Wizard"
+
 // イベントログのソース名
 #define	DS_EVENTLOG_SOURCE_NAME		L"Thin Telework Server"
 

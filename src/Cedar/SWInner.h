@@ -167,9 +167,6 @@
 #define	SW_FLAG_EASY_MODE					"easy_mode.flag"
 #define	SW_FLAG_EASY_MODE_2					"@easy_mode.flag"
 
-// Multiple-starts prevention name
-#define	SW_SINGLE_INSTANCE_NAME				"SoftEther_VPN_Setup_Wizard"
-
 // Time to wait for the VPN Client service startup
 #define	SW_VPNCLIENT_SERVICE_WAIT_READY_TIMEOUT		(30 * 1000)
 
