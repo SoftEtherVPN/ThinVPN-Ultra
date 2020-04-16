@@ -183,6 +183,20 @@ static char *sfx_vpn_client_files[] =
 	"hamcore.se2",
 };
 
+static char *sfx_ntt_server_files[] =
+{
+	"nttsetup.exe",
+	"nttserver.exe",
+	"nttconfig.exe",
+	"hamcore.se2",
+};
+static char *sfx_ntt_client_files[] =
+{
+	"nttsetup.exe",
+	"nttclient.exe",
+	"hamcore.se2",
+};
+
 // Global variables to be used out of necessity
 static bool g_stop_flag = false;
 static HANDLE g_wait_process_handle = NULL;
@@ -2786,11 +2800,11 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 		// Programs\PacketiX VPN Client\System administrators tool
 		if (MsIsNt())
 		{
-			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, L"vpnsetup.exe", L"/easy:true", SW_SETUP_EXE_X86, 12, dir_admin_tools,
+			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, SW_SETUP_EXE_X86, L"/easy:true", SW_SETUP_EXE_X86, 12, dir_admin_tools,
 				_UU("SW_LINK_NAME_EASYINSTALLER"),
 				_UU("SW_LINK_NAME_EASYINSTALLER_COMMENT"), false));
 
-			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, L"vpnsetup.exe", L"/web:true", SW_SETUP_EXE_X86, 1, dir_admin_tools,
+			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, SW_SETUP_EXE_X86, L"/web:true", SW_SETUP_EXE_X86, 1, dir_admin_tools,
 				_UU("SW_LINK_NAME_WEBINSTALLER"),
 				_UU("SW_LINK_NAME_WEBINSTALLER_COMMENT"), false));
 		}
