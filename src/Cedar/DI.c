@@ -2416,10 +2416,10 @@ void DiApplyProductFileList(DI *di)
 
 	if (di->Product == DI_PRODUCT_SERVER)
 	{
-		// DeskServer.exe の種類
+		// NttServer.exe の種類
 		wchar_t exe[MAX_PATH];
 
-		CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), L"deskserver.exe");
+		CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), L"nttserver.exe");
 		di->ForceShareDisabled = DsCheckShareDisableSignature(exe);
 
 		// Server
