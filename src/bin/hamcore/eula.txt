@@ -1,25 +1,103 @@
-Copyright (c) all contributors on SoftEther VPN project in GitHub.
-Copyright (c) Daiyuu Nobori, SoftEther Project at University of Tsukuba, and SoftEther Corporation.
+「NTT 東日本 - IPA シン・テレワークシステム」使用条件 [未完成]
+2020 年 4 月 20 日版 (案)
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+発行元
+東日本電信電話株式会社 コロナ対策プロジェクト 特殊局
+独立行政法人情報処理推進機構 産業サイバーセキュリティセンター サイバー技術研究室
 
-    http://www.apache.org/licenses/LICENSE-2.0
+本テレワークシステムを使用される場合は、下記の使用条件への同意が必要です。
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and limitations under the License.
+0. 前提
+本テレワークシステムは、ユーザーのコンピュータで動作するサーバーアプリケーションおよびクライアントアプリケーション (以下「アプリケーション」) と、クラウド上のテレワークセッションの中継システム (以下「中継システム」) から構成されています。アプリケーションのプログラムおよび中継システムは、NTT 東日本、IPA および複数の連携協力者 (以下「提供元」) によって提供されるものの組み合わせです。連携協力者の一覧は、アプリケーションをダウンロード提供する Web サイトに掲載されています。本テレワークシステムは、市販ソフトウェアまたは商用通信サービスとして顧客に提供されるものではなく、学術的・試験的な実証実験として、当該実証実験へ参加いただくユーザーの皆様に、無償・無保証で提供されるものです。
+
+1. 免責事項
+本テレワークシステムでは、新型コロナウイルス感染症拡大防止と事業継続支援のため、研究開発中の試験的プログラムや無保証のインフラや実験ネットワークを組み合わせ、限られたリソースの元で、学術的・試験的な実証実験として、一時的・緊急的に提供されるものです。アプリケーションや中継システムの品質・機能・性能・セキュリティレベルは、実験段階のレベルであり、完成された商用レベルではありません。不具合によりデータの滅失、改変、ハードウェアやネットワーク装置の故障が発生する可能性もあります。アプリケーションや中継システムの一部または全部を利用されたこと、または利用できなかったことが原因で、何らかの損害がユーザーまたはその所属組織等に発生しても、提供元は一切責任を負いません。たとえこれらの損害の可能性を知らされていた場合でも同様です。アプリケーションや中継システムに不具合がある場合、提供元は、できるだけ早期に改善を試みる予定ですが、一般の商用サービス等と比較しても対応の優先順位は低くなることから、時間を要するか、改善できない場合もあります。提供元は、不具合の修正の義務を負いません。中継システムの利用数が思いがけなく増加した場合、スケーラビリティ上の不具合が発生する場合があり、改善できない場合があります。
+
+2. 保証およびユーザーサポートがないことについて
+本テレワークシステムはも商用の通信サービスと同様の保証や、個別のユーザーサポートが提供されません。提供元は、個別のお問い合わせには応じません。ユーザーは、提供元各組織の通常の商用サービスまたは通常業務用のコールセンター等への問い合わせを行なうことはできません。すべての問題はユーザーの責任で解決していただくこととなります。なお、提供元は、インターネット Web サイト上でユーザー間の相互サポートのための掲示板 (フォーラム) を設置する場合があります。フォーラムの URL は、アプリケーションのダウンロード Web サイトに掲載されます。
+
+2. 実証実験
+本テレワークシステムは、実証実験であり、提供元は実験の目的を達成するため、いつでもユーザーへの事前の予告なく、中継システムをメンテナンスしたり、停止したり、不具合の修正または新たな機能を付け加えるために挙動を変更したりすることができます。また、提供元は、本実証実験を、事前の予告なく、いつでも終了することができます。ユーザーはこのことを了解し、いつでもテレワークの通信が停止する可能性がある前提を理解した上で、損害が発生しない用途にのみ利用することとします。アプリケーション、およびアプリケーションと中継システムとの間の通信は、Web サイトに記載されている動作環境であっても、インターネット回線やコンピュータのソフトウェアとの組み合わせによって正常に動作しない可能性があります。本テレワークシステムを利用する際、お使いのインターネット回線が従量課金方式の場合は、通信料が課金される可能性があります。すべての費用はユーザーの負担となります。
+
+3. セキュリティ
+本テレワークシステムは、インターネットファイアウォールの内側にサーバーを設置可能なものであり、中継システムを経由して、インターネット上のコンピュータからサーバーの画面にリモートアクセスが可能となります。第三者による接続を防止するため、サーバーを識別する「コンピュータ ID」は十分複雑な文字列を設置し、秘密にしてください。また、インストール完了後、直ちに十分複雑な秘密のパスワードを設定してください。これらが行なわれていない場合は、第三者による接続が発生し、セキュリティ上の問題となる可能性があります。また、アプリケーションや中継システムに一切のセキュリティ上の脆弱性が存在しないことは保証されていません。脆弱性が発見された場合は、原理上は、アップデートまでの間は、第三者によるセキュリティ侵害が発生する可能性があります。アプリケーションはフリーウェアであり、提供元は脆弱性やその他の不具合の修正義務を負いません。したがって、商用レベルの迅速さで、脆弱性を解消するアップデートが提供されない場合があります。アプリケーションと中継システムとの間のインターネットを流れる通信は暗号化されますが、原理上、インターネット上の第三者によって解読される可能性があります。中継システムでは SSL トンネルが終端されます。中継システムにはテレワーク通信の内容を複製または記録する機能はなく、中継システムの管理者であっても原則として読み取ることはできませんが、原理上は、中継システムに対して、第三者がセキュリティ侵害に成功した場合は、中継システムのメモリ上の情報を取得されるリスクがあります。ユーザーのコンピュータと中継システムとの間に信頼できない通信回線が含まれている場合、第三者が成りすましサーバーを設置できる可能性があります。公開鍵暗号技術よって成りすましは防止されていますが、万一の事故を防ぐために、ユーザーのコンピュータと中継システムとの間のインターネット回線はすべての部分でユーザーの責任で信頼できる回線提供者の回線を利用してください。中継システムでは通信内容の保存はありませんが、VPN セッションの接続要求に関するログは、本実証実験における検証を行なうために保存されています。これらのログは公開されませんが、司法機関または法執行機関からの法令に基づく要求に応じて取得される可能性があります。本テレワークシステムには、サーバーとクライアントとの間で、クリップボードやローカルドライブを共有する機能があります。これらの機能はオプションで無効にできます。ただし、無効にした場合でも、ユーザー自らによるアプリケーションの改造や、画面キャプチャ、クラウドシステムへのアップロードなどの特殊な操作によって、情報の持ち出しが可能となる場合もあります。これらのセキュリティ上のリスクを理解された上で、ユーザーの責任において十分な対策を行なってから、本テレワークシステムを利用してください。
+
+4. アプリケーションの動作
+アプリケーションは、インストールまたは動作時に、必要な範囲で Windows の設定を変更する場合があります。これらの変更には、必要なサービスの作成、Windows の RDP 機能の有効化および設定、テレワーク時にユーザーのログオンプロンプトを正しく表示するためのレジストリ設定、Windows の UAC 機能の変更などが含まれます。
+
+5. 所属組織からの承諾の取得
+アプリケーションは低い特権モードで動作可能であり、技術上、インストールおよび動作には、システム管理者権限が不要な場合があります。ただし、ユーザーがアプリケーションを第三者 (ユーザーの所属組織を含む) が所有または管理するコンピュータにインストールする場合は、事前に、第三者からの承諾を得なければなりません。また、本テレワークシステムを用いて情報を持ち出す場合には、事前に、情報の所有者または管理者による承諾を得なければなりません。
+
+6. 著作権
+アプリケーションは、別添に記載する著作権者による著作物です。ユーザーは、本条件書のすべての内容に同意された場合に限り、アプリケーションを、自身または自身の所属組織での利用のため必要な範囲で複製・インストールできます。また、自身の所属組織の関係者のみがアクセス可能なサーバー上に転載することができます。これらの範囲を超えるアプリケーションの再配布・転載や、一切の改変は、すべての提供元の明示的な合意がない限り、禁止されています。
+
+7. 著作物のリバースエンジニアリング等で得られた秘密情報の取扱い
+ユーザーがアプリケーションの著作物を逆コンパイル、逆アセンブルまたはリバースエンジニアリングした結果、脆弱性につながる情報を取得した場合は、遅滞なく、当該情報を直接、または政府によって定められた脆弱性関連情報の届出制度に係る機関を経由して、当該情報を提供元に無償で通知いただくものとします。また、提供元がこれらの脆弱性を修正し対策を完了するまでの間は、ユーザーはこれらの情報を秘密情報として取扱い、一般または第三者に公開しないことに予め同意するものとします。
+
+8. 禁止事項
+本テレワークシステムを人命や誤りの許容されない業務に関わる用途で利用すること、停止による一切の不具合により自身または第三者に対して損害が発生する可能性がある目的で利用すること、その他第三者に対して損害が発生するか権利を侵害する可能性がある利用を行なうこと、アプリケーションの著作権を侵害すること、中継システムに通常の利用と異なる著しい負荷をかけること、その他本テレワークシステムの動作を妨害すること、適用される法令に違反して本テレワークシステムを利用し、または著作物を複製または輸出することは、禁止します。
+
+9. その他
+本テレワークシステムは日本国内での使用に限定した目的で開発され、日本国法に準拠して提供されます。本条件書は日本国法に準拠して構成され、その支配を受けます。ユーザーは、何らかの係争が生じる場合において、東京地方裁判所を専属的合意管轄裁判所とすることに合意します。ユーザーは、すべての管轄権の欠如を主張する防御権、およびフォーラム・ノン・コンビーニエンス法理を主張する防御権を予め放棄するものとします。本条件書の一部分が裁判所によって無効と判断された場合でも、その他の部分は有効なまま存続するものとします。
+
+10. 改訂
+特定のバージョンのアプリケーションに係る使用条件は、当該バージョンのアプリケーションに同梱されインストール時に表示されるものが適用されます。中継システムに係る使用条件は、必要に応じて改訂される場合があります。改訂された使用条件は、アプリケーションのダウンロード元 Web サイトに掲載されます。
 
 
-DISCLAIMER
-==========
+(別添 アプリケーションの著作権者)
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+■ アプリケーション
+Copyright (c) 2020 東日本電信電話株式会社. All Rights Reserved.
+Copyright (c) 2020 独立行政法人情報処理推進機構. All Rights Reserved.
 
-THIS SOFTWARE IS DEVELOPED IN JAPAN, AND DISTRIBUTED FROM JAPAN, UNDER JAPANESE LAWS. YOU MUST AGREE IN ADVANCE TO USE, COPY, MODIFY, MERGE, PUBLISH, DISTRIBUTE, SUBLICENSE, AND/OR SELL COPIES OF THIS SOFTWARE, THAT ANY JURIDICAL DISPUTES WHICH ARE CONCERNED TO THIS SOFTWARE OR ITS CONTENTS, AGAINST US (SOFTETHER PROJECT, SOFTETHER CORPORATION, DAIYUU NOBORI OR OTHER SUPPLIERS), OR ANY JURIDICAL DISPUTES AGAINST US WHICH ARE CAUSED BY ANY KIND OF USING, COPYING, MODIFYING, MERGING, PUBLISHING, DISTRIBUTING, SUBLICENSING, AND/OR SELLING COPIES OF THIS SOFTWARE SHALL BE REGARDED AS BE CONSTRUED AND CONTROLLED BY JAPANESE LAWS, AND YOU MUST FURTHER CONSENT TO EXCLUSIVE JURISDICTION AND VENUE IN THE COURTS SITTING IN TOKYO, JAPAN. YOU MUST WAIVE ALL DEFENSES OF LACK OF PERSONAL JURISDICTION AND FORUM NON CONVENIENS. PROCESS MAY BE SERVED ON EITHER PARTY IN THE MANNER AUTHORIZED BY APPLICABLE LAW OR COURT RULE.
+■ アプリケーションに組み込まれているオープンソースプログラム
+SoftEther VPN:
+Copyright (c) 2014-2020 all contributors on SoftEther VPN project in GitHub.
+Copyright (c) 2003-2020 Daiyuu Nobori.
+Copyright (c) 2013-2020 SoftEther VPN Project, University of Tsukuba, Japan.
+Copyright (c) 2004-2020 SoftEther Corporation.
+License: https://github.com/SoftEtherVPN/SoftEtherVPN_Stable/blob/master/LICENSE
 
-USE ONLY IN JAPAN. DO NOT USE THIS SOFTWARE IN ANOTHER COUNTRY UNLESS YOU HAVE A CONFIRMATION THAT THIS SOFTWARE DOES NOT VIOLATE ANY CRIMINAL LAWS OR CIVIL RIGHTS IN THAT PARTICULAR COUNTRY. USING THIS SOFTWARE IN OTHER COUNTRIES IS COMPLETELY AT YOUR OWN RISK. THE SOFTETHER VPN PROJECT HAS DEVELOPED AND DISTRIBUTED THIS SOFTWARE TO COMPLY ONLY WITH THE JAPANESE LAWS AND EXISTING CIVIL RIGHTS INCLUDING PATENTS WHICH ARE SUBJECTS APPLY IN JAPAN. OTHER COUNTRIES' LAWS OR CIVIL RIGHTS ARE NONE OF OUR CONCERNS NOR RESPONSIBILITIES. WE HAVE NEVER INVESTIGATED ANY CRIMINAL REGULATIONS, CIVIL LAWS OR INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENTS IN ANY OF OTHER 200+ COUNTRIES AND TERRITORIES. BY NATURE, THERE ARE 200+ REGIONS IN THE WORLD, WITH DIFFERENT LAWS. IT IS IMPOSSIBLE TO VERIFY EVERY COUNTRIES' LAWS, REGULATIONS AND CIVIL RIGHTS TO MAKE THE SOFTWARE COMPLY WITH ALL COUNTRIES' LAWS BY THE PROJECT. EVEN IF YOU WILL BE SUED BY A PRIVATE ENTITY OR BE DAMAGED BY A PUBLIC SERVANT IN YOUR COUNTRY, THE DEVELOPERS OF THIS SOFTWARE WILL NEVER BE LIABLE TO RECOVER OR COMPENSATE SUCH DAMAGES, CRIMINAL OR CIVIL
-RESPONSIBILITIES. NOTE THAT THIS LINE IS NOT LICENSE RESTRICTION BUT JUST A STATEMENT FOR WARNING AND DISCLAIMER.
+BitVisor(R) VPN Client Module:
+Copyright (c) 2007, 2008 University of Tsukuba.
+Copyright (C) 2007, 2008 National Institute of Information and Communications
+Technology.
+All rights reserved.
+License: https://github.com/SoftEtherVPN/SoftEtherVPN_Stable/blob/master/THIRD_PARTY.TXT
 
-READ AND UNDERSTAND THE 'src/WARNING.TXT' FILE BEFORE USING THIS SOFTWARE. SOME SOFTWARE PROGRAMS FROM THIRD PARTIES ARE INCLUDED ON THIS SOFTWARE WITH LICENSE CONDITIONS WHICH ARE DESCRIBED ON THE 'src/THIRD_PARTY.TXT' FILE.
+OpenSSL:
+Copyright (c) 1998-2020 The OpenSSL Project. All rights reserved.
+Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com). All rights reserved.
+License: https://github.com/openssl/openssl/blob/master/LICENSE
+
+zlib:
+(C) 1995-2004 Jean-loup Gailly and Mark Adler
+License: https://github.com/madler/zlib/blob/master/README
+
+TightVNC (as a separated binary):
+Copyright (C) 2006-2019 GlavSoft LLC.
+Source code: https://github.com/IPA-CyberLab/IPA-DN-ThinTelework-RUDP/tree/master/RUDP2
+License: https://github.com/IPA-CyberLab/IPA-DN-ThinTelework-RUDP/blob/master/RUDP2/LICENSE.txt
+
+VNC Free Edition (as a separated binary):
+Copyright RealVNC Ltd. 2002-2019.
+Source code: https://github.com/IPA-CyberLab/IPA-DN-ThinTelework-RUDP/tree/master/RUDP1/Japanese
+License: https://github.com/IPA-CyberLab/IPA-DN-ThinTelework-RUDP/blob/master/RUDP1/Japanese/LICENCE.TXT
+
+RSA Security Inc. PKCS #11 Cryptographic Token Interface (Cryptoki):
+License: https://github.com/SoftEtherVPN/SoftEtherVPN_Stable/blob/master/THIRD_PARTY.TXT
+
+アプリレーションに含まれる GPL 2.0 ライセンスの派生物の独立されたバイナリに係るソースコードは、上記の各 URL で、GPL 2.0 ライセンスに基づき提供されます。
+
+■ アプリケーションに組み込まれている非オープンソースプログラム
+Microsoft(R) C Runtime Library:
+(c) 2007 Microsoft Corporation. All Rights Reserved.
+
+Microsoft (R) Cabinet Tool - Version 1.00.0601 (03/18/97) (Redistributable Code)
+Copyright (c) Microsoft Corp 1996-1997. All rights reserved.
+
+UI 基礎および中継システム通信用ライブラリ (Desktop VPN の派生):
+Copyright (c) 2006-2007 Daiyuu Nobori.
+Copyright (c) 2007-2016 SoftEther Corporation.
+
 

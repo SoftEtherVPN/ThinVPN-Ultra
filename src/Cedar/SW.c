@@ -190,6 +190,7 @@ static char *sfx_ntt_files[] =
 	"nttclient.exe",
 	"nttconfig.exe",
 	"hamcore.se2",
+	"EntryPoint.dat",
 };
 
 // Global variables to be used out of necessity
@@ -381,6 +382,7 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 	}
 
 	Add(o, SwNewSfxFile("install_src.dat", L"|install_src.dat"));
+	Add(o, SwNewSfxFile("EntryPoint.dat", L"|EntryPoint.dat"));
 
 	return true;
 }
@@ -2949,6 +2951,9 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 
 	// Hamcore!
 	Add(t->CopyTasks, SwNewCopyTask(L"hamcore.se2", NULL, sw->InstallSrc, sw->InstallDir, true, true));
+
+	// EntryPoint.dat
+	Add(t->CopyTasks, SwNewCopyTask(L"EntryPoint.dat", NULL, sw->InstallSrc, sw->InstallDir, true, false));
 }
 
 // Build the Web installer

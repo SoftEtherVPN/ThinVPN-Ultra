@@ -10021,9 +10021,9 @@ bool SmCaDlgAdd(HWND hWnd, SM_HUB *s)
 	}
 
 #ifndef	CEDAR_DESKVPN
-	if (CmLoadXFromFileOrSecureCard(hWnd, &x))
+	if (CmLoadXFromFileOrSecureCard(hWnd, &x) == false)
 #else	// CEDAR_DESKVPN
-	if (CmLoadX(hWnd, &x))
+	if (CmLoadX(hWnd, &x) == false)
 #endif	// CEDAR_DESKVPN
 	{
 		return false;
