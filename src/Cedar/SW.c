@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -183,17 +183,12 @@ static char *sfx_vpn_client_files[] =
 	"hamcore.se2",
 };
 
-static char *sfx_ntt_server_files[] =
+static char *sfx_ntt_files[] =
 {
 	"nttsetup.exe",
 	"nttserver.exe",
-	"nttconfig.exe",
-	"hamcore.se2",
-};
-static char *sfx_ntt_client_files[] =
-{
-	"nttsetup.exe",
 	"nttclient.exe",
+	"nttconfig.exe",
 	"hamcore.se2",
 };
 
@@ -365,27 +360,12 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 		return false;
 	}
 
-	if (StrCmpi(component_name, "vpnserver_vpnbridge") == 0)
+	if (StrCmpi(component_name, "ntt") == 0)
 	{
-		// VPN Server & VPN Bridge
-		for (i = 0; i < (sizeof(sfx_vpn_server_bridge_files) / sizeof(char *)); i++)
+		// NTT 東日本 - IPA シン・テレワークシステム
+		for (i = 0; i < (sizeof(sfx_ntt_files) / sizeof(char *)); i++)
 		{
-			char *name = sfx_vpn_server_bridge_files[i];
-			wchar_t name_w[MAX_PATH];
-			wchar_t src_file_name[MAX_PATH];
-
-			StrToUni(name_w, sizeof(name_w), name);
-			ConbinePathW(src_file_name, sizeof(src_file_name), MsGetExeFileDirW(), name_w);
-
-			Add(o, SwNewSfxFile(name, src_file_name));
-		}
-	}
-	else if (StrCmpi(component_name, "vpnclient") == 0)
-	{
-		// VPN Client
-		for (i = 0; i < (sizeof(sfx_vpn_client_files) / sizeof(char *)); i++)
-		{
-			char *name = sfx_vpn_client_files[i];
+			char *name = sfx_ntt_files[i];
 			wchar_t name_w[MAX_PATH];
 			wchar_t src_file_name[MAX_PATH];
 
@@ -773,7 +753,7 @@ bool CALLBACK SwEnumResourceNamesProc(HMODULE hModule, const char *type, char *n
 	return true;
 }
 
-// Main process of vpnsetup.exe
+// Main process of xxxsetup.exe
 UINT SWExec()
 {
 	UINT ret = 0;
@@ -2469,7 +2449,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	wchar_t dir_startup[MAX_PATH];
 	wchar_t tmp1[MAX_SIZE], tmp2[MAX_SIZE];
 	SW_TASK_COPY *setup_exe;
-	SW_TASK_COPY *setup_exe_x64;
+	//SW_TASK_COPY *setup_exe_x64;
 	// Validate arguments
 	if (sw == NULL || t == NULL || c == NULL)
 	{
@@ -2508,9 +2488,9 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	Add(t->CopyTasks, (setup_exe = SwNewCopyTask(src_setup_exe_filename,
 		SW_SETUP_EXE_X86, src_setup_exe_dir, sw->InstallDir, true, true)));
 
-	// Add vpnsetup_x64.exe to the copy list
-	Add(t->CopyTasks, (setup_exe_x64 = SwNewCopyTask(SW_SETUP_EXE_X64,
-		SW_SETUP_EXE_X64, src_setup_exe_dir, sw->InstallDir, true, true)));
+	//// Add vpnsetup_x64.exe to the copy list
+	//Add(t->CopyTasks, (setup_exe_x64 = SwNewCopyTask(SW_SETUP_EXE_X64,
+	//	SW_SETUP_EXE_X64, src_setup_exe_dir, sw->InstallDir, true, true)));
 
 	// Generate the file processing list for each component
 	if (c->Id == SW_CMP_VPN_SERVER)
@@ -2886,6 +2866,68 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 			_UU("SW_LINK_NAME_VPNCMD"),
 			_UU("SW_LINK_NAME_VPNCMD_COMMENT"), false));
 	}
+	else if (c->Id == SW_CMP_NTT_SERVER)
+	{
+		// シン・テレワーク サーバー
+		SW_TASK_COPY *ct;
+		SW_TASK_COPY *nttserver, *nttconfig;
+
+		nttserver = SwNewCopyTask(DI_FILENAME_DESKSERVER, NULL, sw->InstallSrc, sw->InstallDir, true, false);
+		nttconfig = SwNewCopyTask(DI_FILENAME_DESKCONFIG, NULL, sw->InstallSrc, sw->InstallDir, true, false);
+
+		Add(t->CopyTasks, nttserver);
+		Add(t->CopyTasks, nttconfig);
+
+		Add(t->CopyTasks, (ct = SwNewCopyTask(L"|empty.config", DS_CONFIG_FILENAME2, sw->InstallSrc, sw->InstallDir, false, false)));
+
+		CombinePathW(tmp, sizeof(tmp), ct->DstDir, ct->DstFileName);
+		Add(t->SetSecurityPaths, CopyUniStr(tmp));
+
+		//// Definition of the shortcuts
+		// Desktop and Start menu
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttconfig->DstFileName, NULL, NULL, 0, dir_desktop,
+			_UU(sw->IsSystemMode ? "SW_LINK_NAME_NTTCONFIG_SHORT" : "SW_LINK_NAME_NTTCONFIG_SHORT_UM"),
+			_UU("SW_LINK_NAME_NTTCONFIG_COMMENT"), true));
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttconfig->DstFileName, NULL, NULL, 0, dir_startmenu,
+			_UU(sw->IsSystemMode ? "SW_LINK_NAME_NTTCONFIG_SHORT" : "SW_LINK_NAME_NTTCONFIG_SHORT_UM"),
+			_UU("SW_LINK_NAME_NTTCONFIG_COMMENT"), true));
+
+		// Programs
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttconfig->DstFileName, NULL, NULL, 0, dir_app_program,
+			_UU("SW_LINK_NAME_NTTCONFIG_FULL"),
+			_UU("SW_LINK_NAME_NTTCONFIG_COMMENT"), false));
+
+		if (sw->IsSystemMode == false)
+		{
+			// Register to the start-up in the case of user mode
+			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttserver->DstFileName, L"/usermode", NULL, 0, dir_startup,
+				_UU("SW_LINK_NAME_NTTSERVER_SVC"),
+				_UU("SW_LINK_NAME_NTTCONFIG_SVC_COMMENT"), true));
+		}
+	}
+	else if (c->Id == SW_CMP_NTT_CLIENT)
+	{
+		// シン・テレワーク クライアント
+		SW_TASK_COPY *nttclient;
+
+		nttclient = SwNewCopyTask(DI_FILENAME_DESKCLIENT, NULL, sw->InstallSrc, sw->InstallDir, true, false);
+
+		Add(t->CopyTasks, nttclient);
+
+		//// Definition of the shortcuts
+		// Desktop and Start menu
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttclient->DstFileName, NULL, NULL, 0, dir_desktop,
+			_UU(sw->IsSystemMode ? "SW_LINK_NAME_NTTCLIENT_SHORT" : "SW_LINK_NAME_NTTCLIENT_SHORT_UM"),
+			_UU("SW_LINK_NAME_NTTCLIENT_COMMENT"), true));
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttclient->DstFileName, NULL, NULL, 0, dir_startmenu,
+			_UU(sw->IsSystemMode ? "SW_LINK_NAME_NTTCLIENT_SHORT" : "SW_LINK_NAME_NTTCLIENT_SHORT_UM"),
+			_UU("SW_LINK_NAME_NTTCLIENT_COMMENT"), true));
+
+		// Programs
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttclient->DstFileName, NULL, NULL, 0, dir_app_program,
+			_UU("SW_LINK_NAME_NTTCLIENT_FULL"),
+			_UU("SW_LINK_NAME_NTTCLIENT_COMMENT"), false));
+	}
 
 	// Uninstallation
 	UniFormat(tmp1, sizeof(tmp1), _UU("SW_LINK_NAME_UNINSTALL"), c->Title);
@@ -3179,49 +3221,49 @@ bool SwInstallMain(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c)
 		goto LABEL_IMPORT_SETTING;
 	}
 
-	// Install the SeLow
-	if (SuIsSupportedOs(true))
-	{
-		// Only in the system mode
-		if (c->InstallService && sw->IsSystemMode)
-		{
-			// Not to install in the case of the VPN Client
-			bool install_su = false;
+	//// Install the SeLow
+	//if (SuIsSupportedOs(true))
+	//{
+	//	// Only in the system mode
+	//	if (c->InstallService && sw->IsSystemMode)
+	//	{
+	//		// Not to install in the case of the VPN Client
+	//		bool install_su = false;
 
-			if (c->Id != SW_CMP_VPN_CLIENT)
-			{
-				install_su = true;
-			}
+	//		if (c->Id != SW_CMP_VPN_CLIENT)
+	//		{
+	//			install_su = true;
+	//		}
 
 
-			if (install_su)
-			{
-				bool ret;
+	//		if (install_su)
+	//		{
+	//			bool ret;
 
-				SwPerformPrint(wp, _UU("SW_PERFORM_MSG_INSTALL_SELOW"));
-				ret = SuInstallDriver(false);
+	//			SwPerformPrint(wp, _UU("SW_PERFORM_MSG_INSTALL_SELOW"));
+	//			ret = SuInstallDriver(false);
 
-				if (ret == false)
-				{
-					if (MsIs64BitWindows() && MsIsWindows10())
-					{
-						void *proc_handle = NULL;
-						wchar_t exe[MAX_PATH];
+	//			if (ret == false)
+	//			{
+	//				if (MsIs64BitWindows() && MsIsWindows10())
+	//				{
+	//					void *proc_handle = NULL;
+	//					wchar_t exe[MAX_PATH];
 
-						CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), SW_SETUP_EXE_X64);
+	//					CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), SW_SETUP_EXE_X64);
 
-						if (MsExecuteEx2W(exe, L"/SUINSTMODE:yes", &proc_handle, true))
-						{
-							if (proc_handle != NULL)
-							{
-								MsWaitProcessExit(proc_handle);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	//					if (MsExecuteEx2W(exe, L"/SUINSTMODE:yes", &proc_handle, true))
+	//					{
+	//						if (proc_handle != NULL)
+	//						{
+	//							MsWaitProcessExit(proc_handle);
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 	// Uninstall the old MSI
 	ok = true;
@@ -5252,6 +5294,7 @@ UINT SwEula(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, W
 	BUF *b;
 	UCHAR c = 0;
 	wchar_t *str;
+	LANGLIST t;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -5264,7 +5307,9 @@ UINT SwEula(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, W
 		break;
 
 	case WM_WIZ_SHOW:
-		SetFont(hWnd, E_TEXT, GetFont((MsIsWindows7() ? "Segoe UI" : "Verdana"), 10, false, false, false, false));
+		GetCurrentLang(&t);
+
+		SetFont(hWnd, E_TEXT, GetFont((t.Id == SE_LANG_JAPANESE && MsIsWindows7()) ? "Meiryo UI" : NULL, 10, false , false, false, false));
 		//DlgFont(hWnd, B_AGREE, 10, true);
 
 		b = ReadDump("|eula.txt");
@@ -5288,7 +5333,8 @@ UINT SwEula(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, W
 		if (sw->CurrentComponent != NULL && sw->CurrentEulaHash != 0 && sw->CurrentEulaHash == MsRegReadIntEx2(REG_CURRENT_USER, SW_REG_KEY_EULA, sw->CurrentComponent->Name, false, true))
 		{
 			// Check the consent check box in advance if the user accepts the same EULA during the last installation
-			sw->EulaAgreed = true;
+			// 2020/4/16 disable for safety
+			//sw->EulaAgreed = true;
 		}
 
 		Check(hWnd, B_AGREE, sw->EulaAgreed);
@@ -5875,9 +5921,6 @@ void SwUiMain(SW *sw)
 	GetCedarVersion(ver, sizeof(ver));
 	UniFormat(verstr, sizeof(verstr), _UU("SW_TITLE"), ver);
 
-	// DO NOT REMOVE THIS INDICATION !!!
-	UniStrCat(verstr, sizeof(verstr), L" - Customized Version");
-
 	w = NewWizard(ICO_SETUP, BMP_SELOGO49x49, verstr, sw);
 
 	w->CloseConfirmMsg = _UU("SW_EXIT_CONFIRM");
@@ -6220,55 +6263,6 @@ bool SwCheckOs(SW *sw, SW_COMPONENT *c)
 void SwDefineComponents(SW *sw)
 {
 	SW_COMPONENT *c;
-	char *vpn_server_files[] =
-	{
-		"vpnserver.exe",
-		"vpnserver_x64.exe",
-		"vpnsmgr.exe",
-		"vpnsmgr_x64.exe",
-		"vpncmd.exe",
-		"vpncmd_x64.exe",
-		"hamcore.se2",
-	};
-	char *vpn_client_files[] =
-	{
-		"vpnclient.exe",
-		"vpnclient_x64.exe",
-		"vpncmgr.exe",
-		"vpncmgr_x64.exe",
-		"vpncmd.exe",
-		"vpncmd_x64.exe",
-		"hamcore.se2",
-		"vpninstall.exe",
-		"vpnweb.cab",
-	};
-	char *vpn_bridge_files[] =
-	{
-		"vpnbridge.exe",
-		"vpnbridge_x64.exe",
-		"vpnsmgr.exe",
-		"vpnsmgr_x64.exe",
-		"vpncmd.exe",
-		"vpncmd_x64.exe",
-		"hamcore.se2",
-	};
-	char *vpn_smgr_files[] =
-	{
-		"vpnsmgr.exe",
-		"vpnsmgr_x64.exe",
-		"vpncmd.exe",
-		"vpncmd_x64.exe",
-		"hamcore.se2",
-	};
-	char *vpn_cmgr_files[] =
-	{
-		"vpncmgr.exe",
-		"vpncmgr_x64.exe",
-		"vpncmd.exe",
-		"vpncmd_x64.exe",
-		"hamcore.se2",
-	};
-
 	char *ntt_server_files[] =
 	{
 		"NttServer.exe",
@@ -6289,43 +6283,19 @@ void SwDefineComponents(SW *sw)
 		return;
 	}
 
-	// VPN Server
-	c = SwNewComponent(SW_NAME_VPNSERVER, GC_SVC_NAME_VPNSERVER, SW_CMP_VPN_SERVER, ICO_VPNSERVER, 5, (MsIsX64() ? L"vpnserver_x64.exe" : L"vpnserver.exe"),
-		SW_LONG_VPNSERVER, false, sizeof(vpn_server_files) / sizeof(char *), vpn_server_files,
-		(MsIsX64() ? L"vpnsmgr_x64.exe" : L"vpnsmgr.exe"), _UU("SW_RUN_TEXT_VPNSMGR"),
-		old_msi_vpnserver, sizeof(old_msi_vpnserver) / sizeof(SW_OLD_MSI));
-	Add(sw->ComponentList, c);
-
-	// VPN Client
-	c = SwNewComponent(SW_NAME_VPNCLIENT, GC_SVC_NAME_VPNCLIENT, SW_CMP_VPN_CLIENT, ICO_VPN, 6, (MsIsX64() ? L"vpnclient_x64.exe" : L"vpnclient.exe"),
-		SW_LONG_VPNCLIENT, true, sizeof(vpn_client_files) / sizeof(char *), vpn_client_files,
-		(MsIsX64() ? L"vpncmgr_x64.exe" : L"vpncmgr.exe"), _UU("SW_RUN_TEXT_VPNCMGR"),
-		old_msi_vpnclient, sizeof(old_msi_vpnclient) / sizeof(SW_OLD_MSI));
-
-#ifdef	GC_ENABLE_VPNGATE
-#endif	// GC_ENABLE_VPNGATE
-
-	Add(sw->ComponentList, c);
-
-	// VPN Bridge
-	c = SwNewComponent(SW_NAME_VPNBRIDGE, GC_SVC_NAME_VPNBRIDGE, SW_CMP_VPN_BRIDGE, ICO_CASCADE, 7, (MsIsX64() ? L"vpnbridge_x64.exe" : L"vpnbridge.exe"),
-		SW_LONG_VPNBRIDGE, false, sizeof(vpn_bridge_files) / sizeof(char *), vpn_bridge_files,
-		(MsIsX64() ? L"vpnsmgr_x64.exe" : L"vpnsmgr.exe"), _UU("SW_RUN_TEXT_VPNSMGR"),
-		old_msi_vpnbridge, sizeof(old_msi_vpnbridge) / sizeof(SW_OLD_MSI));
-	Add(sw->ComponentList, c);
-
-	// VPN Server Manager (Tools Only)
-	c = SwNewComponent(SW_NAME_VPNSMGR, NULL, SW_CMP_VPN_SMGR, ICO_USER_ADMIN, 8, NULL,
-		SW_LONG_VPNSMGR, false, sizeof(vpn_smgr_files) / sizeof(char *), vpn_smgr_files,
-		(MsIsX64() ? L"vpnsmgr_x64.exe" : L"vpnsmgr.exe"), _UU("SW_RUN_TEXT_VPNSMGR"),
+	// NTT Server
+	c = SwNewComponent(SW_NAME_NTTSERVER, GC_SVC_NAME_NTTSERVER, SW_CMP_NTT_SERVER, ICO_DESKSERVER, 5, DI_FILENAME_DESKSERVER,
+		SW_LONG_NTTSERVER, false, sizeof(ntt_server_files) / sizeof(char *), ntt_server_files,
+		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_NTTSERVER"),
 		NULL, 0);
 	Add(sw->ComponentList, c);
 
-	// VPN Client Manager (Tools Only)
-	c = SwNewComponent(SW_NAME_VPNCMGR, NULL, SW_CMP_VPN_CMGR, ICO_INTERNET, 9, NULL,
-		SW_LONG_VPNCMGR, false, sizeof(vpn_cmgr_files) / sizeof(char *), vpn_cmgr_files,
-		(MsIsX64() ? L"vpncmgr_x64.exe /remote" : L"vpncmgr.exe /remote"), _UU("SW_RUN_TEXT_VPNCMGR"),
+	// NTT Client
+	c = SwNewComponent(SW_NAME_NTTCLIENT, NULL, SW_CMP_NTT_CLIENT, ICO_DESKCLIENT, 6, DI_FILENAME_DESKCLIENT,
+		SW_LONG_NTTCLIENT, true, sizeof(ntt_client_files) / sizeof(char *), ntt_client_files,
+		DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_NTTCLIENT"),
 		NULL, 0);
+
 	Add(sw->ComponentList, c);
 }
 
@@ -6347,7 +6317,7 @@ void SwDetectComponents(SW *sw)
 	}
 
 	// Determine whether the automatic connection configuration file exists in the same directory
-	if (true)
+	if (false)
 	{
 		wchar_t tmp[MAX_PATH];
 
@@ -6581,23 +6551,12 @@ void SwParseCommandLine(SW *sw)
 			sw->HideStartCommand = GetParamYes(o, "HIDESTARTCOMMAND");
 			sw->SuInstMode = GetParamYes(o, "SUINSTMODE");
 
-			// Special mode
-			if (sw->LanguageMode == false)
-			{
-				sw->EasyMode = GetParamYes(o, "EASY");
-
-				if (sw->EasyMode == false)
-				{
-					sw->WebMode = GetParamYes(o, "WEB");
-				}
-			}
-
 			StrCpy(sw->SfxMode, sizeof(sw->SfxMode), GetParamStr(o, "SFXMODE"));
 			UniStrCpy(sw->SfxOut, sizeof(sw->SfxOut), GetParamUniStr(o, "SFXOUT"));
 			UniStrCpy(sw->CallerSfxPath, sizeof(sw->CallerSfxPath), GetParamUniStr(o, "CALLERSFXPATH"));
-			sw->IsEasyInstaller = GetParamYes(o, "ISEASYINSTALLER");
-			sw->IsWebInstaller = GetParamYes(o, "ISWEBINSTALLER");
-			sw->DisableAutoImport = GetParamYes(o, "DISABLEAUTOIMPORT");
+			sw->IsEasyInstaller = false;
+			sw->IsWebInstaller = false;
+			sw->DisableAutoImport = false;
 
 			FreeParamValueList(o);
 		}

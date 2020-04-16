@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Japanese resources
+// 日本語 resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
 #ifdef _WIN32
@@ -82,7 +82,7 @@ END
 
 10001 DIALOGEX 0, 0, 261, 75
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
-CAPTION "SoftEther Installer"
+CAPTION "Software Installer"
 FONT 9, "MS PGothic", 400, 0, 0x80
 BEGIN
     ICON            IDI_ICON10,IDC_STATIC,7,7,20,20,WS_TABSTOP
@@ -90,12 +90,12 @@ BEGIN
     DEFPUSHBUTTON   "キャンセル",IDCANCEL,195,52,59,16
 END
 
-#endif    // Japanese resources
+#endif    // 日本語 resources
 /////////////////////////////////////////////////////////////////////////////
 
 
 /////////////////////////////////////////////////////////////////////////////
-// English resources
+// 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -149,7 +149,7 @@ END
 
 10002 DIALOGEX 0, 0, 261, 75
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
-CAPTION "SoftEther Installer"
+CAPTION "Software Installer"
 FONT 8, "Arial", 400, 0, 0x0
 BEGIN
     ICON            IDI_ICON10,IDC_STATIC,7,7,20,20,WS_TABSTOP
@@ -157,7 +157,7 @@ BEGIN
     DEFPUSHBUTTON   "Cancel",IDCANCEL,195,54,59,14
 END
 
-#endif    // English resources
+#endif    // 英語 (米国) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

@@ -43,7 +43,10 @@
 // 定数
 #define DS_RPC_VER_SIGNATURE_STR	"Thin Telework Server Configuration Procotol (localhost only)"
 #define DS_CONFIG_FILENAME			"@ThinServer.config"
+#define DS_CONFIG_FILENAME2			L"ThinServer.config"
+
 #define	DC_CONFIG_FILENAME			L"ThinClient.config"
+
 
 #define	GC_REG_COMPANY_NAME			"Thin Telework"
 
@@ -72,6 +75,7 @@
 #define DI_FILENAME_SETUPINI		L"@NttSetup.ini"
 
 
+#define	GC_SVC_NAME_NTTSERVER		"NTTSERVER"
 
 // ここから下は おそらくいじらなくて OK
 #define DC_RDP_PORT_START				3500	// Client の RDP ポートの開始番号

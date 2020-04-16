@@ -7597,8 +7597,8 @@ CHECK_PROC_NETWORK		ネットワークシステム
 #                                                    #
 ######################################################
 
-SW_TITLE									SoftEther VPN セットアップ ウィザード (バージョン %S)
-SW_EXIT_CONFIRM								SoftEther VPN のセットアップは完了していません。\r\n\r\nセットアップ ウィザードを終了しますか?
+SW_TITLE									NTT 東日本 - IPA シン・テレワークシステム セットアップ ウィザード (バージョン %S)
+SW_EXIT_CONFIRM								NTT 東日本 - IPA シン・テレワークシステムのセットアップは完了していません。\r\n\r\nセットアップ ウィザードを終了しますか?
 SW_UNINSTALL_CONFIRM						%s のアンインストール処理を開始します。\r\n\r\nよろしいですか?
 
 
@@ -7617,7 +7617,17 @@ SW_COMPONENT_VPNSMGR_DESCRIPTION			この PC に VPN サーバー管理マネー
 SW_COMPONENT_VPNCMGR_TITLE					SoftEther VPN クライアント接続マネージャ (管理ツールのみ)
 SW_COMPONENT_VPNCMGR_DESCRIPTION			この PC に VPN クライアント接続マネージャのみをインストールします。VPN Client 本体はインストールしません。別のコンピュータの Windows / Linux で動作している VPN Client をリモート管理することができます。
 
-SW_WELCOME_TITLE							SoftEther VPN セットアップ ウィザードへようこそ
+
+SW_COMPONENT_NTTSERVER_TITLE				NTT 東日本 - IPA シン・テレワークシステム サーバー
+SW_COMPONENT_NTTSERVER_DESCRIPTION			リモートアクセスを受け付ける側の PC (職場の PC など) にインストールします。
+
+SW_COMPONENT_NTTCLIENT_TITLE				NTT 東日本 - IPA シン・テレワークシステム クライアント
+SW_COMPONENT_NTTCLIENT_DESCRIPTION			リモートアクセスを始動する側の PC (自宅 PC やモバイル PC など) にインストールします。
+
+
+
+
+SW_WELCOME_TITLE							NTT 東日本 - IPA シン・テレワークシステム セットアップ ウィザードへようこそ
 SW_MODE_TITLE								セットアップモードの選択
 SW_NOT_ADMIN_TITLE							権限が不足しています
 SW_COMPONENTS_TITLE							インストールするソフトウェアの選択
@@ -7629,7 +7639,7 @@ SW_PERFORM_TITLE							セットアップの進行中
 SW_ERROR_TITLE								セットアップの結果
 SW_FINISH_TITLE								セットアップが完了しました
 SW_UNINST1_TITLE							アンインストールの開始
-SW_LANG1_TITLE								SoftEther VPN: Configure the Display Language (言語設定の変更)
+SW_LANG1_TITLE								Thin Telework: Configure the Display Language (言語設定の変更)
 SW_EASY1_TITLE								SoftEther VPN Client 簡易インストーラ作成ウィザードへようこそ
 SW_EASY2_TITLE								ファイルの指定
 SW_WEB1_TITLE								SoftEther VPN Client Web インストーラ作成ウィザードへようこそ
@@ -7639,7 +7649,7 @@ SW_WEB2_TITLE								ファイルの指定
 SW_UNINSTALLINFO_URL						http://selinks.org/
 SW_UNINSTALLINFO_PUBLISHER					SoftEther VPN Project
 
-SW_KB3033929_REQUIRED						Windows 7 および Windows Server 2008 R2 では、SoftEther VPN の一部の機能を利用するためには、Microsoft 社の Windows Update プログラム KB3033929 がインストールされている必要があります。\r\n\r\nKB3033929 がインストールされていない場合は、SoftEther VPN をインストールする前に、Windows Update または Microsoft 社の Web サイトから KB3033929 をインストールをしてください。
+SW_KB3033929_REQUIRED						Windows 7 および Windows Server 2008 R2 では、NTT 東日本 - IPA シン・テレワークシステムの一部の機能を利用するためには、Microsoft 社の Windows Update プログラム KB3033929 がインストールされている必要があります。\r\n\r\nKB3033929 がインストールされていない場合は、NTT 東日本 - IPA シン・テレワークシステムをインストールする前に、Windows Update または Microsoft 社の Web サイトから KB3033929 をインストールをしてください。
 
 
 SW_COMPONENTS_ABOUT_TAG						「%s」とは
@@ -7738,6 +7748,9 @@ SW_RUN_TEXT_VPNCMGR							SoftEther VPN クライアント接続マネージャ�
 
 SW_NIC_UNINSTALL							SoftEther VPN Client の仮想 LAN カードが作成されています。\r\nこれらの仮想 LAN カードを削除しますか?
 
+SW_RUN_TEXT_NTTSERVER						NTT 東日本 - IPA シン・テレワークシステム サーバーの初期設定を行ないます。
+SW_RUN_TEXT_NTTCLIENT						NTT 東日本 - IPA シン・テレワークシステム クライアントを起動します。
+
 # Do not translate this section !!!
 SW_TAG_USERNAME_ENGLISH						\ (User-Mode)
 SW_LINK_NAME_VPNSERVER_SVC					SoftEther VPN Server User-mode Service
@@ -7748,6 +7761,22 @@ SW_LONG_VPNBRIDGE							SoftEther VPN Bridge
 SW_LONG_VPNSMGR								SoftEther VPN Server Manager
 SW_LONG_VPNCMGR								SoftEther VPN Client Manager
 SW_LANG_SET_FAILED							Failed to write the new language setting on lang.config file.
+SW_LINK_NAME_NTTSERVER_SVC					Thin Telework User-mode Service
+
+
+# ショートカット名 (シン・テレワーク)
+SW_LINK_NAME_NTTCONFIG_FULL					NTT 東日本 - IPA シン・テレワークシステム サーバー設定ツール
+SW_LINK_NAME_NTTCONFIG_SHORT				NTT東-IPA シン・テレワーク サーバー設定
+SW_LINK_NAME_NTTCONFIG_SHORT_UM				NTT東-IPA シン・テレワーク サーバー設定 (ユーザー)
+SW_LINK_NAME_NTTCONFIG_COMMENT				このコンピュータで動作している NTT 東日本 - IPA シン・テレワークシステム サーバーの設定を行なうためのツールです。
+SW_LINK_NAME_NTTCONFIG_SVC_COMMENT			NTT 東日本 - IPA シン・テレワークシステム サーバー サービスをユーザーモードで起動します。
+
+SW_LINK_NAME_NTTCLIENT_FULL					NTT 東日本 - IPA シン・テレワークシステム クライアント
+SW_LINK_NAME_NTTCLIENT_SHORT				NTT東-IPA シン・テレワーク クライアント
+SW_LINK_NAME_NTTCLIENT_SHORT_UM				NTT東-IPA シン・テレワーク クライアント (ユーザー)
+SW_LINK_NAME_NTTCLIENT_COMMENT				遠隔地にあるコンピュータで動作している NTT 東日本 - IPA シン・テレワークシステム サーバーにインターネット経由でリモートアクセスするためのクライアントです。
+
+
 
 # ショートカット名
 SW_LINK_NAME_VPNSMGR_SHORT					SoftEther VPN サーバー管理
