@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\DeskSetup.exe"
+				OutputFile="$(OutDir)\NttSetup.exe"
 				LinkIncremental="2"
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
@@ -103,7 +103,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest&#x0D;&#x0A;$(SolutionDir)bin\BuildUtil.exe /CMD:FileCopy &quot;$(TargetPath)&quot; /DEST:&quot;$(SolutionDir)bin\hamcore\DeskSetup_nosign.exe&quot;&#x0D;&#x0A;"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest&#x0D;&#x0A;$(SolutionDir)bin\BuildUtil.exe /CMD:FileCopy &quot;$(TargetPath)&quot; /DEST:&quot;$(SolutionDir)bin\hamcore\NttSetup_nosign.exe&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -159,7 +159,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\DeskSetup_x64.exe"
+				OutputFile="$(OutDir)\NttSetup_x64.exe"
 				LinkIncremental="2"
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
@@ -250,7 +250,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\DeskSetup.exe"
+				OutputFile="$(OutDir)\NttSetup.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\Microsoft Visual Studio 8\VC\lib&quot;"
 				GenerateManifest="false"
@@ -286,7 +286,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetPE4 &quot;$(TargetPath)&quot;&#x0D;&#x0A;$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest&#x0D;&#x0A;$(SolutionDir)bin\BuildUtil.exe /CMD:FileCopy &quot;$(TargetPath)&quot; /DEST:&quot;$(SolutionDir)bin\hamcore\DeskSetup_nosign.exe&quot;&#x0D;&#x0A;"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetPE4 &quot;$(TargetPath)&quot;&#x0D;&#x0A;$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest&#x0D;&#x0A;$(SolutionDir)bin\BuildUtil.exe /CMD:FileCopy &quot;$(TargetPath)&quot; /DEST:&quot;$(SolutionDir)bin\hamcore\NttSetup_nosign.exe&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -346,7 +346,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\DeskSetup_x64.exe"
+				OutputFile="$(OutDir)\NttSetup_x64.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				GenerateManifest="false"
