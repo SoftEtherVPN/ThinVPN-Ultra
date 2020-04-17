@@ -122,7 +122,7 @@
 #define	TAG_END				"end"
 #define	TAG_ROOT			"root"
 
-#define	TAG_CPYRIGHT		"\xef\xbb\xbf# Software Configuration File\r\n# ---------------------------\r\n# \r\n# You may edit this file when the VPN Server / Client / Bridge program is not running.\r\n# \r\n# In prior to edit this file manually by your text editor,\r\n# shutdown the VPN Server / Client / Bridge background service.\r\n# Otherwise, all changes will be lost.\r\n# \r\n"
+#define	TAG_CPYRIGHT		"\xef\xbb\xbf# Software Configuration File\r\n# ---------------------------\r\n# \r\n# You may edit this file when the server program is not running.\r\n# \r\n# In prior to edit this file manually by your text editor,\r\n# shutdown the server background service.\r\n# Otherwise, all changes will be lost.\r\n# \r\n"
 #define	TAG_BINARY			"SEVPN_DB"
 
 // Data type

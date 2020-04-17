@@ -2466,7 +2466,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	// Program
 	UniStrCpy(dir_program, sizeof(dir_program), (sw->IsSystemMode ? MsGetCommonProgramsDirW() : MsGetPersonalProgramsDirW()));
 	// Program directory for this application
-	ConbinePathW(dir_app_program, sizeof(dir_app_program), dir_program, c->LongName);
+	ConbinePathW(dir_app_program, sizeof(dir_app_program), dir_program, c->Title);
 	if (sw->IsSystemMode == false)
 	{
 		// User mode
@@ -3758,12 +3758,33 @@ LABEL_RETRY_5:
 						}
 					}
 				}
+
+				if (ok)
+				{
+					if (c->Id == SW_CMP_NTT_SERVER)
+					{
+						// RDP ログオン画面の有効化
+						if (sw->EnableRdpLogonScreen)
+						{
+							MsSetRdpAllowLoginScreen(true);
+
+							MsRegWriteInt(REG_LOCAL_MACHINE, DI_REGKEY, "RDP1", 1);
+						}
+					}
+				}
 			}
 
 			if (c->Id == SW_CMP_VPN_CLIENT)
 			{
 				// In the VPN Client service, wait until the service port can be connected
 				SwWaitForVpnClientPortReady(SW_VPNCLIENT_SERVICE_WAIT_READY_TIMEOUT);
+			}
+
+			if (c->Id == SW_CMP_NTT_SERVER)
+			{
+				// シン・テレワークサーバー
+				// RPC が有効になるまで待つ
+				DeskWaitReadyForDeskServerRpc();
 			}
 		}
 	}
@@ -6589,6 +6610,14 @@ UINT SWExecMain()
 
 	// Create a SW
 	sw = NewSw();
+
+	// RDP ログオン画面を有効にする処理をするかどうか決める
+	sw->EnableRdpLogonScreen = MsIsRdpAllowLoginScreen();
+	if (MsRegReadInt(REG_LOCAL_MACHINE, DI_REGKEY, "RDP1") == 0)
+	{
+		// 初回は必ず有効にする操作をする
+		sw->EnableRdpLogonScreen = true;
+	}
 
 	// Read the setting
 	sw->Easy_EraseSensitive = MsRegReadInt(REG_CURRENT_USER, SW_REG_KEY, "Easy_EraseSensitive");

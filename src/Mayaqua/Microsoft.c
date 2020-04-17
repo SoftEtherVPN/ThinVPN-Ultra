@@ -7351,6 +7351,25 @@ bool MsEnableRemoteDesktop()
 		return false;
 	}
 
+	if (MsIsVista())
+	{
+		// ログオン画面を必ず出すように設定する (ただし、ユーザーによって元に戻された場合は出さない)
+		if (MsRegReadInt(REG_LOCAL_MACHINE,
+			"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
+			"UserAuthentication") != 0)
+		{
+			if (MsRegReadInt(REG_LOCAL_MACHINE, DI_REGKEY, "RDP2") == 0)
+			{
+				if (MsRegWriteInt(REG_LOCAL_MACHINE,
+					"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
+					"UserAuthentication", 0))
+				{
+					MsRegWriteInt(REG_LOCAL_MACHINE, DI_REGKEY, "RDP2", 1);
+				}
+			}
+		}
+	}
+
 	if (MsIsRemoteDesktopEnabled())
 	{
 		return true;
@@ -7367,13 +7386,6 @@ bool MsEnableRemoteDesktop()
 		"fDenyTSConnections", 0) == false)
 	{
 		return false;
-	}
-
-	if (MsIsVista())
-	{
-		MsRegWriteInt(REG_LOCAL_MACHINE,
-			"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
-			"UserAuthentication", 0);
 	}
 
 	return true;
@@ -7413,19 +7425,6 @@ bool MsIsRemoteDesktopEnabled()
 			}
 			else
 			{
-				/*
-				// 2020/4/15 Do not check UserAuthentication flag anymore
-				if (MsRegReadInt(REG_LOCAL_MACHINE,
-					"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
-					"UserAuthentication"))
-				{
-					return false;
-				}
-				else
-				{
-					return true;
-				}*/
-
 				return true;
 			}
 		}

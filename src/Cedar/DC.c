@@ -1109,6 +1109,8 @@ UINT DcDownloadMstscExe(DC *dc, wchar_t *name, UINT name_size, wchar_t *tmp_dir_
 	BUF *buf;
 	INTERNET_SETTING setting;
 	char *url_env_str;
+	UCHAR hash[SHA1_SIZE];
+	char hash_str[128];
 
 	// 引数チェック
 	if (dc == NULL || name == NULL || tmp_dir_name == NULL)
@@ -1173,6 +1175,19 @@ UINT DcDownloadMstscExe(DC *dc, wchar_t *name, UINT name_size, wchar_t *tmp_dir_
 		{
 			ret = ERR_DESK_MSTSC_DOWNLOAD_FAILED;
 		}
+		return ret;
+	}
+
+	// ダウンロードしたファイルが破損していないかどうか確認
+	HashSha1(hash, buf->Buf, buf->Size);
+
+	BinToStr(hash_str, sizeof(hash_str), hash, SHA1_SIZE);
+
+	if (StrCmpi(hash_str, "8aeaa9932c2ee263b36a32a620be81eca4eb48b8") != 0 && StrCmpi(hash_str, "ac35a498cab1c91b68ce5d08b19e56bdef3169e7") != 0)
+	{
+		FreeBuf(buf);
+		buf = NULL;
+		ret = ERR_DESK_MSTSC_DOWNLOAD_FAILED;
 		return ret;
 	}
 

@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -338,6 +338,8 @@ typedef struct SW
 	bool DisableAutoImport;				// Not to use the automatic import process
 	bool SuInstMode;					// SuInst mode
 	UINT CurrentEulaHash;				// Hash of the license agreement
+
+	bool EnableRdpLogonScreen;			// RDP ログオン画面を有効にする処理をするかどうか
 } SW;
 
 

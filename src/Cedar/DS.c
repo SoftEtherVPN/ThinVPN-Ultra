@@ -832,6 +832,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			}
 			DsSendError(sock, ERR_DESK_PASSWORD_NOT_SET);
 			FreePack(p);
+			return;
 		}
 
 		if (ret == false)
@@ -1146,6 +1147,11 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 				}
 				return;
 			}
+		}
+		else
+		{
+			// 有効な場合でも再度有効にする
+			MsEnableRemoteDesktop();
 		}
 	}
 
@@ -2161,11 +2167,7 @@ void DsNormalizeConfig(DS *ds)
 	if (ds->ServiceType == DESK_SERVICE_RDP)
 	{
 		// リモートデスクトップを有効にしておく
-		if (MsIsRemoteDesktopEnabled() == false)
-		{
-			// 無効な場合は有効にする
-			MsEnableRemoteDesktop();
-		}
+		MsEnableRemoteDesktop();
 	}
 #endif  // OS_WIN32
 }

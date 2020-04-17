@@ -19,6 +19,8 @@
 #define	DESK_SECURE_PACK_NAME			"NTT_SERVER"			// 元: "DESK_SERVER"
 #define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.desktopvpn.com"	// TODO: 後で変更する
 
+#define DESK_SETTINGS_DIR_NAME			L"Thin Telework Settings"
+
 #define DESK_SECURE_PACK_EASY_MODE		// 有効にすると簡易モードになる
 
 

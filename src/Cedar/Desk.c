@@ -23,7 +23,7 @@ void DeskGetAppDataDir(wchar_t *name, UINT name_size)
 		return;
 	}
 
-	ConbinePathW(name, name_size, MsGetPersonalAppDataDirW(), L"Desktop VPN Settings");
+	ConbinePathW(name, name_size, MsGetPersonalAppDataDirW(), DESK_SETTINGS_DIR_NAME);
 	MakeDirW(name);
 #endif  // OS_WIN32
 }
@@ -38,7 +38,7 @@ void DeskGetAppDataDirOld(wchar_t *name, UINT name_size)
 		return;
 	}
 
-	ConbinePathW(name, name_size, MsGetPersonalAppDataDirW(), L"Desktop VPN Datas");
+	ConbinePathW(name, name_size, MsGetPersonalAppDataDirW(), DESK_SETTINGS_DIR_NAME);
 #endif  // OS_WIN32
 }
 
@@ -258,7 +258,7 @@ bool DeskWaitReadyForUrdpServer()
 }
 
 // RPC が有効になるまで待つ
-bool DeskWaitReadyForDeskServerRpc(void *hWnd)
+bool DeskWaitReadyForDeskServerRpc()
 {
 #ifdef	OS_WIN32
 	UINT64 start_time = Tick64();
@@ -268,9 +268,7 @@ bool DeskWaitReadyForDeskServerRpc(void *hWnd)
 		UINT64 now = Tick64();
 		SOCK *s;
 
-		DoEvents(hWnd);
-
-		if (now > (start_time + (UINT64)(30 * 1000)))
+		if (now > (start_time + (UINT64)(60 * 1000)))
 		{
 			// タイムアウト
 			return false;

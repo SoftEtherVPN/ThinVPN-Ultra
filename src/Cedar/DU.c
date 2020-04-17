@@ -59,8 +59,8 @@ void DuShareDlgUpdate(HWND hWnd)
 		return;
 	}
 
-	SetEnable(hWnd, S_INFO, IsChecked(hWnd, C_SHARE_DISK));
-	SetEnable(hWnd, B_USAGE, IsChecked(hWnd, C_SHARE_DISK));
+	SetEnable(hWnd, S_INFO, IsChecked(hWnd, C_SHARE_DISK) || IsChecked(hWnd, C_SHARE_CLIPBOARD));
+	SetEnable(hWnd, B_USAGE, IsChecked(hWnd, C_SHARE_DISK) || IsChecked(hWnd, C_SHARE_CLIPBOARD));
 }
 
 // 共有ダイアログプロシージャ
@@ -74,6 +74,7 @@ UINT DuShareDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *par
 	case WM_INITDIALOG:
 		SetIcon(hWnd, 0, ICO_SHARE);
 		DlgFont(hWnd, C_USE, 0, true);
+		DlgFont(hWnd, C_SHARE_CLIPBOARD, 0, true);
 		DlgFont(hWnd, C_SHARE_DISK, 0, true);
 		DlgFont(hWnd, C_SHARE_PRINTER, 0, true);
 		DlgFont(hWnd, C_SHARE_COMPORT, 0, true);
