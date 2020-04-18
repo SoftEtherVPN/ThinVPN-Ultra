@@ -12,7 +12,7 @@
 
 
 //// For DeskVPN
-#define	DESK_PROTUCE_NAME_SUITE			"Thin Telework"
+#define	DESK_PRODUCT_NAME_SUITE			"Thin Telework"
 
 #define DESK_PUBLISHER_NAME_UNICODE		L"Thin Telework"		// 元: L"SoftEther Corporation"
 #define DESK_PUBLISHER_NAME_ANSI		"Thin Telework"			// 元: "SoftEther Corporation"

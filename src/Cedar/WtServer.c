@@ -542,6 +542,9 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 	WtGateConnectParamToPack(p, session->ConnectParam->GateConnectParam);
 	PackAddBool(p, "use_compress", session->ConnectParam->UseCompress);
 	PackAddBool(p, "support_timeout_param", true);
+	PackAddInt(p, "build", CEDAR_BUILD);
+	PackAddInt(p, "ver", CEDAR_VER);
+	PackAddStr(p, "name_suite", DESK_PRODUCT_NAME_SUITE);
 	if (wt->Wide != NULL)
 	{
 		PackAddInt(p, "se_lang", wt->Wide->SeLang);

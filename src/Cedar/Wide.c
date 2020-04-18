@@ -371,7 +371,7 @@ LABEL_RETRY:
 	{
 		Debug("Redirect Host: %s:%u\n", c.HostName, c.Port);
 
-		ret = WtcConnect(wt, &c, sockio);
+		ret = WtcConnectEx(wt, &c, sockio, CEDAR_VER, CEDAR_BUILD);
 
 		if (ret != ERR_NO_ERROR)
 		{
@@ -3082,7 +3082,7 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size)
 
 	if (buf == NULL)
 	{
-		Alert("Failed to find the local EntryPoint.dat file. Please re-install the software.", DESK_PROTUCE_NAME_SUITE);
+		Alert("Failed to find the local EntryPoint.dat file. Please re-install the software.", DESK_PRODUCT_NAME_SUITE);
 		_exit(1);
 	}
 
@@ -3090,7 +3090,7 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size)
 
 	if (cert_tmp == NULL)
 	{
-		Alert("Failed to parse the local EntryPoint.dat file. Please re-install the software.", DESK_PROTUCE_NAME_SUITE);
+		Alert("Failed to parse the local EntryPoint.dat file. Please re-install the software.", DESK_PRODUCT_NAME_SUITE);
 		_exit(1);
 	}
 
@@ -3118,7 +3118,7 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size)
 
 	if (IsEmptyStr(url_tmp))
 	{
-		Alert("Failed to parse the local EntryPoint.dat file. Please re-install the software.", DESK_PROTUCE_NAME_SUITE);
+		Alert("Failed to parse the local EntryPoint.dat file. Please re-install the software.", DESK_PRODUCT_NAME_SUITE);
 		_exit(1);
 	}
 

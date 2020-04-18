@@ -357,6 +357,7 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 	PackAddData(p, "session_id", connect->SessionId, WT_SESSION_ID_SIZE);
 	PackAddInt(p, "ver", ver);
 	PackAddInt(p, "build", build);
+	PackAddStr(p, "name_suite", DESK_PRODUCT_NAME_SUITE);
 	PackAddBool(p, "support_timeout_param", true);
 	if (wt->Wide != NULL)
 	{
