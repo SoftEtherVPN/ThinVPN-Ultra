@@ -234,6 +234,10 @@ namespace BuildUtil
 					ret = "Thin Telework System";
 					break;
 
+				case Software.thintelework_share_disabled:
+					ret = "Thin Telework System (No Sharing Function)";
+					break;
+
 				default:
 					throw new ApplicationException("invalid soft.");
 			}
@@ -254,6 +258,10 @@ namespace BuildUtil
 			{
 				case Software.thintelework:
 					ret = "Thin Telework System";
+					break;
+
+				case Software.thintelework_share_disabled:
+					ret = "Thin Telework System (No Sharing Function)";
 					break;
 
 				default:

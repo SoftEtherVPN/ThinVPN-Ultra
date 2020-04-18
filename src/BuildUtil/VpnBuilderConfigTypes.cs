@@ -169,6 +169,7 @@ namespace BuildUtil
 	public enum Software
 	{
 		thintelework,
+		thintelework_share_disabled,
 	}
 
 	// Class to build the software

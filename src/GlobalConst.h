@@ -70,9 +70,9 @@
 #define DI_FILENAME_HAMCORE			L"hamcore.se2"
 #define DI_FILENAME_DESKSERVER_NOSHARE_SRC		L"ThinSvrNS.exe"
 
-#define SW_SETUP_NOSIGN_EXESRC		L"|thinsetup_nosign.exe"
-#define SW_SETUP_EXE_X86			L"thinsetup.exe"
-#define SW_SETUP_EXE_X64			L"thinsetup_x64.exe"
+#define SW_SETUP_NOSIGN_EXESRC		L"|ThinSetup_nosign.exe"
+#define SW_SETUP_EXE_X86			L"ThinSetup.exe"
+#define SW_SETUP_EXE_X64			L"ThinSetup_x64.exe"
 
 // 関係するファイル名
 #define DI_FILENAME_SETUPINI		L"@ThinSetup.ini"

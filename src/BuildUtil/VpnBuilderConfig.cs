@@ -144,6 +144,9 @@ namespace BuildUtil
 		public static readonly BuildSoftware thintelework_win32_x86x64_ja =
 			new BuildSoftwareWin32(Software.thintelework, 0, 0, "", CpuList.intel, OSList.Windows);
 
+		public static readonly BuildSoftware thintelework_share_disabled_win32_x86x64_ja =
+			new BuildSoftwareWin32(Software.thintelework_share_disabled, 0, 0, "", CpuList.intel, OSList.Windows);
+
 		static BuildSoftwareList()
 		{
 			foreach (BuildSoftware soft in List)

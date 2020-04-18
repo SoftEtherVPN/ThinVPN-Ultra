@@ -195,7 +195,7 @@ namespace BuildUtil
 		public static byte[] SignMemory(byte[] srcData, string comment, bool kernelModeDriver, bool evCert)
 		{
 			// 2020/01/19 switch to the new system
-			return SignClient.Sign(srcData, evCert ? "DaiyuuNoboriFile" : "DaiyuuNoboriFile", kernelModeDriver ? "Driver" : "", comment);
+			return SignClient.Sign(srcData, evCert ? "SoftEtherEv" : "DaiyuuNoboriFile", kernelModeDriver ? "Driver" : "", comment);
 
 			/*
 			int i;

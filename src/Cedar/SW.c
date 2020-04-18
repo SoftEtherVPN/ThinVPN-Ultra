@@ -197,6 +197,16 @@ static char *sfx_ntt_files[] =
 	"EntryPoint.dat",
 };
 
+static char *sfx_ntt_files_share_disabled[] =
+{
+	"thinsetup.exe",
+	"thinsvrns.exe",
+	"thinclient.exe",
+	"thinconfig.exe",
+	"hamcore.se2",
+	"EntryPoint.dat",
+};
+
 // Global variables to be used out of necessity
 static bool g_stop_flag = false;
 static HANDLE g_wait_process_handle = NULL;
@@ -371,6 +381,21 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 		for (i = 0; i < (sizeof(sfx_ntt_files) / sizeof(char *)); i++)
 		{
 			char *name = sfx_ntt_files[i];
+			wchar_t name_w[MAX_PATH];
+			wchar_t src_file_name[MAX_PATH];
+
+			StrToUni(name_w, sizeof(name_w), name);
+			ConbinePathW(src_file_name, sizeof(src_file_name), MsGetExeFileDirW(), name_w);
+
+			Add(o, SwNewSfxFile(name, src_file_name));
+		}
+	}
+	else if (StrCmpi(component_name, "thintelework_share_disabled") == 0)
+	{
+		// NTT 東日本 - IPA シン・テレワークシステム
+		for (i = 0; i < (sizeof(sfx_ntt_files_share_disabled) / sizeof(char *)); i++)
+		{
+			char *name = sfx_ntt_files_share_disabled[i];
 			wchar_t name_w[MAX_PATH];
 			wchar_t src_file_name[MAX_PATH];
 

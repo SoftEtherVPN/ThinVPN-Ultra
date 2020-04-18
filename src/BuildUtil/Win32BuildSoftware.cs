@@ -157,7 +157,7 @@ namespace BuildUtil
 		{
 			string outFileName = Path.Combine(Paths.ReleaseDir, this.OutputFileName);
 
-			string vpnsetup_exe = Path.Combine(Paths.BinDirName, "thinsetup.exe");
+			string vpnsetup_exe = Path.Combine(Paths.BinDirName, "ThinSetup.exe");
 
 			try
 			{
@@ -170,7 +170,7 @@ namespace BuildUtil
 			Win32BuildUtil.ExecCommand(vpnsetup_exe, string.Format("/SFXMODE:{1} /SFXOUT:\"{0}\"",
 				outFileName, Software.ToString()));
 
-			CodeSign.SignFile(outFileName, outFileName, "VPN Software Installer", false, true);
+			CodeSign.SignFile(outFileName, outFileName, BuildConfig.SignComment, false, true);
 		}
 	}
 }

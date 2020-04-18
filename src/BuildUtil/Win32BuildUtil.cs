@@ -166,7 +166,7 @@ namespace BuildUtil
 				m.ReleaseMutex();
 			}
 
-			CodeSign.SignFile(cabFileName, cabFileName, BuildConfig.SignComment, false, false);
+			CodeSign.SignFile(cabFileName, cabFileName, BuildConfig.SignComment, false, true);
 
 			File.Copy(cabFileName, dstFileName, true);
 		}
