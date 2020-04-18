@@ -4129,6 +4129,25 @@ LABEL_FINISHED:
 	// Completion message
 	SwPerformPrint(wp, _UU("SW_PERFORM_MSG_FINISHED"));
 
+	if (ok && c->Id == SW_CMP_NTT_SERVER && sw->IsSystemMode && MsIsVista())
+	{
+		wchar_t username[MAX_PATH];
+
+		StrToUni(username, sizeof(username), MsGetUserName());
+
+		if (MsIsPasswordEmpty(username))
+		{
+			if (MsIsUseWelcomeLogin())
+			{
+				SwPerformMsgBox(wp, MB_ICONINFORMATION, _UU("DI_EMPTY_PASSWORD_WARNING_1"));
+			}
+			else
+			{
+				SwPerformMsgBox(wp, MB_ICONINFORMATION, _UU("DI_EMPTY_PASSWORD_WARNING_2"));
+			}
+		}
+	}
+
 	ret = true;
 
 LABEL_CLEANUP:
