@@ -29,10 +29,10 @@
 
 #define DI_RUDP_INSTALL_DIR		L"Common Files\\Thin Telework Server RUDP Helper"
 
-#define DI_PRODUCT_SERVER_NAME	"NttServer"
-#define DI_PRODUCT_CLIENT_NAME	"NttClient"
+#define DI_PRODUCT_SERVER_NAME	"ThinSvr"
+#define DI_PRODUCT_CLIENT_NAME	"ThinClient"
 
-#define DESK_SERVER_SVC_NAME			"NTTSERVER"										// Desk Server Windows サービス名
+#define DESK_SERVER_SVC_NAME			"THINSVR"										// Desk Server Windows サービス名
 
 #define	DESK_SVC_NAME					"DESK"	// WideTunnel 内でのサービス名
 #define DS_RPC_PORT						9823	// Server の RPC ポート					// 元: 9822
@@ -54,30 +54,30 @@
 
 
 // Installer 関係
-#define SW_NAME_NTTSERVER			"nttserver"
-#define SW_LONG_NTTSERVER			L"Thin Telework Server"
+#define SW_NAME_THINSVR			"thinsvr"
+#define SW_LONG_THINSVR			L"Thin Telework Server"
 
-#define SW_NAME_NTTCLIENT			"nttclient"
-#define SW_LONG_NTTCLIENT			L"Thin Telework Client"
+#define SW_NAME_THINCLIENT			"thinclient"
+#define SW_LONG_THINCLIENT			L"Thin Telework Client"
 
 
 // インストールするファイル名
-#define DI_FILENAME_DESKCLIENT		L"NttClient.exe"
-#define DI_FILENAME_DESKCONFIG		L"NttConfig.exe"
-#define DI_FILENAME_DESKSERVER		L"NttServer.exe"
-#define DI_FILENAME_DESKSETUP		L"NttSetup.exe"
+#define DI_FILENAME_DESKCLIENT		L"ThinClient.exe"
+#define DI_FILENAME_DESKCONFIG		L"ThinConfig.exe"
+#define DI_FILENAME_DESKSERVER		L"ThinSvr.exe"
+#define DI_FILENAME_DESKSETUP		L"ThinSetup.exe"
 #define	DI_FILENAME_DESKHELPER		L"NttHelper.exe"
 #define DI_FILENAME_HAMCORE			L"hamcore.se2"
 
-#define SW_SETUP_NOSIGN_EXESRC		L"|nttsetup_nosign.exe"
-#define SW_SETUP_EXE_X86			L"nttsetup.exe"
-#define SW_SETUP_EXE_X64			L"nttsetup_x64.exe"
+#define SW_SETUP_NOSIGN_EXESRC		L"|thinsetup_nosign.exe"
+#define SW_SETUP_EXE_X86			L"thinsetup.exe"
+#define SW_SETUP_EXE_X64			L"thinsetup_x64.exe"
 
 // 関係するファイル名
-#define DI_FILENAME_SETUPINI		L"@NttSetup.ini"
+#define DI_FILENAME_SETUPINI		L"@ThinSetup.ini"
 
 
-#define	GC_SVC_NAME_NTTSERVER		"NTTSERVER"
+#define	GC_SVC_NAME_THINSVR		"THINSVR"
 
 // ここから下は おそらくいじらなくて OK
 #define DC_RDP_PORT_START				3500	// Client の RDP ポートの開始番号

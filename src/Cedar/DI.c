@@ -2416,10 +2416,10 @@ void DiApplyProductFileList(DI *di)
 
 	if (di->Product == DI_PRODUCT_SERVER)
 	{
-		// NttServer.exe の種類
+		// ThinSvr.exe の種類
 		wchar_t exe[MAX_PATH];
 
-		CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), L"nttserver.exe");
+		CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), L"thinsvr.exe");
 		di->ForceShareDisabled = DsCheckShareDisableSignature(exe);
 
 		// Server

@@ -157,7 +157,7 @@ namespace BuildUtil
 		{
 			string outFileName = Path.Combine(Paths.ReleaseDir, this.OutputFileName);
 
-			string vpnsetup_exe = Path.Combine(Paths.BinDirName, "nttsetup.exe");
+			string vpnsetup_exe = Path.Combine(Paths.BinDirName, "thinsetup.exe");
 
 			try
 			{

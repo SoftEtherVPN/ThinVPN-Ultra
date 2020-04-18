@@ -545,9 +545,9 @@ DI_LINK_CLIENT_UNINSTALL_COMMENT	NTT 東日本 - IPA 「シン・テレワーク
 
 
 # シン・テレワークシステム サーバー サービス定義
-SVC_NTTSERVER_NAME		NTTSERVER
-SVC_NTTSERVER_TITLE		Thin Telework Server by NTT East and IPA
-SVC_NTTSERVER_DESCRIPT	NTT 東日本 - IPA 「シン・テレワークシステム」 サーバー サービスは、システムモードで NTT 東日本 - IPA 「シン・テレワークシステム」 サーバー を常時稼動させるためのプログラムです。このサービスが起動中の場合は、このコンピュータのデスクトップに遠隔地の NTT 東日本 - IPA 「シン・テレワークシステム」 Client からリモートアクセスすることができます。
+SVC_THINSVR_NAME		THINSVR
+SVC_THINSVR_TITLE		Thin Telework Server by NTT East and IPA
+SVC_THINSVR_DESCRIPT	NTT 東日本 - IPA 「シン・テレワークシステム」 サーバー サービスは、システムモードで NTT 東日本 - IPA 「シン・テレワークシステム」 サーバー を常時稼動させるためのプログラムです。このサービスが起動中の場合は、このコンピュータのデスクトップに遠隔地の NTT 東日本 - IPA 「シン・テレワークシステム」 Client からリモートアクセスすることができます。
 
 
 # WideGate サービス定義
@@ -7643,11 +7643,11 @@ SW_COMPONENT_VPNCMGR_TITLE					SoftEther VPN クライアント接続マネー�
 SW_COMPONENT_VPNCMGR_DESCRIPTION			この PC に VPN クライアント接続マネージャのみをインストールします。VPN Client 本体はインストールしません。別のコンピュータの Windows / Linux で動作している VPN Client をリモート管理することができます。
 
 
-SW_COMPONENT_NTTSERVER_TITLE				シン・テレワークシステム サーバー
-SW_COMPONENT_NTTSERVER_DESCRIPTION			リモートアクセスを受け付ける側の PC (職場の PC など) にインストールします。
+SW_COMPONENT_THINSVR_TITLE				シン・テレワークシステム サーバー
+SW_COMPONENT_THINSVR_DESCRIPTION			リモートアクセスを受け付ける側の PC (職場の PC など) にインストールします。
 
-SW_COMPONENT_NTTCLIENT_TITLE				シン・テレワークシステム クライアント
-SW_COMPONENT_NTTCLIENT_DESCRIPTION			リモートアクセスを始動する側の PC (自宅 PC やモバイル PC など) にインストールします。
+SW_COMPONENT_THINCLIENT_TITLE				シン・テレワークシステム クライアント
+SW_COMPONENT_THINCLIENT_DESCRIPTION			リモートアクセスを始動する側の PC (自宅 PC やモバイル PC など) にインストールします。
 
 
 
@@ -7774,8 +7774,8 @@ SW_RUN_TEXT_VPNCMGR							SoftEther VPN クライアント接続マネージャ�
 
 SW_NIC_UNINSTALL							SoftEther VPN Client の仮想 LAN カードが作成されています。\r\nこれらの仮想 LAN カードを削除しますか?
 
-SW_RUN_TEXT_NTTSERVER						NTT 東日本 - IPA 「シン・テレワークシステム」 サーバーの初期設定を行ないます。
-SW_RUN_TEXT_NTTCLIENT						NTT 東日本 - IPA 「シン・テレワークシステム」 クライアントを起動します。
+SW_RUN_TEXT_THINSVR						NTT 東日本 - IPA 「シン・テレワークシステム」 サーバーの初期設定を行ないます。
+SW_RUN_TEXT_THINCLIENT						NTT 東日本 - IPA 「シン・テレワークシステム」 クライアントを起動します。
 
 # Do not translate this section !!!
 SW_TAG_USERNAME_ENGLISH						\ (User-Mode)
@@ -7787,20 +7787,20 @@ SW_LONG_VPNBRIDGE							SoftEther VPN Bridge
 SW_LONG_VPNSMGR								SoftEther VPN Server Manager
 SW_LONG_VPNCMGR								SoftEther VPN Client Manager
 SW_LANG_SET_FAILED							Failed to write the new language setting on lang.config file.
-SW_LINK_NAME_NTTSERVER_SVC					Thin Telework User-mode Service
+SW_LINK_NAME_THINSVR_SVC					Thin Telework User-mode Service
 
 
 # ショートカット名 (シン・テレワーク)
-SW_LINK_NAME_NTTCONFIG_FULL					NTT 東日本 - IPA 「シン・テレワークシステム」 サーバー設定ツール
-SW_LINK_NAME_NTTCONFIG_SHORT				シン・テレワークシステム サーバー設定
-SW_LINK_NAME_NTTCONFIG_SHORT_UM				シン・テレワークシステム サーバー設定 (ユーザー)
-SW_LINK_NAME_NTTCONFIG_COMMENT				このコンピュータで動作している NTT 東日本 - IPA 「シン・テレワークシステム」 サーバーの設定を行なうためのツールです。
-SW_LINK_NAME_NTTCONFIG_SVC_COMMENT			NTT 東日本 - IPA 「シン・テレワークシステム」 サーバー サービスをユーザーモードで起動します。
+SW_LINK_NAME_THINCONFIG_FULL					NTT 東日本 - IPA 「シン・テレワークシステム」 サーバー設定ツール
+SW_LINK_NAME_THINCONFIG_SHORT				シン・テレワークシステム サーバー設定
+SW_LINK_NAME_THINCONFIG_SHORT_UM				シン・テレワークシステム サーバー設定 (ユーザー)
+SW_LINK_NAME_THINCONFIG_COMMENT				このコンピュータで動作している NTT 東日本 - IPA 「シン・テレワークシステム」 サーバーの設定を行なうためのツールです。
+SW_LINK_NAME_THINCONFIG_SVC_COMMENT			NTT 東日本 - IPA 「シン・テレワークシステム」 サーバー サービスをユーザーモードで起動します。
 
-SW_LINK_NAME_NTTCLIENT_FULL					NTT 東日本 - IPA 「シン・テレワークシステム」 クライアント
-SW_LINK_NAME_NTTCLIENT_SHORT				シン・テレワークシステム クライアント
-SW_LINK_NAME_NTTCLIENT_SHORT_UM				シン・テレワークシステム クライアント (ユーザー)
-SW_LINK_NAME_NTTCLIENT_COMMENT				遠隔地にあるコンピュータで動作している NTT 東日本 - IPA 「シン・テレワークシステム」 サーバーにインターネット経由でリモートアクセスするためのクライアントです。
+SW_LINK_NAME_THINCLIENT_FULL					NTT 東日本 - IPA 「シン・テレワークシステム」 クライアント
+SW_LINK_NAME_THINCLIENT_SHORT				シン・テレワークシステム クライアント
+SW_LINK_NAME_THINCLIENT_SHORT_UM				シン・テレワークシステム クライアント (ユーザー)
+SW_LINK_NAME_THINCLIENT_COMMENT				遠隔地にあるコンピュータで動作している NTT 東日本 - IPA 「シン・テレワークシステム」 サーバーにインターネット経由でリモートアクセスするためのクライアントです。
 
 
 

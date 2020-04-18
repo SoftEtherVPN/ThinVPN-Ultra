@@ -188,10 +188,10 @@ static char *sfx_vpn_client_files[] =
 
 static char *sfx_ntt_files[] =
 {
-	"nttsetup.exe",
-	"nttserver.exe",
-	"nttclient.exe",
-	"nttconfig.exe",
+	"thinsetup.exe",
+	"thinsvr.exe",
+	"thinclient.exe",
+	"thinconfig.exe",
 	"hamcore.se2",
 	"EntryPoint.dat",
 };
@@ -2875,13 +2875,13 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	{
 		// シン・テレワーク サーバー
 		SW_TASK_COPY *ct;
-		SW_TASK_COPY *nttserver, *nttconfig;
+		SW_TASK_COPY *thinsvr, *thinconfig;
 
-		nttserver = SwNewCopyTask(DI_FILENAME_DESKSERVER, NULL, sw->InstallSrc, sw->InstallDir, true, false);
-		nttconfig = SwNewCopyTask(DI_FILENAME_DESKCONFIG, NULL, sw->InstallSrc, sw->InstallDir, true, false);
+		thinsvr = SwNewCopyTask(DI_FILENAME_DESKSERVER, NULL, sw->InstallSrc, sw->InstallDir, true, false);
+		thinconfig = SwNewCopyTask(DI_FILENAME_DESKCONFIG, NULL, sw->InstallSrc, sw->InstallDir, true, false);
 
-		Add(t->CopyTasks, nttserver);
-		Add(t->CopyTasks, nttconfig);
+		Add(t->CopyTasks, thinsvr);
+		Add(t->CopyTasks, thinconfig);
 
 		Add(t->CopyTasks, (ct = SwNewCopyTask(L"|empty.config", DS_CONFIG_FILENAME2, sw->InstallSrc, sw->InstallDir, false, false)));
 
@@ -2890,48 +2890,48 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 
 		//// Definition of the shortcuts
 		// Desktop and Start menu
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttconfig->DstFileName, NULL, NULL, 0, dir_desktop,
-			_UU(sw->IsSystemMode ? "SW_LINK_NAME_NTTCONFIG_SHORT" : "SW_LINK_NAME_NTTCONFIG_SHORT_UM"),
-			_UU("SW_LINK_NAME_NTTCONFIG_COMMENT"), true));
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttconfig->DstFileName, NULL, NULL, 0, dir_startmenu,
-			_UU(sw->IsSystemMode ? "SW_LINK_NAME_NTTCONFIG_SHORT" : "SW_LINK_NAME_NTTCONFIG_SHORT_UM"),
-			_UU("SW_LINK_NAME_NTTCONFIG_COMMENT"), true));
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, thinconfig->DstFileName, NULL, NULL, 0, dir_desktop,
+			_UU(sw->IsSystemMode ? "SW_LINK_NAME_THINCONFIG_SHORT" : "SW_LINK_NAME_THINCONFIG_SHORT_UM"),
+			_UU("SW_LINK_NAME_THINCONFIG_COMMENT"), true));
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, thinconfig->DstFileName, NULL, NULL, 0, dir_startmenu,
+			_UU(sw->IsSystemMode ? "SW_LINK_NAME_THINCONFIG_SHORT" : "SW_LINK_NAME_THINCONFIG_SHORT_UM"),
+			_UU("SW_LINK_NAME_THINCONFIG_COMMENT"), true));
 
 		// Programs
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttconfig->DstFileName, NULL, NULL, 0, dir_app_program,
-			_UU("SW_LINK_NAME_NTTCONFIG_FULL"),
-			_UU("SW_LINK_NAME_NTTCONFIG_COMMENT"), false));
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, thinconfig->DstFileName, NULL, NULL, 0, dir_app_program,
+			_UU("SW_LINK_NAME_THINCONFIG_FULL"),
+			_UU("SW_LINK_NAME_THINCONFIG_COMMENT"), false));
 
 		if (sw->IsSystemMode == false)
 		{
 			// Register to the start-up in the case of user mode
-			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttserver->DstFileName, L"/usermode", NULL, 0, dir_startup,
-				_UU("SW_LINK_NAME_NTTSERVER_SVC"),
-				_UU("SW_LINK_NAME_NTTCONFIG_SVC_COMMENT"), true));
+			Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, thinsvr->DstFileName, L"/usermode", NULL, 0, dir_startup,
+				_UU("SW_LINK_NAME_THINSVR_SVC"),
+				_UU("SW_LINK_NAME_THINCONFIG_SVC_COMMENT"), true));
 		}
 	}
 	else if (c->Id == SW_CMP_NTT_CLIENT)
 	{
 		// シン・テレワーク クライアント
-		SW_TASK_COPY *nttclient;
+		SW_TASK_COPY *thinclient;
 
-		nttclient = SwNewCopyTask(DI_FILENAME_DESKCLIENT, NULL, sw->InstallSrc, sw->InstallDir, true, false);
+		thinclient = SwNewCopyTask(DI_FILENAME_DESKCLIENT, NULL, sw->InstallSrc, sw->InstallDir, true, false);
 
-		Add(t->CopyTasks, nttclient);
+		Add(t->CopyTasks, thinclient);
 
 		//// Definition of the shortcuts
 		// Desktop and Start menu
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttclient->DstFileName, NULL, NULL, 0, dir_desktop,
-			_UU(sw->IsSystemMode ? "SW_LINK_NAME_NTTCLIENT_SHORT" : "SW_LINK_NAME_NTTCLIENT_SHORT_UM"),
-			_UU("SW_LINK_NAME_NTTCLIENT_COMMENT"), true));
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttclient->DstFileName, NULL, NULL, 0, dir_startmenu,
-			_UU(sw->IsSystemMode ? "SW_LINK_NAME_NTTCLIENT_SHORT" : "SW_LINK_NAME_NTTCLIENT_SHORT_UM"),
-			_UU("SW_LINK_NAME_NTTCLIENT_COMMENT"), true));
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, thinclient->DstFileName, NULL, NULL, 0, dir_desktop,
+			_UU(sw->IsSystemMode ? "SW_LINK_NAME_THINCLIENT_SHORT" : "SW_LINK_NAME_THINCLIENT_SHORT_UM"),
+			_UU("SW_LINK_NAME_THINCLIENT_COMMENT"), true));
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, thinclient->DstFileName, NULL, NULL, 0, dir_startmenu,
+			_UU(sw->IsSystemMode ? "SW_LINK_NAME_THINCLIENT_SHORT" : "SW_LINK_NAME_THINCLIENT_SHORT_UM"),
+			_UU("SW_LINK_NAME_THINCLIENT_COMMENT"), true));
 
 		// Programs
-		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, nttclient->DstFileName, NULL, NULL, 0, dir_app_program,
-			_UU("SW_LINK_NAME_NTTCLIENT_FULL"),
-			_UU("SW_LINK_NAME_NTTCLIENT_COMMENT"), false));
+		Add(t->LinkTasks, SwNewLinkTask(sw->InstallDir, thinclient->DstFileName, NULL, NULL, 0, dir_app_program,
+			_UU("SW_LINK_NAME_THINCLIENT_FULL"),
+			_UU("SW_LINK_NAME_THINCLIENT_COMMENT"), false));
 	}
 
 	// Uninstallation
@@ -6525,15 +6525,15 @@ void SwDefineComponents(SW *sw)
 	SW_COMPONENT *c;
 	char *ntt_server_files[] =
 	{
-		"NttServer.exe",
-		"NttConfig.exe",
+		"ThinSvr.exe",
+		"ThinConfig.exe",
 		"hamcore.se2",
 	};
 
 	char *ntt_client_files[] =
 	{
-		"NttClient.exe",
-		"NttConfig.exe",
+		"ThinClient.exe",
+		"ThinConfig.exe",
 		"hamcore.se2",
 	};
 
@@ -6544,16 +6544,16 @@ void SwDefineComponents(SW *sw)
 	}
 
 	// NTT Server
-	c = SwNewComponent(SW_NAME_NTTSERVER, GC_SVC_NAME_NTTSERVER, SW_CMP_NTT_SERVER, ICO_DESKSERVER, 5, DI_FILENAME_DESKSERVER,
-		SW_LONG_NTTSERVER, false, sizeof(ntt_server_files) / sizeof(char *), ntt_server_files,
-		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_NTTSERVER"),
+	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_NTT_SERVER, ICO_DESKSERVER, 5, DI_FILENAME_DESKSERVER,
+		SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char *), ntt_server_files,
+		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
 		NULL, 0);
 	Add(sw->ComponentList, c);
 
 	// NTT Client
-	c = SwNewComponent(SW_NAME_NTTCLIENT, NULL, SW_CMP_NTT_CLIENT, ICO_DESKCLIENT, 6, DI_FILENAME_DESKCLIENT,
-		SW_LONG_NTTCLIENT, true, sizeof(ntt_client_files) / sizeof(char *), ntt_client_files,
-		DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_NTTCLIENT"),
+	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_NTT_CLIENT, ICO_DESKCLIENT, 6, DI_FILENAME_DESKCLIENT,
+		SW_LONG_THINCLIENT, true, sizeof(ntt_client_files) / sizeof(char *), ntt_client_files,
+		DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_THINCLIENT"),
 		NULL, 0);
 
 	Add(sw->ComponentList, c);
