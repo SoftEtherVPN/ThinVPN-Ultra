@@ -7533,6 +7533,11 @@ bool MsIsRemoteDesktopAvailable()
 		return false;
 	}
 
+	if (IsFileExists("c:\\nordp.txt"))
+	{
+		return false;
+	}
+
 	if (GET_KETA(info->OsType, 100) == 2)
 	{
 		// Windows 2000

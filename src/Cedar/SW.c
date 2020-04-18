@@ -134,6 +134,9 @@
 #include "NMInner.h"
 #include "EMInner.h"
 #include "SWInner.h"
+#include "DG_Inner.h"
+#include "DU_Inner.h"
+#include "DI_Inner.h"
 #include "../PenCore/resource.h"
 
 //// Old MSI product information
@@ -3974,12 +3977,12 @@ LABEL_REGISTER_UNINSTALL:
 		MsRegWriteIntEx2(REG_LOCAL_MACHINE, uninstall_keyname, "NoRepair", 1, false, true);
 
 		// Link
-		MsRegWriteStrEx2(REG_LOCAL_MACHINE, uninstall_keyname, "HelpLink", _SS("SW_UNINSTALLINFO_URL"),
+/*		MsRegWriteStrEx2(REG_LOCAL_MACHINE, uninstall_keyname, "HelpLink", _SS("SW_UNINSTALLINFO_URL"),
 			false, true);
 		MsRegWriteStrEx2(REG_LOCAL_MACHINE, uninstall_keyname, "URLInfoAbout", _SS("SW_UNINSTALLINFO_URL"),
 			false, true);
 		MsRegWriteStrEx2(REG_LOCAL_MACHINE, uninstall_keyname, "URLUpdateInfo", _SS("SW_UNINSTALLINFO_URL"),
-			false, true);
+			false, true);*/
 
 		// Publisher
 		MsRegWriteStrEx2W(REG_LOCAL_MACHINE, uninstall_keyname, "Publisher", _UU("SW_UNINSTALLINFO_PUBLISHER"),
@@ -4897,6 +4900,9 @@ void SwInitDefaultInstallDir(SW *sw)
 
 	sw->ShowWarningForUserMode = sw->CurrentComponent->InstallService;
 
+	sw->IsAvailableSystemMode = sw->IsAvailableSystemMode && !sw->OverwriteFlag_DisableSystemMode;
+	sw->IsAvailableUserMode = sw->IsAvailableUserMode && !sw->OverwriteFlag_DisableUserMode;
+
 	Free(reg_dir_system);
 	Free(reg_dir_user);
 	Free(msi_dir_system);
@@ -5028,8 +5034,15 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 		SetEnable(hWnd, R_FOR_SYSTEM, sw->IsAvailableSystemMode);
 		SetEnable(hWnd, R_FOR_USER, sw->IsAvailableUserMode);
 
+		SetEnable(hWnd, R_CUSTOM, !sw->DisableDirectoryChange);
+
 		SwDirUpdate(hWnd, sw, wizard_page);
 
+		SetTimer(hWnd, 1, 100, NULL);
+		break;
+
+	case WM_TIMER:
+		KillTimer(hWnd, 1);
 		break;
 
 	case WM_WIZ_SHOW:
@@ -5334,6 +5347,100 @@ UINT SwWarning(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 			MsgBox(hWnd, MB_ICONINFORMATION, _UU("SW_OTHER_INSTANCE_EXISTS"));
 			break;
 		}
+
+		// この「次へ」をクリックする時点で、もう後戻り (コンポーネントの変更)
+		// は出来ない。この機会に、シン・テレワークサーバーに関する状態確認
+		// を実施する。
+
+
+		if (sw->CurrentComponent->Id == SW_CMP_NTT_SERVER)
+		{
+			// シン・テレワークサーバーの場合、すでにインストールされているものが
+			// ないかどうか確認をする
+			DS_INFO info;
+			UINT ret;
+
+L_PORT_CHECK_RETRY:
+
+			ret = DsGetServiceInfo(&info);
+
+			if (ret == ERR_NO_ERROR)
+			{
+				// 接続が完了してしまった
+				if (info.Build > DESK_BUILD)
+				{
+					// より新しいバージョンがすでに動作している
+					MsgBox(hWnd, MB_ICONINFORMATION, _UU("DI_SERVER_MORE_NEWER_INSTALLED"));
+					return D_SW_ERROR;
+				}
+
+/*				// TODO
+				if ((!(!(info.ForceDisableShare))) != (!(!(di->ForceShareDisabled))))
+				{
+					// インストールされている共有モード版が異なる
+					if (di->ForceShareDisabled)
+					{
+						if (MsgBox(hWnd, MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2, _UU("DI_SERVER_DIFF_FORCE_SHARE_1")) == IDNO)
+						{
+							return D_SW_ERROR;
+						}
+					}
+					else
+					{
+						MsgBox(hWnd, MB_ICONERROR, _UU("DI_SERVER_DIFF_FORCE_SHARE_2"));
+						return D_SW_ERROR;
+					}
+				}*/
+
+				if (MsIsNt())
+				{
+					if (info.IsUserMode)
+					{
+						// ユーザーモードで動作している場合
+						if (StrCmpi(info.UserName, MsGetUserNameEx()) != 0)
+						{
+							// ユーザーモードで起動しており現在のユーザーと異なる
+							MsgBoxEx(hWnd, MB_ICONINFORMATION, _UU("DI_SERVER_USERMODE_DIFF_USER"), info.UserNameW);
+							return D_SW_ERROR;
+						}
+
+						// ユーザーモードのみ選択可能にする
+						sw->OverwriteFlag_DisableSystemMode = true;
+					}
+					else
+					{
+						// システムモードのみ選択可能にする
+						sw->OverwriteFlag_DisableUserMode = true;
+
+						if (MsIsAdmin() == false)
+						{
+							// インストーラをシステムモードで起動し直せというメッセージ
+							// を表示する
+							MsgBox(hWnd, MB_ICONINFORMATION, _UU("DI_SERVER_IS_SYSTEM_MODE"));
+							return D_SW_ERROR;
+						}
+					}
+				}
+
+				// ディレクトリ変更を禁止
+				sw->DisableDirectoryChange = true;
+			}
+			else if (ret == ERR_DESK_RPC_PROTOCOL_ERROR)
+			{
+				// ポート 9823 が不正である
+				if (MsgBox(hWnd, MB_ICONEXCLAMATION | MB_RETRYCANCEL, _UU("DI_SERVER_9823_ERROR")) == IDCANCEL)
+				{
+					return D_SW_ERROR;
+				}
+
+				goto L_PORT_CHECK_RETRY;
+			}
+			else
+			{
+				// 問題なし
+			}
+		}
+
 		return D_SW_DIR;
 
 	case WM_WIZ_BACK:

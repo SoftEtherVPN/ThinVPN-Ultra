@@ -135,7 +135,7 @@ void StartProcess()
 		DS_INFO info;
 		UINT ret;
 
-		// ユーザーモードの場合、すでにポート 9822 が開かれていないかどうか
+		// ユーザーモードの場合、すでにポート 9823 が開かれていないかどうか
 		// チェックする
 		ret = DsGetServiceInfo(&info);
 
@@ -145,20 +145,20 @@ void StartProcess()
 			if (info.IsUserMode == false)
 			{
 				MsgBoxEx(NULL, MB_ICONEXCLAMATION,
-					_UU("DS_9822_ALREADY_SVC"),
+					_UU("DS_9823_ALREADY_SVC"),
 					info.ExeDirW);
 			}
 			else
 			{
 				MsgBoxEx(NULL, MB_ICONEXCLAMATION,
-					_UU("DS_9822_ALREADY_USER"),
+					_UU("DS_9823_ALREADY_USER"),
 					info.ExeDirW, info.UserNameW);
 			}
 		}
 		else if (ret == ERR_DESK_RPC_PROTOCOL_ERROR)
 		{
 			// 変なソフトが動作している
-			MsgBox(NULL, MB_ICONEXCLAMATION, _UU("DS_9822_WARNING"));
+			MsgBox(NULL, MB_ICONEXCLAMATION, _UU("DS_9823_WARNING"));
 		}
 	}
 

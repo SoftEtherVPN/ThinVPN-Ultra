@@ -750,6 +750,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		}
 	}
 
+	// Windows RDP が有効かどうかのフラグ
+	if (MsIsRemoteDesktopAvailable() && MsIsRemoteDesktopEnabled())
+	{
+		ds_caps |= DS_CAPS_WIN_RDP_ENABLED;
+	}
+
 	PackAddInt(p, "DsCaps", ds_caps);
 
 	PackAddBool(p, "IsShareDisabled", is_share_disabled);

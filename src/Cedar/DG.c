@@ -105,10 +105,20 @@ UINT DgPassword2DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void 
 	switch (msg)
 	{
 	case WM_INITDIALOG:
+		if (MsIsVista())
+		{
+			SetFont(hWnd, S_1, GetMeiryoFontEx2(14, true));
+			SetFont(hWnd, S_2, GetMeiryoFontEx2(11, false));
+		}
+		else
+		{
+			DlgFont(hWnd, S_1, (_GETLANG() == 0 ? 18 : 14), true);
+			DlgFont(hWnd, S_2, 11, false);
+		}
+
 		dg->Password2Clicked = false;
 		SetIcon(hWnd, 0, ICO_KEY);
-		DlgFont(hWnd, S_1, (_GETLANG() == 0 ? 18 : 14), true);
-		DlgFont(hWnd, S_2, 11, false);
+		//DlgFont(hWnd, S_1, (_GETLANG() == 0 ? 18 : 14), true);
 		DlgFont(hWnd, IDOK, 0, true);
 
 		SetShow(hWnd, S_LANG_JP, _GETLANG() == 0);
@@ -187,9 +197,20 @@ UINT DgPassword1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void 
 	switch (msg)
 	{
 	case WM_INITDIALOG:
+		if (MsIsVista())
+		{
+			SetFont(hWnd, S_1, GetMeiryoFontEx2(14, true));
+			SetFont(hWnd, S_2, GetMeiryoFontEx2(11, false));
+		}
+		else
+		{
+			DlgFont(hWnd, S_1, (_GETLANG() == 0 ? 18 : 14), true);
+			DlgFont(hWnd, S_2, 11, false);
+		}
+
 		SetIcon(hWnd, 0, ICO_KEY);
-		DlgFont(hWnd, S_1, (_GETLANG() == 0 ? 18 : 14), true);
-		DlgFont(hWnd, S_2, 11, false);
+		//DlgFont(hWnd, S_1, (_GETLANG() == 0 ? 18 : 14), true);
+		//DlgFont(hWnd, S_2, 11, false);
 
 		SetShow(hWnd, S_LANG_JP, _GETLANG() == 0);
 		SetShow(hWnd, S_LANG_EN, _GETLANG() != 0);

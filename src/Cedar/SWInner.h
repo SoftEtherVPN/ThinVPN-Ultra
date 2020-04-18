@@ -341,6 +341,10 @@ typedef struct SW
 	UINT CurrentEulaHash;				// Hash of the license agreement
 
 	bool EnableRdpLogonScreen;			// RDP ログオン画面を有効にする処理をするかどうか
+
+	bool OverwriteFlag_DisableSystemMode;
+	bool OverwriteFlag_DisableUserMode;
+	bool DisableDirectoryChange;
 } SW;
 
 

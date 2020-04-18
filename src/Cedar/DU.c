@@ -979,7 +979,14 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 					}
 					else
 					{
-						once_msg = _UU("DU_ONCEMSG_2");
+						if (s->DsCaps & DS_CAPS_WIN_RDP_ENABLED)
+						{
+							once_msg = _UU("DU_ONCEMSG_3");
+						}
+						else
+						{
+							once_msg = _UU("DU_ONCEMSG_2");
+						}
 					}
 
 					UniFormat(tmp, sizeof(tmp), _UU("DU_ONCEMSG_TITLE"), s->Pcid);
