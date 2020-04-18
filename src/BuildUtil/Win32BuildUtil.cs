@@ -172,7 +172,7 @@ namespace BuildUtil
 		}
 
 		// Generate a version information resource
-		public static void GenerateVersionInfoResource(string targetExeName, string outName, string rc_name, string product_name)
+		public static void GenerateVersionInfoResource(string targetExeName, string outName, string rc_name, string product_name, string postfix)
 		{
 			int build, version;
 			string name;
@@ -189,6 +189,11 @@ namespace BuildUtil
 
 			string exeFileName = Path.GetFileName(targetExeName);
 			string internalName = Path.GetFileNameWithoutExtension(exeFileName);
+
+			if (Str.IsEmptyStr(postfix) == false)
+			{
+				internalName += " " + postfix;
+			}
 
 			if (Str.IsEmptyStr(product_name) == false)
 			{

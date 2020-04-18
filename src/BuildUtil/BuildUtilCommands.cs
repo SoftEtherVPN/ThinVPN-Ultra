@@ -1165,14 +1165,16 @@ namespace BuildUtil
 				new ConsoleParam("OUT", ConsoleService.Prompt, "Dst Filename: ", ConsoleService.EvalNotEmpty, null),
 				new ConsoleParam("PRODUCT"),
 				new ConsoleParam("RC"),
+				new ConsoleParam("POSTFIX"),
 			};
 			ConsoleParamValueList vl = c.ParseCommandList(cmdName, str, args);
 
 			string targetFilename = vl.DefaultParam.StrValue;
 			string outFilename = vl["OUT"].StrValue;
 			string product_name = vl["PRODUCT"].StrValue;
+			string postfix = vl["POSTFIX"].StrValue;
 
-			Win32BuildUtil.GenerateVersionInfoResource(targetFilename, outFilename, vl["RC"].StrValue, product_name);
+			Win32BuildUtil.GenerateVersionInfoResource(targetFilename, outFilename, vl["RC"].StrValue, product_name, postfix);
 
 			return 0;
 		}
