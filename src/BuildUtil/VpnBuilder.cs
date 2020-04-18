@@ -230,20 +230,8 @@ namespace BuildUtil
 
 			switch (soft)
 			{
-				case Software.vpnbridge:
-					ret = "PacketiX VPN Bridge";
-					break;
-
-				case Software.vpnclient:
-					ret = "PacketiX VPN Client, PacketiX VPN Command-Line Admin Utility (vpncmd)";
-					break;
-
-				case Software.vpnserver:
-					ret = "PacketiX VPN Server, PacketiX VPN Command-Line Admin Utility (vpncmd)";
-					break;
-
-				case Software.vpnserver_vpnbridge:
-					ret = "PacketiX VPN Server, PacketiX VPN Bridge, PacketiX VPN Server Manager for Windows, PacketiX VPN Command-Line Admin Utility (vpncmd)";
+				case Software.thintelework:
+					ret = "Thin Telework System";
 					break;
 
 				default:
@@ -264,20 +252,8 @@ namespace BuildUtil
 
 			switch (soft)
 			{
-				case Software.vpnbridge:
-					ret = "PacketiX VPN Bridge";
-					break;
-
-				case Software.vpnclient:
-					ret = "PacketiX VPN Client";
-					break;
-
-				case Software.vpnserver:
-					ret = "PacketiX VPN Server";
-					break;
-
-				case Software.vpnserver_vpnbridge:
-					ret = "PacketiX VPN Server and VPN Bridge";
+				case Software.thintelework:
+					ret = "Thin Telework System";
 					break;
 
 				default:

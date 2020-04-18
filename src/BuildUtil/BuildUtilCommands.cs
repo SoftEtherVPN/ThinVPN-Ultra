@@ -137,20 +137,12 @@ namespace BuildUtil
 			"IGNOREERROR:Specify yes if you'd like to ignore the child process to show the error message.",
 			"SERIAL:Specify yes not to use parallel mode.",
 			"DEBUG:Specity yes to enable debug mode. (UNIX only)"
-#if !BU_SOFTETHER
-			, "SEVPN:Build SoftEther VPN Automatically After PacketiX VPN Build"
-#endif
 			)]
 		static int All(ConsoleService c, string cmdName, string str)
 		{
 			ConsoleParam[] args =
 			{
-#if !BU_SOFTETHER
 				new ConsoleParam("[yes|no]", ConsoleService.Prompt, "Increments build number (y/n) ? ", ConsoleService.EvalNotEmpty, null),
-				new ConsoleParam("SEVPN", ConsoleService.Prompt, "Build SoftEther VPN automatically after PacketiX VPN Build (y/n) ? ", ConsoleService.EvalNotEmpty, null),
-#else
-				new ConsoleParam("[yes|no]"),
-#endif
 				new ConsoleParam("IGNOREERROR"),
 				new	ConsoleParam("DEBUG"),
 				new ConsoleParam("SERIAL"),
@@ -257,7 +249,7 @@ namespace BuildUtil
 									name,
 									date.Year, date.Month, date.Day);
 
-#if !BU_OSS
+#if true
 			string destDirName = Path.Combine(Paths.ReleaseDestDir,
 				string.Format(@"{0}-{1}-{2}-{3}",
 					Str.DateToStrShort(BuildSoftwareList.ListCreatedDateTime),
@@ -271,13 +263,13 @@ namespace BuildUtil
 					Env.MachineName, Env.UserName));
 #endif
 
-#if !BU_OSS
+#if true
 			string publicDir = Path.Combine(destDirName, "Public");
 #else	// !BU_OSS
 			string publicDir = destDirName;
 #endif
 
-#if !BU_OSS
+#if true
 			string filesReleaseDir = Path.Combine(publicDir, baseName);
 #else	// !BU_OSS
 			string filesReleaseDir = publicDir;
@@ -287,7 +279,7 @@ namespace BuildUtil
 
 			IO.CopyDir(Paths.ReleaseDir, filesReleaseDir, null, false, true);
 
-#if !BU_OSS
+#if true
 			IO.CopyDir(Paths.ReleaseSrckitDir, Path.Combine(destDirName, "Private"), null, false, true);
 			IO.CopyDir(Path.Combine(Paths.BaseDirName, @"tmp\lib"), Path.Combine(destDirName, @"Private\lib"), null, false, true);
 #endif
@@ -303,6 +295,7 @@ namespace BuildUtil
 
 			File.Copy(Path.Combine(Paths.AutorunSrcDir, "packetix.ico"),
 				Path.Combine(autorunReleaseSrcDir, "autorun.ico"), true);*/
+
 
 			// Create a batch file
 			string batchFileName = Path.Combine(publicDir, "MakeCD.cmd");
@@ -390,10 +383,10 @@ namespace BuildUtil
 
 				string txt_lang = "English, Japanese, Simplified Chinese";
 
-				string txt_category = "PacketiX VPN (Commercial)";
+				string txt_category = "Freeware";
 
 #if BU_SOFTETHER
-				txt_category = "SoftEther VPN (Freeware)";
+				//txt_category = "SoftEther VPN (Freeware)";
 #endif
 
 				txt.WriteLine("FILENAME\t" + txt_filename);
@@ -912,7 +905,7 @@ namespace BuildUtil
 			};
 			ConsoleParamValueList vl = c.ParseCommandList(cmdName, str, args);
 
-			((BuildSoftwareUnix)BuildSoftwareList.vpnbridge_linux_x86_ja).CopyUnixSrc(vl.DefaultParam.StrValue);
+			//((BuildSoftwareUnix)BuildSoftwareList.vpnbridge_linux_x86_ja).CopyUnixSrc(vl.DefaultParam.StrValue);
 
 			return 0;
 		}

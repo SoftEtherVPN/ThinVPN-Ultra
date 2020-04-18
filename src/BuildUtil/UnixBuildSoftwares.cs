@@ -163,9 +163,9 @@ namespace BuildUtil
 			this.CrossCompilerOption = crossCompilerOption;
 
 #if !BU_SOFTETHER
-			this.SrcKitDefaultDir = Env.SystemDir.Substring(0, 2) + @"\tmp\vpn4_srckit";
+			this.SrcKitDefaultDir = Env.SystemDir.Substring(0, 2) + @"\tmp\se_thin_srckit";
 #else
-			this.SrcKitDefaultDir = Env.SystemDir.Substring(0, 2) + @"\tmp\se_vpn_srckit";
+			this.SrcKitDefaultDir = Env.SystemDir.Substring(0, 2) + @"\tmp\se_thin_srckit";
 #endif
 		}
 
@@ -649,10 +649,10 @@ namespace BuildUtil
 
 			sr.WriteLine("\t$(CC) code/{0}.a $(OPTIONS) -o {0}", "vpncmd");
 
-			if (this.Software == Software.vpnserver_vpnbridge || this.Software == Software.vpnbridge || this.Software == Software.vpnserver)
-			{
-				sr.WriteLine("\t./vpncmd /tool /cmd:Check");
-			}
+			//if (this.Software == Software.thinsvr )
+			//{
+			//    sr.WriteLine("\t./vpncmd /tool /cmd:Check");
+			//}
 
 			Language[] langs = BuildHelper.GetLanguageList();
 
