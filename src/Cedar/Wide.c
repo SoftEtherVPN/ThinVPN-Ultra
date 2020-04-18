@@ -849,6 +849,11 @@ void WideSetDontCheckCert(WIDE *w, bool dont_check_cert)
 	}
 
 	w->DontCheckCert = dont_check_cert;
+
+	if (w->wt != NULL)
+	{
+		w->wt->CheckSslTrust = !w->DontCheckCert;
+	}
 }
 
 // 証明書をチェックしないフラグを取得

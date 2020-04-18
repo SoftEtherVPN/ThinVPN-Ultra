@@ -2191,6 +2191,8 @@ void DsInitDefaultConfig(DS *ds)
 		}
 	}
 
+	WideSetDontCheckCert(ds->Wide, false);
+
 	DsNormalizeConfig(ds);
 }
 

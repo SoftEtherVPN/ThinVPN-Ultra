@@ -1657,6 +1657,8 @@ void DcInitDefaultConfig(DC *dc)
 
 	dc->Candidate = NewCandidateList();
 	dc->AdvAuthList = NewList(DcCompareAdvAuth);
+
+	WideSetDontCheckCert(dc->Wide, false);
 }
 
 // 設定の初期化
