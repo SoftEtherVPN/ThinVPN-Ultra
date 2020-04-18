@@ -99,8 +99,9 @@
 // test has been passed before release this source code.
 
 
-
 #include <GlobalConst.h>
+
+#define	VPN_EXE
 
 #ifdef	WIN32
 #include <winsock2.h>
@@ -112,7 +113,6 @@
 #include <Dbghelp.h>
 #include "../PenCore/resource.h"
 #endif	// WIN32
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -122,18 +122,69 @@
 #include <Mayaqua/Mayaqua.h>
 #include <Cedar/Cedar.h>
 
-// WinMain function
-int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
+static DS *ds = NULL;
+
+// プロセス開始関数
+void StartProcess()
+{
+	// サーバーの開始
+	InitCedar();
+
+	if (MsIsUserMode())
+	{
+		DS_INFO info;
+		UINT ret;
+
+		// ユーザーモードの場合、すでにポート 9823 が開かれていないかどうか
+		// チェックする
+		ret = DsGetServiceInfo(&info);
+
+		if (ret == ERR_NO_ERROR)
+		{
+			// すでに動作している
+			if (info.IsUserMode == false)
+			{
+				MsgBoxEx(NULL, MB_ICONEXCLAMATION,
+					_UU("DS_9823_ALREADY_SVC"),
+					info.ExeDirW);
+			}
+			else
+			{
+				MsgBoxEx(NULL, MB_ICONEXCLAMATION,
+					_UU("DS_9823_ALREADY_USER"),
+					info.ExeDirW, info.UserNameW);
+			}
+		}
+		else if (ret == ERR_DESK_RPC_PROTOCOL_ERROR)
+		{
+			// 変なソフトが動作している
+			MsgBox(NULL, MB_ICONEXCLAMATION, _UU("DS_9823_WARNING"));
+		}
+	}
+
+	ds = NewDs(MsIsUserMode(), true);   ////////////// ★ ★ 共有機能 無効バージョン
+}
+
+// プロセス終了関数
+void StopProcess()
+{
+	FreeDs(ds);
+	ds = NULL;
+
+	// サーバーの停止
+	FreeCedar();
+}
+
+// WinMain 関数
+int main(int argc, char *argv[])
 {
 	InitProcessCallOnce();
 
-	InitMayaqua(false, false, 0, NULL);
-	InitCedar();
-	DIExec(true);
-	FreeCedar();
-	FreeMayaqua();
-
-	return 0;
+#ifdef	OS_WIN32
+	return MsService(DESK_SERVER_SVC_NAME, StartProcess, StopProcess, ICO_DESKSERVER_TRAY, argv[0]);
+#else	// OS_WIN32
+	return UnixService(argc, argv, DESK_SERVER_SVC_NAME, StartProcess, StopProcess);
+#endif	// OS_WIN32
 }
 
 

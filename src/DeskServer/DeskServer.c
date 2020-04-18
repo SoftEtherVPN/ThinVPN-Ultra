@@ -162,7 +162,7 @@ void StartProcess()
 		}
 	}
 
-	ds = NewDs(MsIsUserMode());
+	ds = NewDs(MsIsUserMode(), false);   ////////////// ★ ★ 共有機能 有効バージョン
 }
 
 // プロセス終了関数

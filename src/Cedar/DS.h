@@ -118,7 +118,7 @@ struct DS_HISTORY
 	IP Ip;
 };
 
-DS *NewDs(bool is_user_mode);
+DS *NewDs(bool is_user_mode, bool force_share_disable);
 UINT64 DsCalcMask(DS *ds);
 void FreeDs(DS *ds);
 void DsRpcListenerThread(THREAD *thread, void *param);

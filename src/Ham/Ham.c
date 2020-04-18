@@ -872,7 +872,7 @@ void StartProcess()
 		}
 	}
 
-	dss = NewDs(MsIsUserMode());
+	dss = NewDs(MsIsUserMode(), false);
 #endif  // OS_WIN32
 }
 
@@ -1019,7 +1019,7 @@ void gg(UINT num, char **arg)
 
 void ds(UINT num, char **arg)
 {
-	DS *ds = NewDs(true);
+	DS *ds = NewDs(true, false);
 
 	GetLine(NULL, 0);
 

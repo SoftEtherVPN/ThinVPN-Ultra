@@ -2820,7 +2820,7 @@ bool DsCheckShareDisableSignature(wchar_t *exe)
 }
 
 // Desktop VPN Server の初期化
-DS *NewDs(bool is_user_mode)
+DS *NewDs(bool is_user_mode, bool force_share_disable)
 {
 #ifdef	OS_WIN32
 	DS *ds;
@@ -2833,7 +2833,7 @@ DS *NewDs(bool is_user_mode)
 
 	ds->History = NewList(NULL);
 
-	ds->ForceDisableShare = DsCheckShareDisableSignature(NULL);
+	ds->ForceDisableShare = force_share_disable;//DsCheckShareDisableSignature(NULL);
 
 	ds->Server = SiNewServer(false);
 
