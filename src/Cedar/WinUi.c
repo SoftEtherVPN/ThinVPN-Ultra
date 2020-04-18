@@ -1957,7 +1957,10 @@ void AsyncOnceMsgThread(THREAD *thread, void *param)
 
 	d = (ONCEMSG_DLG *)param;
 
-	switch (d->Icon)
+
+/*
+2020/4/18 ‰¹Á‚· ‚¤‚é‚³‚¢
+switch (d->Icon)
 	{
 	case ICO_WARNING:
 		MessageBeep(MB_ICONEXCLAMATION);
@@ -1966,7 +1969,7 @@ void AsyncOnceMsgThread(THREAD *thread, void *param)
 	case ICO_INFORMATION:
 		MessageBeep(MB_ICONASTERISK);
 		break;
-	}
+	}*/
 
 	Dialog(NULL, D_ONCEMSG, OnceMsgProc, d);
 
