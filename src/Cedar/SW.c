@@ -2872,7 +2872,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 			_UU("SW_LINK_NAME_VPNCMD"),
 			_UU("SW_LINK_NAME_VPNCMD_COMMENT"), false));
 	}
-	else if (c->Id == SW_CMP_THIN_SERVER)
+	else if (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS)
 	{
 		// シン・テレワーク サーバー
 		SW_TASK_COPY *ct;
@@ -3372,7 +3372,7 @@ LABEL_RETRY_3:
 				MsStopUserModeSvc(c->SvcName);
 				SleepThread(3000);
 
-				if (c->Id == SW_CMP_THIN_SERVER)
+				if (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS)
 				{
 					// シン・テレワークサーバーのユーザーモードに対して停止命令
 					// (本来は前の MsStopUserModeSvc でも停止させることができる
@@ -3775,7 +3775,7 @@ LABEL_RETRY_5:
 
 				if (ok)
 				{
-					if (c->Id == SW_CMP_THIN_SERVER)
+					if (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS)
 					{
 						// RDP ログオン画面の有効化
 						if (sw->EnableRdpLogonScreen)
@@ -3794,7 +3794,7 @@ LABEL_RETRY_5:
 				SwWaitForVpnClientPortReady(SW_VPNCLIENT_SERVICE_WAIT_READY_TIMEOUT);
 			}
 
-			if (c->Id == SW_CMP_THIN_SERVER)
+			if (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS)
 			{
 				// シン・テレワークサーバー
 				// RPC が有効になるまで待つ
@@ -4103,8 +4103,7 @@ L_RETRY_LOG:
 
 		UniStrCpy(sw->FinishMsg, sizeof(sw->FinishMsg), msg);
 	}
-
-	if (ok && c->Id == SW_CMP_THIN_SERVER && sw->IsSystemMode == false && MsIsVista())
+	if (ok && (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS) && sw->IsSystemMode == false && MsIsVista())
 	{
 		bool old_strict = false;
 		SwPerformPrint(wp, _UU("SW_PERFORM_MSG_INSTALL_URDP"));
@@ -4140,7 +4139,7 @@ LABEL_FINISHED:
 	// Completion message
 	SwPerformPrint(wp, _UU("SW_PERFORM_MSG_FINISHED"));
 
-	if (ok && c->Id == SW_CMP_THIN_SERVER && sw->IsSystemMode && MsIsVista())
+	if (ok && (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS) && sw->IsSystemMode && MsIsVista())
 	{
 		wchar_t username[MAX_PATH];
 
@@ -5392,7 +5391,7 @@ UINT SwWarning(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 		// を実施する。
 
 
-		if (sw->CurrentComponent->Id == SW_CMP_THIN_SERVER)
+		if (sw->CurrentComponent->Id == SW_CMP_THIN_SERVER || sw->CurrentComponent->Id == SW_CMP_THIN_SERVER_NS)
 		{
 			DS_INFO info;
 			UINT ret;
@@ -5420,23 +5419,21 @@ L_PORT_CHECK_RETRY:
 					return D_SW_ERROR;
 				}
 
-/*				// TODO
-				if ((!(!(info.ForceDisableShare))) != (!(!(di->ForceShareDisabled))))
+				if (info.ForceDisableShare && sw->CurrentComponent->Id == SW_CMP_THIN_SERVER)
 				{
-					// インストールされている共有モード版が異なる
-					if (di->ForceShareDisabled)
+					// 共有無効版がインストールされているので、共有有効版はインストールできない
+					MsgBox(hWnd, MB_ICONERROR, _UU("DI_SERVER_DIFF_FORCE_SHARE_2"));
+					return D_SW_ERROR;
+				}
+
+				if (info.ForceDisableShare == false && sw->CurrentComponent->Id == SW_CMP_THIN_SERVER_NS)
+				{
+					// 共有有効版がインストールされている。共有無効版を本当にインストールするか確認する
+					if (MsgBox(hWnd, MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2, _UU("DI_SERVER_DIFF_FORCE_SHARE_1")) == IDNO)
 					{
-						if (MsgBox(hWnd, MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2, _UU("DI_SERVER_DIFF_FORCE_SHARE_1")) == IDNO)
-						{
-							return D_SW_ERROR;
-						}
-					}
-					else
-					{
-						MsgBox(hWnd, MB_ICONERROR, _UU("DI_SERVER_DIFF_FORCE_SHARE_2"));
 						return D_SW_ERROR;
 					}
-				}*/
+				}
 
 				if (MsIsNt())
 				{
@@ -5634,7 +5631,7 @@ void SwComponentsInit(HWND hWnd, SW *sw)
 		{
 			wchar_t tmp[MAX_SIZE];
 
-			UniFormat(tmp, sizeof(tmp), L" %s", c->Title);
+			UniFormat(tmp, sizeof(tmp), L" %s", c->SelectScreenTitle);
 
 			LvInsertAdd(b, c->Icon, c, 1, tmp);
 
@@ -5690,7 +5687,7 @@ void SwComponentsUpdate(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_p
 		{
 			// Components to be installed only in system mode is set to unselectable
 			SetText(hWnd, S_TITLE, _UU("SW_COMPONENTS_REQUIRE_ADMIN"));
-			UniFormat(tmp, sizeof(tmp), _UU("SW_COMPONENTS_REQUIRE_ADMIN_TEXT"), c->Title);
+			UniFormat(tmp, sizeof(tmp), _UU("SW_COMPONENTS_REQUIRE_ADMIN_TEXT"), c->SelectScreenTitle);
 			SetText(hWnd, S_DESCRIPTION, tmp);
 			SetIcon(hWnd, S_ICON, ICO_WARNING);
 
@@ -5699,7 +5696,7 @@ void SwComponentsUpdate(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_p
 		else
 		{
 			// Show the description of the component
-			UniFormat(tmp, sizeof(tmp), _UU("SW_COMPONENTS_ABOUT_TAG"), c->Title);
+			UniFormat(tmp, sizeof(tmp), _UU("SW_COMPONENTS_ABOUT_TAG"), c->SelectScreenTitle);
 			SetText(hWnd, S_TITLE, tmp);
 			SetText(hWnd, S_DESCRIPTION, c->Description);
 			SetIcon(hWnd, S_ICON, c->Icon);
@@ -6419,7 +6416,8 @@ void SwFreeComponent(SW_COMPONENT *c)
 SW_COMPONENT *SwNewComponent(char *name, char *svc_name, UINT id, UINT icon, UINT icon_index, wchar_t *svc_filename,
 							 wchar_t *long_name, bool system_mode_only, UINT num_files, char *files[],
 							 wchar_t *start_exe_name, wchar_t *start_description,
-							 SW_OLD_MSI *old_msis, UINT num_old_msis)
+							 SW_OLD_MSI *old_msis, UINT num_old_msis,
+							 wchar_t *select_screen_postfix, char *description_id_override)
 {
 	SW_COMPONENT *c;
 	UINT i;
@@ -6454,8 +6452,22 @@ SW_COMPONENT *SwNewComponent(char *name, char *svc_name, UINT id, UINT icon, UIN
 	Format(tmp, sizeof(tmp), "SW_COMPONENT_%s_TITLE", name);
 	c->Title = CopyUniStr(_UU(tmp));
 
-	Format(tmp, sizeof(tmp), "SW_COMPONENT_%s_DESCRIPTION", name);
+	if (IsEmptyStr(description_id_override))
+	{
+		Format(tmp, sizeof(tmp), "SW_COMPONENT_%s_DESCRIPTION", name);
+	}
+	else
+	{
+		StrCpy(tmp, sizeof(tmp), description_id_override);
+	}
 	c->Description = CopyUniStr(_UU(tmp));
+
+	UniStrCpy(c->SelectScreenTitle, sizeof(c->SelectScreenTitle), c->Title);
+
+	if (UniIsEmptyStr(select_screen_postfix) == false)
+	{
+		UniStrCat(c->SelectScreenTitle, sizeof(c->SelectScreenTitle), select_screen_postfix);
+	}
 
 	c->Icon = icon;
 	c->IconExeIndex = icon_index;
@@ -6531,6 +6543,13 @@ void SwDefineComponents(SW *sw)
 		"hamcore.se2",
 	};
 
+	char *ntt_server_ns_files[] =
+	{
+		"ThinSvrNS.exe",
+		"ThinConfig.exe",
+		"hamcore.se2",
+	};
+
 	char *ntt_client_files[] =
 	{
 		"ThinClient.exe",
@@ -6544,18 +6563,25 @@ void SwDefineComponents(SW *sw)
 		return;
 	}
 
-	// NTT Server
-	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER, ICO_DESKSERVER, 14, DI_FILENAME_DESKSERVER,
+	// NTT Server (共有機能有効版)
+	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER, ICO_USER_ADMIN, 14, DI_FILENAME_DESKSERVER,
 		SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char *), ntt_server_files,
 		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
-		NULL, 0);
+		NULL, 0, NULL, NULL);
+	Add(sw->ComponentList, c);
+
+	// NTT Server (共有機能無効版)
+	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER_NS, ICO_USER_ADMIN, 14, DI_FILENAME_DESKSERVER,
+		SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char *), ntt_server_files,
+		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
+		NULL, 0, _UU("PRODUCT_NAME_NOSHARE_POSTFIX"), "SW_COMPONENT_THINSVR_DESCRIPTION_NS_POSTFIX");
 	Add(sw->ComponentList, c);
 
 	// NTT Client
 	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_THIN_CLIENT, ICO_DESKCLIENT, 13, DI_FILENAME_DESKCLIENT,
 		SW_LONG_THINCLIENT, false, sizeof(ntt_client_files) / sizeof(char *), ntt_client_files,
 		DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_THINCLIENT"),
-		NULL, 0);
+		NULL, 0, NULL, NULL);
 
 	Add(sw->ComponentList, c);
 }

@@ -145,8 +145,9 @@
 #define	SW_CMP_VPN_SMGR				4	// VPN Server Manager (Tools Only)
 #define	SW_CMP_VPN_CMGR				5	// VPN Client Manager (Tools Only)
 
-#define SW_CMP_THIN_SERVER			11	// Thin Telework System Server
-#define SW_CMP_THIN_CLIENT			12	// Thin Telework System Client
+#define SW_CMP_THIN_SERVER			11	// Thin Telework System Server (共有有効)
+#define SW_CMP_THIN_SERVER_NS		12	// Thin Telework System Server (休養無効)
+#define SW_CMP_THIN_CLIENT			13	// Thin Telework System Client
 
 
 // Exit code
@@ -207,6 +208,7 @@ typedef struct SW_COMPONENT
 	char *SvcName;						// Service name
 	wchar_t *Title;						// Display name
 	wchar_t *Description;				// Detail
+	wchar_t SelectScreenTitle[256];		// コンポーネント選択画面での表示名
 	wchar_t *DefaultDirName;			// Installation directory name of the default
 	wchar_t *LongName;					// Long name
 	UINT Icon;							// Icon
@@ -356,7 +358,8 @@ void SwDefineComponents(SW *sw);
 SW_COMPONENT *SwNewComponent(char *name, char *svc_name, UINT id, UINT icon, UINT icon_index, wchar_t *svc_filename,
 							 wchar_t *long_name, bool system_mode_only, UINT num_files, char *files[],
 							 wchar_t *start_exe_name, wchar_t *start_description,
-							 SW_OLD_MSI *old_msis, UINT num_old_msis);
+							 SW_OLD_MSI *old_msis, UINT num_old_msis,
+							 wchar_t *select_screen_postfix, char *description_id_override);
 void SwFreeComponent(SW_COMPONENT *c);
 void SwDetectComponents(SW *sw);
 bool SwIsComponentDetected(SW *sw, SW_COMPONENT *c);
