@@ -2871,7 +2871,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 			_UU("SW_LINK_NAME_VPNCMD"),
 			_UU("SW_LINK_NAME_VPNCMD_COMMENT"), false));
 	}
-	else if (c->Id == SW_CMP_NTT_SERVER)
+	else if (c->Id == SW_CMP_THIN_SERVER)
 	{
 		// シン・テレワーク サーバー
 		SW_TASK_COPY *ct;
@@ -2910,7 +2910,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 				_UU("SW_LINK_NAME_THINCONFIG_SVC_COMMENT"), true));
 		}
 	}
-	else if (c->Id == SW_CMP_NTT_CLIENT)
+	else if (c->Id == SW_CMP_THIN_CLIENT)
 	{
 		// シン・テレワーク クライアント
 		SW_TASK_COPY *thinclient;
@@ -3371,7 +3371,7 @@ LABEL_RETRY_3:
 				MsStopUserModeSvc(c->SvcName);
 				SleepThread(3000);
 
-				if (c->Id == SW_CMP_NTT_SERVER)
+				if (c->Id == SW_CMP_THIN_SERVER)
 				{
 					// シン・テレワークサーバーのユーザーモードに対して停止命令
 					// (本来は前の MsStopUserModeSvc でも停止させることができる
@@ -3774,7 +3774,7 @@ LABEL_RETRY_5:
 
 				if (ok)
 				{
-					if (c->Id == SW_CMP_NTT_SERVER)
+					if (c->Id == SW_CMP_THIN_SERVER)
 					{
 						// RDP ログオン画面の有効化
 						if (sw->EnableRdpLogonScreen)
@@ -3793,7 +3793,7 @@ LABEL_RETRY_5:
 				SwWaitForVpnClientPortReady(SW_VPNCLIENT_SERVICE_WAIT_READY_TIMEOUT);
 			}
 
-			if (c->Id == SW_CMP_NTT_SERVER)
+			if (c->Id == SW_CMP_THIN_SERVER)
 			{
 				// シン・テレワークサーバー
 				// RPC が有効になるまで待つ
@@ -4103,7 +4103,7 @@ L_RETRY_LOG:
 		UniStrCpy(sw->FinishMsg, sizeof(sw->FinishMsg), msg);
 	}
 
-	if (ok && c->Id == SW_CMP_NTT_SERVER && sw->IsSystemMode == false && MsIsVista())
+	if (ok && c->Id == SW_CMP_THIN_SERVER && sw->IsSystemMode == false && MsIsVista())
 	{
 		bool old_strict = false;
 		SwPerformPrint(wp, _UU("SW_PERFORM_MSG_INSTALL_URDP"));
@@ -4139,7 +4139,7 @@ LABEL_FINISHED:
 	// Completion message
 	SwPerformPrint(wp, _UU("SW_PERFORM_MSG_FINISHED"));
 
-	if (ok && c->Id == SW_CMP_NTT_SERVER && sw->IsSystemMode && MsIsVista())
+	if (ok && c->Id == SW_CMP_THIN_SERVER && sw->IsSystemMode && MsIsVista())
 	{
 		wchar_t username[MAX_PATH];
 
@@ -5391,7 +5391,7 @@ UINT SwWarning(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 		// を実施する。
 
 
-		if (sw->CurrentComponent->Id == SW_CMP_NTT_SERVER)
+		if (sw->CurrentComponent->Id == SW_CMP_THIN_SERVER)
 		{
 			DS_INFO info;
 			UINT ret;
@@ -6544,14 +6544,14 @@ void SwDefineComponents(SW *sw)
 	}
 
 	// NTT Server
-	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_NTT_SERVER, ICO_DESKSERVER, 5, DI_FILENAME_DESKSERVER,
+	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER, ICO_DESKSERVER, 5, DI_FILENAME_DESKSERVER,
 		SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char *), ntt_server_files,
 		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
 		NULL, 0);
 	Add(sw->ComponentList, c);
 
 	// NTT Client
-	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_NTT_CLIENT, ICO_DESKCLIENT, 6, DI_FILENAME_DESKCLIENT,
+	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_THIN_CLIENT, ICO_DESKCLIENT, 6, DI_FILENAME_DESKCLIENT,
 		SW_LONG_THINCLIENT, true, sizeof(ntt_client_files) / sizeof(char *), ntt_client_files,
 		DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_THINCLIENT"),
 		NULL, 0);

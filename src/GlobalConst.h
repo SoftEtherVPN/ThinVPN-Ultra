@@ -12,22 +12,22 @@
 
 
 //// For DeskVPN
-#define	DESK_PRODUCT_NAME_SUITE			"Thin Telework"
+#define	DESK_PRODUCT_NAME_SUITE			"Thin Telework System"
 
-#define DESK_PUBLISHER_NAME_UNICODE		L"Thin Telework"		// 元: L"SoftEther Corporation"
-#define DESK_PUBLISHER_NAME_ANSI		"Thin Telework"			// 元: "SoftEther Corporation"
-#define	DESK_SECURE_PACK_NAME			"NTT_SERVER"			// 元: "DESK_SERVER"
+#define DESK_PUBLISHER_NAME_UNICODE		L"Thin Telework System"		// 元: L"SoftEther Corporation"
+#define DESK_PUBLISHER_NAME_ANSI		"Thin Telework System"			// 元: "SoftEther Corporation"
+#define	DESK_SECURE_PACK_NAME			"THIN_SERVER"			// 元: "DESK_SERVER"
 #define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.desktopvpn.com"	// TODO: 後で変更する
 
-#define DESK_SETTINGS_DIR_NAME			L"Thin Telework Settings"
+#define DESK_SETTINGS_DIR_NAME			L"Thin Telework System Settings"
 
 #define DESK_SECURE_PACK_EASY_MODE		// 有効にすると簡易モードになる
 
 
-#define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework Server\\Config Tool"
-#define DI_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework Server\\Installer"
+#define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Server\\Config Tool"
+#define DI_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Server\\Installer"
 
-#define DI_RUDP_INSTALL_DIR		L"Common Files\\Thin Telework Server RUDP Helper"
+#define DI_RUDP_INSTALL_DIR		L"Common Files\\Thin Telework System Server RUDP Helper"
 
 #define DI_PRODUCT_SERVER_NAME	"ThinSvr"
 #define DI_PRODUCT_CLIENT_NAME	"ThinClient"
@@ -40,25 +40,25 @@
 #define	SW_SINGLE_INSTANCE_NAME				"ThinTelework_Setup_Wizard"
 
 // イベントログのソース名
-#define	DS_EVENTLOG_SOURCE_NAME		L"Thin Telework Server"
+#define	DS_EVENTLOG_SOURCE_NAME		L"Thin Telework System Server"
 
 // 定数
-#define DS_RPC_VER_SIGNATURE_STR	"Thin Telework Server Configuration Procotol (localhost only)"
+#define DS_RPC_VER_SIGNATURE_STR	"Thin Telework System Server Configuration Procotol (localhost only)"
 #define DS_CONFIG_FILENAME			"@ThinServer.config"
 #define DS_CONFIG_FILENAME2			L"ThinServer.config"
 
 #define	DC_CONFIG_FILENAME			L"ThinClient.config"
 
 
-#define	GC_REG_COMPANY_NAME			"Thin Telework"
+#define	GC_REG_COMPANY_NAME			"Thin Telework System"
 
 
 // Installer 関係
 #define SW_NAME_THINSVR			"thinsvr"
-#define SW_LONG_THINSVR			L"Thin Telework Server"
+#define SW_LONG_THINSVR			L"Thin Telework System Server"
 
 #define SW_NAME_THINCLIENT			"thinclient"
-#define SW_LONG_THINCLIENT			L"Thin Telework Client"
+#define SW_LONG_THINCLIENT			L"Thin Telework System Client"
 
 
 // インストールするファイル名
@@ -66,7 +66,7 @@
 #define DI_FILENAME_DESKCONFIG		L"ThinConfig.exe"
 #define DI_FILENAME_DESKSERVER		L"ThinSvr.exe"
 #define DI_FILENAME_DESKSETUP		L"ThinSetup.exe"
-#define	DI_FILENAME_DESKHELPER		L"NttHelper.exe"
+#define	DI_FILENAME_DESKHELPER		L"ThinHelper.exe"
 #define DI_FILENAME_HAMCORE			L"hamcore.se2"
 
 #define SW_SETUP_NOSIGN_EXESRC		L"|thinsetup_nosign.exe"
@@ -88,8 +88,8 @@
 
 //// Basic Variables
 
-#define	CEDAR_PRODUCT_STR			"Thin Telework"
-#define	CEDAR_PRODUCT_STR_W			L"Thin Telework"
+#define	CEDAR_PRODUCT_STR			"Thin Telework System"
+#define	CEDAR_PRODUCT_STR_W			L"Thin Telework System"
 #define	CEDAR_SERVER_STR			"SoftEther VPN Server"
 #define	CEDAR_BRIDGE_STR			"SoftEther VPN Bridge"
 #define	CEDAR_BETA_SERVER			"SoftEther VPN Server Pre Release"

@@ -94,4 +94,4 @@ mayaqua.key
 /src/abort_error_log.txt
 /src/bin/*.cer
 /src/bin/*.key
-/src/bin/hamcore/NttSetup_nosign.exe
+/src/bin/hamcore/ThinSetup_nosign.exe
