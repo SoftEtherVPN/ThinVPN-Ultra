@@ -734,7 +734,22 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	{
 		ds_caps |= DS_CAPS_SUPPORT_URDP2;
 		urdp_version = 2;
+
+		if (DeskCheckUrdpIsInstalledOnProgramFiles(2) == false && MsIsVista())
+		{
+			// UAC による制限が厳しいことを示すフラグを立てる
+			ds_caps |= DS_CAPS_RUDP_VERY_LIMITED;
+		}
 	}
+	else
+	{
+		if (DeskCheckUrdpIsInstalledOnProgramFiles(1) == false && MsIsVista())
+		{
+			// UAC による制限が厳しいことを示すフラグを立てる
+			ds_caps |= DS_CAPS_RUDP_VERY_LIMITED;
+		}
+	}
+
 	PackAddInt(p, "DsCaps", ds_caps);
 
 	PackAddBool(p, "IsShareDisabled", is_share_disabled);

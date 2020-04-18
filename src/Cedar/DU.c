@@ -929,6 +929,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 		UINT ret = ERR_NO_ERROR;
 		void *process = NULL;
 		DU_URDPMSG *msg = NULL;
+		ONCEMSG_DLG *once = NULL;
 		UINT process_id = 0;
 		bool rdp_file_write_failed = false;
 		UINT urdp_version = 0;
@@ -962,10 +963,28 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 				if (process != NULL)
 				{
+					wchar_t *once_msg = NULL;
+					wchar_t tmp[MAX_SIZE];
+
 					if (urdp_version <= 1)
 					{
+						// URDP1 の使い方のメッセージ
 						msg = DuUrdpMsgStart(t);
 					}
+
+					// URDP の場合必ず表示する Once Msg
+					if (s->DsCaps & DS_CAPS_RUDP_VERY_LIMITED)
+					{
+						once_msg = _UU("DU_ONCEMSG_1");
+					}
+					else
+					{
+						once_msg = _UU("DU_ONCEMSG_2");
+					}
+
+					UniFormat(tmp, sizeof(tmp), _UU("DU_ONCEMSG_TITLE"), s->Pcid);
+
+					once = StartAsyncOnceMsg(tmp, once_msg, true, ICO_INFORMATION, true);
 				}
 			}
 		}
@@ -997,6 +1016,12 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 				{
 					DuUrdpMsgStop(t, msg);
 				}
+
+				if (once != NULL)
+				{
+					StopAsyncOnceMsg(once);
+				}
+
 				Show(t->hWnd, 0);
 			}
 		}

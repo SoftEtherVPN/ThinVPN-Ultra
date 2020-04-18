@@ -359,6 +359,21 @@ void DeskGetRudpServerProgramFilesDir(wchar_t *dir, UINT size)
 #endif  // OS_WIN32
 }
 
+// Program Files\\Common Files\\ の下にインストールされた RUDP があるかどうか調べる
+bool DeskCheckUrdpIsInstalledOnProgramFiles(UINT version)
+{
+	wchar_t tmp[MAX_PATH];
+	wchar_t exe[MAX_PATH];
+	wchar_t prog_files_path[MAX_PATH];
+
+	DeskGetUrdpServerExeName(exe, sizeof(exe), version);
+	DeskGetRudpServerProgramFilesDir(prog_files_path, sizeof(prog_files_path));
+
+	ConbinePathW(tmp, sizeof(tmp), prog_files_path, exe);
+
+	return IsFileExistsW(tmp);
+}
+
 // URDP Server の開始
 void DeskStartUrdpServer(URDP_SERVER *u, UINT version)
 {

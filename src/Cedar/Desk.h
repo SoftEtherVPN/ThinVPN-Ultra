@@ -167,6 +167,8 @@ void DeskGetRudpServerProgramFilesDir(wchar_t *dir, UINT size);
 bool DeskIsUacSettingStrict();
 void DeskMitigateUacSetting();
 
+bool DeskCheckUrdpIsInstalledOnProgramFiles(UINT version);
+
 #endif	// DESK_H
 
 
