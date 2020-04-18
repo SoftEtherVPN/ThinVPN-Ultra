@@ -4550,7 +4550,7 @@ IDCANCEL				キャンセル
 
 
 PREFIX					D_DG_MAIN
-CAPTION					シン・テレワークシステム サーバー設定ツール (バージョン %u.%02u)
+CAPTION					NTT 東日本 - IPA 「シン・テレワークシステム サーバー設定ツール」 (バージョン %u.%02u)
 S1						「シン・テレワークシステム サーバー」 の通信に関する設定(&I)
 S_PCID					コンピュータ I&D:
 IDOK					変更(&C)
@@ -4654,7 +4654,7 @@ IDCANCEL				キャンセル
 
 
 PREFIX					D_DU_MAIN
-CAPTION					シン・テレワークシステム クライアント (バージョン %u.%02u)
+CAPTION					NTT 東日本 - IPA 「シン・テレワークシステム クライアント」 (バージョン %u.%02u)
 S_PCID					接続先コンピュータ I&D:
 IDOK					接続(&N)
 IDCANCEL				キャンセル

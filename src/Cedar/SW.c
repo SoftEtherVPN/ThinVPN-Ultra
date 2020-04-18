@@ -4966,7 +4966,7 @@ void SwDirUpdate(HWND hWnd, SW *sw, WIZARD_PAGE *wizard_page)
 
 	SetText(hWnd, R_DEFAULT, user_mode_selected ? sw->DefaultInstallDir_User : sw->DefaultInstallDir_System);
 
-	if (user_mode_selected == false)
+	if (user_mode_selected == false || sw->CurrentComponent->Id == SW_CMP_THIN_CLIENT)
 	{
 		Hide(hWnd, S_WARNING);
 		Hide(hWnd, S_WARNING2);
@@ -6544,15 +6544,15 @@ void SwDefineComponents(SW *sw)
 	}
 
 	// NTT Server
-	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER, ICO_DESKSERVER, 5, DI_FILENAME_DESKSERVER,
+	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER, ICO_DESKSERVER, 14, DI_FILENAME_DESKSERVER,
 		SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char *), ntt_server_files,
 		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
 		NULL, 0);
 	Add(sw->ComponentList, c);
 
 	// NTT Client
-	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_THIN_CLIENT, ICO_DESKCLIENT, 6, DI_FILENAME_DESKCLIENT,
-		SW_LONG_THINCLIENT, true, sizeof(ntt_client_files) / sizeof(char *), ntt_client_files,
+	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_THIN_CLIENT, ICO_DESKCLIENT, 13, DI_FILENAME_DESKCLIENT,
+		SW_LONG_THINCLIENT, false, sizeof(ntt_client_files) / sizeof(char *), ntt_client_files,
 		DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_THINCLIENT"),
 		NULL, 0);
 

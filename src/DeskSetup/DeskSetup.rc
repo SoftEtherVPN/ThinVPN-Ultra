@@ -55,6 +55,8 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_SETUP_MAIN          ICON                    "DeskSetup.ico"
+IDI_ICON12              ICON                    "C:\\git\\IPA-DNP-DeskVPN\\src\\PenCore\\deskclient.ico"
+IDI_ICON13              ICON                    "C:\\git\\IPA-DNP-DeskVPN\\src\\PenCore\\UserAdmin.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

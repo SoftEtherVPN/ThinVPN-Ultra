@@ -317,13 +317,13 @@ namespace BuildUtil
 #else
 		// SoftEther VPN (build by Open Source Developers)
 		public static readonly string VPN4SolutionFileName = Path.Combine(BaseDirName, "DeskVPN.sln");
-		public static readonly string DebugSnapshotBaseDir = IO.NormalizePath(Path.Combine(BaseDirName, @"..\output\debug"));
-		public static readonly string ReleaseDestDir = IO.NormalizePath(Path.Combine(BaseDirName, @"..\output\pkg"));
-		public const string Prefix = "softether_open-";
+		public static readonly string DebugSnapshotBaseDir = @"S:\NTTVPN\DebugFilesSnapshot";
+		public static readonly string ReleaseDestDir = @"s:\NTTVPN\Releases";
+		public const string Prefix = "";
 #endif
 #endif
 
-		public static readonly string ReleaseDestDir_SEVPN = @"s:\SE4\Releases_SEVPN";
+		public static readonly string ReleaseDestDir_SEVPN = @"s:\NTTVPN\Releases_SEVPN";
 
 		public static readonly string BuildHamcoreFilesDirName = Path.Combine(BinDirName, "BuiltHamcoreFiles");
 		public static readonly string VisualStudioVCDir;

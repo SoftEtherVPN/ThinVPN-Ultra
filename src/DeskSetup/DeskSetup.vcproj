@@ -419,6 +419,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\PenCore\deskclient.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\DeskSetup.ico"
 				>
 			</File>
