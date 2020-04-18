@@ -1,7 +1,10 @@
-# SoftEther VPN String Table
-# Copyright (c) SoftEther VPN Project. All Rights Reserved.
-#
-# http://www.softether.co.jp/
+# ご注意
+# 
+# 「シン・テレワークシステム」は、SoftEther VPN オープンソース版をもとに開発されています。
+# また、一部のコードはソフトイーサ社「Desktop VPN」の提供も受けています。
+# 
+# したがって、本文字列データファイルには、これらの派生元のプログラムに含まれる
+# ものの「シン・テレワークシステム」では直接使用されない文字列も登場します。
 
 
 ###########################################################################
@@ -35,6 +38,7 @@ STRTABLE_ID				NTT_THIN_200416
 CM_JAPANESE_ONLY_OLD_STARTUP	%s\\SoftEther VPN Client 2.0 タスクトレイ.lnk
 
 # ソフトウェア情報
+# Open Source SoftEther VPN から派生したため、無関係のソフト文字列が残っておりますが、動作に支障はありません。
 PRODUCT_NAME_VPN_CLI	SoftEther VPN Client
 PRODUCT_NAME_VPN_CMGR	SoftEther VPN クライアント接続マネージャ
 PRODUCT_NAME_VPN_SVR	SoftEther VPN Server
@@ -43,8 +47,16 @@ PRODUCT_NAME_VPN_SMGR	SoftEther VPN サーバー管理マネージャ
 PRODUCT_NAME_ELOGSVC	SoftEther EtherLogger Beta Edition
 PRODUCT_NAME_ELOGMGR	SoftEther EtherLogger Manager Beta Edition
 
+
+
+PRODUCT_NAME_DESKSERVER		NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 (共有機能有効版)
+PRODUCT_NAME_DESKSERVER2	NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 (共有機能無効版)
+
+PRODUCT_NAME_DESKCLIENT		NTT 東日本 - IPA 「シン・テレワークシステム クライアント」
+
+
 # ソフトウェア更新チェック用の Family Name
-PRODUCT_FAMILY_NAME		SoftEther
+PRODUCT_FAMILY_NAME		ThinTelework
 
 
 # 接続制限用のブランド化文字列
