@@ -1785,6 +1785,11 @@ UINT OnceMsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
 			DlgFont(hWnd, E_TEXT, 11, false);
 		}
 
+		if (d->TopMost)
+		{
+			Top(hWnd);
+		}
+
 		SetTimer(hWnd, 1, 50, NULL);
 		break;
 
@@ -1854,6 +1859,7 @@ void OnceMsgEx(HWND hWnd, wchar_t *title, wchar_t *message, bool show_checkbox, 
 
 	hash = GetOnceMsgHash(title, message);
 	Format(valuename, sizeof(valuename), ONCE_MSG_REGVALUE, hash);
+	d.MessageHash = hash;
 
 	if (MsRegReadInt(REG_CURRENT_USER, ONCE_MSG_REGKEY, valuename) == 0)
 	{
@@ -1876,6 +1882,99 @@ void OnceMsgEx(HWND hWnd, wchar_t *title, wchar_t *message, bool show_checkbox, 
 			{
 				MsRegWriteInt(REG_CURRENT_USER, ONCE_MSG_REGKEY, valuename, 1);
 			}
+		}
+	}
+}
+
+// Stop async OnceMsg
+void StopAsyncOnceMsg(ONCEMSG_DLG *d)
+{
+	if (d == NULL)
+	{
+		return;
+	}
+
+	*d->halt = true;
+
+	WaitThread(d->AsyncThread, INFINITE);
+	ReleaseThread(d->AsyncThread);
+
+	Free(d->halt);
+
+	Free(d);
+}
+
+// Start async OnceMsg
+ONCEMSG_DLG *StartAsyncOnceMsg(wchar_t *title, wchar_t *message, bool show_checkbox, UINT icon, bool topmost)
+{
+	ONCEMSG_DLG *d;
+	UINT hash;
+	char valuename[MAX_PATH];
+	bool b_dummy = false;
+	// Validate arguments
+	if (title == NULL)
+	{
+		title = title_bar;
+	}
+	if (message == NULL)
+	{
+		message = L"message";
+	}
+
+	d = ZeroMalloc(sizeof(ONCEMSG_DLG));
+
+	d->Message = message;
+	d->Title = title;
+	d->ShowCheckbox = show_checkbox;
+	d->Icon = icon;
+	d->halt = ZeroMalloc(sizeof(bool));
+	d->TopMost = topmost;
+
+	hash = GetOnceMsgHash(title, message);
+	Format(valuename, sizeof(valuename), ONCE_MSG_REGVALUE, hash);
+	d->MessageHash = hash;
+
+	if (MsRegReadInt(REG_CURRENT_USER, ONCE_MSG_REGKEY, valuename) == 0)
+	{
+		d->AsyncThread = NewThread(AsyncOnceMsgThread, d);
+	}
+
+	return d;
+}
+
+// URDP メッセージスレッド
+void AsyncOnceMsgThread(THREAD *thread, void *param)
+{
+	ONCEMSG_DLG *d = (ONCEMSG_DLG *)param;
+	char valuename[MAX_PATH];
+	// 引数チェック
+	if (thread == NULL || param == NULL)
+	{
+		return;
+	}
+
+	Format(valuename, sizeof(valuename), ONCE_MSG_REGVALUE, d->MessageHash);
+
+	d = (ONCEMSG_DLG *)param;
+
+	switch (d->Icon)
+	{
+	case ICO_WARNING:
+		MessageBeep(MB_ICONEXCLAMATION);
+		break;
+
+	case ICO_INFORMATION:
+		MessageBeep(MB_ICONASTERISK);
+		break;
+	}
+
+	Dialog(NULL, D_ONCEMSG, OnceMsgProc, d);
+
+	if (d->ShowCheckbox)
+	{
+		if (d->Checked)
+		{
+			MsRegWriteInt(REG_CURRENT_USER, ONCE_MSG_REGKEY, valuename, 1);
 		}
 	}
 }

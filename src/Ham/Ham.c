@@ -889,15 +889,32 @@ void StopProcess()
 
 void test(UINT num, char **arg)
 {
-	X *master = FileToX("S:\\NTTVPN\\Certs\\200413_Certs\\00_Master.cer");
-	X *sub = FileToX("S:\\NTTVPN\\Certs\\200413_Certs\\01_Controller.cer");
-	UINT i;
-
-	for (i = 0;;i++)
+	if (true)
 	{
-		bool ok = CheckX(sub, master) && CheckXDateNow(master) && CheckXDateNow(sub);
+#ifdef OS_WIN32
+		ONCEMSG_DLG *d;
+		InitWinUi(L"Soft", NULL, 0);
+		d = StartAsyncOnceMsg(L"Hello", L"World", false, ICO_INFORMATION, true);
+		GetLine(NULL, 0);
+		StopAsyncOnceMsg(d);
+		FreeWinUi();
+#endif
+		return;
+	}
 
-		Print("%u %u\n", i, ok);
+	if (false)
+	{
+		X *master = FileToX("S:\\NTTVPN\\Certs\\200413_Certs\\00_Master.cer");
+		X *sub = FileToX("S:\\NTTVPN\\Certs\\200413_Certs\\01_Controller.cer");
+		UINT i;
+
+		for (i = 0;;i++)
+		{
+			bool ok = CheckX(sub, master) && CheckXDateNow(master) && CheckXDateNow(sub);
+
+			Print("%u %u\n", i, ok);
+		}
+		return;
 	}
 }
 

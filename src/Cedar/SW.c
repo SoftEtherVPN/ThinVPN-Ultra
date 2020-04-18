@@ -5648,6 +5648,8 @@ UINT SwNotAdminDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wi
 	case WM_WIZ_SHOW:
 		FormatText(hWnd, S_INFO, MsGetUserNameW());
 
+		DlgFont(hWnd, S_INFO2, 0, true);
+
 		SetShow(hWnd, S_INFO2, (sw->UninstallMode ? false : true));
 
 		SetWizardButton(wizard_page, true, ((sw->UninstallMode && sw->IsReExecForUac) ? false : true), true, true);

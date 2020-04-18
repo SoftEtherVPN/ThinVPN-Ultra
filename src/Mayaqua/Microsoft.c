@@ -7341,6 +7341,24 @@ bool MsIsUserSwitchingInstalled()
 	return false;
 }
 
+// ローカルの RDP ポートへの接続をチェック
+bool MsCheckLocalhostRemoteDesktopPort()
+{
+	UINT port, i;
+	if (MsIsRemoteDesktopAvailable() == false) return false;
+	if (MsIsRemoteDesktopEnabled() == false) return false;
+
+	port = DS_RDP_PORT;
+
+	i = MsRegReadInt(REG_LOCAL_MACHINE, "SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp", "PortNumber");
+	if (i != 0)
+	{
+		port = i;
+	}
+
+	return CheckTCPPortEx("localhost", port, 5000);
+}
+
 // Enable the remote desktop
 bool MsEnableRemoteDesktop()
 {

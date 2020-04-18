@@ -2135,6 +2135,34 @@ void DsInitDefaultConfig(DS *ds)
 	{
 		// ユーザーモードの場合は URDP を使用する
 		ds->ServiceType = DESK_SERVICE_VNC;
+
+		if (false) // 2020/4/18 折角実装したが、いったんキャンセル。
+			// 一般ユーザー権限しかないユーザーは Remote Desktop Users グループに
+			// 入っていない可能性が高いので、RDP で接続しても意味
+			// がない。
+		{
+			// 2020/4/17 ユーザーモードであっても、RDP ポートが開いていて利用可能
+			// であれば DESK_SERVICE_RDP にする
+			if (MsIsRemoteDesktopAvailable())
+			{
+				if (MsIsRemoteDesktopCanEnableByRegistory())
+				{
+					if (MsEnableRemoteDesktop())
+					{
+						if (MsIsRemoteDesktopEnabled())
+						{
+							// リモートデスクトップが有効になったようだぞ
+							// ポートチェックして、有効なようならこれをデフォルトで
+							// 使う
+							if (MsCheckLocalhostRemoteDesktopPort())
+							{
+								ds->ServiceType = DESK_SERVICE_RDP;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	DsNormalizeConfig(ds);

@@ -476,6 +476,9 @@ typedef struct ONCEMSG_DLG
 	bool Checked;
 	UINT MessageHash;
 	bool *halt;
+	bool TopMost;
+
+	THREAD *AsyncThread;
 } ONCEMSG_DLG;
 
 // Definition of bad process
@@ -921,6 +924,10 @@ void AdjustFontSize(HWND hWnd, UINT id);
 bool IsFontFitInRect(struct FONT *f, UINT width, UINT height, wchar_t *text, UINT format, bool *aborted);
 
 void ShowTextFile(HWND hWnd, char *filename, wchar_t *caption, UINT icon);
+
+void StopAsyncOnceMsg(ONCEMSG_DLG *d);
+ONCEMSG_DLG *StartAsyncOnceMsg(wchar_t *title, wchar_t *message, bool show_checkbox, UINT icon, bool topmost);
+void AsyncOnceMsgThread(THREAD *thread, void *param);
 
 #endif	// OS_WIN32
 
