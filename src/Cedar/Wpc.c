@@ -1269,6 +1269,9 @@ bool ParseUrl(URL_DATA *data, char *str, bool is_post, char *referrer)
 	StrCpy(data->HostName, sizeof(data->HostName), host);
 	data->Port = port;
 
+	// SNI string
+	StrCpy(data->SniString, sizeof(data->SniString), data->HostName);
+
 	Free(host);
 
 	if ((data->Secure && data->Port == 443) || (data->Secure == false && data->Port == 80))

@@ -485,7 +485,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 	//SetSocketSendRecvBufferSize((int)s, WT_SOCKET_WINDOW_SIZE);
 
 	// SSL 通信の開始
-	if (StartSSLEx(s, NULL, NULL, true, 0, WT_SNI_STRING_V2) == false)
+	if (StartSSLEx(s, NULL, NULL, true, 0, session->ConnectParam->HostName) == false)
 	{
 		// 失敗
 		Debug("StartSSL Failed.\n");

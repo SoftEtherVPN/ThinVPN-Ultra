@@ -291,7 +291,7 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 	SetTimeout(s, CONNECTING_TIMEOUT);
 
 	// SSL 通信の開始
-	if (StartSSLEx(s, NULL, NULL, true, 0, WT_SNI_STRING_V2) == false)
+	if (StartSSLEx(s, NULL, NULL, true, 0, connect->HostName) == false)
 	{
 		// 失敗
 		Debug("StartSSL Failed.\n");

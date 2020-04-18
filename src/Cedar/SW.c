@@ -3371,6 +3371,16 @@ LABEL_RETRY_3:
 				MsStopUserModeSvc(c->SvcName);
 				SleepThread(3000);
 
+				if (c->Id == SW_CMP_NTT_SERVER)
+				{
+					// シン・テレワークサーバーのユーザーモードに対して停止命令
+					// (本来は前の MsStopUserModeSvc でも停止させることができる
+					//  はずであるが、1 回目のインストール時が高い特権で
+					//  2 回目が一般ユーザー権限のときは停止に失敗するので
+					//  代わりに特殊コマンドを送付して強制停止させる)
+					DsStopUsermodeService();
+				}
+
 				// Wait until the EXE file for the service become ready to write
 				ConbinePathW(svc_exe, sizeof(svc_exe), sw->InstallDir, c->SvcFileName);
 
@@ -4908,11 +4918,13 @@ void SwInitDefaultInstallDir(SW *sw)
 	}
 	else if (MsIsNt() == false)
 	{
+		// Win9x
 		sw->IsAvailableSystemMode = true;
 		sw->IsAvailableUserMode = false;
 	}
 	else
 	{
+		// WinNT
 		sw->IsAvailableSystemMode = true;
 		sw->IsAvailableUserMode = !sw->CurrentComponent->SystemModeOnly;
 	}
@@ -5030,6 +5042,13 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 	switch (msg)
 	{
 	case WM_INITDIALOG:
+		if (sw->IsSystemMode && sw->OverwriteFlag_DisableSystemMode)
+		{
+			// システムモードでインストールするつものであったがシステムモード不可
+			// の場合はユーザーモードにここで強制切替えする
+			sw->IsSystemMode = false;
+		}
+
 		SetIcon(hWnd, S_ICON, sw->CurrentComponent->Icon);
 
 		SwInitDefaultInstallDir(sw);
@@ -5374,11 +5393,18 @@ UINT SwWarning(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 
 		if (sw->CurrentComponent->Id == SW_CMP_NTT_SERVER)
 		{
-			// シン・テレワークサーバーの場合、すでにインストールされているものが
-			// ないかどうか確認をする
 			DS_INFO info;
 			UINT ret;
 
+			// シン・テレワークサーバーの場合、Windows が Home Edition 等の場合
+			// はユーザーモードでのみインストールを可能とする
+			if (MsIsRemoteDesktopAvailable() == false)
+			{
+				sw->OverwriteFlag_DisableSystemMode = true;
+			}
+
+			// シン・テレワークサーバーの場合、すでにインストールされているものが
+			// ないかどうか確認をする
 L_PORT_CHECK_RETRY:
 
 			ret = DsGetServiceInfo(&info);
