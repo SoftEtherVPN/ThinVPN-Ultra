@@ -190,6 +190,7 @@ static char *sfx_ntt_files[] =
 {
 	"thinsetup.exe",
 	"thinsvr.exe",
+	"thinsvrns.exe",
 	"thinclient.exe",
 	"thinconfig.exe",
 	"hamcore.se2",
@@ -364,7 +365,7 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 		return false;
 	}
 
-	if (StrCmpi(component_name, "ntt") == 0)
+	if (StrCmpi(component_name, "thintelework") == 0)
 	{
 		// NTT 東日本 - IPA シン・テレワークシステム
 		for (i = 0; i < (sizeof(sfx_ntt_files) / sizeof(char *)); i++)
