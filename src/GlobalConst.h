@@ -68,6 +68,7 @@
 #define DI_FILENAME_DESKSETUP		L"ThinSetup.exe"
 #define	DI_FILENAME_DESKHELPER		L"ThinHelper.exe"
 #define DI_FILENAME_HAMCORE			L"hamcore.se2"
+#define DI_FILENAME_DESKSERVER_NOSHARE_SRC		L"ThinSvrNS.exe"
 
 #define SW_SETUP_NOSIGN_EXESRC		L"|thinsetup_nosign.exe"
 #define SW_SETUP_EXE_X86			L"thinsetup.exe"

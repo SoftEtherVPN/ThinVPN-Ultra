@@ -2878,7 +2878,9 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 		SW_TASK_COPY *ct;
 		SW_TASK_COPY *thinsvr, *thinconfig;
 
-		thinsvr = SwNewCopyTask(DI_FILENAME_DESKSERVER, NULL, sw->InstallSrc, sw->InstallDir, true, false);
+		thinsvr = SwNewCopyTask((c->Id == SW_CMP_THIN_SERVER ? DI_FILENAME_DESKSERVER : DI_FILENAME_DESKSERVER_NOSHARE_SRC),
+			DI_FILENAME_DESKSERVER,
+			sw->InstallSrc, sw->InstallDir, true, false);
 		thinconfig = SwNewCopyTask(DI_FILENAME_DESKCONFIG, NULL, sw->InstallSrc, sw->InstallDir, true, false);
 
 		Add(t->CopyTasks, thinsvr);
@@ -5225,7 +5227,7 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 		if (logfile != NULL)
 		{
 			wchar_t *errmsg = NULL;
-			if (logfile->Component != sw->CurrentComponent)
+			if (logfile->Component != sw->CurrentComponent && StrCmpi(logfile->Component->Name, sw->CurrentComponent->Name) != 0)
 			{
 				errmsg = _UU("SW_DIR_DST_IS_OTHER_PRODUCT");
 			}
@@ -6572,7 +6574,7 @@ void SwDefineComponents(SW *sw)
 
 	// NTT Server (共有機能無効版)
 	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER_NS, ICO_USER_ADMIN, 14, DI_FILENAME_DESKSERVER,
-		SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char *), ntt_server_files,
+		SW_LONG_THINSVR, false, sizeof(ntt_server_ns_files) / sizeof(char *), ntt_server_ns_files,
 		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
 		NULL, 0, _UU("PRODUCT_NAME_NOSHARE_POSTFIX"), "SW_COMPONENT_THINSVR_DESCRIPTION_NS_POSTFIX");
 	Add(sw->ComponentList, c);
