@@ -279,7 +279,7 @@ namespace BuildUtil
 
 			IO.CopyDir(Paths.ReleaseDir, filesReleaseDir, null, false, true);
 
-#if true
+#if false
 			IO.CopyDir(Paths.ReleaseSrckitDir, Path.Combine(destDirName, "Private"), null, false, true);
 			IO.CopyDir(Path.Combine(Paths.BaseDirName, @"tmp\lib"), Path.Combine(destDirName, @"Private\lib"), null, false, true);
 #endif
@@ -381,7 +381,7 @@ namespace BuildUtil
 
 				string txt_date = Str.DateTimeToStrShortWithMilliSecs(date);
 
-				string txt_lang = "English, Japanese, Simplified Chinese";
+				string txt_lang = "English, Japanese";
 
 				string txt_category = "Freeware";
 
