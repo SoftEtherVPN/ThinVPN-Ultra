@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="DeskHelper"
+	Name="DeskServerNS"
 	ProjectGUID="{A4DC7ACC-9FED-418F-92B2-6BE3EF39DC86}"
-	RootNamespace="DeskHelper"
+	RootNamespace="DeskServerNS"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -71,7 +71,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\NttHelper.exe"
+				OutputFile="$(OutDir)\NttHelperNS.exe"
 				LinkIncremental="2"
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
@@ -159,7 +159,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\NttHelper_x64.exe"
+				OutputFile="$(OutDir)\NttHelperNS_x64.exe"
 				LinkIncremental="2"
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
@@ -250,7 +250,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\NttHelper.exe"
+				OutputFile="$(OutDir)\NttHelperNS.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\Microsoft Visual Studio 8\VC\lib&quot;"
 				GenerateManifest="false"
@@ -346,7 +346,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
-				OutputFile="$(OutDir)\NttHelper_x64.exe"
+				OutputFile="$(OutDir)\NttHelperNS_x64.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories=""
 				GenerateManifest="false"
@@ -395,7 +395,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\DeskHelper.c"
+				RelativePath=".\DeskServerNS.c"
 				>
 			</File>
 		</Filter>
@@ -415,11 +415,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\DeskHelper.ico"
+				RelativePath=".\DeskServerNS.ico"
 				>
 			</File>
 			<File
-				RelativePath=".\DeskHelper.rc"
+				RelativePath=".\DeskServerNS.rc"
 				>
 			</File>
 			<File
