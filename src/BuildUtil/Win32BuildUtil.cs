@@ -166,7 +166,7 @@ namespace BuildUtil
 				m.ReleaseMutex();
 			}
 
-			CodeSign.SignFile(cabFileName, cabFileName, "VPN Software", false, false);
+			CodeSign.SignFile(cabFileName, cabFileName, BuildConfig.SignComment, false, false);
 
 			File.Copy(cabFileName, dstFileName, true);
 		}
@@ -653,7 +653,7 @@ namespace BuildUtil
 
 				ExecCommand(Paths.CmdFileName, string.Format("/C \"{0}\"", batFileName));
 
-				BuildReplaceHeader();
+				//BuildReplaceHeader();
 			}
 			finally
 			{
@@ -820,6 +820,10 @@ namespace BuildUtil
 				return false;
 			}
 			if (fileName.EndsWith("VpnGatePlugin_x64.dll", StringComparison.InvariantCultureIgnoreCase))
+			{
+				return false;
+			}
+			if (fileName.EndsWith("cabarc.exe", StringComparison.InvariantCultureIgnoreCase))
 			{
 				return false;
 			}
@@ -1398,7 +1402,7 @@ namespace BuildUtil
 					{
 						Con.WriteLine("Signing...");
 
-						CodeSign.SignFile(file, file, "VPN Software", isDriver, false);
+						CodeSign.SignFile(file, file, BuildConfig.SignComment, isDriver, false);
 					}
 				}
 			}
@@ -1407,6 +1411,10 @@ namespace BuildUtil
 		// Sign for all binary files (parallel mode)
 		public static void SignAllBinaryFiles()
 		{
+			//// 2020/4/18 ‚È‚ñ‚©ˆêŽž“I‚É’x‚¢‚Ì‚Å Serial ‚É
+			//SignAllBinaryFilesSerial();
+			//return;
+
 			string[] files = Directory.GetFiles(Paths.BinDirName, "*", SearchOption.AllDirectories);
 
 			List<string> filename_list = new List<string>();
@@ -1446,7 +1454,7 @@ namespace BuildUtil
 
 			Con.WriteLine("Signing...");
 
-			CodeSign.SignFile(filename, filename, "VPN Software", isDriver, false);
+			CodeSign.SignFile(filename, filename, BuildConfig.SignComment, isDriver, false);
 		}
 	}
 }

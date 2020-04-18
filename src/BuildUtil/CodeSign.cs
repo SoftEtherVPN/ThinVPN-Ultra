@@ -194,9 +194,8 @@ namespace BuildUtil
 		// Digital-sign the data on the memory
 		public static byte[] SignMemory(byte[] srcData, string comment, bool kernelModeDriver, bool evCert)
 		{
-#if	!BU_OSS
 			// 2020/01/19 switch to the new system
-			return SignClient.Sign(srcData, evCert ? "SoftEtherEv" : "SoftEtherFile", kernelModeDriver ? "Driver" : "", comment);
+			return SignClient.Sign(srcData, evCert ? "DaiyuuNoboriFile" : "DaiyuuNoboriFile", kernelModeDriver ? "Driver" : "", comment);
 
 			/*
 			int i;
@@ -291,15 +290,11 @@ namespace BuildUtil
 			}
 
 			return ret;*/
-#else	// BU_OSS
-			return srcData;
-#endif	// BU_OSS
 		}
 
 		// Digital-sign the data on the file
 		public static void SignFile(string destFileName, string srcFileName, string comment, bool kernelModeDriver, bool evCert)
 		{
-#if	!BU_OSS
 
 			Con.WriteLine("Signing for '{0}'...", Path.GetFileName(destFileName));
 			byte[] srcData = File.ReadAllBytes(srcFileName);
@@ -317,9 +312,6 @@ namespace BuildUtil
 			File.WriteAllBytes(destFileName, destData);
 
 			Con.WriteLine("Done.");
-#else	// BU_OSS
-			Con.WriteLine("Skipping the code signing for '{0}' in the build process. You can insert your own authenticode sign process here.", srcFileName);
-#endif	// BU_OSS
 		}
 	}
 }
