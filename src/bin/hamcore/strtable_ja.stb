@@ -4828,6 +4828,7 @@ PREFIX					D_DG_HASH
 CAPTION					固有 ID
 S_INFO					以下の固有 ID を選択して右クリックし、[コピー] を選択すると、クリップボードにコピーすることができます。
 IDCANCEL				閉じる(&X)
+S_INFO2					SSL-VPN 中継ゲートウェイアドレス
 
 
 

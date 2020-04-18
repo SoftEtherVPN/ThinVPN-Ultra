@@ -1238,6 +1238,7 @@
 #define C_SHARE_COMPORT                 2601
 #define E_HASH                          2602
 #define C_EVENTLOG                      2603
+#define E_HASH2                         2603
 #define S_S3                            2604
 #define S_S2                            2605
 #define S_S10                           2606

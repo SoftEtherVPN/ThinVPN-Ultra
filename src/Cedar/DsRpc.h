@@ -31,6 +31,7 @@ struct RPC_DS_STATUS
 	bool SupportEventLog;
 	UINT NumConfigures;
 	UINT NumAdvancedUsers;
+	char GateIP[64];
 };
 
 struct RPC_PCID

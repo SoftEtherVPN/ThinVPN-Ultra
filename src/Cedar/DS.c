@@ -1646,6 +1646,11 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 	t->SupportEventLog = ds->SupportEventLog;
 	t->NumConfigures = ds->NumConfigures;
 
+	if (ds->Wide != NULL && ds->Wide->wt != NULL)
+	{
+		StrCpy(t->GateIP, sizeof(t->GateIP), ds->Wide->wt->CurrentGateIp);
+	}
+
 	if (ds->Server != NULL && ds->Server->Cedar != NULL)
 	{
 		LockHubList(ds->Server->Cedar);

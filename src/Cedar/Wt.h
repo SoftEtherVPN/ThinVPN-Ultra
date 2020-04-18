@@ -160,6 +160,8 @@ struct WT
 	char FixedEntranceUrl[MAX_PATH];	// 固定されたエントランス URL
 	INTERNET_SETTING *InternetSetting;	// インターネット接続設定
 	bool CheckSslTrust;					// SSL 証明書の信頼性を検証するかどうか
+
+	char CurrentGateIp[64];				// 現在の接続先 Gate の IP アドレス
 };
 
 // スレッドとセッションの組み合わせ

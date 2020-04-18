@@ -125,6 +125,7 @@ void InRpcDsStatus(RPC_DS_STATUS *t, PACK *p)
 	t->SupportEventLog = PackGetBool(p, "SupportEventLog");
 	t->NumConfigures = PackGetInt(p, "NumConfigures");
 	t->NumAdvancedUsers = PackGetInt(p, "NumAdvancedUsers");
+	PackGetStr(p, "GateIP", t->GateIP, sizeof(t->GateIP));
 }
 void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 {
@@ -154,6 +155,7 @@ void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 	PackAddBool(p, "SupportEventLog", t->SupportEventLog);
 	PackAddInt(p, "NumConfigures", t->NumConfigures);
 	PackAddInt(p, "NumAdvancedUsers", t->NumAdvancedUsers);
+	PackAddStr(p, "GateIP", t->GateIP);
 }
 
 // INTERNET_SETTING

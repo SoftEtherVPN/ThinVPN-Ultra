@@ -21,6 +21,12 @@ void WtsSessionMain(TSESSION *s)
 		return;
 	}
 
+	// 現在の接続先 Gate の情報を取得
+	if (s->Sock != NULL)
+	{
+		IPToStr(s->wt->CurrentGateIp, sizeof(s->wt->CurrentGateIp), &s->Sock->RemoteIP);
+	}
+
 #ifdef	OS_WIN32
 	MsSetThreadPriorityRealtime();
 #endif  // OS_WIN32
@@ -93,6 +99,9 @@ void WtsSessionMain(TSESSION *s)
 			break;
 		}
 	}
+
+	// 接続先 Gate 情報を消去する
+	ClearStr(s->wt->CurrentGateIp, sizeof(s->wt->CurrentGateIp));
 
 	// すべての SOCKIO の切断
 	for (i = 0;i < LIST_NUM(s->TunnelList);i++)

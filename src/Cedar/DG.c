@@ -1261,6 +1261,9 @@ void DgHashDlgInit(HWND hWnd, DG *dg)
 	h = GetFont("Arial", 12, false, false, false, false);
 	SetFont(hWnd, E_HASH, h);
 
+	h = GetFont("Arial", 10, false, false, false, false);
+	SetFont(hWnd, E_IP, h);
+
 	Zero(&t, sizeof(t));
 
 	if (DtcGetStatus(dg->Rpc, &t) == ERR_NO_ERROR)
@@ -1279,6 +1282,16 @@ void DgHashDlgInit(HWND hWnd, DG *dg)
 		}
 
 		FreeBuf(buf);
+
+		if (IsEmptyStr(t.GateIP) == false)
+		{
+			SetTextA(hWnd, E_IP, t.GateIP);
+		}
+		else
+		{
+			Hide(hWnd, S_INFO2);
+			Hide(hWnd, E_IP);
+		}
 	}
 }
 
