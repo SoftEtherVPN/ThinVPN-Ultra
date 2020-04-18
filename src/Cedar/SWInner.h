@@ -337,6 +337,7 @@ typedef struct SW
 	bool IsWebInstaller;				// Whether Web installer
 	bool DisableAutoImport;				// Not to use the automatic import process
 	bool SuInstMode;					// SuInst mode
+	bool UrdpInstMode;					// URDP Install Mode
 	UINT CurrentEulaHash;				// Hash of the license agreement
 
 	bool EnableRdpLogonScreen;			// RDP ログオン画面を有効にする処理をするかどうか
@@ -365,6 +366,7 @@ wchar_t *SwGetOldMsiInstalledDir(SW_COMPONENT *c);
 bool SwUninstallOldMsiInstalled(HWND hWnd, WIZARD_PAGE *wp, SW_COMPONENT *c, bool *reboot_required);
 
 bool SwReExecMyself(SW *sw, wchar_t *additional_params, bool as_admin);
+HANDLE *SwReExecMyselfWithNewParam(SW *sw, wchar_t *new_param, bool as_admin);
 
 SW_TASK *SwNewTask();
 void SwFreeTask(SW_TASK *t);
@@ -440,6 +442,8 @@ bool SwSfxExtractProcess(HWND hWnd, bool *hide_error_msg);
 bool SwSfxExtractFile(HWND hWnd, void *data, UINT size, wchar_t *dst, bool compressed);
 SW_SFX_FILE *SwNewSfxFile(char *inner_file_name, wchar_t *disk_file_name);
 bool SwSfxCopyVgFiles(HWND hWnd, wchar_t *src, wchar_t *dst);
+
+bool SwThinTeleworkInstallUrdpToProgramFiles(SW *sw);
 
 #endif	// SW_INNER_H
 

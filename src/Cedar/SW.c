@@ -3842,7 +3842,7 @@ LABEL_CREATE_SHORTCUT:
 		SleepThread(3000);
 	}
 
-	if (true)
+	if (false)
 	{
 		// Run the vpncmd and exit immediately
 		wchar_t fullpath[MAX_PATH];
@@ -4090,6 +4090,37 @@ L_RETRY_LOG:
 		UniStrCpy(sw->FinishMsg, sizeof(sw->FinishMsg), msg);
 	}
 
+	if (ok && c->Id == SW_CMP_NTT_SERVER && sw->IsSystemMode == false && MsIsVista())
+	{
+		bool old_strict = false;
+		SwPerformPrint(wp, _UU("SW_PERFORM_MSG_INSTALL_URDP"));
+
+LABEL_RETRY_EXEC:
+		old_strict = DeskIsUacSettingStrict();
+
+		// RUDP を Program Files 配下にインストールする
+		if (SwThinTeleworkInstallUrdpToProgramFiles(sw) == false)
+		{
+			// ヘルパーの起動に失敗した場合は再試行するか確認する
+			if (SwPerformMsgBox(wp, MB_ICONQUESTION | MB_RETRYCANCEL,
+				_UU("DI_INSTALL_RUDP_ERROR")) == IDRETRY)
+			{
+				// 再試行
+				goto LABEL_RETRY_EXEC;
+			}
+		}
+		else
+		{
+			bool new_strict = DeskIsUacSettingStrict();
+
+			if (old_strict && (new_strict == false))
+			{
+				// UAC の暗転設定が解除されたことを情報表示
+				SwPerformMsgBox(wp, MB_ICONINFORMATION, _UU("DI_INSTALL_RUDP_UAC_MITIGATE"));
+			}
+		}
+	}
+
 LABEL_FINISHED:
 
 	// Completion message
@@ -4105,6 +4136,28 @@ LABEL_CLEANUP:
 	}
 
 	return ret;
+}
+
+// ヘルパーの起動 (URDP を Program Files 下にインストールする)
+bool SwThinTeleworkInstallUrdpToProgramFiles(SW *sw)
+{
+	void *h;
+	// 引数チェック
+	if (sw == NULL)
+	{
+		return false;
+	}
+
+	h = SwReExecMyselfWithNewParam(sw, L"/URDPINSTMODE:TRUE", true);
+
+	if (h == NULL)
+	{
+		return false;
+	}
+
+	MsWaitProcessExit(h);
+
+	return true;
 }
 
 // Wait for that the listening port of the VPN Client service becomes available
@@ -5933,6 +5986,33 @@ bool SwReExecMyself(SW *sw, wchar_t *additional_params, bool as_admin)
 	return true;
 }
 
+// Restart itself
+HANDLE *SwReExecMyselfWithNewParam(SW *sw, wchar_t *new_param, bool as_admin)
+{
+	void *handle;
+	bool ret = false;
+	// Validate arguments
+	if (sw == NULL)
+	{
+		return NULL;
+	}
+	if (sw->ReExecProcessHandle != NULL)
+	{
+		return NULL;
+	}
+
+	handle = NULL;
+	ret = MsExecuteEx2W(MsGetExeFileNameW(), new_param, &handle, as_admin);
+
+	if (ret == false)
+	{
+		return false;
+	}
+
+	return handle;
+}
+
+
 // Show the UI
 void SwUiMain(SW *sw)
 {
@@ -6550,6 +6630,7 @@ void SwParseCommandLine(SW *sw)
 		{"DISABLEAUTOIMPORT", NULL, NULL, NULL, NULL, },
 		{"ISWEBINSTALLER", NULL, NULL, NULL, NULL, },
 		{"SUINSTMODE", NULL, NULL, NULL, NULL, },
+		{"URDPINSTMODE", NULL, NULL, NULL, NULL, },
 	};
 	// Validate arguments
 	if (sw == NULL)
@@ -6577,7 +6658,8 @@ void SwParseCommandLine(SW *sw)
 			sw->LangNow = GetParamYes(o, "LANGNOW");
 			sw->SetLangAndReboot = GetParamYes(o, "SETLANGANDREBOOT");
 			sw->HideStartCommand = GetParamYes(o, "HIDESTARTCOMMAND");
-			sw->SuInstMode = GetParamYes(o, "SUINSTMODE");
+			//sw->SuInstMode = GetParamYes(o, "SUINSTMODE");
+			sw->UrdpInstMode = GetParamYes(o, "URDPINSTMODE");
 
 			StrCpy(sw->SfxMode, sizeof(sw->SfxMode), GetParamStr(o, "SFXMODE"));
 			UniStrCpy(sw->SfxOut, sizeof(sw->SfxOut), GetParamUniStr(o, "SFXOUT"));
@@ -6653,6 +6735,18 @@ UINT SWExecMain()
 		{
 			sw->ExitCode = SW_EXIT_CODE_INTERNAL_ERROR;
 		}
+	}
+	else if (sw->UrdpInstMode)
+	{
+		// URDP install mode
+		DeskInstallRudpServerToProgramFilesDir();
+
+		if (DeskIsUacSettingStrict())
+		{
+			DeskMitigateUacSetting();
+		}
+
+		sw->ExitCode = 0;
 	}
 	else
 	{
