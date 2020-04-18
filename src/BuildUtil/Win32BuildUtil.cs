@@ -196,11 +196,7 @@ namespace BuildUtil
 			}
 			else
 			{
-#if !BU_SOFTETHER
-				body = Str.ReplaceStr(body, "$PRODUCTNAME$", "PacketiX VPN");
-#else		
-				body = Str.ReplaceStr(body, "$PRODUCTNAME$", "SoftEther VPN");
-#endif
+				body = Str.ReplaceStr(body, "$PRODUCTNAME$", "Thin Telework System by NTT-EAST and IPA");
 			}
 			body = Str.ReplaceStr(body, "$INTERNALNAME$", internalName);
 			body = Str.ReplaceStr(body, "$YEAR$", date.Year.ToString());
