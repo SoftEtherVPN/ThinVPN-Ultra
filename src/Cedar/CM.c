@@ -8421,7 +8421,7 @@ START_FIRST:
 
 	if (p12only && (is_p12 == false))
 	{
-		MsgBoxEx(hWnd, MB_ICONEXCLAMATION, _UU("DLG_BAD_P12"), s);
+		MsgBoxEx(hWnd, MB_ICONEXCLAMATION, _UU("DLG_BAD_P12_W"), tmp);
 		return false;
 	}
 

@@ -666,14 +666,14 @@ void DgOptionDlgUpdate(HWND hWnd)
 		Enable(hWnd, S_PORT);
 		Enable(hWnd, E_PORT);
 
-		if (port == DS_RDP_PORT)
-		{
-			Disable(hWnd, B_DEFAULT);
-		}
-		else
-		{
-			Enable(hWnd, B_DEFAULT);
-		}
+		//if (port == DS_RDP_PORT)
+		//{
+		//	Disable(hWnd, B_DEFAULT);
+		//}
+		//else
+		//{
+		//	Enable(hWnd, B_DEFAULT);
+		//}
 
 		//if (port == 0 || port >= 65536)
 		//{
@@ -684,7 +684,7 @@ void DgOptionDlgUpdate(HWND hWnd)
 	{
 		Disable(hWnd, S_PORT);
 		Disable(hWnd, E_PORT);
-		Disable(hWnd, B_DEFAULT);
+		//Disable(hWnd, B_DEFAULT);
 	}
 
 	if (IsChecked(hWnd, C_SYSLOG))
@@ -778,11 +778,11 @@ UINT DgOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 			}
 			break;
 
-		case B_DEFAULT:
-			SetInt(hWnd, E_PORT, DS_RDP_PORT);
-			DgOptionDlgUpdate(hWnd);
-			FocusEx(hWnd, E_PORT);
-			break;
+		//case B_DEFAULT:
+		//	SetInt(hWnd, E_PORT, DS_RDP_PORT);
+		//	DgOptionDlgUpdate(hWnd);
+		//	FocusEx(hWnd, E_PORT);
+		//	break;
 
 		case B_LOG:
 			if (true)
