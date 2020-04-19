@@ -230,11 +230,11 @@ namespace BuildUtil
 
 			switch (soft)
 			{
-				case Software.thintelework:
+				case Software.ThinTelework_Server_and_Client_Full:
 					ret = "Thin Telework System";
 					break;
 
-				case Software.thintelework_share_disabled:
+				case Software.Thin_Telework_Server_and_Client_ShareDisabled:
 					ret = "Thin Telework System (No Sharing Function)";
 					break;
 
@@ -256,11 +256,11 @@ namespace BuildUtil
 
 			switch (soft)
 			{
-				case Software.thintelework:
+				case Software.ThinTelework_Server_and_Client_Full:
 					ret = "Thin Telework System";
 					break;
 
-				case Software.thintelework_share_disabled:
+				case Software.Thin_Telework_Server_and_Client_ShareDisabled:
 					ret = "Thin Telework System (No Sharing Function)";
 					break;
 

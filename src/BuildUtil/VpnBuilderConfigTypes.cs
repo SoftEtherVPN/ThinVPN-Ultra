@@ -168,8 +168,8 @@ namespace BuildUtil
 	// Type of software
 	public enum Software
 	{
-		thintelework,
-		thintelework_share_disabled,
+		ThinTelework_Server_and_Client_Full,
+		Thin_Telework_Server_and_Client_ShareDisabled,
 	}
 
 	// Class to build the software
