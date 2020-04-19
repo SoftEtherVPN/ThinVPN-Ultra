@@ -17,7 +17,7 @@
 #define DESK_PUBLISHER_NAME_UNICODE		L"Thin Telework System"		// 元: L"SoftEther Corporation"
 #define DESK_PUBLISHER_NAME_ANSI		"Thin Telework System"			// 元: "SoftEther Corporation"
 #define	DESK_SECURE_PACK_NAME			"THIN_SERVER"			// 元: "DESK_SERVER"
-#define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.desktopvpn.com"	// TODO: 後で変更する
+#define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.thin.cyber.ipa.go.jp"	// TODO: 後で変更する
 
 #define DESK_SETTINGS_DIR_NAME			L"Thin Telework System Settings"
 
