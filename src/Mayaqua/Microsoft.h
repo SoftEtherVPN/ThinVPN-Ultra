@@ -1171,6 +1171,8 @@ void MsProcEnterSuspend();
 void MsProcLeaveSuspend();
 UINT64 MsGetSuspendModeBeginTick();
 
+UINT64 MsGetCurrentFileTime();
+
 // Inner functions
 #ifdef	MICROSOFT_C
 

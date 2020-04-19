@@ -902,6 +902,9 @@ void test(UINT num, char **arg)
 		StrCpy(set.HostName, 0, "www.google.com");
 		set.Port = 443;
 
+		StrCpy(set.ProxyUsername, 0, "xxx");
+		StrCpy(set.ProxyPassword, 0, "xxx");
+
 		s = WpcSockConnectEx(&set, &err, 0, NULL);
 
 		if (s == NULL)

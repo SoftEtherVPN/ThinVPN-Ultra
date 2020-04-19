@@ -1034,6 +1034,9 @@ int CompareHttpValue(void *p1, void *p2);
 void FreeHttpValue(HTTP_VALUE *value);
 void FreeHttpHeader(HTTP_HEADER *header);
 
+bool CheckHasHttpValue(HTTP_HEADER *header, char *name, char *value);
+
+
 bool SendPack(SOCK *s, PACK *p);
 PACK *RecvPack(SOCK *s);
 PACK *RecvPackWithHash(SOCK *s);

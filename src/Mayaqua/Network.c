@@ -22824,6 +22824,32 @@ HTTP_VALUE *NewHttpValue(char *name, char *data)
 	return v;
 }
 
+// Check if the HTTP header contains a value
+bool CheckHasHttpValue(HTTP_HEADER *header, char *name, char *value)
+{
+	UINT i;
+	// Validate arguments
+	if (header == NULL || name == NULL)
+	{
+		return false;
+	}
+
+	for (i = 0;i < LIST_NUM(header->ValueList);i++)
+	{
+		HTTP_VALUE *v = LIST_DATA(header->ValueList, i);
+
+		if (StrCmpi(v->Name, name) == 0)
+		{
+			if (StrCmpi(v->Data, value) == 0)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 // Look for the HTTP value from the HTTP header
 HTTP_VALUE *GetHttpValue(HTTP_HEADER *header, char *name)
 {

@@ -7931,6 +7931,342 @@ bool SocksSendRequestPacket(CONNECTION *c, SOCK *s, UINT dest_port, IP *dest_ip,
 	return ret;
 }
 
+// Connect to the proxy with NTLM authentication
+SOCK *ProxyConnectEx2NtlmAuth(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
+							  char *server_host_name, UINT server_port,
+							  char *username, char *password, bool additional_connect,
+							  bool *cancel_flag, void *hWnd, UINT timeout)
+{
+	SOCK *s = NULL;
+	bool use_auth = false;
+	char tmp[MAX_SIZE];
+	char auth_b64_str[MAX_SIZE * 4];
+	char basic_str[MAX_SIZE * 4];
+	UINT http_error_code;
+	HTTP_HEADER *h;
+	char server_host_name_tmp[256];
+	SOCK *ret = NULL;
+	UINT i, len;
+	BUF *ntlm_challenge = NULL;
+	BUF *ntlm_authenticate = NULL;
+	// Validate arguments
+	if (c == NULL || proxy_host_name == NULL || proxy_port == 0 || server_host_name == NULL ||
+		server_port == 0)
+	{
+		c->Err = ERR_PROXY_CONNECT_FAILED;
+		goto LABEL_CLEANUP;
+	}
+	use_auth = true;
+
+	if (c->Halt)
+	{
+		// Stop
+		c->Err = ERR_USER_CANCEL;
+		goto LABEL_CLEANUP;
+	}
+
+	Zero(server_host_name_tmp, sizeof(server_host_name_tmp));
+	StrCpy(server_host_name_tmp, sizeof(server_host_name_tmp), server_host_name);
+
+	len = StrLen(server_host_name_tmp);
+
+	for (i = 0;i < len;i++)
+	{
+		if (server_host_name_tmp[i] == '/')
+		{
+			server_host_name_tmp[i] = 0;
+		}
+	}
+
+	// Connection
+	s = TcpConnectEx3(proxy_host_name, proxy_port, timeout, cancel_flag, hWnd, true, NULL, false, false, NULL);
+	if (s == NULL)
+	{
+		// Failure
+		c->Err = ERR_PROXY_CONNECT_FAILED;
+		goto LABEL_CLEANUP;
+	}
+
+	// Timeout setting
+	SetTimeout(s, MIN(CONNECTING_TIMEOUT_PROXY, (timeout == 0 ? INFINITE : timeout)));
+
+	if (additional_connect == false)
+	{
+		c->FirstSock = s;
+	}
+
+	// HTTP header generation
+	if (IsStrIPv6Address(server_host_name_tmp))
+	{
+		IP ip;
+		char iptmp[MAX_PATH];
+
+		StrToIP(&ip, server_host_name_tmp);
+		IPToStr(iptmp, sizeof(iptmp), &ip);
+
+		Format(tmp, sizeof(tmp), "[%s]:%u", iptmp, server_port);
+	}
+	else
+	{
+		Format(tmp, sizeof(tmp), "%s:%u", server_host_name_tmp, server_port);
+	}
+
+	ntlm_challenge = NtlmGenerateNegotiate();
+
+	h = NewHttpHeader("CONNECT", tmp, "HTTP/1.0");
+	AddHttpValue(h, NewHttpValue("User-Agent", (c->Cedar == NULL ? DEFAULT_USER_AGENT : c->Cedar->HttpUserAgent)));
+	AddHttpValue(h, NewHttpValue("Host", server_host_name_tmp));
+	AddHttpValue(h, NewHttpValue("Content-Length", "0"));
+	AddHttpValue(h, NewHttpValue("Proxy-Connection", "Keep-Alive"));
+	AddHttpValue(h, NewHttpValue("Pragma", "no-cache"));
+
+	if (use_auth)
+	{
+		// Base64 encode
+		Zero(auth_b64_str, sizeof(auth_b64_str));
+		B64_Encode(auth_b64_str, ntlm_challenge->Buf, ntlm_challenge->Size);
+
+		Format(basic_str, sizeof(basic_str), "NTLM %s", auth_b64_str);
+
+		AddHttpValue(h, NewHttpValue("Proxy-Authorization", basic_str));
+	}
+
+	// Transmission
+	if (SendHttpHeader(s, h) == false)
+	{
+		// Failure
+		if (additional_connect == false)
+		{
+			c->FirstSock = NULL;
+		}
+		FreeHttpHeader(h);
+		Disconnect(s);
+		ReleaseSock(s);
+		c->Err = ERR_PROXY_ERROR;
+		goto LABEL_CLEANUP;
+	}
+
+	FreeHttpHeader(h);
+
+	if (c->Halt)
+	{
+		// Stop
+		if (additional_connect == false)
+		{
+			c->FirstSock = NULL;
+		}
+		Disconnect(s);
+		ReleaseSock(s);
+		c->Err = ERR_USER_CANCEL;
+		goto LABEL_CLEANUP;
+	}
+
+	// Receive the results
+	h = RecvHttpHeader(s);
+	if (h == NULL)
+	{
+		// Failure
+		if (additional_connect == false)
+		{
+			c->FirstSock = NULL;
+		}
+		FreeHttpHeader(h);
+		Disconnect(s);
+		ReleaseSock(s);
+		c->Err = ERR_PROXY_ERROR;
+		goto LABEL_CLEANUP;
+	}
+
+	http_error_code = 0;
+	if (StrLen(h->Method) == 8)
+	{
+		if (Cmp(h->Method, "HTTP/1.", 7) == 0)
+		{
+			http_error_code = ToInt(h->Target);
+		}
+	}
+
+	if (http_error_code == 407)
+	{
+		UINT i;
+		UCHAR *ntlm_buffer = NULL;
+		UINT ntlm_buffer_size = 0;
+		char *ntlm_message_str = NULL;
+		BUF *svr_challenge_data = NULL;
+		UINT content_len;
+		UCHAR *content_recv_buffer;
+		for (i = 0;i < LIST_NUM(h->ValueList);i++)
+		{
+			HTTP_VALUE *v = LIST_DATA(h->ValueList, i);
+
+			if (StrCmpi(v->Name, "Proxy-Authenticate") == 0)
+			{
+				if (StartWith(v->Data, "NTLM "))
+				{
+					ntlm_message_str = v->Data + 5;
+				}
+			}
+		}
+
+		if (IsEmptyStr(ntlm_message_str))
+		{
+			Disconnect(s);
+			ReleaseSock(s);
+			FreeHttpHeader(h);
+
+			c->Err = ERR_PROXY_AUTH_FAILED;
+
+			goto LABEL_CLEANUP;
+		}
+
+		ntlm_buffer_size = StrLen(ntlm_message_str) * 4 + 32;
+		ntlm_buffer = ZeroMalloc(ntlm_buffer_size);
+
+		i = B64_Decode(ntlm_buffer, ntlm_message_str, StrLen(ntlm_message_str));
+
+		svr_challenge_data = NewBufFromMemory(ntlm_buffer, i);
+
+		ntlm_authenticate = NtlmGenerateAuthenticate(svr_challenge_data, username, password, "aho");
+		Free(ntlm_buffer);
+		FreeBuf(svr_challenge_data);
+
+		// Receive remain contents
+		content_len = GetContentLength(h);
+		content_len = MIN(content_len, 1024 * 1024);
+		content_recv_buffer = Malloc(content_len);
+
+		RecvAll(s, content_recv_buffer, content_len, false);
+
+		Free(content_recv_buffer);
+	}
+
+	FreeHttpHeader(h);
+
+	if (ntlm_authenticate != NULL)
+	{
+		// Send NTLM auth packet
+		h = NewHttpHeader("CONNECT", tmp, "HTTP/1.0");
+		AddHttpValue(h, NewHttpValue("User-Agent", (c->Cedar == NULL ? DEFAULT_USER_AGENT : c->Cedar->HttpUserAgent)));
+		AddHttpValue(h, NewHttpValue("Host", server_host_name_tmp));
+		AddHttpValue(h, NewHttpValue("Content-Length", "0"));
+		AddHttpValue(h, NewHttpValue("Proxy-Connection", "Keep-Alive"));
+		AddHttpValue(h, NewHttpValue("Pragma", "no-cache"));
+
+		if (use_auth)
+		{
+			// Base64 encode
+			Zero(auth_b64_str, sizeof(auth_b64_str));
+			B64_Encode(auth_b64_str, ntlm_authenticate->Buf, ntlm_authenticate->Size);
+
+			Format(basic_str, sizeof(basic_str), "NTLM %s", auth_b64_str);
+
+			AddHttpValue(h, NewHttpValue("Proxy-Authorization", basic_str));
+		}
+
+		// Transmission
+		if (SendHttpHeader(s, h) == false)
+		{
+			// Failure
+			if (additional_connect == false)
+			{
+				c->FirstSock = NULL;
+			}
+			FreeHttpHeader(h);
+			Disconnect(s);
+			ReleaseSock(s);
+			c->Err = ERR_PROXY_ERROR;
+			goto LABEL_CLEANUP;
+		}
+
+		FreeHttpHeader(h);
+
+		if (c->Halt)
+		{
+			// Stop
+			if (additional_connect == false)
+			{
+				c->FirstSock = NULL;
+			}
+			Disconnect(s);
+			ReleaseSock(s);
+			c->Err = ERR_USER_CANCEL;
+			goto LABEL_CLEANUP;
+		}
+
+		// Receive the results
+		h = RecvHttpHeader(s);
+		if (h == NULL)
+		{
+			// Failure
+			if (additional_connect == false)
+			{
+				c->FirstSock = NULL;
+			}
+			FreeHttpHeader(h);
+			Disconnect(s);
+			ReleaseSock(s);
+			c->Err = ERR_PROXY_ERROR;
+			goto LABEL_CLEANUP;
+		}
+
+		http_error_code = 0;
+		if (StrLen(h->Method) == 8)
+		{
+			if (Cmp(h->Method, "HTTP/1.", 7) == 0)
+			{
+				http_error_code = ToInt(h->Target);
+			}
+		}
+
+		FreeHttpHeader(h);
+	}
+
+	// Check the code
+	switch (http_error_code)
+	{
+	case 401:
+	case 403:
+	case 407:
+		// Authentication failure
+		if (additional_connect == false)
+		{
+			c->FirstSock = NULL;
+		}
+		Disconnect(s);
+		ReleaseSock(s);
+		c->Err = ERR_PROXY_AUTH_FAILED;
+		goto LABEL_CLEANUP;
+
+	default:
+		if ((http_error_code / 100) == 2)
+		{
+			// Success
+			SetTimeout(s, INFINITE);
+			ret = s;
+			goto LABEL_CLEANUP;
+		}
+		else
+		{
+			// Receive an unknown result
+			if (additional_connect == false)
+			{
+				c->FirstSock = NULL;
+			}
+			Disconnect(s);
+			ReleaseSock(s);
+			c->Err = ERR_PROXY_ERROR;
+			goto LABEL_CLEANUP;
+		}
+	}
+
+LABEL_CLEANUP:
+
+	FreeBuf(ntlm_challenge);
+	FreeBuf(ntlm_authenticate);
+
+	return ret;
+}
+
 // Connect through a proxy
 SOCK *ProxyConnect(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 				   char *server_host_name, UINT server_port,
@@ -8105,6 +8441,24 @@ SOCK *ProxyConnectEx2(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 			http_error_code = ToInt(h->Target);
 		}
 	}
+
+	if (http_error_code == 407)
+	{
+		if (CheckHasHttpValue(h, "Proxy-Authenticate", "NTLM"))
+		{
+			// The proxy server requests the NTLM authentication.
+			// Disconnect the socket.
+			Disconnect(s);
+			ReleaseSock(s);
+			FreeHttpHeader(h);
+
+			c->Err = ERR_PROXY_AUTH_FAILED;
+
+			return ProxyConnectEx2NtlmAuth(c, proxy_host_name, proxy_port, server_host_name,
+				server_port, username, password, additional_connect, cancel_flag, hWnd, timeout);
+		}
+	}
+
 	FreeHttpHeader(h);
 
 	// Check the code
