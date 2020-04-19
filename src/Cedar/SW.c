@@ -4190,7 +4190,7 @@ LABEL_FINISHED:
 	// Completion message
 	SwPerformPrint(wp, _UU("SW_PERFORM_MSG_FINISHED"));
 
-	if (ok && (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS) && sw->IsSystemMode && MsIsVista())
+	if (ok && (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS) && sw->IsSystemMode && MsIsNt())
 	{
 		wchar_t username[MAX_PATH];
 
