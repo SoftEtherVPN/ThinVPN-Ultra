@@ -878,9 +878,13 @@ void WtgAccept(WT *wt, SOCK *s)
 	// セッション ID の生成
 	Rand(session_id, sizeof(session_id));
 
-	SetWantToUseCipher(s, "RC4-MD5");
+	//SetWantToUseCipher(s, "RC4-MD5");
 
 	// SSL 通信の開始
+	// SSL バージョン無効化
+	s->SslAcceptSettings.AcceptOnlyTls = WT_GATE_DISABLE_SSL3;
+	s->SslAcceptSettings.Tls_Disable1_0 = WT_GATE_DISABLE_TLS1_0;
+	s->SslAcceptSettings.Tls_Disable1_1 = WT_GATE_DISABLE_TLS1_1;  
 	if (StartSSLEx(s, wt->GateCert, wt->GateKey, true, 0, NULL) == false)
 	{
 		Debug("StartSSL Failed.\n");

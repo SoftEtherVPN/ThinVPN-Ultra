@@ -213,6 +213,12 @@ void WideFreeSessionInfoCache(LIST *o);
 
 void WideLoadEntryPoint(X **cert, char *url, UINT url_size);
 
+bool WideVerifyNewEntryPointAndSignature(X *master_x, BUF *ep, BUF *sign);
+BUF *WideTryDownloadAndVerifyNewEntryPoint(X *master_x, INTERNET_SETTING *setting, char *base_url, bool *cancel, WT *wt);
+bool WideTryUpdateNewEntryPoint(wchar_t *dirname, X *master_x, INTERNET_SETTING *setting, bool *cancel, WT *wt);
+bool WideTryUpdateNewEntryPointModest(wchar_t *dirname, X *master_x, INTERNET_SETTING *setting, bool *cancel, WT *wt, UINT interval);
+bool WideTryUpdateNewEntryPointModestStandard(WT *wt, bool *cancel);
+
 
 // WideClient
 WIDE *WideClientStart(char *svc_name, UINT se_lang);

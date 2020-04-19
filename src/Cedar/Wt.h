@@ -58,6 +58,8 @@
 #define LOCAL_ENTRY_POINT_FILENAME		"@EntryPoint.dat"
 #define ENTRY_POINT_RAW_FILENAME_W		L"EntryPoint.dat"
 
+#define ENTRY_POINT_UPDATE_FROM_GITHUB_INTERVAL		(12 * 60 * 60 * 1000)
+
 
 #define ENTRANCE_URL_TIME_REPLACE_TAG	"__TIME__"
 
@@ -92,7 +94,7 @@
 
 // WPC 通信関係
 #define WT_WPC_DEFAULT_ENTRANCE_CACHE_SPAN	(30 * 60 * 1000)	// デフォルトの Entrance URL のキャッシュ時間
-#define	WT_GATE_CONNECT_RETRY	1000					// Gate への再接続までの時間
+#define	WT_GATE_CONNECT_RETRY	(1500)					// Gate への再接続までの時間
 
 // セッションの種類
 #define WT_SESSION_GATE			0						// Gate 上のセッション
@@ -148,6 +150,7 @@ struct WT
 	UINT64 EntranceCacheTimestamp;	// Entrance URL の取得日時
 	UINT DefaultEntranceCacheExpireSpan;	// Entrance URL の有効期限
 	WIDE *Wide;						// Wide へのポインタ
+	bool EnableUpdateEntryPoint;
 	UINT64 LastTryUpdateNewEntryPoint;	// 最後に GitHub から Entry Point 更新を試行した時刻
 
 	// Gate 用

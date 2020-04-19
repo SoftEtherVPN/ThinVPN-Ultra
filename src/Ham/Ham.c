@@ -886,159 +886,19 @@ void StopProcess()
 	FreeCedar();
 }
 
-bool WideVerifyNewEntryPointAndSignature(X *master_x, BUF *ep, BUF *sign)
-{
-	K *pubkey;
-	bool ret = false;
-	if (master_x == NULL || ep == NULL || sign == NULL)
-	{
-		return false;
-	}
-
-	if (sign->Size < (4096 / 8))
-	{
-		return false;
-	}
-
-	pubkey = GetKFromX(master_x);
-
-	if (pubkey != NULL)
-	{
-		ret = RsaVerifyEx(ep->Buf, ep->Size, sign->Buf, pubkey, 4096);
-
-		FreeK(pubkey);
-	}
-
-	return ret;
-}
-
-BUF *WideTryDownloadAndVerifyNewEntryPoint(X *master_x, INTERNET_SETTING *setting, char *base_url, bool *cancel, WT *wt)
-{
-	UINT i;
-	char base_url2[MAX_PATH] = {0};
-	char data_url[MAX_PATH] = {0};
-	char sign_url[MAX_PATH] = {0};
-	BUF *data_buf = NULL;
-	BUF *sign_buf = NULL;
-	URL_DATA data_url2 = {0};
-	URL_DATA sign_url2 = {0};
-	BUF *ret = NULL;
-	if (master_x == NULL || base_url == NULL)
-	{
-		return NULL;
-	}
-
-	StrCpy(base_url2, sizeof(base_url2), base_url);
-
-	Trim(base_url2);
-
-	i = StrLen(base_url2);
-	if (i >= 1)
-	{
-		if (base_url2[i - 1] == '/')
-		{
-			base_url2[i - 1] = 0;
-		}
-	}
-
-	Format(data_url, sizeof(data_url), "%s/Files/EntryPoint.dat", base_url2);
-	Format(sign_url, sizeof(sign_url), "%s/Files/EntryPointSign.dat", base_url2);
-
-	ParseUrl(&data_url2, data_url, false, NULL);
-	ParseUrl(&sign_url2, sign_url, false, NULL);
-
-	data_buf = HttpRequestEx4(&data_url2, setting, 0, 0, NULL, false, NULL, NULL, NULL, NULL, 0,
-		cancel, 65536, NULL, NULL, wt);
-
-	if (data_buf == NULL)
-	{
-		goto LABEL_CLEANUP;
-	}
-
-	sign_buf = HttpRequestEx4(&sign_url2, setting, 0, 0, NULL, false, NULL, NULL, NULL, NULL, 0,
-		cancel, 65536, NULL, NULL, wt);
-
-	if (sign_buf == NULL)
-	{
-		goto LABEL_CLEANUP;
-	}
-
-	if (WideVerifyNewEntryPointAndSignature(master_x, data_buf, sign_buf))
-	{
-		ret = CloneBuf(data_buf);
-	}
-
-LABEL_CLEANUP:
-	FreeBuf(data_buf);
-	FreeBuf(sign_buf);
-	return ret;
-}
-
-bool WideTryUpdateNewEntryPoint(wchar_t *dirname, X *master_x, INTERNET_SETTING *setting, bool *cancel, WT *wt)
-{
-	char *tag = "Update:";
-	wchar_t fullpath[MAX_PATH] = {0};
-	bool ret = false;
-	BUF *current_data = NULL;
-	BUF *new_data = NULL;
-	char base_url[MAX_PATH] = {0};
-	if (dirname == NULL || master_x == NULL || wt == NULL)
-	{
-		return false;
-	}
-
-	CombinePathW(fullpath, sizeof(fullpath), dirname, ENTRY_POINT_RAW_FILENAME_W);
-
-	// Try read
-	current_data = ReadDumpW(fullpath);
-	if (current_data == NULL)
-	{
-		goto LABEL_CLEANUP;
-	}
-
-	Zero(base_url, sizeof(base_url));
-
-	// Get update base URL
-	while (true)
-	{
-		char *line = CfgReadNextLine(current_data);
-		if (line == NULL)
-		{
-			break;
-		}
-
-		if (StartWith(line, tag))
-		{
-			if (IsEmptyStr(base_url))
-			{
-				StrCpy(base_url, sizeof(base_url), line + StrLen(tag));
-
-				Trim(base_url);
-			}
-		}
-
-		Free(line);
-	}
-
-	if (IsEmptyStr(base_url))
-	{
-		goto LABEL_CLEANUP;
-	}
-
-	// Try to download new file
-	new_data = WideTryDownloadAndVerifyNewEntryPoint(master_x, setting, base_url, cancel, wt);
-
-	// Overwrite the file
-	ret = DumpBufW(new_data, fullpath);
-
-LABEL_CLEANUP:
-	FreeBuf(current_data);
-	FreeBuf(new_data);
-	return ret;
-}
-
 void test(UINT num, char **arg)
 {
+	if (true)
+	{
+		WT wt;
+		X *master_x = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
+		Zero(&wt, sizeof(WT));
+		Print("%u\n", WideTryUpdateNewEntryPoint(L"C:\\git\\IPA-DNP-DeskVPN\\src\\bin",
+			master_x, NULL, NULL, &wt));
+		FreeX(master_x);
+		return;
+	}
+
 	if (true)
 	{
 		X *master_x = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");

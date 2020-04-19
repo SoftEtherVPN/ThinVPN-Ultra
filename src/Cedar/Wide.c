@@ -423,6 +423,8 @@ WIDE *WideClientStartEx(char *svc_name, UINT se_lang, X *master_cert, char *fixe
 		w->wt = NewWt(master_cert);
 	}
 
+	w->wt->EnableUpdateEntryPoint = true; // EntryPoint.dat 自動更新有効
+
 	if (fixed_entrance_url != NULL)
 	{
 		if (IsEmptyStr(fixed_entrance_url))
@@ -713,10 +715,12 @@ LABEL_RETRY:
 
 			if (level == DESK_ERRORLEVEL_SERVER_SIDE)
 			{
+				// サーバー側問題の場合は 15 秒 × 再試行回数 くらい待つ
 				interval *= 10;
 			}
 			else if (level == DESK_ERRORLEVEL_CLIENT_SIDE)
 			{
+				// クライアント側問題の場合は 75 秒 × 再試行回数 くらい待つ
 				interval *= 50;
 			}
 
@@ -1541,6 +1545,8 @@ WIDE *WideServerStartEx2(char *svc_name, WT_ACCEPT_PROC *accept_proc, void *acce
 	w->ServerAcceptParam = accept_param;
 	w->ResetCertProc = reset_cert_proc;
 	w->ResetCertProcParam = reset_cert_proc_param;
+
+	w->wt->EnableUpdateEntryPoint = true; // EntryPoint.dat 自動更新有効
 
 
 	if (fixed_entrance_url != NULL)
@@ -3146,3 +3152,190 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size)
 	}
 }
 
+
+bool WideVerifyNewEntryPointAndSignature(X *master_x, BUF *ep, BUF *sign)
+{
+	K *pubkey;
+	bool ret = false;
+	if (master_x == NULL || ep == NULL || sign == NULL)
+	{
+		return false;
+	}
+
+	if (sign->Size < (4096 / 8))
+	{
+		return false;
+	}
+
+	pubkey = GetKFromX(master_x);
+
+	if (pubkey != NULL)
+	{
+		ret = RsaVerifyEx(ep->Buf, ep->Size, sign->Buf, pubkey, 4096);
+
+		FreeK(pubkey);
+	}
+
+	return ret;
+}
+
+BUF *WideTryDownloadAndVerifyNewEntryPoint(X *master_x, INTERNET_SETTING *setting, char *base_url, bool *cancel, WT *wt)
+{
+	UINT i;
+	char base_url2[MAX_PATH] = {0};
+	char data_url[MAX_PATH] = {0};
+	char sign_url[MAX_PATH] = {0};
+	BUF *data_buf = NULL;
+	BUF *sign_buf = NULL;
+	URL_DATA data_url2 = {0};
+	URL_DATA sign_url2 = {0};
+	BUF *ret = NULL;
+	if (master_x == NULL || base_url == NULL)
+	{
+		return NULL;
+	}
+
+	StrCpy(base_url2, sizeof(base_url2), base_url);
+
+	Trim(base_url2);
+
+	i = StrLen(base_url2);
+	if (i >= 1)
+	{
+		if (base_url2[i - 1] == '/')
+		{
+			base_url2[i - 1] = 0;
+		}
+	}
+
+	Format(data_url, sizeof(data_url), "%s/EntryPoint.dat", base_url2);
+	Format(sign_url, sizeof(sign_url), "%s/EntryPointSign.dat", base_url2);
+
+	ParseUrl(&data_url2, data_url, false, NULL);
+	ParseUrl(&sign_url2, sign_url, false, NULL);
+
+	data_buf = HttpRequestEx4(&data_url2, setting, 0, 0, NULL, false, NULL, NULL, NULL, NULL, 0,
+		cancel, 65536, NULL, NULL, wt);
+
+	sign_buf = HttpRequestEx4(&sign_url2, setting, 0, 0, NULL, false, NULL, NULL, NULL, NULL, 0,
+		cancel, 65536, NULL, NULL, wt);
+
+	if (sign_buf == NULL)
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	if (WideVerifyNewEntryPointAndSignature(master_x, data_buf, sign_buf))
+	{
+		ret = CloneBuf(data_buf);
+	}
+
+LABEL_CLEANUP:
+	FreeBuf(data_buf);
+	FreeBuf(sign_buf);
+	return ret;
+}
+
+bool WideTryUpdateNewEntryPoint(wchar_t *dirname, X *master_x, INTERNET_SETTING *setting, bool *cancel, WT *wt)
+{
+	char *tag = "Update:";
+	wchar_t fullpath[MAX_PATH] = {0};
+	bool ret = false;
+	BUF *current_data = NULL;
+	BUF *new_data = NULL;
+	char base_url[MAX_PATH] = {0};
+	if (dirname == NULL || master_x == NULL || wt == NULL)
+	{
+		return false;
+	}
+
+	CombinePathW(fullpath, sizeof(fullpath), dirname, ENTRY_POINT_RAW_FILENAME_W);
+
+	// Try read
+	current_data = ReadDumpW(fullpath);
+	if (current_data == NULL)
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	Zero(base_url, sizeof(base_url));
+
+	// Get update base URL
+	while (true)
+	{
+		char *line = CfgReadNextLine(current_data);
+		if (line == NULL)
+		{
+			break;
+		}
+
+		if (StartWith(line, tag))
+		{
+			if (IsEmptyStr(base_url))
+			{
+				StrCpy(base_url, sizeof(base_url), line + StrLen(tag));
+
+				Trim(base_url);
+			}
+		}
+
+		Free(line);
+	}
+
+	if (IsEmptyStr(base_url))
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	// Try to download new file
+	new_data = WideTryDownloadAndVerifyNewEntryPoint(master_x, setting, base_url, cancel, wt);
+
+	// Overwrite the file
+	ret = DumpBufW(new_data, fullpath);
+
+LABEL_CLEANUP:
+	FreeBuf(current_data);
+	FreeBuf(new_data);
+	return ret;
+}
+
+bool WideTryUpdateNewEntryPointModest(wchar_t *dirname, X *master_x, INTERNET_SETTING *setting, bool *cancel, WT *wt, UINT interval)
+{
+	UINT64 now = Tick64();
+
+	if (wt == NULL)
+	{
+		return false;
+	}
+
+	if (wt->LastTryUpdateNewEntryPoint == 0 ||
+		(now >= (wt->LastTryUpdateNewEntryPoint + (UINT64)interval)))
+	{
+		bool ret = WideTryUpdateNewEntryPoint(dirname, master_x, setting, cancel, wt);
+
+		if (ret)
+		{
+			wt->LastTryUpdateNewEntryPoint = now;
+		}
+
+		return ret;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool WideTryUpdateNewEntryPointModestStandard(WT *wt, bool *cancel)
+{
+	wchar_t current_dir[MAX_PATH] = {0};
+	if (wt == NULL)
+	{
+		return false;
+	}
+
+	GetExeDirW(current_dir, sizeof(current_dir));
+
+	return WideTryUpdateNewEntryPointModest(current_dir, wt->MasterCert,
+		wt->InternetSetting, cancel, wt, ENTRY_POINT_UPDATE_FROM_GITHUB_INTERVAL);
+}

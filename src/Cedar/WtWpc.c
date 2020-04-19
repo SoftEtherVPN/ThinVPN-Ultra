@@ -386,11 +386,13 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 	BUF *b, *recv;
 	UINT error;
 	WPC_PACKET packet;
+	UINT num_retry = 0;
 	// 引数チェック
 	if (wt == NULL || function_name == NULL || pack == NULL)
 	{
 		return PackError(ERR_INTERNAL_ERROR);
 	}
+L_RETRY:
 
 	error = WpcGetEntranceUrlEx(wt, url, sizeof(url), wt->DefaultEntranceCacheExpireSpan);
 	if (error != ERR_NO_ERROR)
@@ -421,6 +423,29 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 
 	if (recv == NULL)
 	{
+		if (error == ERR_SSL_X509_UNTRUSTED || error == ERR_CERT_NOT_TRUSTED ||
+			error == ERR_PROTOCOL_ERROR || error == ERR_CONNECT_FAILED)
+		{
+			if (wt->EnableUpdateEntryPoint && num_retry == 0)
+			{
+				Debug("Trying update Entry Point...\n");
+				// Wide Controller との上記の通信エラーが発生した場合は
+				// EntryPoint.dat が古い可能性があるので
+				// GitHub を用いて更新を試みる
+				if (WideTryUpdateNewEntryPointModestStandard(wt, NULL))
+				{
+					Debug("Try update Entry Point OK. Retrying...\n");
+					// 更新されたら接続リトライをしてみる
+					num_retry++;
+					goto L_RETRY;
+				}
+				else
+				{
+					Debug("Try update Entry Point error.\n");
+				}
+			}
+		}
+
 		return PackError(error);
 	}
 

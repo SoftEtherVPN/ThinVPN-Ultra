@@ -43,6 +43,10 @@
 
 #define	SW_SINGLE_INSTANCE_NAME				"ThinTelework_Setup_Wizard"
 
+#define WT_GATE_DISABLE_SSL3		true
+#define WT_GATE_DISABLE_TLS1_0		true
+#define WT_GATE_DISABLE_TLS1_1		true
+
 // イベントログのソース名
 #define	DS_EVENTLOG_SOURCE_NAME		L"Thin Telework System Server"
 
