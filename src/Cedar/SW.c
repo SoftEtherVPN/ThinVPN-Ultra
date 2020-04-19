@@ -410,8 +410,8 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 		return false;
 	}
 
-	Add(o, SwNewSfxFile("install_src.dat", L"|install_src.dat"));
 	Add(o, SwNewSfxFile("EntryPoint.dat", L"|EntryPoint.dat"));
+	Add(o, SwNewSfxFile("install_src.dat", L"|install_src.dat"));
 
 	return true;
 }

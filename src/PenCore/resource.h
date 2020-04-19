@@ -220,6 +220,8 @@
 #define BMP_UNIVTSUKUBA                 240
 #define ICO_POLICE                      241
 #define BMP_THEEND                      242
+#define IDB_BITMAP3                     243
+#define BMP_CREDIT                      243
 #define S_TITLE                         1007
 #define S_INSERT_SECURE                 1008
 #define S_TITLE2                        1008
@@ -1355,7 +1357,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        243
+#define _APS_NEXT_RESOURCE_VALUE        244
 #define _APS_NEXT_COMMAND_VALUE         40111
 #define _APS_NEXT_CONTROL_VALUE         1518
 #define _APS_NEXT_SYMED_VALUE           102

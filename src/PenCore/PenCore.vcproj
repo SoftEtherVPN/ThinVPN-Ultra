@@ -217,6 +217,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CREDIT.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\DateTime.ico"
 				>
 			</File>

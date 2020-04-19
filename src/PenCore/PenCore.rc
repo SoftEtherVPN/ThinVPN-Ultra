@@ -4546,11 +4546,12 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "@D_SW_FINISH"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    ICON            ICO_TEST,S_ICON,7,5,20,18,WS_TABSTOP
-    LTEXT           "@S_INFO",S_INFO,38,5,278,65
-    CONTROL         "RUN_TEXT",B_RUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,73,271,12
-    LTEXT           "@S_INFO8",S_INFO8,65,113,251,42
-    ICON            ICO_GROUP,S_ICON2,43,111,18,18,WS_TABSTOP
+    ICON            ICO_TEST,S_ICON,7,5,20,20,WS_TABSTOP
+    LTEXT           "@S_INFO",S_INFO,38,5,278,25
+    CONTROL         "RUN_TEXT",B_RUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,35,271,12
+    LTEXT           "@S_INFO8",S_INFO8,38,60,278,46
+    ICON            ICO_LINK,S_ICON2,7,57,18,18,NOT WS_VISIBLE | WS_TABSTOP
+    CONTROL         243,IDC_STATIC,"Static",SS_BITMAP,119,108,202,39
 END
 
 D_SW_UNINST1 DIALOGEX 0, 0, 323, 155
@@ -5520,6 +5521,7 @@ BMP_PASSWORD1_EN        BITMAP                  "Password1_en.bmp"
 BMP_PASSWORD2_EN        BITMAP                  "Password2_en.bmp"
 BMP_THANKS_EN           BITMAP                  "Thanks_en.bmp"
 BMP_THEEND              BITMAP                  "TheEnd.bmp"
+BMP_CREDIT              BITMAP                  "CREDIT.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
