@@ -25,6 +25,11 @@ void WtsSessionMain(TSESSION *s)
 	if (s->Sock != NULL)
 	{
 		IPToStr(s->wt->CurrentGateIp, sizeof(s->wt->CurrentGateIp), &s->Sock->RemoteIP);
+
+		if (s->ConnectParam != NULL)
+		{
+			StrCpy(s->wt->CurrentGateIp, sizeof(s->wt->CurrentGateIp), s->ConnectParam->HostName);
+		}
 	}
 
 #ifdef	OS_WIN32
