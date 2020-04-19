@@ -8095,6 +8095,14 @@ SOCK *ProxyConnectEx2NtlmAuth(CONNECTION *c, char *proxy_host_name, UINT proxy_p
 		BUF *svr_challenge_data = NULL;
 		UINT content_len;
 		UCHAR *content_recv_buffer;
+		char machine_name[128];
+
+		StrCpy(machine_name, sizeof(machine_name), "machine");
+
+#ifdef	OS_WIN32
+		MsGetComputerName(machine_name, sizeof(machine_name));
+#endif	// OS_WIN32
+
 		for (i = 0;i < LIST_NUM(h->ValueList);i++)
 		{
 			HTTP_VALUE *v = LIST_DATA(h->ValueList, i);
