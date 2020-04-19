@@ -890,6 +890,36 @@ void test(UINT num, char **arg)
 {
 	if (true)
 	{
+		// NTLM Proxy Test
+		WPC_CONNECT set;
+		SOCK *s;
+		UINT err = 0;
+		Zero(&set, sizeof(set));
+		set.ProxyType = PROXY_HTTP;
+		StrCpy(set.ProxyHostName, 0, "10.40.200.12");
+		set.ProxyPort = 3128;
+
+		StrCpy(set.HostName, 0, "www.google.com");
+		set.Port = 443;
+
+		s = WpcSockConnectEx(&set, &err, 0, NULL);
+
+		if (s == NULL)
+		{
+			UniPrint(L"error %s\n", _E(err));
+		}
+		else
+		{
+			Print("Ok\n");
+
+			Disconnect(s);
+			ReleaseSock(s);
+		}
+		return;
+	}
+
+	if (true)
+	{
 		WT wt;
 		X *master_x = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
 		Zero(&wt, sizeof(WT));
