@@ -2456,7 +2456,7 @@ void DiApplyProductFileList(DI *di)
 		di->Title = _UU("DI_TITLE_CLIENT");
 
 		// アイコン
-		di->Icon = ICO_DESKCLIENT;
+		di->Icon = ICO_THINCLIENT;
 	}
 }
 

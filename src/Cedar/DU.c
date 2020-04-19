@@ -1627,7 +1627,7 @@ void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 
 	Center2(hWnd);
 
-	SetIcon(hWnd, 0, ICO_DESKCLIENT);
+	SetIcon(hWnd, 0, ICO_THINCLIENT);
 
 	h = GetFont("Arial", 10, false, false, false, false);
 	SetFont(hWnd, C_PCID, h);
@@ -1881,7 +1881,7 @@ UINT DuMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 		{
 		case CMD_ABOUT:
 			// バージョン情報
-			DuAboutDlg(hWnd, ICO_DESKCLIENT, _SS("PRODUCT_NAME_DESKCLIENT"),
+			DuAboutDlg(hWnd, ICO_THINCLIENT, _SS("PRODUCT_NAME_DESKCLIENT"),
 				t->Du->Cedar->BuildInfo);
 			break;
 

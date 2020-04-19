@@ -6605,7 +6605,7 @@ void SwDefineComponents(SW *sw)
 	Add(sw->ComponentList, c);
 
 	// NTT Client
-	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_THIN_CLIENT, ICO_DESKCLIENT, 13, DI_FILENAME_DESKCLIENT,
+	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_THIN_CLIENT, ICO_THINCLIENT, 13, DI_FILENAME_DESKCLIENT,
 		SW_LONG_THINCLIENT, false, sizeof(ntt_client_files) / sizeof(char *), ntt_client_files,
 		DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_THINCLIENT"),
 		NULL, 0, NULL, NULL);
