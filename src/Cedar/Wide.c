@@ -124,7 +124,7 @@ SESSION_INFO_CACHE *WideSessionInfoCacheGet(LIST *o, char *pcid, UINT64 expire_s
 }
 
 // セッション接続情報キャッシュの追加
-void WideSessionInfoCacheAdd(LIST *o, char *pcid, char *hostname, UINT port,
+void WideSessionInfoCacheAdd(LIST *o, char *pcid, char *hostname, char *hostname_for_proxy, UINT port,
 							 UCHAR *session_id, UINT64 expire_span)
 {
 	// 引数チェック
@@ -159,6 +159,7 @@ void WideSessionInfoCacheAdd(LIST *o, char *pcid, char *hostname, UINT port,
 		}
 
 		StrCpy(c->HostName, sizeof(c->HostName), hostname);
+		StrCpy(c->HostNameForProxy, sizeof(c->HostNameForProxy), hostname_for_proxy);
 		c->Port = port;
 		Copy(c->SessionId, session_id, sizeof(c->SessionId));
 
@@ -369,7 +370,7 @@ LABEL_RETRY:
 	ret = WideClientConnectInner(w, &c, pcid, ver, build);
 	if (ret == ERR_NO_ERROR)
 	{
-		Debug("Redirect Host: %s:%u\n", c.HostName, c.Port);
+		Debug("Redirect Host: %s (for proxy: %s):%u\n", c.HostName, c.ProxyHostName, c.Port);
 
 		ret = WtcConnectEx(wt, &c, sockio, CEDAR_VER, CEDAR_BUILD);
 
@@ -653,7 +654,7 @@ LABEL_RETRY:
 			Unlock(w->SettingLock);
 
 			// 接続先 Gate が決定した
-			Debug("Redirecting to %s:%u...\n", c.HostName, c.Port);
+			Debug("Redirecting to %s:%u... (for proxy: %s)\n", c.HostName, c.Port, c.HostNameForProxy);
 
 			// 接続
 			w->ServerErrorCode = ERR_NO_ERROR;
@@ -959,11 +960,12 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 		if (cache == NULL)
 		{
 			PackGetStr(p, "Hostname", c->HostName, sizeof(c->HostName));
+			PackGetStr(p, "HostnameForProxy", c->HostNameForProxy, sizeof(c->HostNameForProxy));
 			c->Port = PackGetInt(p, "Port");
 			PackGetData2(p, "SessionId", c->SessionId, sizeof(c->SessionId));
 
 			WideSessionInfoCacheAdd(w->SessionInfoCache, pcid,
-				c->HostName, c->Port, c->SessionId, w->SessionInfoCacheExpires);
+				c->HostName, c->HostNameForProxy, c->Port, c->SessionId, w->SessionInfoCacheExpires);
 
 			c->CacheUsed = false;
 
@@ -972,6 +974,7 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 		else
 		{
 			StrCpy(c->HostName, sizeof(c->HostName), cache->HostName);
+			StrCpy(c->HostNameForProxy, sizeof(c->HostNameForProxy), cache->HostNameForProxy);
 			c->Port = cache->Port;
 			Copy(c->SessionId, cache->SessionId, sizeof(c->SessionId));
 
@@ -1029,6 +1032,7 @@ UINT WideServerConnect(WIDE *w, WT_CONNECT *c)
 		else
 		{
 			PackGetStr(p, "Hostname", c->HostName, sizeof(c->HostName));
+			PackGetStr(p, "HostnameForProxy", c->HostNameForProxy, sizeof(c->HostNameForProxy));
 			PackGetStr(p, "Pcid", c->Pcid, sizeof(c->Pcid));
 			c->Port = PackGetInt(p, "Port");
 			c->DontCheckCert = WideGetDontCheckCert(w);

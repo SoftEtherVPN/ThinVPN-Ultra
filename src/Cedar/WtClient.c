@@ -271,6 +271,7 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 	UINT tunnel_timeout = WT_TUNNEL_TIMEOUT;
 	UINT tunnel_keepalive = WT_TUNNEL_KEEPALIVE;
 	bool tunnel_use_aggressive_timeout = false;
+	char *sni = NULL;
 
 	// 引数チェック
 	if (wt == NULL || connect == NULL || sockio == NULL)
@@ -278,12 +279,31 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 		return ERR_INVALID_PARAMETER;
 	}
 
+	sni = connect->HostName;
+
 	// Gate に接続
-	s = WtSockConnect(connect, &code);
+	s = WtSockConnect(connect, &code, false);
 	if (s == NULL)
 	{
 		// 失敗
-		return code;
+		if (connect->ProxyType == PROXY_HTTP && code != ERR_PROXY_CONNECT_FAILED &&
+			IsEmptyStr(connect->HostNameForProxy) == false && StrCmpi(connect->HostNameForProxy, connect->HostName) != 0)
+		{
+			// HTTP プロキシサーバーの場合で単純プロキシサーバー接続不具合以外
+			// の場合は、接続先接続先を HostNameForProxy にして再試行する
+			s = WtSockConnect(connect, &code, true);
+
+			if (s == NULL)
+			{
+				return code;
+			}
+
+			sni = connect->HostNameForProxy;
+		}
+		else
+		{
+			return code;
+		}
 	}
 
 	//SetSocketSendRecvBufferSize((int)s, WT_SOCKET_WINDOW_SIZE);
@@ -291,7 +311,7 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 	SetTimeout(s, CONNECTING_TIMEOUT);
 
 	// SSL 通信の開始
-	if (StartSSLEx(s, NULL, NULL, true, 0, connect->HostName) == false)
+	if (StartSSLEx(s, NULL, NULL, true, 0, sni) == false)
 	{
 		// 失敗
 		Debug("StartSSL Failed.\n");

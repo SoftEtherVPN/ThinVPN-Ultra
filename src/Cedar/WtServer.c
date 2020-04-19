@@ -471,7 +471,7 @@ void WtsWaitForSock(TSESSION *s)
 }
 
 // 接続処理
-void WtsConnectInner(TSESSION *session, SOCK *s)
+void WtsConnectInner(TSESSION *session, SOCK *s, char *sni)
 {
 	WT *wt;
 	PACK *p;
@@ -494,7 +494,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s)
 	//SetSocketSendRecvBufferSize((int)s, WT_SOCKET_WINDOW_SIZE);
 
 	// SSL 通信の開始
-	if (StartSSLEx(s, NULL, NULL, true, 0, session->ConnectParam->HostName) == false)
+	if (StartSSLEx(s, NULL, NULL, true, 0, sni) == false)
 	{
 		// 失敗
 		Debug("StartSSL Failed.\n");
@@ -656,36 +656,62 @@ void WtsConnectMain(TSESSION *session)
 {
 	SOCK *s;
 	UINT err = 0;
+	char *sni = NULL;
+	WT_CONNECT *connect = session->ConnectParam;
 	// 引数チェック
-	if (session == NULL)
+	if (session == NULL || session->ConnectParam == NULL)
 	{
 		return;
 	}
 
 	Debug("WtsConnectMain Start.\n");
 
+	sni = connect->HostName;
+
 	// Gate に接続
-	s = WtSockConnect(session->ConnectParam, &err);
+	s = WtSockConnect(connect, &err, false);
 	if (s == NULL)
 	{
 		// 失敗
 		Debug("WtSockConnect Failed.\n");
-		session->ErrorCode = err;
-		return;
+
+		if (connect->ProxyType == PROXY_HTTP && err != ERR_PROXY_CONNECT_FAILED &&
+			IsEmptyStr(connect->HostNameForProxy) == false && StrCmpi(connect->HostNameForProxy, connect->HostName) != 0)
+		{
+			// HTTP プロキシサーバーの場合で単純プロキシサーバー接続不具合以外
+			// の場合は、接続先接続先を HostNameForProxy にして再試行する
+			s = WtSockConnect(connect, &err, true);
+
+			if (s == NULL)
+			{
+				Debug("WtSockConnect Failed 2.\n");
+				session->ErrorCode = err;
+				return;
+			}
+
+			sni = connect->HostNameForProxy;
+		}
+		else
+		{
+			session->ErrorCode = err;
+			return;
+		}
 	}
+
+	Debug("WtSockConnect Ok.\n");
 
 	session->Sock = s;
 	AddRef(s->ref);
 
 	// 接続処理
-	WtsConnectInner(session, s);
+	WtsConnectInner(session, s, sni);
 
 	Disconnect(s);
 	ReleaseSock(s);
 }
 
 // ソケット接続
-SOCK *WtSockConnect(WT_CONNECT *param, UINT *error_code)
+SOCK *WtSockConnect(WT_CONNECT *param, UINT *error_code, bool proxy_use_alternative_fqdn)
 {
 	CONNECTION c;
 	SOCK *sock;
@@ -713,7 +739,7 @@ SOCK *WtSockConnect(WT_CONNECT *param, UINT *error_code)
 
 	case PROXY_HTTP:
 		sock = ProxyConnect(&c, param->ProxyHostName, param->ProxyPort,
-			param->HostName, param->Port,
+			(proxy_use_alternative_fqdn ? param->HostNameForProxy :  param->HostName), param->Port,
 			param->ProxyUsername, param->ProxyPassword, false);
 		if (sock == NULL)
 		{

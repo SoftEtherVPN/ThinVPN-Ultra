@@ -896,10 +896,10 @@ void test(UINT num, char **arg)
 		UINT err = 0;
 		Zero(&set, sizeof(set));
 		set.ProxyType = PROXY_HTTP;
-		StrCpy(set.ProxyHostName, 0, "10.40.200.12");
-		set.ProxyPort = 3128;
+		StrCpy(set.ProxyHostName, 0, "172.16.92.1");
+		set.ProxyPort = 12080;
 
-		StrCpy(set.HostName, 0, "www.google.com");
+		StrCpy(set.HostName, 0, "216-58-220-132.v4.coe.ad.jp");
 		set.Port = 443;
 
 		StrCpy(set.ProxyUsername, 0, "xxx");

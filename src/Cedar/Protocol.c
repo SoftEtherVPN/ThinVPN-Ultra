@@ -8134,7 +8134,7 @@ SOCK *ProxyConnectEx2NtlmAuth(CONNECTION *c, char *proxy_host_name, UINT proxy_p
 
 		svr_challenge_data = NewBufFromMemory(ntlm_buffer, i);
 
-		ntlm_authenticate = NtlmGenerateAuthenticate(svr_challenge_data, username, password, "aho");
+		ntlm_authenticate = NtlmGenerateAuthenticate(svr_challenge_data, username, password, machine_name);
 		Free(ntlm_buffer);
 		FreeBuf(svr_challenge_data);
 

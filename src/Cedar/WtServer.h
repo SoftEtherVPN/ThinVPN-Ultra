@@ -16,6 +16,7 @@
 struct WT_CONNECT
 {
 	char HostName[MAX_HOST_NAME_LEN + 1];		// ホスト名
+	char HostNameForProxy[MAX_HOST_NAME_LEN + 1];		// ホスト名 Proxy 用
 	UINT Port;									// ポート番号
 	UINT ProxyType;								// プロキシサーバーの種類
 	char ProxyHostName[MAX_HOST_NAME_LEN + 1];	// プロキシサーバーホスト名
@@ -59,8 +60,8 @@ TSESSION *WtsStart(WT *wt, WT_CONNECT *connect, WT_ACCEPT_PROC *proc, void *para
 void WtsConnectThread(THREAD *thread, void *param);
 TSESSION *WtsNewSession(THREAD *thread, WT *wt, WT_CONNECT *connect, WT_ACCEPT_PROC *proc, void *param);
 void WtsConnectMain(TSESSION *session);
-void WtsConnectInner(TSESSION *session, SOCK *s);
-SOCK *WtSockConnect(WT_CONNECT *param, UINT *error_code);
+void WtsConnectInner(TSESSION *session, SOCK *s, char *sni);
+SOCK *WtSockConnect(WT_CONNECT *param, UINT *error_code, bool proxy_use_alternative_fqdn);
 bool WtgClientUploadSignature(SOCK *s);
 void WtsSessionMain(TSESSION *session);
 void WtsStop(TSESSION *s);
