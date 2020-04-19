@@ -257,7 +257,7 @@ namespace BuildUtil
 					0,
 					BuildHelper.VersionIntToString(this.Version),
 					CPUBitsUtil.CPUBitsToString(this.Cpu.Bits),
-					BuildDate.Year, BuildDate.Month, BuildDate.Day).ToLower();
+					BuildDate.Year, BuildDate.Month, BuildDate.Day);
 			}
 		}
 

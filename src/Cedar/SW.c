@@ -375,7 +375,7 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 		return false;
 	}
 
-	if (StrCmpi(component_name, "thintelework") == 0)
+	if (StrCmpi(component_name, "ThinTelework_Server_and_Client_Full") == 0)
 	{
 		// NTT 東日本 - IPA シン・テレワークシステム
 		for (i = 0; i < (sizeof(sfx_ntt_files) / sizeof(char *)); i++)
@@ -390,7 +390,7 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 			Add(o, SwNewSfxFile(name, src_file_name));
 		}
 	}
-	else if (StrCmpi(component_name, "thintelework_share_disabled") == 0)
+	else if (StrCmpi(component_name, "Thin_Telework_Server_and_Client_ShareDisabled") == 0)
 	{
 		// NTT 東日本 - IPA シン・テレワークシステム
 		for (i = 0; i < (sizeof(sfx_ntt_files_share_disabled) / sizeof(char *)); i++)
