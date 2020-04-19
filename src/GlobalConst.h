@@ -27,6 +27,8 @@
 #define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Server\\Config Tool"
 #define DI_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Server\\Installer"
 
+#define DU_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Client\\UI"
+
 #define DI_RUDP_INSTALL_DIR		L"Common Files\\Thin Telework System Server RUDP Helper"
 
 #define DI_PRODUCT_SERVER_NAME	"ThinSvr"

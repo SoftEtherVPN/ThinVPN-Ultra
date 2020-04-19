@@ -142,4 +142,7 @@ void DuAuthDlgUpdate(HWND hWnd, DU_AUTH *a);
 void DuAuthDlgOnOk(HWND hWnd, DU_AUTH *a);
 void DuAuthDlgSetCertPath(HWND hWnd, wchar_t *path);
 
+void DuTheEndDlg(HWND hWnd);
+UINT DuTheEndDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+
 

@@ -219,6 +219,7 @@
 #define ICO_RESEARCH                    239
 #define BMP_UNIVTSUKUBA                 240
 #define ICO_POLICE                      241
+#define BMP_THEEND                      242
 #define S_TITLE                         1007
 #define S_INSERT_SECURE                 1008
 #define S_TITLE2                        1008
@@ -727,6 +728,7 @@
 #define B_RUN                           1285
 #define B_DELETE_SENSITIVE              1285
 #define R_LOG                           1285
+#define C_NOMORE                        1285
 #define R_DOUBLE                        1286
 #define C_SITE                          1286
 #define C_JITTER                        1286
@@ -1282,6 +1284,7 @@
 #define D_DU_ADVAUTH                    2644
 #define D_DU_AUTH                       2645
 #define B_RESTORE                       2646
+#define D_DU_THEEND                     2646
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021
@@ -1352,7 +1355,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        242
+#define _APS_NEXT_RESOURCE_VALUE        243
 #define _APS_NEXT_COMMAND_VALUE         40111
 #define _APS_NEXT_CONTROL_VALUE         1518
 #define _APS_NEXT_SYMED_VALUE           102

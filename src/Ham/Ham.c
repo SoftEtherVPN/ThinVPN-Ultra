@@ -894,9 +894,7 @@ void test(UINT num, char **arg)
 #ifdef OS_WIN32
 		ONCEMSG_DLG *d;
 		InitWinUi(L"Soft", NULL, 0);
-		d = StartAsyncOnceMsg(L"Hello", L"World", false, ICO_INFORMATION, true);
-		GetLine(NULL, 0);
-		StopAsyncOnceMsg(d);
+		DuTheEndDlg(NULL);
 		FreeWinUi();
 #endif
 		return;

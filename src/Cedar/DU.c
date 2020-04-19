@@ -11,6 +11,8 @@
 
 // Build 8600
 
+#include <GlobalConst.h>
+
 #ifdef	WIN32
 
 #define	SM_C
@@ -49,6 +51,56 @@
 
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
+
+// 業務完了 Dlg Proc
+UINT DuTheEndDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		SetIcon(hWnd, 0, ICO_INFORMATION);
+		if (MsIsVista())
+		{
+			SetFont(hWnd, IDCANCEL, GetMeiryoFontEx2(11, true));
+		}
+		else
+		{
+			DlgFont(hWnd, IDCANCEL, 11, true);
+		}
+
+		Top(hWnd);
+
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+		case IDCANCEL:
+			if (IsChecked(hWnd, C_NOMORE))
+			{
+				MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, "NoTheEndDialog", 1);
+			}
+
+			Close(hWnd);
+			break;
+		}
+
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		return 1;
+	}
+
+	return 0;
+}
+
+// 業務完了
+void DuTheEndDlg(HWND hWnd)
+{
+	Dialog(hWnd, D_DU_THEEND, DuTheEndDlgProc, NULL);
+}
 
 // コントロール更新
 void DuShareDlgUpdate(HWND hWnd)
@@ -1027,6 +1079,12 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 				if (once != NULL)
 				{
 					StopAsyncOnceMsg(once);
+				}
+
+				// お疲れ様でした
+				if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, "NoTheEndDialog") == 0)
+				{
+					DuTheEndDlg(NULL);
 				}
 
 				Show(t->hWnd, 0);

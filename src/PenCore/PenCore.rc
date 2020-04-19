@@ -1486,6 +1486,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 353
     END
+
+    D_DU_THEEND, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 299
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 216
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -5383,6 +5391,16 @@ BEGIN
     ICON            ICO_PASS,S_LOCK,45,185,18,18
 END
 
+D_DU_THEEND DIALOGEX 0, 0, 306, 221
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "NTT 東日本 - IPA 「シン・テレワークシステム」 業務完了"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    CONTROL         242,IDC_STATIC,"Static",SS_BITMAP | WS_TABSTOP,65,2,173,186
+    CONTROL         "次回から表示しない(&N)",C_NOMORE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,197,107,13
+    DEFPUSHBUTTON   "閉じる(&C)",IDCANCEL,117,194,71,22
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -5501,6 +5519,7 @@ BMP_THANKS              BITMAP                  "Thanks.bmp"
 BMP_PASSWORD1_EN        BITMAP                  "Password1_en.bmp"
 BMP_PASSWORD2_EN        BITMAP                  "Password2_en.bmp"
 BMP_THANKS_EN           BITMAP                  "Thanks_en.bmp"
+BMP_THEEND              BITMAP                  "TheEnd.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
