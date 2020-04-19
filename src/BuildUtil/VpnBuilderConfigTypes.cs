@@ -247,7 +247,8 @@ namespace BuildUtil
 		{
 			get
 			{
-				return string.Format("{0}-v{6}-{1}-{2}-{8:D4}.{9:D2}.{10:D2}-{4}-{3}-{7}",
+				//return string.Format("{0}-v{6}-{1}-{2}-{8:D4}.{9:D2}.{10:D2}-{4}-{3}-{7}",
+				return string.Format("{0}-v{6}-{1}-{2}-{8:D4}.{9:D2}.{10:D2}",	// Windows î≈ÇÃÇ›ÇµÇ©Ç»Ç¢ÇÃÇ≈ è»ó™ÅIÅI
 					Paths.Prefix + this.Software.ToString(),
 					this.BuildNumber,
 					this.BuildName,

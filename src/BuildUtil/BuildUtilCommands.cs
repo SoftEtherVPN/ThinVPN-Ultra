@@ -297,119 +297,119 @@ namespace BuildUtil
 				Path.Combine(autorunReleaseSrcDir, "autorun.ico"), true);*/
 
 
-			// Create a batch file
-			string batchFileName = Path.Combine(publicDir, "MakeCD.cmd");
-#if !BU_OSS
-			StreamWriter w = new StreamWriter(batchFileName);
-#else	// !BU_OSS
-			StringWriter w = new StringWriter();
-#endif
-			w.WriteLine(@"SETLOCAL");
-			w.WriteLine(@"SET BATCH_FILE_NAME=%0");
-			w.WriteLine(@"SET BATCH_DIR_NAME=%0\..");
-			w.WriteLine(@"SET NOW_TMP=%time:~0,2%");
-			w.WriteLine(@"SET NOW=%date:~0,4%%date:~5,2%%date:~8,2%_%NOW_TMP: =0%%time:~3,2%%time:~6,2%");
-			w.WriteLine();
-			w.WriteLine();
+//            // Create a batch file
+//            string batchFileName = Path.Combine(publicDir, "MakeCD.cmd");
+//#if !BU_OSS
+//            StreamWriter w = new StreamWriter(batchFileName);
+//#else	// !BU_OSS
+//            StringWriter w = new StringWriter();
+//#endif
+//            w.WriteLine(@"SETLOCAL");
+//            w.WriteLine(@"SET BATCH_FILE_NAME=%0");
+//            w.WriteLine(@"SET BATCH_DIR_NAME=%0\..");
+//            w.WriteLine(@"SET NOW_TMP=%time:~0,2%");
+//            w.WriteLine(@"SET NOW=%date:~0,4%%date:~5,2%%date:~8,2%_%NOW_TMP: =0%%time:~3,2%%time:~6,2%");
+//            w.WriteLine();
+//            w.WriteLine();
 
-			string[] files = Directory.GetFiles(filesReleaseDir, "*", SearchOption.AllDirectories);
+//            string[] files = Directory.GetFiles(filesReleaseDir, "*", SearchOption.AllDirectories);
 
-			string cddir = "CD";
-				/*string.Format("CD-v{0}.{1}-{2}-{3}-{4:D4}.{5:D2}.{6:D2}",
-				version / 100, version % 100, build, name,
-				date.Year, date.Month, date.Day);*/
+//            string cddir = "CD";
+//                /*string.Format("CD-v{0}.{1}-{2}-{3}-{4:D4}.{5:D2}.{6:D2}",
+//                version / 100, version % 100, build, name,
+//                date.Year, date.Month, date.Day);*/
 
-			StringWriter txt = new StringWriter();
+//            StringWriter txt = new StringWriter();
 
-			foreach (string filename in files)
-			{
-				string file = filename;
+//            foreach (string filename in files)
+//            {
+//                string file = filename;
 
-				BuildSoftware s = new BuildSoftware(file);
+//                BuildSoftware s = new BuildSoftware(file);
 
-				// Software\Windows\PacketiX VPN Server 4.0\32bit (Intel x86)\filename.exe
-				string cpustr = string.Format("{0} - {1}", CPUBitsUtil.CPUBitsToString(s.Cpu.Bits), s.Cpu.Title).Replace("/", "or");
-				string cpustr2 = cpustr;
+//                // Software\Windows\PacketiX VPN Server 4.0\32bit (Intel x86)\filename.exe
+//                string cpustr = string.Format("{0} - {1}", CPUBitsUtil.CPUBitsToString(s.Cpu.Bits), s.Cpu.Title).Replace("/", "or");
+//                string cpustr2 = cpustr;
 
-				if (s.Cpu == CpuList.intel)
-				{
-					cpustr2 = "";
-					cpustr = "Intel";
-				}
+//                if (s.Cpu == CpuList.intel)
+//                {
+//                    cpustr2 = "";
+//                    cpustr = "Intel";
+//                }
 
-				string tmp = string.Format(@"{1}\{2}\{3}\{5}{4}",
-					0,
-					s.Os.Title,
-					BuildHelper.GetSoftwareTitle(s.Software),
-					cpustr2,
-					Path.GetFileName(file),
-					""
-					);
+//                string tmp = string.Format(@"{1}\{2}\{3}\{5}{4}",
+//                    0,
+//                    s.Os.Title,
+//                    BuildHelper.GetSoftwareTitle(s.Software),
+//                    cpustr2,
+//                    Path.GetFileName(file),
+//                    ""
+//                    );
 
-				tmp = Str.ReplaceStr(tmp, "\\\\", "\\");
+//                tmp = Str.ReplaceStr(tmp, "\\\\", "\\");
 
-				tmp = Str.ReplaceStr(tmp, " ", "_");
+//                tmp = Str.ReplaceStr(tmp, " ", "_");
 
-				w.WriteLine("mkdir \"{1}\\{0}\"", Path.GetDirectoryName(tmp), cddir);
-				w.WriteLine("copy /b /y \"{2}\\{0}\" \"{3}\\{1}\"", IO.GetRelativeFileName(file, filesReleaseDir), tmp, baseName, cddir);
-				w.WriteLine();
+//                w.WriteLine("mkdir \"{1}\\{0}\"", Path.GetDirectoryName(tmp), cddir);
+//                w.WriteLine("copy /b /y \"{2}\\{0}\" \"{3}\\{1}\"", IO.GetRelativeFileName(file, filesReleaseDir), tmp, baseName, cddir);
+//                w.WriteLine();
 
-				string txt_filename = tmp;
-				txt_filename = Str.ReplaceStr(txt_filename, "\\", "/");
+//                string txt_filename = tmp;
+//                txt_filename = Str.ReplaceStr(txt_filename, "\\", "/");
 
-				string txt_description = BuildHelper.GetSoftwareTitle(s.Software);
+//                string txt_description = BuildHelper.GetSoftwareTitle(s.Software);
 
-				string txt_products = BuildHelper.GetSoftwareProductList(s.Software);
+//                string txt_products = BuildHelper.GetSoftwareProductList(s.Software);
 
-				string txt_os = s.Os.Title;
+//                string txt_os = s.Os.Title;
 
-				string txt_cpu = s.Cpu.Title;
-				if (s.Cpu.Bits != CPUBits.Both)
-				{
-					txt_cpu += " (" + CPUBitsUtil.CPUBitsToString(s.Cpu.Bits) + ")";
-				}
-				else
-				{
-					txt_cpu += " (x86 and x64)";
-				}
+//                string txt_cpu = s.Cpu.Title;
+//                if (s.Cpu.Bits != CPUBits.Both)
+//                {
+//                    txt_cpu += " (" + CPUBitsUtil.CPUBitsToString(s.Cpu.Bits) + ")";
+//                }
+//                else
+//                {
+//                    txt_cpu += " (x86 and x64)";
+//                }
 
-				string txt_version = BuildHelper.VersionIntToString(version);
+//                string txt_version = BuildHelper.VersionIntToString(version);
 
-				string txt_build = build.ToString();
+//                string txt_build = build.ToString();
 
-				string txt_verstr = name;
+//                string txt_verstr = name;
 
-				string txt_date = Str.DateTimeToStrShortWithMilliSecs(date);
+//                string txt_date = Str.DateTimeToStrShortWithMilliSecs(date);
 
-				string txt_lang = "English, Japanese";
+//                string txt_lang = "English, Japanese";
 
-				string txt_category = "Freeware";
+//                string txt_category = "Freeware";
 
-#if BU_SOFTETHER
-				//txt_category = "SoftEther VPN (Freeware)";
-#endif
+//#if BU_SOFTETHER
+//                //txt_category = "SoftEther VPN (Freeware)";
+//#endif
 
-				txt.WriteLine("FILENAME\t" + txt_filename);
-				txt.WriteLine("DESCRIPTION\t" + txt_description);
-				txt.WriteLine("CATEGORY\t" + txt_category);
-				txt.WriteLine("PRODUCT\t" + txt_products);
-				txt.WriteLine("OS\t" + txt_os);
-				txt.WriteLine("OSLIST\t" + s.Os.OSSimpleList);
-				txt.WriteLine("CPU\t" + txt_cpu);
-				txt.WriteLine("VERSION\t" + txt_version);
-				txt.WriteLine("BUILD\t" + txt_build);
-				txt.WriteLine("VERSTR\t" + txt_verstr);
-				txt.WriteLine("DATE\t" + txt_date);
-				txt.WriteLine("LANGUAGE\t" + txt_lang);
-				txt.WriteLine("*");
-				txt.WriteLine();
-			}
+//                txt.WriteLine("FILENAME\t" + txt_filename);
+//                txt.WriteLine("DESCRIPTION\t" + txt_description);
+//                txt.WriteLine("CATEGORY\t" + txt_category);
+//                txt.WriteLine("PRODUCT\t" + txt_products);
+//                txt.WriteLine("OS\t" + txt_os);
+//                txt.WriteLine("OSLIST\t" + s.Os.OSSimpleList);
+//                txt.WriteLine("CPU\t" + txt_cpu);
+//                txt.WriteLine("VERSION\t" + txt_version);
+//                txt.WriteLine("BUILD\t" + txt_build);
+//                txt.WriteLine("VERSTR\t" + txt_verstr);
+//                txt.WriteLine("DATE\t" + txt_date);
+//                txt.WriteLine("LANGUAGE\t" + txt_lang);
+//                txt.WriteLine("*");
+//                txt.WriteLine();
+//            }
 
-#if BU_OSS
-			Con.WriteLine("Installer packages are built on '{0}'. Enjoy it !!", publicDir);
+//#if BU_OSS
+//            Con.WriteLine("Installer packages are built on '{0}'. Enjoy it !!", publicDir);
 
-			return 0;
-#endif	// BU_OSS
+//            return 0;
+//#endif	// BU_OSS
 
 			/*
 			w.WriteLine("mkdir \"{0}\\autorun\"", cddir);
@@ -418,160 +418,156 @@ namespace BuildUtil
 			w.WriteLine("copy /b /y autorun\\autorun.inf \"{0}\\autorun.inf\"", cddir);
 			 * */
 
-			string zipFileName = string.Format("VPN-CD-v{0}.{1:D2}-{2}-{3}-{4:D4}.{5:D2}.{6:D2}.zip",
-				version / 100, version % 100, build, name,
-				date.Year, date.Month, date.Day);
-			w.WriteLine("del {0}", zipFileName);
-			w.WriteLine("CD {0}", cddir);
-			w.WriteLine("zip -r -0 ../{0} *", zipFileName);
-			w.WriteLine("cd ..");
-			w.WriteLine("move {0} CD\\", zipFileName);
-			w.WriteLine("rename CD {0}-tree", baseName);
-			w.WriteLine();
+//            string zipFileName = string.Format("VPN-CD-v{0}.{1:D2}-{2}-{3}-{4:D4}.{5:D2}.{6:D2}.zip",
+//                version / 100, version % 100, build, name,
+//                date.Year, date.Month, date.Day);
+//            w.WriteLine("del {0}", zipFileName);
+//            w.WriteLine("CD {0}", cddir);
+//            w.WriteLine("zip -r -0 ../{0} *", zipFileName);
+//            w.WriteLine("cd ..");
+//            w.WriteLine("move {0} CD\\", zipFileName);
+//            w.WriteLine("rename CD {0}-tree", baseName);
+//            w.WriteLine();
 
-			w.Close();
+//            w.Close();
 
-			// Copy of fastcopy
-			string fastcopy_dest = Path.Combine(destDirName, @"Private\fastcopy_bin");
-			IO.MakeDirIfNotExists(fastcopy_dest);
-			File.Copy(Path.Combine(Paths.UtilityDirName, "FastCopy.exe"), Path.Combine(fastcopy_dest, "FastCopy.exe"), true);
-			File.Copy(Path.Combine(Paths.UtilityDirName, "FastEx64.dll"), Path.Combine(fastcopy_dest, "FastEx64.dll"), true);
-			File.Copy(Path.Combine(Paths.UtilityDirName, "FastExt1.dll"), Path.Combine(fastcopy_dest, "FastExt1.dll"), true);
+//            // Copy of fastcopy
+//            string fastcopy_dest = Path.Combine(destDirName, @"Private\fastcopy_bin");
+//            IO.MakeDirIfNotExists(fastcopy_dest);
+//            File.Copy(Path.Combine(Paths.UtilityDirName, "FastCopy.exe"), Path.Combine(fastcopy_dest, "FastCopy.exe"), true);
+//            File.Copy(Path.Combine(Paths.UtilityDirName, "FastEx64.dll"), Path.Combine(fastcopy_dest, "FastEx64.dll"), true);
+//            File.Copy(Path.Combine(Paths.UtilityDirName, "FastExt1.dll"), Path.Combine(fastcopy_dest, "FastExt1.dll"), true);
 
-			string fastcopy_exe = @"..\Private\fastcopy_bin\FastCopy.exe";
+//            string fastcopy_exe = @"..\Private\fastcopy_bin\FastCopy.exe";
 
-			// Create a upload batch
-			string uploadBatchFileName = Path.Combine(publicDir, "UploadNow.cmd");
-#if !BU_OSS
-			w = new StreamWriter(uploadBatchFileName);
-#endif	// !BU_OSS
+//            // Create a upload batch
+//            string uploadBatchFileName = Path.Combine(publicDir, "UploadNow.cmd");
+//#if !BU_OSS
+//            w = new StreamWriter(uploadBatchFileName);
+//#endif	// !BU_OSS
 
-			string folder_name = "packetix";
-#if BU_SOFTETHER
-			folder_name = "softether";
-#endif
-			w.WriteLine(@"mkdir \\download\FILES\{1}\{0}-tree", baseName, folder_name);
-			w.WriteLine(@"{0} /cmd=force_copy /exclude={3} /auto_close /force_start /estimate /open_window /error_stop=TRUE /bufsize=128 /disk_mode=diff /speed=full /verify {1}-tree /to=\\download\FILES\{2}\{1}-tree", fastcopy_exe, baseName, folder_name,
-				"\"*files.txt*\"");
+//            string folder_name = "packetix";
+//#if BU_SOFTETHER
+//            folder_name = "softether";
+//#endif
+//            w.WriteLine(@"mkdir \\download\FILES\{1}\{0}-tree", baseName, folder_name);
+//            w.WriteLine(@"{0} /cmd=force_copy /exclude={3} /auto_close /force_start /estimate /open_window /error_stop=TRUE /bufsize=128 /disk_mode=diff /speed=full /verify {1}-tree /to=\\download\FILES\{2}\{1}-tree", fastcopy_exe, baseName, folder_name,
+//                "\"*files.txt*\"");
 
-			w.WriteLine();
-			/*
-			w.WriteLine(@"mkdir \\downloadjp\FILES\{1}\{0}-tree", baseName, folder_name);
-			w.WriteLine(@"{0} /cmd=force_copy /exclude={3} /auto_close /force_start /estimate /open_window /error_stop=TRUE /bufsize=128 /disk_mode=diff /speed=full /verify {1}-tree /to=\\downloadjp\FILES\{2}\{1}-tree", fastcopy_exe, baseName, folder_name,
-				"\"*files.txt*\"");
+//            w.WriteLine();
+//            /*
+//            w.WriteLine(@"mkdir \\downloadjp\FILES\{1}\{0}-tree", baseName, folder_name);
+//            w.WriteLine(@"{0} /cmd=force_copy /exclude={3} /auto_close /force_start /estimate /open_window /error_stop=TRUE /bufsize=128 /disk_mode=diff /speed=full /verify {1}-tree /to=\\downloadjp\FILES\{2}\{1}-tree", fastcopy_exe, baseName, folder_name,
+//                "\"*files.txt*\"");
 
-			w.WriteLine();*/
+//            w.WriteLine();*/
 	
-			w.WriteLine(@"copy /y /b {0}-tree\files.txt \\download\FILES\{1}\{0}-tree\files.txt", baseName, folder_name);
-			//w.WriteLine(@"copy /y /b {0}-tree\files.txt \\downloadjp\FILES\{1}\{0}-tree\files.txt", baseName, folder_name);
+//            w.WriteLine(@"copy /y /b {0}-tree\files.txt \\download\FILES\{1}\{0}-tree\files.txt", baseName, folder_name);
+//            //w.WriteLine(@"copy /y /b {0}-tree\files.txt \\downloadjp\FILES\{1}\{0}-tree\files.txt", baseName, folder_name);
 
 
-			w.WriteLine();
-			w.WriteLine(@"pause");
-			w.WriteLine();
+//            w.WriteLine();
+//            w.WriteLine(@"pause");
+//            w.WriteLine();
 
-			w.Close();
+//            w.Close();
 
 
-			txt.WriteLine("FILENAME\t" + zipFileName);
-#if BU_SOFTETHER
-			txt.WriteLine("DESCRIPTION\t" + "ZIP CD-ROM Image Package of SoftEther VPN (for Admins)");
-			txt.WriteLine("CATEGORY\t" + "SoftEther VPN (Freeware)");
-			txt.WriteLine("PRODUCT\t" + "ZIP CD-ROM Image Package of SoftEther VPN");
-#else	// BU_SOFTETHER
-			txt.WriteLine("DESCRIPTION\t" + "ZIP CD-ROM Image Package of PacketiX VPN (for Admins)");
-			txt.WriteLine("CATEGORY\t" + "PacketiX VPN (Commercial)");
-			txt.WriteLine("PRODUCT\t" + "ZIP CD-ROM Image Package of PacketiX VPN");
-#endif	// BU_SOFTETHER
-			txt.WriteLine("OS\t" + "Any");
-			txt.WriteLine("OSLIST\t" + "Any");
-			txt.WriteLine("CPU\t" + "CD-ROM");
-			txt.WriteLine("VERSION\t" + BuildHelper.VersionIntToString(version));
-			txt.WriteLine("BUILD\t" + build.ToString());
-			txt.WriteLine("VERSTR\t" + name);
-			txt.WriteLine("DATE\t" + Str.DateTimeToStrShortWithMilliSecs(date));
-			txt.WriteLine("LANGUAGE\t" + "English, Japanese, Simplified Chinese");
-			txt.WriteLine("*");
-			txt.WriteLine();
+//            txt.WriteLine("FILENAME\t" + zipFileName);
+//#if BU_SOFTETHER
+//            txt.WriteLine("DESCRIPTION\t" + "ZIP CD-ROM Image Package of SoftEther VPN (for Admins)");
+//            txt.WriteLine("CATEGORY\t" + "SoftEther VPN (Freeware)");
+//            txt.WriteLine("PRODUCT\t" + "ZIP CD-ROM Image Package of SoftEther VPN");
+//#else	// BU_SOFTETHER
+//            txt.WriteLine("DESCRIPTION\t" + "ZIP CD-ROM Image Package of PacketiX VPN (for Admins)");
+//            txt.WriteLine("CATEGORY\t" + "PacketiX VPN (Commercial)");
+//            txt.WriteLine("PRODUCT\t" + "ZIP CD-ROM Image Package of PacketiX VPN");
+//#endif	// BU_SOFTETHER
+//            txt.WriteLine("OS\t" + "Any");
+//            txt.WriteLine("OSLIST\t" + "Any");
+//            txt.WriteLine("CPU\t" + "CD-ROM");
+//            txt.WriteLine("VERSION\t" + BuildHelper.VersionIntToString(version));
+//            txt.WriteLine("BUILD\t" + build.ToString());
+//            txt.WriteLine("VERSTR\t" + name);
+//            txt.WriteLine("DATE\t" + Str.DateTimeToStrShortWithMilliSecs(date));
+//            txt.WriteLine("LANGUAGE\t" + "English, Japanese, Simplified Chinese");
+//            txt.WriteLine("*");
+//            txt.WriteLine();
 
 			string src_bindir = Path.Combine(Paths.BaseDirName, "bin");
-			string vpnsmgr_zip_filename_relative = @"Windows\Admin_Tools\VPN_Server_Manager_and_Command-line_Utility_Package\";
+			string vpnsmgr_zip_filename_relative = "";// @"Windows\Admin_Tools\VPN_Server_Manager_and_Command-line_Utility_Package\";
 			vpnsmgr_zip_filename_relative += 
-#if BU_SOFTETHER
-				"softether-" + 
-#endif	// BU_SOFTETHER
-			string.Format("vpn_admin_tools-v{0}.{1:D2}-{2}-{3}-{4:D4}.{5:D2}.{6:D2}-win32.zip",
+//#if BU_SOFTETHER
+//                "softether-" + 
+//#endif	// BU_SOFTETHER
+			string.Format("thintelework_client_exeonly-v{0}.{1:D2}-{2}-{3}-{4:D4}.{5:D2}.{6:D2}.zip",
 				version / 100, version % 100, build, name,
 				date.Year, date.Month, date.Day);
 
-			string vpnsmgr_zip_filename_full = Path.Combine(Path.Combine(publicDir, cddir), vpnsmgr_zip_filename_relative);
+			string exeonly_zip_filename_full = Path.Combine(filesReleaseDir, vpnsmgr_zip_filename_relative);
 
 			ZipPacker zip = new ZipPacker();
-			zip.AddFileSimple("vpnsmgr.exe", DateTime.Now, FileAttributes.Normal,
-				IO.ReadFile(Path.Combine(src_bindir, "vpnsmgr.exe")), true);
-			zip.AddFileSimple("vpncmd.exe", DateTime.Now, FileAttributes.Normal,
-				IO.ReadFile(Path.Combine(src_bindir, "vpncmd.exe")), true);
+			zip.AddFileSimple("ThinClient.exe", DateTime.Now, FileAttributes.Normal,
+				IO.ReadFile(Path.Combine(src_bindir, "ThinClient.exe")), true);
+			zip.AddFileSimple("EntryPoint.dat", DateTime.Now, FileAttributes.Normal,
+				IO.ReadFile(Path.Combine(src_bindir, "EntryPoint.dat")), true);
 			zip.AddFileSimple("hamcore.se2", DateTime.Now, FileAttributes.Normal,
 				IO.ReadFile(Path.Combine(src_bindir, @"BuiltHamcoreFiles\hamcore_win32\hamcore.se2")), true);
 			zip.AddFileSimple("ReadMeFirst_License.txt", DateTime.Now, FileAttributes.Normal,
 				IO.ReadFile(Path.Combine(src_bindir, @"hamcore\eula.txt")), true);
 			zip.AddFileSimple("ReadMeFirst_Important_Notices_ja.txt", DateTime.Now, FileAttributes.Normal,
 				IO.ReadFile(Path.Combine(src_bindir, @"hamcore\warning_ja.txt")), true);
-			zip.AddFileSimple("ReadMeFirst_Important_Notices_en.txt", DateTime.Now, FileAttributes.Normal,
-				IO.ReadFile(Path.Combine(src_bindir, @"hamcore\warning_en.txt")), true);
-			zip.AddFileSimple("ReadMeFirst_Important_Notices_cn.txt", DateTime.Now, FileAttributes.Normal,
-				IO.ReadFile(Path.Combine(src_bindir, @"hamcore\warning_cn.txt")), true);
 			zip.Finish();
 			byte[] zip_data = zip.GeneratedData.Read();
-			IO.MakeDirIfNotExists(Path.GetDirectoryName(vpnsmgr_zip_filename_full));
-			IO.SaveFile(vpnsmgr_zip_filename_full, zip_data);
+			IO.MakeDirIfNotExists(Path.GetDirectoryName(exeonly_zip_filename_full));
+			IO.SaveFile(exeonly_zip_filename_full, zip_data);
 
-			// ZIP package for VPN Server Manager GUI
-			txt.WriteLine("FILENAME\t" + Str.ReplaceStr(vpnsmgr_zip_filename_relative, @"\", "/"));
-#if BU_SOFTETHER
-			txt.WriteLine("DESCRIPTION\t" + "ZIP Package of vpnsmgr.exe and vpncmd.exe (without installers)");
-			txt.WriteLine("CATEGORY\t" + "SoftEther VPN (Freeware)");
-			txt.WriteLine("PRODUCT\t" + "SoftEther VPN Server Manager for Windows, SoftEther VPN Command-Line Admin Utility (vpncmd)");
-#else	// BU_SOFTETHER
-			txt.WriteLine("DESCRIPTION\t" + "ZIP Package of vpnsmgr.exe and vpncmd.exe (without installers)");
-			txt.WriteLine("CATEGORY\t" + "PacketiX VPN (Commercial)");
-			txt.WriteLine("PRODUCT\t" + "PacketiX VPN Server Manager for Windows, PacketiX VPN Command-Line Admin Utility (vpncmd)");
-#endif	// BU_SOFTETHER
-			txt.WriteLine("OS\t" + "Windows (.zip package without installers)");
-			txt.WriteLine("OSLIST\t" + OSList.Windows.OSSimpleList);
-			txt.WriteLine("CPU\t" + "Intel (x86 and x64)");
-			txt.WriteLine("VERSION\t" + BuildHelper.VersionIntToString(version));
-			txt.WriteLine("BUILD\t" + build.ToString());
-			txt.WriteLine("VERSTR\t" + name);
-			txt.WriteLine("DATE\t" + Str.DateTimeToStrShortWithMilliSecs(date));
-			txt.WriteLine("LANGUAGE\t" + "English, Japanese, Simplified Chinese");
-			txt.WriteLine("*");
-			txt.WriteLine();
+//            // ZIP package for VPN Server Manager GUI
+//            txt.WriteLine("FILENAME\t" + Str.ReplaceStr(vpnsmgr_zip_filename_relative, @"\", "/"));
+//#if BU_SOFTETHER
+//            txt.WriteLine("DESCRIPTION\t" + "ZIP Package of vpnsmgr.exe and vpncmd.exe (without installers)");
+//            txt.WriteLine("CATEGORY\t" + "SoftEther VPN (Freeware)");
+//            txt.WriteLine("PRODUCT\t" + "SoftEther VPN Server Manager for Windows, SoftEther VPN Command-Line Admin Utility (vpncmd)");
+//#else	// BU_SOFTETHER
+//            txt.WriteLine("DESCRIPTION\t" + "ZIP Package of vpnsmgr.exe and vpncmd.exe (without installers)");
+//            txt.WriteLine("CATEGORY\t" + "PacketiX VPN (Commercial)");
+//            txt.WriteLine("PRODUCT\t" + "PacketiX VPN Server Manager for Windows, PacketiX VPN Command-Line Admin Utility (vpncmd)");
+//#endif	// BU_SOFTETHER
+//            txt.WriteLine("OS\t" + "Windows (.zip package without installers)");
+//            txt.WriteLine("OSLIST\t" + OSList.Windows.OSSimpleList);
+//            txt.WriteLine("CPU\t" + "Intel (x86 and x64)");
+//            txt.WriteLine("VERSION\t" + BuildHelper.VersionIntToString(version));
+//            txt.WriteLine("BUILD\t" + build.ToString());
+//            txt.WriteLine("VERSTR\t" + name);
+//            txt.WriteLine("DATE\t" + Str.DateTimeToStrShortWithMilliSecs(date));
+//            txt.WriteLine("LANGUAGE\t" + "English, Japanese, Simplified Chinese");
+//            txt.WriteLine("*");
+//            txt.WriteLine();
 
-			IO.MakeDirIfNotExists(Path.Combine(publicDir, cddir));
-			File.WriteAllText(Path.Combine(Path.Combine(publicDir, cddir), "files.txt"), txt.ToString(), Str.Utf8Encoding);
+//            IO.MakeDirIfNotExists(Path.Combine(publicDir, cddir));
+//            File.WriteAllText(Path.Combine(Path.Combine(publicDir, cddir), "files.txt"), txt.ToString(), Str.Utf8Encoding);
 
 
-			// Execution of batch file
-			string old_cd = Environment.CurrentDirectory;
+//            // Execution of batch file
+//            string old_cd = Environment.CurrentDirectory;
 
-			try
-			{
-				Environment.CurrentDirectory = Path.GetDirectoryName(batchFileName);
-			}
-			catch
-			{
-			}
+//            try
+//            {
+//                Environment.CurrentDirectory = Path.GetDirectoryName(batchFileName);
+//            }
+//            catch
+//            {
+//            }
 
-			Win32BuildUtil.ExecCommand(Paths.CmdFileName, string.Format("/C \"{0}\"", batchFileName));
+//            Win32BuildUtil.ExecCommand(Paths.CmdFileName, string.Format("/C \"{0}\"", batchFileName));
 
-			try
-			{
-				Environment.CurrentDirectory = old_cd;
-			}
-			catch
-			{
-			}
+//            try
+//            {
+//                Environment.CurrentDirectory = old_cd;
+//            }
+//            catch
+//            {
+//            }
 
 			Con.WriteLine();
 			Con.WriteLine("'{0}' に出力されました。", destDirName);
