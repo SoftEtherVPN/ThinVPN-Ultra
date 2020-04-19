@@ -520,14 +520,14 @@ bool DeskInitUrdpFiles(wchar_t *dst_dir, bool rudp_server_manifest, bool overwri
 
 	MakeDirExW(dst_dir);
 
-	ConbinePathW(dst, sizeof(dst), dst_dir, L"License.xps");
-	if (overwrite || IsFileExistsW(dst) == false)
-	{
-		if (FileCopyW(L"|License.xps", dst) == false)
-		{
-			return false;
-		}
-	}
+	//ConbinePathW(dst, sizeof(dst), dst_dir, L"License.xps");
+	//if (overwrite || IsFileExistsW(dst) == false)
+	//{
+	//	if (FileCopyW(L"|License.xps", dst) == false)
+	//	{
+	//		return false;
+	//	}
+	//}
 
 	ConbinePathW(dst, sizeof(dst), dst_dir, L"logmessages.dll");
 	if (overwrite || IsFileExistsW(dst) == false)

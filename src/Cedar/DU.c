@@ -79,7 +79,7 @@ UINT DuTheEndDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		case IDCANCEL:
 			if (IsChecked(hWnd, C_NOMORE))
 			{
-				MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, DU_NO_THEEND_KEY_NAME, 1);
+				MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME, 0);
 			}
 
 			Close(hWnd);
@@ -1082,7 +1082,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 				}
 
 				// お疲れ様でした
-				if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_NO_THEEND_KEY_NAME) == 0)
+				if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME))
 				{
 					DuTheEndDlg(NULL);
 				}
@@ -1337,7 +1337,7 @@ void DuOptionDlgInit(HWND hWnd, DU_OPTION *t)
 
 	Check(hWnd, C_VER2, dc->EnableVersion2);
 
-	Check(hWnd, C_NO_THEEND, MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_NO_THEEND_KEY_NAME) == 0);
+	Check(hWnd, C_SHOW_THEEND, MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME));
 
 	DuOptionDlgInitProxyStr(hWnd, t);
 
@@ -1477,7 +1477,7 @@ void DuOptionDlgOnOk(HWND hWnd, DU_OPTION *t)
 	DcSaveConfig(dc);
 
 	// お疲れ様でした
-	MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, DU_NO_THEEND_KEY_NAME, !IsChecked(hWnd, C_NO_THEEND));
+	MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME, IsChecked(hWnd, C_SHOW_THEEND));
 
 	EndDialog(hWnd, 1);
 }
