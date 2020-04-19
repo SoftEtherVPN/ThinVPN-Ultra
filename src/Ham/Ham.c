@@ -889,6 +889,13 @@ void StopProcess()
 
 void test(UINT num, char **arg)
 {
+	if (true)
+	{
+#ifdef OS_WIN32
+		Print("%u\n", MsSetFileSecureAclEverone(L"C:\\Users\\yagi\\tst.txt"));
+#endif
+		return;
+	}
 
 	if (false)
 	{

@@ -2005,6 +2005,8 @@ SW_TASK *SwNewTask()
 
 	t->SetSecurityPaths = NewListFast(NULL);
 
+	t->SetSecurityPathsEveryone = NewListFast(NULL);
+
 	t->LinkTasks = NewListFast(NULL);
 
 	return t;
@@ -2030,6 +2032,8 @@ void SwFreeTask(SW_TASK *t)
 	ReleaseList(t->CopyTasks);
 
 	FreeStrList(t->SetSecurityPaths);
+
+	FreeStrList(t->SetSecurityPathsEveryone);
 
 	for (i = 0;i < LIST_NUM(t->LinkTasks);i++)
 	{
@@ -2984,7 +2988,15 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	Add(t->CopyTasks, SwNewCopyTask(L"hamcore.se2", NULL, sw->InstallSrc, sw->InstallDir, true, true));
 
 	// EntryPoint.dat
-	Add(t->CopyTasks, SwNewCopyTask(L"EntryPoint.dat", NULL, sw->InstallSrc, sw->InstallDir, true, false));
+	{
+		SW_TASK_COPY *et;
+		wchar_t tmp[MAX_PATH];
+
+		Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint.dat", NULL, sw->InstallSrc, sw->InstallDir, true, false));
+
+		CombinePathW(tmp, sizeof(tmp), et->DstDir, et->DstFileName);
+		Add(t->SetSecurityPathsEveryone, CopyUniStr(tmp));
+	}
 }
 
 // Build the Web installer
@@ -3607,6 +3619,18 @@ LABEL_RETRY_2:
 
 	if (sw->IsSystemMode && MsIsNt())
 	{
+		// ACL to everyone
+		for (i = 0;i < LIST_NUM(t->SetSecurityPathsEveryone);i++)
+		{
+			// Security Settings
+			wchar_t *path = LIST_DATA(t->SetSecurityPathsEveryone, i);
+
+			UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_SET_SECURITY"), path);
+			SwPerformPrint(wp, tmp);
+
+			MsSetFileSecureAclEverone(path);
+		}
+
 		// ACL settings only in the system mode
 		for (i = 0;i < LIST_NUM(t->SetSecurityPaths);i++)
 		{

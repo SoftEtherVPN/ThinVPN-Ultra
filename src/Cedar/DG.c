@@ -1473,7 +1473,7 @@ void DgMainDlgInit(HWND hWnd, DG *dg)
 		SetText(hWnd, 0, tmp2);
 	}
 
-	SetIcon(hWnd, 0, ICO_DESKSERVER);
+	SetIcon(hWnd, 0, ICO_USER_ADMIN);
 
 	DlgFont(hWnd, S_PROXY_CONFIG, 0, true);
 

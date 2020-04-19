@@ -766,6 +766,52 @@ bool MsSetFileSecureAcl(wchar_t *path)
 	return ret;
 }
 
+bool MsSetFileSecureAclEverone(wchar_t *path)
+{
+	SID *sid_everyone;
+	bool ret = false;
+	// Validate arguments
+	if (path == NULL)
+	{
+		return false;
+	}
+	if (ms->nt == NULL)
+	{
+		return false;
+	}
+	if (ms->nt->SetNamedSecurityInfoW == NULL || ms->nt->AddAccessAllowedAceEx == NULL)
+	{
+		return false;
+	}
+
+	sid_everyone = MsGetSidFromAccountName("Everyone");
+
+	if (sid_everyone != NULL)
+	{
+		UINT acl_size = 4096;
+		ACL *acl;
+
+		acl = ZeroMalloc(acl_size);
+
+		if (InitializeAcl(acl, acl_size, 2))
+		{
+			if (ms->nt->AddAccessAllowedAceEx(acl, 2, CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE, GENERIC_ALL, sid_everyone))
+			{
+				if (ms->nt->SetNamedSecurityInfoW(path, SE_FILE_OBJECT, DACL_SECURITY_INFORMATION | PROTECTED_DACL_SECURITY_INFORMATION, NULL, NULL, acl, NULL) == ERROR_SUCCESS)
+				{
+					ret = true;
+				}
+			}
+		}
+
+		Free(acl);
+	}
+
+	MsFreeSid(sid_everyone);
+
+	return ret;
+}
+
 // Disable the minimization function of the number of network connections by WCM
 void MsDisableWcmNetworkMinimize()
 {

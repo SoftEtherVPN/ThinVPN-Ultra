@@ -17,7 +17,6 @@ BEGIN
             VALUE "FileVersion", "$VER_MAJOR$, $VER_MINOR$, 0, $VER_BUILD$"
             VALUE "InternalName", "$INTERNALNAME$"
             VALUE "LegalCopyright", "Copyright (c) $YEAR$ Information-technology Promotion Agency, Nippon Telegraph and Telephone East Corporation, and all contributors. All rights reserved."
-            VALUE "LegalTrademarks", "'NTT' and 'IPA' are trademarks of these entities."
             VALUE "OriginalFilename", "$FILENAME$"
             VALUE "ProductName", "$PRODUCTNAME$"
             VALUE "ProductVersion", "$VER_MAJOR$, $VER_MINOR$, 0, $VER_BUILD$"

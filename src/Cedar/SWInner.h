@@ -253,6 +253,7 @@ typedef struct SW_TASK
 {
 	LIST *CopyTasks;					// File copy task
 	LIST *SetSecurityPaths;				// List of paths to set the security
+	LIST *SetSecurityPathsEveryone;		// List of paths to set the security (Everyone)
 	LIST *LinkTasks;					// Link creation task
 } SW_TASK;
 
