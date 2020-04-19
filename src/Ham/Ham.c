@@ -1084,7 +1084,7 @@ void du(UINT num, char **arg)
 void di(UINT num, char **arg)
 {
 #ifdef	OS_WIN32
-	DIExec(false);
+	SWExec();
 #endif  // OS_WIN32
 }
 
