@@ -176,7 +176,7 @@ void DsUpdateTaskIcon(DS *ds)
 		return;
 	}
 
-	hIcon = LoadSmallIcon(ICO_DESKSERVER_TRAY);
+	hIcon = LoadSmallIcon(ICO_TOWER);
 
 	LockList(ds->ClientList);
 	{
@@ -186,7 +186,7 @@ void DsUpdateTaskIcon(DS *ds)
 
 		if (LIST_NUM(ds->ClientList) >= 1)
 		{
-			hIcon = LoadSmallIcon(ICO_DESKSERVER_TRAY2);
+			hIcon = LoadSmallIcon(ICO_USER_ADMIN);
 		}
 
 		for (i = 0;i < LIST_NUM(ds->ClientList);i++)
@@ -231,7 +231,7 @@ void DsUpdateTaskIcon(DS *ds)
 
 	if (num != 0)
 	{
-		hIcon = LoadSmallIcon(ICO_DESKSERVER_TRAY2);
+		hIcon = LoadSmallIcon(ICO_USER_ADMIN);
 	}
 
 	MsChangeIconOnTrayEx2((void *)hIcon, tmp, NULL, NULL, 0);

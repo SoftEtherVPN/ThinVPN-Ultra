@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 	InitProcessCallOnce();
 
 #ifdef	OS_WIN32
-	return MsService(DESK_SERVER_SVC_NAME, StartProcess, StopProcess, ICO_DESKSERVER_TRAY, argv[0]);
+	return MsService(DESK_SERVER_SVC_NAME, StartProcess, StopProcess, ICO_TOWER, argv[0]);
 #else	// OS_WIN32
 	return UnixService(argc, argv, DESK_SERVER_SVC_NAME, StartProcess, StopProcess);
 #endif	// OS_WIN32

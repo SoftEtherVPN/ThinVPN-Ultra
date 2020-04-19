@@ -5657,8 +5657,8 @@ void MsUserModeTrayMenu(HWND hWnd)
 
 	// Create a menu
 	h = CreatePopupMenu();
-	MsAppendMenu(h, MF_ENABLED | MF_STRING, 10001, _UU("SVC_USERMODE_MENU_1"));
-	MsAppendMenu(h, MF_SEPARATOR, 10002, NULL);
+//	MsAppendMenu(h, MF_ENABLED | MF_STRING, 10001, _UU("SVC_USERMODE_MENU_1"));
+//	MsAppendMenu(h, MF_SEPARATOR, 10002, NULL);
 
 	if (MsIsNt())
 	{
@@ -5730,7 +5730,7 @@ LRESULT CALLBACK MsUserModeWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 		}
 
 		Format(value_name, sizeof(value_name), SVC_HIDETRAY_REG_VALUE, title_w);
-		if (MsRegReadInt(REG_CURRENT_USER, SVC_USERMODE_SETTING_KEY, value_name) == 0 &&
+		if (/*MsRegReadInt(REG_CURRENT_USER, SVC_USERMODE_SETTING_KEY, value_name) == 0 &&*/
 			service_for_9x_mode == false)
 		{
 			MsShowIconOnTray(hWnd, tray_icon, tmp, WM_APP + 33);
@@ -5797,7 +5797,14 @@ LRESULT CALLBACK MsUserModeWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 			}
 			break;
 		case 10003:
-			SendMessage(hWnd, WM_CLOSE, 0, 0);
+			GetWindowText(hWnd, title, sizeof(title));
+			StrToUni(title_w, sizeof(title_w), title);
+			// Display a confirmation message
+			if (MsgBoxEx(hWnd, MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2 |
+				MB_SYSTEMMODAL, _UU("SVC_EXIT_CONFIRM_MSG"), title_w) == IDYES)
+			{
+				SendMessage(hWnd, WM_CLOSE, 0, 0);
+			}
 			break;
 		}
 		break;
@@ -6694,20 +6701,20 @@ UINT MsService(char *name, SERVICE_FUNCTION *start, SERVICE_FUNCTION *stop, UINT
 			{
 				mode = SVC_MODE_UIHELP;
 			}
-			if (StrCmpi(arg, SVC_ARG_USERMODE_SHOWTRAY) == 0)
-			{
-				char tmp[MAX_SIZE];
-				mode = SVC_MODE_USERMODE;
-				Format(tmp, sizeof(tmp), SVC_HIDETRAY_REG_VALUE, service_title);
-				MsRegDeleteValue(REG_CURRENT_USER, SVC_USERMODE_SETTING_KEY, tmp);
-			}
-			if (StrCmpi(arg, SVC_ARG_USERMODE_HIDETRAY) == 0)
-			{
-				char tmp[MAX_SIZE];
-				mode = SVC_MODE_USERMODE;
-				Format(tmp, sizeof(tmp), SVC_HIDETRAY_REG_VALUE, service_title);
-				MsRegWriteInt(REG_CURRENT_USER, SVC_USERMODE_SETTING_KEY, tmp, 1);
-			}
+			//if (StrCmpi(arg, SVC_ARG_USERMODE_SHOWTRAY) == 0)
+			//{
+			//	char tmp[MAX_SIZE];
+			//	mode = SVC_MODE_USERMODE;
+			//	Format(tmp, sizeof(tmp), SVC_HIDETRAY_REG_VALUE, service_title);
+			//	MsRegDeleteValue(REG_CURRENT_USER, SVC_USERMODE_SETTING_KEY, tmp);
+			//}
+			//if (StrCmpi(arg, SVC_ARG_USERMODE_HIDETRAY) == 0)
+			//{
+			//	char tmp[MAX_SIZE];
+			//	mode = SVC_MODE_USERMODE;
+			//	Format(tmp, sizeof(tmp), SVC_HIDETRAY_REG_VALUE, service_title);
+			//	MsRegWriteInt(REG_CURRENT_USER, SVC_USERMODE_SETTING_KEY, tmp, 1);
+			//}
 			if (StrCmpi(arg, SVC_ARG_SERVICE) == 0)
 			{
 				mode = SVC_MODE_SERVICE;
