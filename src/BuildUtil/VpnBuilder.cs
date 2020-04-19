@@ -230,7 +230,7 @@ namespace BuildUtil
 
 			switch (soft)
 			{
-				case Software.ThinTelework_Server_and_Client_Full:
+				case Software.Thin_Telework_Server_and_Client_Full:
 					ret = "Thin Telework System";
 					break;
 
@@ -256,7 +256,7 @@ namespace BuildUtil
 
 			switch (soft)
 			{
-				case Software.ThinTelework_Server_and_Client_Full:
+				case Software.Thin_Telework_Server_and_Client_Full:
 					ret = "Thin Telework System";
 					break;
 

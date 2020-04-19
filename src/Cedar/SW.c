@@ -375,7 +375,7 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 		return false;
 	}
 
-	if (StrCmpi(component_name, "ThinTelework_Server_and_Client_Full") == 0)
+	if (StrCmpi(component_name, "Thin_Telework_Server_and_Client_Full") == 0)
 	{
 		// NTT 東日本 - IPA シン・テレワークシステム
 		for (i = 0; i < (sizeof(sfx_ntt_files) / sizeof(char *)); i++)

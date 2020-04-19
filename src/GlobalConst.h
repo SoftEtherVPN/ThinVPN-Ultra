@@ -41,7 +41,7 @@
 #define	DESK_SVC_NAME					"DESK"	// WideTunnel 内でのサービス名
 #define DS_RPC_PORT						9823	// Server の RPC ポート					// 元: 9822
 
-#define	SW_SINGLE_INSTANCE_NAME				"ThinTelework_Setup_Wizard"
+#define	SW_SINGLE_INSTANCE_NAME				"Thin_Telework_Setup_Wizard"
 
 #define WT_GATE_DISABLE_SSL3		true
 #define WT_GATE_DISABLE_TLS1_0		true
