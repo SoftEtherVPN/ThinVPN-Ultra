@@ -56,6 +56,8 @@
 
 // ローカルディレクトリの EntryPoint のファイル名
 #define LOCAL_ENTRY_POINT_FILENAME		"@EntryPoint.dat"
+#define ENTRY_POINT_RAW_FILENAME_W		L"EntryPoint.dat"
+
 
 #define ENTRANCE_URL_TIME_REPLACE_TAG	"__TIME__"
 
@@ -146,6 +148,7 @@ struct WT
 	UINT64 EntranceCacheTimestamp;	// Entrance URL の取得日時
 	UINT DefaultEntranceCacheExpireSpan;	// Entrance URL の有効期限
 	WIDE *Wide;						// Wide へのポインタ
+	UINT64 LastTryUpdateNewEntryPoint;	// 最後に GitHub から Entry Point 更新を試行した時刻
 
 	// Gate 用
 	LISTENER *Listener;				// リスナー
