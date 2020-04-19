@@ -889,16 +889,6 @@ void StopProcess()
 
 void test(UINT num, char **arg)
 {
-	if (true)
-	{
-#ifdef OS_WIN32
-		ONCEMSG_DLG *d;
-		InitWinUi(L"Soft", NULL, 0);
-		DuTheEndDlg(NULL);
-		FreeWinUi();
-#endif
-		return;
-	}
 
 	if (false)
 	{

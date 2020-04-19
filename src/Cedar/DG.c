@@ -1934,9 +1934,11 @@ UINT DgMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 
 				if (CALL(hWnd, DtcGetStatus(dg->Rpc, &s)))
 				{
-					DuAboutDlg(hWnd, ICO_DESKSERVER,
+					/*DuAboutDlg(hWnd, ICO_DESKSERVER,
 						((s.ForceDisableShare == false) ? _SS("PRODUCT_NAME_DESKSERVER") : _SS("PRODUCT_NAME_DESKSERVER2")),
-						dg->Cedar->BuildInfo);
+						dg->Cedar->BuildInfo);*/
+
+					About(hWnd, dg->Cedar, (s.ForceDisableShare == false) ? _UU("PRODUCT_NAME_DESKSERVER") : _UU("PRODUCT_NAME_DESKSERVER2"));
 				}
 			}
 			break;

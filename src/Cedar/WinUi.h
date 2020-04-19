@@ -881,6 +881,7 @@ bool CheckBadProcesses(HWND hWnd);
 BAD_PROCESS *IsBadProcess(char *exe);
 void ShowBadProcessWarning(HWND hWnd, BAD_PROCESS *bad);
 void SetFontMeiryo(HWND hWnd, UINT id, UINT font_size);
+void SetFontMeiryoEx(HWND hWnd, UINT id, UINT font_size, bool bold);
 char *GetMeiryoFontName();
 void SetFontDefault(HWND hWnd, UINT id);
 HFONT GetMeiryoFont();

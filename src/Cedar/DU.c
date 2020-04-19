@@ -58,7 +58,7 @@ UINT DuTheEndDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		SetIcon(hWnd, 0, ICO_INFORMATION);
+		SetIcon(hWnd, 0, ICO_THINCLIENT);
 		if (MsIsVista())
 		{
 			SetFont(hWnd, IDCANCEL, GetMeiryoFontEx2(11, true));
@@ -79,7 +79,7 @@ UINT DuTheEndDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		case IDCANCEL:
 			if (IsChecked(hWnd, C_NOMORE))
 			{
-				MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, "NoTheEndDialog", 1);
+				MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, DU_NO_THEEND_KEY_NAME, 1);
 			}
 
 			Close(hWnd);
@@ -1082,7 +1082,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 				}
 
 				// お疲れ様でした
-				if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, "NoTheEndDialog") == 0)
+				if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_NO_THEEND_KEY_NAME) == 0)
 				{
 					DuTheEndDlg(NULL);
 				}
@@ -1337,6 +1337,8 @@ void DuOptionDlgInit(HWND hWnd, DU_OPTION *t)
 
 	Check(hWnd, C_VER2, dc->EnableVersion2);
 
+	Check(hWnd, C_NO_THEEND, MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_NO_THEEND_KEY_NAME) == 0);
+
 	DuOptionDlgInitProxyStr(hWnd, t);
 
 	DuOptionDlgUpdate(hWnd, t);
@@ -1473,6 +1475,9 @@ void DuOptionDlgOnOk(HWND hWnd, DU_OPTION *t)
 	dc->MstscUsePublicSwitchForVer6 = IsChecked(hWnd, C_PUBLIC);
 
 	DcSaveConfig(dc);
+
+	// お疲れ様でした
+	MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, DU_NO_THEEND_KEY_NAME, !IsChecked(hWnd, C_NO_THEEND));
 
 	EndDialog(hWnd, 1);
 }
@@ -1881,8 +1886,7 @@ UINT DuMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 		{
 		case CMD_ABOUT:
 			// バージョン情報
-			DuAboutDlg(hWnd, ICO_THINCLIENT, _SS("PRODUCT_NAME_DESKCLIENT"),
-				t->Du->Cedar->BuildInfo);
+			About(hWnd, t->Du->Cedar, _UU("PRODUCT_NAME_DESKCLIENT"));
 			break;
 
 		case CMD_OPTION:

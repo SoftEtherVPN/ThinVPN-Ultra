@@ -1188,6 +1188,8 @@
 #define C_PUBLIC                        2546
 #define C_CHECK_CERT                    2547
 #define C_USE_ADVANCED                  2548
+#define C_CHECK_CERT2                   2548
+#define C_NO_THEEND                     2548
 #define B_AUTH                          2549
 #define B_ACCEPT                        2550
 #define C_PUBLIC2                       2551
