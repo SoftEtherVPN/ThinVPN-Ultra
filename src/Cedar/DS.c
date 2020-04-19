@@ -818,20 +818,24 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		}
 		else if (ds->AuthType == DESK_AUTH_PASSWORD)
 		{
-			UCHAR secure_password_2[SHA1_SIZE];
+			UCHAR hash_of_server_pw[SHA1_SIZE];
 
-			UCHAR zero_hash[SHA1_SIZE];
-
-			HashSha1(zero_hash, NULL, 0);
-
-			if (Cmp(zero_hash, secure_password_2, SHA1_SIZE) == 0 ||
-				IsZero(secure_password_2, SHA1_SIZE))
+			// サーバー側で設定されているパスワードが、空文字でないかどうか確認する
+			HashSha1(hash_of_server_pw, NULL, 0);
+			if (Cmp(hash_of_server_pw, ds->AuthPassword) == 0)
 			{
-				// パスワードがなぜか設定されていない
+				// サーバー側で設定されているパスワードが空文字である
+				is_password_empty = true;
+			}
+			else if (IsZero(ds->AuthPassword, SHA1_SIZE))
+			{
+				// なぜかサーバー側のパスワードハッシュがゼロである
 				is_password_empty = true;
 			}
 			else
 			{
+				UCHAR secure_password_2[SHA1_SIZE];
+
 				// パスワード認証
 				SecurePassword(secure_password_2, ds->AuthPassword, rand);
 
