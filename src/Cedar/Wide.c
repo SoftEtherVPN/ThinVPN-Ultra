@@ -2445,6 +2445,7 @@ void WideGatePackGateInfo(PACK *p, WT *wt)
 	PackAddData(p, "GateId", wt->GateId, sizeof(wt->GateId));
 	PackAddInt(p, "EntryExpires", WideGateGetIniEntry("EntryExpires"));
 	PackAddInt(p, "Performance", WideGateGetIniEntry("Performance"));
+	PackAddInt(p, "Build", CEDAR_BUILD);
 }
 
 // ini ファイル内のエントリを取得
