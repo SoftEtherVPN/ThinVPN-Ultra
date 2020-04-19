@@ -822,7 +822,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 			// サーバー側で設定されているパスワードが、空文字でないかどうか確認する
 			HashSha1(hash_of_server_pw, NULL, 0);
-			if (Cmp(hash_of_server_pw, ds->AuthPassword) == 0)
+			if (Cmp(hash_of_server_pw, ds->AuthPassword, SHA1_SIZE) == 0)
 			{
 				// サーバー側で設定されているパスワードが空文字である
 				is_password_empty = true;
