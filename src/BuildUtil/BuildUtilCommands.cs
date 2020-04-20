@@ -500,7 +500,7 @@ namespace BuildUtil
 //#if BU_SOFTETHER
 //                "softether-" + 
 //#endif	// BU_SOFTETHER
-			string.Format("Thin_Telework_ZIP_Client_Only-v{0}.{1:D2}-{2}-{3}-{4:D4}.{5:D2}.{6:D2}.zip",
+			string.Format("IPA_Thin_Telework_ZIP_Client_Only-v{0}.{1:D2}-{2}-{3}-{4:D4}.{5:D2}.{6:D2}.zip",
 				version / 100, version % 100, build, name,
 				date.Year, date.Month, date.Day);
 
