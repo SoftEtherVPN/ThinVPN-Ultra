@@ -424,7 +424,9 @@ L_RETRY:
 	if (recv == NULL)
 	{
 		if (error == ERR_SSL_X509_UNTRUSTED || error == ERR_CERT_NOT_TRUSTED ||
-			error == ERR_PROTOCOL_ERROR || error == ERR_CONNECT_FAILED)
+			error == ERR_SSL_X509_EXPIRED || 
+			error == ERR_PROTOCOL_ERROR || error == ERR_CONNECT_FAILED ||
+			error == ERR_TIMEOUTED || error == ERR_DISCONNECTED)
 		{
 			if (wt->EnableUpdateEntryPoint && num_retry == 0)
 			{
