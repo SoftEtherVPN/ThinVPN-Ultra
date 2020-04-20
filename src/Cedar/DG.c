@@ -1722,6 +1722,17 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 		}
 	}
 
+	if (t.MsgForServerArrived && UniIsEmptyStr(t.MsgForServer) == false)
+	{
+		// 新しいメッセージが届いている
+		// 画面に表示する
+		if (dg->MsgForServerDlg == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+		{
+			dg->MsgForServerDlg = StartAsyncOnceMsg(_UU("DU_SERVER_MSG2"), t.MsgForServer, t.MsgForServerOnce,
+				ICO_INFORMATION, true);
+		}
+	}
+
 	// コントロールの更新
 	DgMainDlgUpdate(hWnd, dg);
 }
@@ -2349,6 +2360,13 @@ void DgMain(DG *dg)
 	}
 
 	DgMainDlg(dg);
+
+	if (dg->MsgForServerDlg != NULL)
+	{
+		// メッセージ画面が表示されたままの場合は閉じる
+		StopAsyncOnceMsg(dg->MsgForServerDlg);
+		dg->MsgForServerDlg = NULL;
+	}
 
 	EndRpc(rpc);
 }

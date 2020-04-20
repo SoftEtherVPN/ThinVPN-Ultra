@@ -1907,6 +1907,9 @@ void StopAsyncOnceMsg(ONCEMSG_DLG *d)
 
 	Free(d->halt);
 
+	Free(d->Title);
+	Free(d->Message);
+
 	Free(d);
 }
 
@@ -1929,8 +1932,8 @@ ONCEMSG_DLG *StartAsyncOnceMsg(wchar_t *title, wchar_t *message, bool show_check
 
 	d = ZeroMalloc(sizeof(ONCEMSG_DLG));
 
-	d->Message = message;
-	d->Title = title;
+	d->Message = UniCopyStr(message);
+	d->Title = UniCopyStr(title);
 	d->ShowCheckbox = show_checkbox;
 	d->Icon = icon;
 	d->halt = ZeroMalloc(sizeof(bool));

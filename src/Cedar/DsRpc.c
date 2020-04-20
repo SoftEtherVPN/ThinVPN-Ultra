@@ -126,6 +126,10 @@ void InRpcDsStatus(RPC_DS_STATUS *t, PACK *p)
 	t->NumConfigures = PackGetInt(p, "NumConfigures");
 	t->NumAdvancedUsers = PackGetInt(p, "NumAdvancedUsers");
 	PackGetStr(p, "GateIP", t->GateIP, sizeof(t->GateIP));
+
+	t->MsgForServerArrived = PackGetBool(p, "MsgForServerArrived");
+	PackGetUniStr(p, "MsgForServer", t->MsgForServer, sizeof(t->MsgForServer));
+	t->MsgForServerOnce = PackGetBool(p, "MsgForServerOnce");
 }
 void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 {
@@ -156,6 +160,10 @@ void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 	PackAddInt(p, "NumConfigures", t->NumConfigures);
 	PackAddInt(p, "NumAdvancedUsers", t->NumAdvancedUsers);
 	PackAddStr(p, "GateIP", t->GateIP);
+
+	PackAddBool(p, "MsgForServerArrived", t->MsgForServerArrived);
+	PackAddUniStr(p, "MsgForServer", t->MsgForServer);
+	PackAddBool(p, "MsgForServerOnce", t->MsgForServerOnce);
 }
 
 // INTERNET_SETTING

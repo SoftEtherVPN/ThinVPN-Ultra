@@ -1653,6 +1653,10 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 	if (ds->Wide != NULL && ds->Wide->wt != NULL)
 	{
 		StrCpy(t->GateIP, sizeof(t->GateIP), ds->Wide->wt->CurrentGateIp);
+
+		t->MsgForServerArrived = ds->Wide->MsgForServerArrived;
+		UniStrCpy(t->MsgForServer, sizeof(t->MsgForServer), ds->Wide->MsgForServer);
+		t->MsgForServerOnce = ds->Wide->MsgForServerOnce;
 	}
 
 	if (ds->Server != NULL && ds->Server->Cedar != NULL)

@@ -47,6 +47,7 @@
 #define ERR_RETRY_AFTER_1_HOURS				241	// 1 時間後に再試行してください
 #define ERR_RETRY_AFTER_8_HOURS				242	// 8 時間後に再試行してください
 #define ERR_RETRY_AFTER_24_HOURS			243	// 24 時間後に再試行してください
+#define ERR_RECV_MSG						251	// メッセージを受信
 
 
 

@@ -26,6 +26,7 @@ typedef struct DG
 	bool BluetoothDirFlag;
 	UINT64 MainDlgStartTick;
 	bool Hello;
+	ONCEMSG_DLG *MsgForServerDlg;
 } DG;
 
 // パスワードダイアログデータ

@@ -370,7 +370,7 @@ LABEL_RETRY:
 	ret = WideClientConnectInner(w, &c, pcid, ver, build);
 	if (ret == ERR_NO_ERROR)
 	{
-		Debug("Redirect Host: %s (for proxy: %s):%u\n", c.HostName, c.ProxyHostName, c.Port);
+		Debug("Redirect Host: %s (for proxy: %s):%u\n", c.HostName, c.HostNameForProxy, c.Port);
 
 		ret = WtcConnectEx(wt, &c, sockio, CEDAR_VER, CEDAR_BUILD);
 
@@ -577,6 +577,26 @@ LABEL_CONNECT_RETRY:
 		// 接続先の Gate の取得
 		Debug("ServerConnect...\n");
 		ret = WideServerConnect(w, &c);
+
+		// サーバーから文字列メッセージが届いていれば WIDE 構造体に報告する
+		if (UniIsEmptyStr(c.MsgForServer) == false)
+		{
+			// 最後に届いたものと内容が異なっているかどうか
+			if (UniStrCmpi(c.MsgForServer, w->MsgForServer) != 0)
+			{
+				// 異なっている場合は上書きして、メッセージ到着フラグをセットする
+				UniStrCpy(w->MsgForServer, sizeof(w->MsgForServer), c.MsgForServer);
+				w->MsgForServerOnce = c.MsgForServerOnce;
+				w->MsgForServerArrived = true;
+			}
+		}
+		else
+		{
+			// サーバーからはメッセージが届いていない場合はメモリ上のメッセージをクリアする
+			Zero(w->MsgForServer, sizeof(w->MsgForServer));
+			w->MsgForServerOnce = false;
+			w->MsgForServerArrived = false;
+		}
 
 		if (ret != ERR_NO_ERROR)
 		{
@@ -990,6 +1010,11 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 		// URL を受信
 		PackGetStr(p, "Url", w->RecvUrl, sizeof(w->RecvUrl));
 	}
+	else if (ret == ERR_RECV_MSG)
+	{
+		// メッセージを受信
+		PackGetUniStr(p, "Msg", w->RecvMsg, sizeof(w->RecvMsg));
+	}
 
 	FreePack(p);
 
@@ -1039,6 +1064,9 @@ UINT WideServerConnect(WIDE *w, WT_CONNECT *c)
 			c->UseCompress = false;
 		}
 	}
+
+	PackGetUniStr(p, "MsgForServer", c->MsgForServer, sizeof(c->MsgForServer));
+	c->MsgForServerOnce = PackGetBool(p, "MsgForServerOnce");
 
 	FreePack(p);
 

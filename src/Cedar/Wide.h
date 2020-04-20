@@ -124,6 +124,7 @@ struct WIDE
 
 	// WideClient
 	char RecvUrl[MAX_PATH];
+	wchar_t RecvMsg[MAX_SIZE];
 	UINT64 SessionInfoCacheExpires;
 	LIST *SessionInfoCache;
 
@@ -169,6 +170,10 @@ struct WIDE
 	void *ResetCertProcParam;
 	UINT64 ServerMask64;
 	ACCEPT_QUEUE *AcceptQueue;
+
+	bool MsgForServerArrived;			// 新しいメッセージが WideController から届いている
+	wchar_t MsgForServer[MAX_SIZE];		// 届いているメッセージ
+	bool MsgForServerOnce;				// 次回から表示しない を許可
 };
 
 // 関数プロトタイプ

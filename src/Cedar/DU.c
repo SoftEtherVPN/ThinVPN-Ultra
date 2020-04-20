@@ -552,6 +552,15 @@ bool DuEventCallback(DC_SESSION *s, UINT event_type, void *event_param)
 				url);
 		}
 		break;
+
+	case DC_EVENT_MSG_RECVED:
+		// メッセージを受信した。表示する
+		{
+			wchar_t *msg = (wchar_t *)event_param;
+
+			OnceMsgEx(t->hWndConnect, _UU("DU_SERVER_MSG"), msg, false, ICO_WARNING, NULL);
+		}
+		break;
 	}
 
 	return true;
@@ -969,7 +978,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 	ret = DcSessionConnect(s);
 	if (ret != ERR_NO_ERROR)
 	{
-		if (ret != ERR_RECV_URL)
+		if (ret != ERR_RECV_URL && ret != ERR_RECV_MSG)
 		{
 			MsgBox(hWnd, MB_ICONEXCLAMATION, _E(ret));
 		}
@@ -1093,7 +1102,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 		if (ret != ERR_NO_ERROR)
 		{
-			if (ret != ERR_RECV_URL)
+			if (ret != ERR_RECV_URL && ret != ERR_RECV_MSG)
 			{
 				MsgBox(hWnd, MB_ICONEXCLAMATION, _E(ret));
 			}

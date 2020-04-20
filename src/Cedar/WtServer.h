@@ -26,6 +26,10 @@ struct WT_CONNECT
 	bool UseCompress;							// 圧縮の使用
 	bool DontCheckCert;							// 証明書をチェックしない
 
+	// Server が Wide Controller に接続してもらってきたメッセージ
+	wchar_t MsgForServer[MAX_SIZE];
+	bool MsgForServerOnce;
+
 	// Server 用
 	WT_GATE_CONNECT_PARAM *GateConnectParam;	// 接続パラメータ
 	char Pcid[MAX_PATH];						// PCID

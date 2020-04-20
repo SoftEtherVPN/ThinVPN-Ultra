@@ -80,6 +80,7 @@
 // DC のイベント
 #define DC_EVENT_CONNECTED				1		// 接続した
 #define DC_EVENT_URL_RECVED				2		// URL を受信した
+#define DC_EVENT_MSG_RECVED				3		// メッセージを受信した
 
 // DC における MSTSC の指定
 #define DC_MSTSC_SYSTEM32				0		// system32 内

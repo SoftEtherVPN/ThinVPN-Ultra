@@ -2099,6 +2099,7 @@ void DcConnectThread(THREAD *thread, void *param)
 			SOCKIO *io;
 			UINT ret;
 			char url[MAX_PATH];
+			wchar_t msg[MAX_SIZE];
 
 			if (s->HaltConnectThread)
 			{
@@ -2120,8 +2121,8 @@ void DcConnectThread(THREAD *thread, void *param)
 			}
 
 			// 接続
-			ret = DcConnect(s->Dc, s->Pcid, DcSessionConnectAuthCallback2,
-				s, url, sizeof(url), false, &io);
+			ret = DcConnectEx(s->Dc, s->Pcid, DcSessionConnectAuthCallback2,
+				s, url, sizeof(url), false, &io, false, msg, sizeof(msg));
 
 			if (ret == ERR_NO_ERROR)
 			{
@@ -2157,6 +2158,7 @@ UINT DcSessionConnect(DC_SESSION *s)
 	SOCKIO *io;
 	UINT ret;
 	char url[MAX_PATH];
+	wchar_t msg[MAX_SIZE];
 	// 引数チェック
 	if (s == NULL)
 	{
@@ -2165,7 +2167,7 @@ UINT DcSessionConnect(DC_SESSION *s)
 
 	// 1 個目のセッションを接続
 	ret = DcConnectEx(s->Dc, s->Pcid, DcSessionConnectAuthCallback1, s,
-		url, sizeof(url), true, &io, true);
+		url, sizeof(url), true, &io, true, msg, sizeof(msg));
 
 	if (ret != ERR_NO_ERROR)
 	{
@@ -2174,6 +2176,11 @@ UINT DcSessionConnect(DC_SESSION *s)
 		{
 			// URL を受信
 			s->EventCallback(s, DC_EVENT_URL_RECVED, url);
+		}
+		else if (ret == ERR_RECV_MSG)
+		{
+			// メッセージを受信
+			s->EventCallback(s, DC_EVENT_MSG_RECVED, msg);
 		}
 		return ret;
 	}
@@ -2671,19 +2678,13 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 }
 
 // 接続
-UINT DcConnect(DC *dc, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, char *ret_url, UINT ret_url_size, bool check_port,
-			   SOCKIO **sockio)
-{
-	return DcConnectEx(dc, pcid, auth_callback, callback_param, ret_url, ret_url_size,
-		check_port, sockio, false);
-}
 UINT DcConnectEx(DC *dc, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, char *ret_url, UINT ret_url_size, bool check_port,
-			   SOCKIO **sockio, bool first_connection)
+				 SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size)
 {
 	SOCKIO *sock;
 	UINT ret;
 	// 引数チェック
-	if (dc == NULL || pcid == NULL || auth_callback == NULL || ret_url == NULL || sockio == NULL)
+	if (dc == NULL || pcid == NULL || auth_callback == NULL || ret_url == NULL || ret_msg == NULL || sockio == NULL)
 	{
 		return ERR_INTERNAL_ERROR;
 	}
@@ -2698,6 +2699,11 @@ UINT DcConnectEx(DC *dc, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *call
 		{
 			// URL を受信
 			StrCpy(ret_url, ret_url_size, dc->Wide->RecvUrl);
+		}
+		else if (ret == ERR_RECV_MSG)
+		{
+			// メッセージを受信
+			UniStrCpy(ret_msg, ret_msg_size, dc->Wide->RecvMsg);
 		}
 		return ret;
 	}
