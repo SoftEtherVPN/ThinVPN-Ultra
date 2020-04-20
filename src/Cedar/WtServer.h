@@ -64,7 +64,7 @@ TSESSION *WtsStart(WT *wt, WT_CONNECT *connect, WT_ACCEPT_PROC *proc, void *para
 void WtsConnectThread(THREAD *thread, void *param);
 TSESSION *WtsNewSession(THREAD *thread, WT *wt, WT_CONNECT *connect, WT_ACCEPT_PROC *proc, void *param);
 void WtsConnectMain(TSESSION *session);
-void WtsConnectInner(TSESSION *session, SOCK *s, char *sni);
+void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_proxy_alternative);
 SOCK *WtSockConnect(WT_CONNECT *param, UINT *error_code, bool proxy_use_alternative_fqdn);
 bool WtgClientUploadSignature(SOCK *s);
 void WtsSessionMain(TSESSION *session);

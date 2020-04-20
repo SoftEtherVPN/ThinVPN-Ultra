@@ -476,7 +476,7 @@ void WtsWaitForSock(TSESSION *s)
 }
 
 // 接続処理
-void WtsConnectInner(TSESSION *session, SOCK *s, char *sni)
+void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_proxy_alternative)
 {
 	WT *wt;
 	PACK *p;
@@ -485,12 +485,20 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni)
 	UINT tunnel_timeout = WT_TUNNEL_TIMEOUT;
 	UINT tunnel_keepalive = WT_TUNNEL_KEEPALIVE;
 	bool tunnel_use_aggressive_timeout = false;
+	bool dummy = false;
 
 	// 引数チェック
 	if (session == NULL || s == NULL)
 	{
 		return;
 	}
+
+	if (should_retry_proxy_alternative == NULL)
+	{
+		should_retry_proxy_alternative = &dummy;
+	}
+
+	*should_retry_proxy_alternative = false;
 
 	wt = session->wt;
 
@@ -504,6 +512,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni)
 		// 失敗
 		Debug("StartSSL Failed.\n");
 		session->ErrorCode = ERR_PROTOCOL_ERROR;
+		*should_retry_proxy_alternative = true;
 		return;
 	}
 
@@ -517,6 +526,8 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni)
 			// 失敗
 			Debug("WtIsTrustedCert Failed.\n");
 			session->ErrorCode = ERR_SSL_X509_UNTRUSTED;
+
+			*should_retry_proxy_alternative = true;
 			return;
 		}
 	}
@@ -663,6 +674,8 @@ void WtsConnectMain(TSESSION *session)
 	UINT err = 0;
 	char *sni = NULL;
 	WT_CONNECT *connect = session->ConnectParam;
+	bool should_retry_proxy_alternative = false;
+	bool is_proxy_alternative_fqdn = false;
 	// 引数チェック
 	if (session == NULL || session->ConnectParam == NULL)
 	{
@@ -683,18 +696,23 @@ void WtsConnectMain(TSESSION *session)
 		if (connect->ProxyType == PROXY_HTTP && err != ERR_PROXY_CONNECT_FAILED &&
 			IsEmptyStr(connect->HostNameForProxy) == false && StrCmpi(connect->HostNameForProxy, connect->HostName) != 0)
 		{
+L_PROXY_RETRY_WITH_ALTERNATIVE_FQDN:
 			// HTTP プロキシサーバーの場合で単純プロキシサーバー接続不具合以外
 			// の場合は、接続先接続先を HostNameForProxy にして再試行する
+			Debug("WtsConnectMain: Try 1\n");
+
 			s = WtSockConnect(connect, &err, true);
 
 			if (s == NULL)
 			{
-				Debug("WtSockConnect Failed 2.\n");
+				Debug("WtSockConnect Failed 2. %u\n", err);
 				session->ErrorCode = err;
 				return;
 			}
 
 			sni = connect->HostNameForProxy;
+
+			is_proxy_alternative_fqdn = true;
 		}
 		else
 		{
@@ -709,10 +727,25 @@ void WtsConnectMain(TSESSION *session)
 	AddRef(s->ref);
 
 	// 接続処理
-	WtsConnectInner(session, s, sni);
+	should_retry_proxy_alternative = false;
+	WtsConnectInner(session, s, sni, &should_retry_proxy_alternative);
 
 	Disconnect(s);
 	ReleaseSock(s);
+
+	if (should_retry_proxy_alternative && is_proxy_alternative_fqdn == false && connect->ProxyType == PROXY_HTTP && IsEmptyStr(connect->HostNameForProxy) == false && StrCmpi(connect->HostNameForProxy, connect->HostName) != 0)
+	{
+		// HTTP プロキシサーバーの場合で単純プロキシサーバー接続不具合以外
+		// の場合は、接続先接続先を HostNameForProxy にして再試行する
+		session->Sock = NULL;
+
+		Debug("WtsConnectMain: Try 0 error\n");
+
+		Disconnect(s);
+		ReleaseSock(s);
+		s = NULL;
+		goto L_PROXY_RETRY_WITH_ALTERNATIVE_FQDN;
+	}
 }
 
 // ソケット接続
