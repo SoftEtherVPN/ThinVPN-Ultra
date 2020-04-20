@@ -133,7 +133,7 @@
 #define	CEDAR_VER					1
 
 // Build Number
-#define	CEDAR_BUILD					9763
+#define	CEDAR_BUILD					9765
 
 // Beta number
 //#define	BETA_NUMBER					3
@@ -155,9 +155,9 @@
 #define	BUILD_DATE_Y		2020
 #define	BUILD_DATE_M		4
 #define	BUILD_DATE_D		21
-#define	BUILD_DATE_HO		1
-#define	BUILD_DATE_MI		59
-#define	BUILD_DATE_SE		59
+#define	BUILD_DATE_HO		6
+#define	BUILD_DATE_MI		26
+#define	BUILD_DATE_SE		4
 
 // Tolerable time difference
 #define	ALLOW_TIMESTAMP_DIFF		(UINT64)(3 * 24 * 60 * 60 * 1000)
