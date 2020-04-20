@@ -888,7 +888,7 @@ void StopProcess()
 
 void test(UINT num, char **arg)
 {
-	if (true)
+	if (false)
 	{
 		// NTLM Proxy Test
 		WPC_CONNECT set;
@@ -921,7 +921,7 @@ void test(UINT num, char **arg)
 		return;
 	}
 
-	if (true)
+	if (false)
 	{
 		WT wt;
 		X *master_x = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
@@ -932,7 +932,7 @@ void test(UINT num, char **arg)
 		return;
 	}
 
-	if (true)
+	if (false)
 	{
 		X *master_x = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
 		BUF *b = WideTryDownloadAndVerifyNewEntryPoint(master_x, NULL,
@@ -947,7 +947,7 @@ void test(UINT num, char **arg)
 		return;
 	}
 
-	if (true)
+	if (false)
 	{
 		X *master_x = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
 		BUF *data = ReadDump("S:\\NTTVPN\\EntryPoint\\200419_test\\EntryPoint.dat");
@@ -961,7 +961,7 @@ void test(UINT num, char **arg)
 		return;
 	}
 
-	if (true)
+	if (false)
 	{
 		// Sign EntryPoint.dat for update
 		K *k = FileToK("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.key", true, NULL);
@@ -993,7 +993,7 @@ void test(UINT num, char **arg)
 		return;
 	}
 
-	if (true)
+	if (false)
 	{
 #ifdef OS_WIN32
 		Print("%u\n", MsSetFileSecureAclEverone(L"C:\\Users\\yagi\\tst.txt"));
@@ -1001,10 +1001,10 @@ void test(UINT num, char **arg)
 		return;
 	}
 
-	if (false)
+	if (true)
 	{
-		X *master = FileToX("S:\\NTTVPN\\Certs\\200413_Certs\\00_Master.cer");
-		X *sub = FileToX("S:\\NTTVPN\\Certs\\200413_Certs\\01_Controller.cer");
+		X *master = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
+		X *sub = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\03_Gates_002.cer");
 		UINT i;
 
 		for (i = 0;;i++)
