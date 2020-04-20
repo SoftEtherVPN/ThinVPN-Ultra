@@ -1586,6 +1586,8 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 
 	if (t.LastError == ERR_NO_ERROR)
 	{
+		bool has_error_msg = false;
+
 		if (t.Active)
 		{
 			UniFormat(status_string, sizeof(status_string), _UU("DG_INTERNET_CONNECT_OK_1"),
@@ -1596,12 +1598,19 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 			UniFormat(status_string, sizeof(status_string), _UU("DG_INTERNET_CONNECT_OK_2"));
 		}
 
+		if (t.MsgForServerArrived && t.MsgForServerOnce == false && UniIsEmptyStr(t.MsgForServer) == false)
+		{
+			// サーバーからエラーメッセージが届いている
+			has_error_msg = true;
+			UniStrCpy(status_string, sizeof(status_string), t.MsgForServer);
+		}
+
 		SetText(hWnd, S_STATUS, status_string);
 		SetText(hWnd, S_CURRENT, _UU("DG_CURRENT_OK"));
 
 		Hide(hWnd, S_WARNING);
 
-		if (t.Active)
+		if (t.Active && has_error_msg == false)
 		{
 			Hide(hWnd, S_DENY);
 			Show(hWnd, S_LOCK);
