@@ -987,7 +987,7 @@ struct HTTP_HEADER
 };
 
 // HTTPS server / client related string constant
-#define	DEFAULT_USER_AGENT	"Mozilla/5.0 (Windows NT 6.3; WOW64; rv:29.0) Gecko/20100101 Firefox/29.0"
+#define	DEFAULT_USER_AGENT	"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0"
 #define	DEFAULT_ACCEPT		"image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, application/msword, application/vnd.ms-powerpoint, application/vnd.ms-excel, */*"
 #define	DEFAULT_ENCODING	"gzip, deflate"
 #define	HTTP_CONTENT_TYPE	"text/html; charset=iso-8859-1"

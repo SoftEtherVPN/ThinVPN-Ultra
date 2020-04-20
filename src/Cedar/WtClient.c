@@ -272,6 +272,7 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 	UINT tunnel_keepalive = WT_TUNNEL_KEEPALIVE;
 	bool tunnel_use_aggressive_timeout = false;
 	char *sni = NULL;
+	bool is_proxy_alternative_fqdn = false;
 
 	// 引数チェック
 	if (wt == NULL || connect == NULL || sockio == NULL)
@@ -282,6 +283,7 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 	sni = connect->HostName;
 
 	// Gate に接続
+	Debug("WtcConnectEx: Try 0\n");
 	s = WtSockConnect(connect, &code, false);
 	if (s == NULL)
 	{
@@ -289,16 +291,23 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 		if (connect->ProxyType == PROXY_HTTP && code != ERR_PROXY_CONNECT_FAILED &&
 			IsEmptyStr(connect->HostNameForProxy) == false && StrCmpi(connect->HostNameForProxy, connect->HostName) != 0)
 		{
+L_PROXY_RETRY_WITH_ALTERNATIVE_FQDN:
 			// HTTP プロキシサーバーの場合で単純プロキシサーバー接続不具合以外
 			// の場合は、接続先接続先を HostNameForProxy にして再試行する
+			Debug("WtcConnectEx: Try 1\n");
 			s = WtSockConnect(connect, &code, true);
 
 			if (s == NULL)
 			{
+				Debug("WtcConnectEx: Try 1 error: %u\n", code);
 				return code;
 			}
 
+			Debug("WtcConnectEx: Try 1 Connect OK\n");
+
 			sni = connect->HostNameForProxy;
+
+			is_proxy_alternative_fqdn = true;
 		}
 		else
 		{
@@ -317,6 +326,15 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 		Debug("StartSSL Failed.\n");
 		Disconnect(s);
 		ReleaseSock(s);
+		s = NULL;
+
+		if (is_proxy_alternative_fqdn == false && connect->ProxyType == PROXY_HTTP && IsEmptyStr(connect->HostNameForProxy) == false && StrCmpi(connect->HostNameForProxy, connect->HostName) != 0)
+		{
+			Debug("WtcConnectEx: Try 0 StartSSLEx error\n");
+			// HTTP プロキシサーバーの場合で単純プロキシサーバー接続不具合以外
+			// の場合は、接続先接続先を HostNameForProxy にして再試行する
+			goto L_PROXY_RETRY_WITH_ALTERNATIVE_FQDN;
+		}
 		return ERR_PROTOCOL_ERROR;
 	}
 
@@ -331,6 +349,15 @@ UINT WtcConnectEx(WT *wt, WT_CONNECT *connect, SOCKIO **sockio, UINT ver, UINT b
 			Debug("WtIsTrustedCert Failed.\n");
 			Disconnect(s);
 			ReleaseSock(s);
+			s = NULL;
+
+			if (is_proxy_alternative_fqdn == false && connect->ProxyType == PROXY_HTTP && IsEmptyStr(connect->HostNameForProxy) == false && StrCmpi(connect->HostNameForProxy, connect->HostName) != 0)
+			{
+				Debug("WtcConnectEx: Try 0 WtIsTrustedCert error\n");
+				// HTTP プロキシサーバーの場合で単純プロキシサーバー接続不具合以外
+				// の場合は、接続先接続先を HostNameForProxy にして再試行する
+				goto L_PROXY_RETRY_WITH_ALTERNATIVE_FQDN;
+			}
 			return ERR_SSL_X509_UNTRUSTED;
 		}
 	}
