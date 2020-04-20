@@ -1004,7 +1004,7 @@ void test(UINT num, char **arg)
 	if (true)
 	{
 		X *master = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
-		X *sub = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\03_Gates_002.cer");
+		X *sub = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\04_Gates_003.cer");
 		UINT i;
 
 		for (i = 0;;i++)
