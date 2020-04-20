@@ -1292,6 +1292,7 @@ void *MsInitEventLog(wchar_t *src_name)
 	wchar_t keyname[MAX_PATH];
 	char keyname_a[MAX_PATH];
 	wchar_t *exename;
+	wchar_t new_exename[MAX_PATH];
 	// Validate arguments
 	if (src_name == NULL)
 	{
@@ -1300,13 +1301,23 @@ void *MsInitEventLog(wchar_t *src_name)
 
 	// Write the key to the registry
 	exename = MsGetExeFileNameW();
+
+	CombinePathW(new_exename, sizeof(new_exename), MsGetExeFileDirW(), DS_EXE_COPY_FILENAME_FOR_EVENTLOG_RES);
+
+	FileCopyW(exename, new_exename);
+
+	if (IsFileExistsW(new_exename) == false)
+	{
+		return NULL;
+	}
+
 	UniFormat(keyname, sizeof(keyname),
 		L"SYSTEM\\CurrentControlSet\\Services\\Eventlog\\Application\\%s",
 		src_name);
 	UniToStr(keyname_a, sizeof(keyname_a), keyname);
 
 	MsRegWriteStrExpandExW(REG_LOCAL_MACHINE, keyname_a, "EventMessageFile",
-		exename, false);
+		new_exename, false);
 
 	MsRegWriteIntEx(REG_LOCAL_MACHINE, keyname_a, "TypesSupported", 7, false);
 
