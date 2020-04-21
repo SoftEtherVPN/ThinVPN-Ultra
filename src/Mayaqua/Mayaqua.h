@@ -136,7 +136,7 @@ int main(int argc, char *argv[]);
 int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 {
 	char *argv[] = { CmdLine, };
-	InitProcessCallOnce();
+	InitProcessCallOnceEx(1);
 	return main(1, argv);
 }
 #endif	// WIN32

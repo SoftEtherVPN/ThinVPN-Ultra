@@ -257,7 +257,7 @@
 				AdditionalLibraryDirectories="&quot;C:\Program Files (x86)\Microsoft Visual Studio 8\VC\lib&quot;"
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;x86&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
-				DelayLoadDLLs="setupapi.dll;advapi32.dll;user32.dll"
+				DelayLoadDLLs="setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(ConfigurationName)\$(ProjectName).pdb"
 				GenerateMapFile="true"
@@ -354,7 +354,7 @@
 				AdditionalLibraryDirectories=""
 				GenerateManifest="false"
 				AdditionalManifestDependencies="type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; processorArchitecture=&apos;amd64&apos;  publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos;"
-				DelayLoadDLLs="setupapi.dll;advapi32.dll;user32.dll"
+				DelayLoadDLLs="setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(ConfigurationName)\$(ProjectName).pdb"
 				GenerateMapFile="true"
@@ -419,11 +419,11 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\Server.ico"
+				RelativePath=".\DeskServer.rc"
 				>
 			</File>
 			<File
-				RelativePath=".\DeskServer.rc"
+				RelativePath=".\Server.ico"
 				>
 			</File>
 		</Filter>

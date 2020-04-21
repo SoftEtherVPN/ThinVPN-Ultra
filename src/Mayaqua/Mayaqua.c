@@ -499,7 +499,7 @@ void InitMayaqua(bool memcheck, bool debug, int argc, char **argv)
 		return;
 	}
 
-	InitProcessCallOnce();
+	InitProcessCallOnceEx(true);
 
 	g_memcheck = memcheck;
 	g_debug = debug;

@@ -149,7 +149,7 @@ void StopProcess()
 // WinMain 関数
 int main(int argc, char *argv[])
 {
-	InitProcessCallOnce();
+	InitProcessCallOnceEx(true);
 
 #ifdef	OS_WIN32
 	return MsService("WIDEGATE", StartProcess, StopProcess, ICO_FARM, argv[0]);

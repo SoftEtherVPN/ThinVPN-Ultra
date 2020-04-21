@@ -1861,7 +1861,7 @@ int main(int argc, char *argv[])
 	char cmd[MAX_SIZE];
 	char *s;
 
-	InitProcessCallOnce();
+	InitProcessCallOnceEx(true);
 
 	printf("WideTunnel Test Program.\n");
 	printf("Copyright (C) 2004-2017 SoftEther Corporation. All Rights Reserved.\n\n");

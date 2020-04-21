@@ -178,7 +178,7 @@ void StopProcess()
 // WinMain 関数
 int main(int argc, char *argv[])
 {
-	InitProcessCallOnce();
+	InitProcessCallOnceEx(true);
 
 #ifdef	OS_WIN32
 	return MsService(DESK_SERVER_SVC_NAME, StartProcess, StopProcess, ICO_TOWER, argv[0]);
