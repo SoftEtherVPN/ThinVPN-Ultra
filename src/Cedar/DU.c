@@ -102,6 +102,80 @@ void DuTheEndDlg(HWND hWnd)
 	Dialog(hWnd, D_DU_THEEND, DuTheEndDlgProc, NULL);
 }
 
+bool DuDialupDlg(HWND hWnd)
+{
+	return DialogEx2(hWnd, D_DU_DIALUP, DuDialupDlgProc, NULL, false, false);
+}
+
+static HINSTANCE hWinMM = NULL;
+static BOOL (WINAPI *_PlaySoundW)(LPCWSTR, HMODULE, DWORD) = NULL;
+
+UINT DuDialupDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	wchar_t tmp[MAX_PATH];
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		if (hWinMM == NULL)
+		{
+			hWinMM = LoadLibraryA("winmm.dll");
+		}
+		if (_PlaySoundW == NULL)
+		{
+			if (hWinMM != NULL)
+			{
+				_PlaySoundW = (UINT (__stdcall *)(LPCWSTR,HMODULE,DWORD))GetProcAddress(hWinMM, "PlaySoundW");
+			}
+		}
+		CombinePathW(tmp, sizeof(tmp), MsGetMyTempDirW(), L"dial.wav");
+		if (IsFileExistsW(tmp) == false)
+		{
+			FileCopyW(L"|dial.wav", tmp);
+		}
+		if (_PlaySoundW != NULL)
+		{
+			_PlaySoundW(tmp, NULL, SND_FILENAME | SND_ASYNC | SND_NOWAIT);
+		}
+		SetTimer(hWnd, 1, 24 * 1000, NULL);
+		Top(hWnd);
+		break;
+
+	case WM_TIMER:
+		switch (wParam)
+		{
+		case 1:
+			KillTimer(hWnd, 1);
+			SetText(hWnd, S_STATIC, _UU("DU_DIALUP_CONNECTING"));
+			SetTimer(hWnd, 2, Rand32() % 1500 + 1000, NULL);
+			break;
+
+		case 2:
+			KillTimer(hWnd, 2);
+			EndDialog(hWnd, 1);
+			PlaySoundW(NULL, NULL, SND_ASYNC);
+			break;
+		}
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+		break;
+
+	case WM_CLOSE:
+		PlaySoundW(NULL, NULL, SND_ASYNC);
+		EndDialog(hWnd, 0);
+		break;
+	}
+
+	return 0;
+}
+
 // コントロール更新
 void DuShareDlgUpdate(HWND hWnd)
 {

@@ -1291,6 +1291,8 @@
 #define D_DU_AUTH                       2645
 #define B_RESTORE                       2646
 #define D_DU_THEEND                     2646
+#define D_DEFAULT4                      2647
+#define D_DU_DIALUP                     2647
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021
