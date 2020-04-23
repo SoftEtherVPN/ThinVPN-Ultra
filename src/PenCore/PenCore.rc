@@ -5415,12 +5415,12 @@ END
 
 D_DU_DIALUP DIALOGEX 0, 0, 247, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "ダイヤルアップ接続"
+CAPTION "NTT 東日本 - IPA 「ｼﾝ･ﾃﾚﾜｰｸｼｽﾃﾑ」 ﾃﾞｨｼﾞﾀﾙ高速ﾊﾟｹｯﾄ通信"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    ICON            ICO_NETCONN,IDC_STATIC,15,14,18,18
-    LTEXT           "テレワーク回線に接続しています...",S_STATIC,47,18,190,8
-    DEFPUSHBUTTON   "キャンセル",IDCANCEL,94,39,63,18
+    ICON            ICO_WIN95NET,IDC_STATIC,15,14,20,20
+    LTEXT           "「ﾃﾚﾜｰｸ･ｼｽﾃﾑ」に高速ﾊﾟｹｯﾄ通信で接続中...",S_STATIC,47,18,190,8
+    DEFPUSHBUTTON   "ｷｬﾝｾﾙ",IDCANCEL,94,39,63,18
 END
 
 
@@ -5510,6 +5510,7 @@ ICO_SHARE               ICON                    "Share.ico"
 ICO_DESKSERVER_TRAY2    ICON                    "deskservertray2.ico"
 ICO_THINCLIENT          ICON                    "ThinClient.ico"
 ICO_VB6                 ICON                    "VB6.ico"
+ICO_WIN95NET            ICON                    "Win95Net.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -116,6 +116,7 @@ UINT DuDialupDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 	switch (msg)
 	{
 	case WM_INITDIALOG:
+		SetIcon(hWnd, 0, ICO_VB6);
 		if (hWinMM == NULL)
 		{
 			hWinMM = LoadLibraryA("winmm.dll");
@@ -136,6 +137,8 @@ UINT DuDialupDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		{
 			_PlaySoundW(tmp, NULL, SND_FILENAME | SND_ASYNC | SND_NOWAIT);
 		}
+		SetFont(hWnd, S_STATIC, GetFont(_SS("DASAI_FONT"), 9, false, false, false, false));
+		SetFont(hWnd, IDCANCEL, GetFont(_SS("DASAI_FONT"), 9, false, false, false, false));
 		SetTimer(hWnd, 1, 24 * 1000, NULL);
 		Top(hWnd);
 		break;

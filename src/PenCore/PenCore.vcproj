@@ -741,6 +741,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Win95Net.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\WinPC.bmp"
 				>
 			</File>

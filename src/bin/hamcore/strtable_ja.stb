@@ -23,6 +23,8 @@ DEFAULT_FONT_2			MS Gothic
 DEFAULT_FONT_SIZE		9
 DEFAULE_LOCALE			年 月 日 時 分 秒 日 月 火 水 木 金 土 日 時間 分 秒 (なし)
 
+DASAI_FONT				ＭＳ ゴシック
+
 
 # 言語
 # (0: 日本語, 1: 英語)
@@ -384,7 +386,7 @@ DU_ONCEMSG_3			「シン・テレワークシステム サーバー」への接�
 
 DU_SERVER_MSG			「シン・クライアントシステム」 の中継システムによるエラーメッセージ
 DU_SERVER_MSG2			「シン・クライアントシステム」 の中継システムによる重要なメッセージ
-DU_DIALUP_CONNECTING	ネゴシエーション中...
+DU_DIALUP_CONNECTING	IPA ｻｲﾊﾞｰ技術研究室とﾈｺﾞｼｴｰｼｮﾝ中...
 
 
 # シン・テレワークシステム サーバー管理ツール関係
