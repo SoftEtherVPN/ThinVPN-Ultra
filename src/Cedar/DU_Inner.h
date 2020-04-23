@@ -145,4 +145,7 @@ void DuAuthDlgSetCertPath(HWND hWnd, wchar_t *path);
 void DuTheEndDlg(HWND hWnd);
 UINT DuTheEndDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 
+bool DuDialupDlg(HWND hWnd);
+UINT DuDialupDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+
 

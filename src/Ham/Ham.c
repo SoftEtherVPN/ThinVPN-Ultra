@@ -888,6 +888,14 @@ void StopProcess()
 
 void test(UINT num, char **arg)
 {
+	if (true)
+	{
+		InitWinUi(NULL, NULL, 0);
+		Print("%u\n", DuDialupDlg(NULL));
+		FreeWinUi();
+		return;
+	}
+
 	if (false)
 	{
 		// NTLM Proxy Test
