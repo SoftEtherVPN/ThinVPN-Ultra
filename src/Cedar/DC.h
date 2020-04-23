@@ -126,6 +126,7 @@ void DcSetInternetSetting(DC *dc, INTERNET_SETTING *setting);
 UINT DcConnectEx(DC *dc, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, char *ret_url, UINT ret_url_size, bool check_port,
 			   SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size);
 UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection);
+void DcSetLocalHostAllowFlag(bool allow);
 UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback,
 				  void *param, DC_SESSION **session);
 UINT DcSessionConnect(DC_SESSION *s);

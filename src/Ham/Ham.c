@@ -1894,6 +1894,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	DcSetLocalHostAllowFlag(true);
+
 	InitMayaqua(memchk, true, argc, argv);
 	InitCedar();
 	TestMain(cmdline);

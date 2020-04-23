@@ -992,20 +992,22 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 					cert_buf = ZeroMalloc(cert_size);
 					if (PackGetData(p, "cert", cert_buf))
 					{
-						if (PackGetDataSize(p, "sign") == 128)
+						UCHAR sign[4096 / 8];
+						UINT sign_size = PackGetDataSize(p, "sign");
+						if (sign_size <= sizeof(sign) && sign_size >= 1)
 						{
-							UCHAR sign[128];
 							if (PackGetData(p, "sign", sign))
 							{
 								BUF *b = NewBuf();
 								X *x;
 								WriteBuf(b, cert_buf, cert_size);
 								x = BufToX(b, false);
-								if (x != NULL)
+								if (x != NULL && x->is_compatible_bit &&
+									sign_size == (x->bits / 8))
 								{
 									K *k = GetKFromX(x);
 									// クライアントから受信した署名を確認する
-									if (RsaVerify(rand, SHA1_SIZE, sign, k))
+									if (RsaVerifyEx(rand, SHA1_SIZE, sign, k, x->bits))
 									{
 										// 署名が一致したのでクライアントが確かにこの
 										// 証明書を持っていたことが確認できた。

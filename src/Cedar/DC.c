@@ -2437,6 +2437,13 @@ SOCK *DcListen()
 	return NULL;
 }
 
+// localhost 接続許可フラグ (デバッグ用)
+static bool dc_allow_localhost = false;
+void DcSetLocalHostAllowFlag(bool allow)
+{
+	dc_allow_localhost = allow;
+}
+
 // 接続メイン
 UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection)
 {
@@ -2515,7 +2522,7 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 	}
 
 	// MachineKey の比較
-	if (Cmp(machine_key, my_machine_key, SHA1_SIZE) == 0)
+	if (Cmp(machine_key, my_machine_key, SHA1_SIZE) == 0 && dc_allow_localhost == false)
 	{
 		// 同一のマシンである
 		return ERR_DESK_LOCALHOST;
@@ -2572,7 +2579,7 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 	{
 		// 新しいユーザー認証
 		DC_AUTH a;
-		UCHAR sign[128];
+		UCHAR sign[4096 / 8];
 
 		Zero(&a, sizeof(a));
 
@@ -2617,13 +2624,17 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 				x = BufToX(x_buf, false);
 				k = BufToK(k_buf, true, false, NULL);
 
-				if (RsaSign(sign, rand, SHA1_SIZE, k))
+				if (x != NULL && x->is_compatible_bit &&
+					x->bits != 0 && (x->bits / 8) <= sizeof(sign))
 				{
-					p = PackLoginWithCert(CEDAR_DESKVPN_HUBNAME,
-						a.RetUsername,
-						x,
-						sign,
-						128);
+					if (RsaSignEx(sign, rand, SHA1_SIZE, k, x->bits))
+					{
+						p = PackLoginWithCert(CEDAR_DESKVPN_HUBNAME,
+							a.RetUsername,
+							x,
+							sign,
+							x->bits / 8);
+					}
 				}
 
 				FreeX(x);
