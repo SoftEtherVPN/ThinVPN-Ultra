@@ -1738,7 +1738,7 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 		if (dg->MsgForServerDlg == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
 		{
 			dg->MsgForServerDlg = StartAsyncOnceMsg(_UU("DU_SERVER_MSG2"), t.MsgForServer, t.MsgForServerOnce,
-				ICO_INFORMATION, true);
+				ICO_VB6, true);
 		}
 	}
 

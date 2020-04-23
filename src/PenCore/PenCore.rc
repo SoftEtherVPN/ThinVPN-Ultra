@@ -5491,6 +5491,7 @@ ICO_NONE                ICON                    "None.ico"
 ICO_SHARE               ICON                    "Share.ico"
 ICO_DESKSERVER_TRAY2    ICON                    "deskservertray2.ico"
 ICO_THINCLIENT          ICON                    "ThinClient.ico"
+ICO_VB6                 ICON                    "VB6.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

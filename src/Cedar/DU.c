@@ -558,7 +558,7 @@ bool DuEventCallback(DC_SESSION *s, UINT event_type, void *event_param)
 		{
 			wchar_t *msg = (wchar_t *)event_param;
 
-			OnceMsgEx(t->hWndConnect, _UU("DU_SERVER_MSG"), msg, false, ICO_WARNING, NULL);
+			OnceMsgEx(t->hWndConnect, _UU("DU_SERVER_MSG"), msg, false, ICO_VB6, NULL);
 		}
 		break;
 	}

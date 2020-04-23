@@ -701,6 +701,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\VB6.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\VLan.ico"
 				>
 			</File>
