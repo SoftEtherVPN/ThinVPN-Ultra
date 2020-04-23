@@ -890,9 +890,9 @@ void test(UINT num, char **arg)
 {
 	if (true)
 	{
-		InitWinUi(NULL, NULL, 0);
-		Print("%u\n", DuDialupDlg(NULL));
-		FreeWinUi();
+		char tmp[MAX_SIZE];
+		GenerateDefaultUserProxyAgentStr(tmp, sizeof(tmp));
+		Print("%s\n", tmp);
 		return;
 	}
 

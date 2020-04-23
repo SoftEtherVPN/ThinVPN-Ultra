@@ -124,6 +124,7 @@ struct WPC_CONNECT
 	UINT ProxyPort;								// Proxy server port number
 	char ProxyUsername[MAX_USERNAME_LEN + 1];	// Proxy server user name
 	char ProxyPassword[MAX_USERNAME_LEN + 1];	// Proxy server password
+	char ProxyUserAgent[MAX_SIZE + 1];			// Proxy server user agent
 	bool UseCompress;							// Use of compression
 	bool DontCheckCert;							// Do not check the certificate
 };
@@ -136,6 +137,7 @@ struct INTERNET_SETTING
 	UINT ProxyPort;								// Proxy server port number
 	char ProxyUsername[MAX_USERNAME_LEN + 1];	// Proxy server user name
 	char ProxyPassword[MAX_USERNAME_LEN + 1];	// Proxy server password
+	char ProxyUserAgent[MAX_SIZE + 1];			// Proxy server user agent
 };
 
 // URL

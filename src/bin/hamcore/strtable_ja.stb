@@ -4602,6 +4602,9 @@ S_OPTION2				(オプション)
 B_IE					Internet Explorer の設定を使用する(&I)
 IDOK					&OK
 IDCANCEL				キャンセル
+S_USERAGENT				HTTP User &Agent 文字列:
+S_USERAGENT2			HTTP プロキシサーバーへ接続する際の User Agent の文字列を変更することができます。特定の User Agent のみ通信を許可するプロキシサーバーが存在する場合に利用してください。
+
 
 
 PREFIX					D_DG_AUTH

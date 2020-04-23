@@ -2530,6 +2530,12 @@ void DsLoadInternetSetting(FOLDER *f, INTERNET_SETTING *setting)
 		DsDecryptPassword(b, setting->ProxyPassword, sizeof(setting->ProxyPassword));
 	}
 
+	CfgGetStr(f, "ProxyUserAgent", setting->ProxyUserAgent, sizeof(setting->ProxyUserAgent));
+	if (IsEmptyStr(setting->ProxyUserAgent))
+	{
+		StrCpy(setting->ProxyUserAgent, sizeof(setting->ProxyUserAgent), DEFAULT_PROXY_USER_AGENT);
+	}
+
 	FreeBuf(b);
 }
 
@@ -2550,6 +2556,7 @@ void DsSaveInternetSetting(FOLDER *f, INTERNET_SETTING *setting)
 	CfgAddStr(f, "ProxyUsername", setting->ProxyUsername);
 	b = DsEncryptPassword(setting->ProxyPassword);
 	CfgAddBuf(f, "ProxyPassword", b);
+	CfgAddStr(f, "ProxyUserAgent", setting->ProxyUserAgent);
 	FreeBuf(b);
 }
 

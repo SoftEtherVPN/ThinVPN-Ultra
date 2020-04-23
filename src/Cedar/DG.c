@@ -2065,6 +2065,7 @@ void DgProxyDlgSet(HWND hWnd, INTERNET_SETTING *t)
 	SetIntEx(hWnd, E_PORT, t->ProxyPort);
 	SetTextA(hWnd, E_USERNAME, t->ProxyUsername);
 	SetTextA(hWnd, E_PASSWORD, t->ProxyPassword);
+	SetTextA(hWnd, E_USERAGENT, t->ProxyUserAgent);
 
 	DgProxyDlgUpdate(hWnd);
 }
@@ -2124,6 +2125,10 @@ void DgProxyDlgUpdate(HWND hWnd)
 	SetEnable(hWnd, S_PASSWORD, b3);
 	SetEnable(hWnd, E_PASSWORD, b3);
 	SetEnable(hWnd, S_OPTION2, b3);
+
+	SetEnable(hWnd, E_USERAGENT, b3);
+	SetEnable(hWnd, S_USERAGENT, b3);
+	SetEnable(hWnd, S_USERAGENT2, b3);
 }
 
 // IE の設定を使用する
@@ -2138,6 +2143,8 @@ void DgProxyDlgUseForIE(HWND hWnd)
 
 	Zero(&s, sizeof(s));
 	GetSystemInternetSetting(&s);
+
+	StrCpy(s.ProxyUserAgent, sizeof(s.ProxyUserAgent), DEFAULT_PROXY_USER_AGENT_IE);
 
 	DgProxyDlgSet(hWnd, &s);
 
@@ -2171,6 +2178,7 @@ void DgProxyDlgOnOk(HWND hWnd, INTERNET_SETTING *t)
 	t->ProxyPort = GetInt(hWnd, E_PORT);
 	GetTxtA(hWnd, E_USERNAME, t->ProxyUsername, sizeof(t->ProxyUsername));
 	GetTxtA(hWnd, E_PASSWORD, t->ProxyPassword, sizeof(t->ProxyPassword));
+	GetTxtA(hWnd, E_USERAGENT, t->ProxyUserAgent, sizeof(t->ProxyUserAgent));
 
 	EndDialog(hWnd, 1);
 }

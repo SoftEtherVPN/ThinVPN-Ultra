@@ -328,6 +328,8 @@
 #define S_PASSWORD                      1067
 #define S_CERT                          1068
 #define S_CONTROLLER_PORT               1068
+#define S_PASSWORD4                     1068
+#define S_USERAGENT                     1068
 #define B_REGIST_CLIENT_CERT            1069
 #define S_CERT_INFO                     1070
 #define R_RETRY                         1071
@@ -1195,7 +1197,6 @@
 #define C_NO_THEEND                     2548
 #define C_SHOW_THEEND                   2548
 #define B_AUTH                          2549
-#define C_RELAX                         2549
 #define C_ENABLE_RELAX                  2549
 #define B_ACCEPT                        2550
 #define C_PUBLIC2                       2551
@@ -1204,6 +1205,7 @@
 #define E_PCID                          2554
 #define E_ADDRESS                       2555
 #define E_PATH                          2556
+#define E_USERAGENT                     2556
 #define E_EULA                          2557
 #define E_PARAM                         2558
 #define C_DISABLESHARE                  2559
@@ -1217,6 +1219,7 @@
 #define C_SOCKS                         2567
 #define S_OPTION2                       2568
 #define B_RDP                           2569
+#define S_USERAGENT2                    2569
 #define B_URDP                          2570
 #define S_PCID                          2571
 #define S_PCID_2                        2572

@@ -10180,6 +10180,7 @@ void InRpcInternetSetting(INTERNET_SETTING *t, PACK *p)
 	t->ProxyPort = PackGetInt(p, "ProxyPort");
 	PackGetStr(p, "ProxyUsername", t->ProxyUsername, sizeof(t->ProxyUsername));
 	PackGetStr(p, "ProxyPassword", t->ProxyPassword, sizeof(t->ProxyPassword));
+	PackGetStr(p, "ProxyUserAgent", t->ProxyUserAgent, sizeof(t->ProxyUserAgent));
 }
 void OutRpcInternetSetting(PACK *p, INTERNET_SETTING *t)
 {
@@ -10194,6 +10195,7 @@ void OutRpcInternetSetting(PACK *p, INTERNET_SETTING *t)
 	PackAddInt(p, "ProxyPort", t->ProxyPort);
 	PackAddStr(p, "ProxyUsername", t->ProxyUsername);
 	PackAddStr(p, "ProxyPassword", t->ProxyPassword);
+	PackAddStr(p, "ProxyUserAgent", t->ProxyUserAgent);
 }
 
 // RPC_AZURE_STATUS

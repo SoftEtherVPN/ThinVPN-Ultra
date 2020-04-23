@@ -338,11 +338,11 @@ SOCK *ProxyConnectEx(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 SOCK *ProxyConnectEx2(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 					 char *server_host_name, UINT server_port,
 					 char *username, char *password, bool additional_connect,
-					 bool *cancel_flag, void *hWnd, UINT timeout);
+					 bool *cancel_flag, void *hWnd, UINT timeout, char *user_agent);
 SOCK *ProxyConnectEx2NtlmAuth(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 						   char *server_host_name, UINT server_port,
 						   char *username, char *password, bool additional_connect,
-						   bool *cancel_flag, void *hWnd, UINT timeout);
+						   bool *cancel_flag, void *hWnd, UINT timeout, char *user_agent);
 SOCK *SocksConnect(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 				   char *server_host_name, UINT server_port,
 				   char *username, bool additional_connect);

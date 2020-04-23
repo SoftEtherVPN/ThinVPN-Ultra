@@ -776,9 +776,9 @@ SOCK *WtSockConnect(WT_CONNECT *param, UINT *error_code, bool proxy_use_alternat
 		break;
 
 	case PROXY_HTTP:
-		sock = ProxyConnect(&c, param->ProxyHostName, param->ProxyPort,
+		sock = ProxyConnectEx2(&c, param->ProxyHostName, param->ProxyPort,
 			(proxy_use_alternative_fqdn ? param->HostNameForProxy :  param->HostName), param->Port,
-			param->ProxyUsername, param->ProxyPassword, false);
+			param->ProxyUsername, param->ProxyPassword, false, NULL, NULL, 0, param->ProxyUserAgent);
 		if (sock == NULL)
 		{
 			err = c.Err;
@@ -981,5 +981,6 @@ void WtInitWtConnectFromInternetSetting(WT_CONNECT *c, INTERNET_SETTING	*s)
 	c->ProxyPort = s->ProxyPort;
 	StrCpy(c->ProxyUsername, sizeof(c->ProxyUsername), s->ProxyUsername);
 	StrCpy(c->ProxyPassword, sizeof(c->ProxyPassword), s->ProxyPassword);
+	StrCpy(c->ProxyUserAgent, sizeof(c->ProxyUserAgent), s->ProxyUserAgent);
 }
 

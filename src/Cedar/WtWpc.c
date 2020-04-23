@@ -327,6 +327,11 @@ void WtSetInternetSetting(WT *wt, INTERNET_SETTING *setting)
 	Lock(wt->Lock);
 	{
 		Copy(wt->InternetSetting, setting, sizeof(INTERNET_SETTING));
+
+		if (IsEmptyStr(wt->InternetSetting->ProxyUserAgent))
+		{
+			GenerateDefaultUserProxyAgentStr(wt->InternetSetting->ProxyUserAgent, sizeof(wt->InternetSetting->ProxyUserAgent));
+		}
 	}
 	Unlock(wt->Lock);
 }
@@ -342,6 +347,11 @@ void WtGetInternetSetting(WT *wt, INTERNET_SETTING *setting)
 
 	Lock(wt->Lock);
 	{
+		if (IsEmptyStr(wt->InternetSetting->ProxyUserAgent))
+		{
+			GenerateDefaultUserProxyAgentStr(wt->InternetSetting->ProxyUserAgent, sizeof(wt->InternetSetting->ProxyUserAgent));
+		}
+
 		Copy(setting, wt->InternetSetting, sizeof(INTERNET_SETTING));
 	}
 	Unlock(wt->Lock);
@@ -1165,9 +1175,9 @@ SOCK *WtSockConnectHttpProxy(WT_CONNECT *param, char *target, UINT *error_code)
 		break;
 
 	case PROXY_HTTP:
-		sock = ProxyConnect(&c, param->ProxyHostName, param->ProxyPort,
+		sock = ProxyConnectEx2(&c, param->ProxyHostName, param->ProxyPort,
 			param->HostName, param->Port,
-			param->ProxyUsername, param->ProxyPassword, false);
+			param->ProxyUsername, param->ProxyPassword, false, NULL, NULL, 0, param->ProxyUserAgent);
 		if (sock == NULL)
 		{
 			err = c.Err;

@@ -600,6 +600,27 @@ int GetCurrentTimezone()
 	return ret;
 }
 
+void GenerateDefaultUserProxyAgentStr(char *str, UINT str_size)
+{
+#ifdef	OS_WIN32
+	OSVERSIONINFOEXA ver = {0};
+	ver.dwOSVersionInfoSize = sizeof(ver);
+	if (Win32GetVersionExInternal(&ver) == false)
+	{
+		StrCpy(str, str_size, DEFAULT_PROXY_USER_AGENT);
+	}
+	else
+	{
+		Format(str, str_size, "Mozilla/5.0 (Windows NT %u.%u%s) like Gecko",
+			ver.dwMajorVersion,
+			ver.dwMinorVersion,
+			(MsIs64BitWindows() && Is32() ? "; WOW64" : ""));
+	}
+#else	// OS_WIN32
+	StrCpy(str, str_size, DEFAULT_PROXY_USER_AGENT);
+#endif	// OS_WIN32
+}
+
 // Flag of whether to use the DNS proxy
 bool IsUseDnsProxy()
 {

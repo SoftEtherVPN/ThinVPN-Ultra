@@ -23,6 +23,7 @@ struct WT_CONNECT
 	UINT ProxyPort;								// プロキシサーバーポート番号
 	char ProxyUsername[MAX_USERNAME_LEN + 1];	// プロキシサーバーユーザー名
 	char ProxyPassword[MAX_USERNAME_LEN + 1];	// プロキシサーバーパスワード
+	char ProxyUserAgent[MAX_SIZE + 1];			// Proxy server user agent
 	bool UseCompress;							// 圧縮の使用
 	bool DontCheckCert;							// 証明書をチェックしない
 

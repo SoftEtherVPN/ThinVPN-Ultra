@@ -7935,7 +7935,7 @@ bool SocksSendRequestPacket(CONNECTION *c, SOCK *s, UINT dest_port, IP *dest_ip,
 SOCK *ProxyConnectEx2NtlmAuth(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 							  char *server_host_name, UINT server_port,
 							  char *username, char *password, bool additional_connect,
-							  bool *cancel_flag, void *hWnd, UINT timeout)
+							  bool *cancel_flag, void *hWnd, UINT timeout, char *user_agent)
 {
 	SOCK *s = NULL;
 	bool use_auth = false;
@@ -7964,6 +7964,8 @@ SOCK *ProxyConnectEx2NtlmAuth(CONNECTION *c, char *proxy_host_name, UINT proxy_p
 		c->Err = ERR_USER_CANCEL;
 		goto LABEL_CLEANUP;
 	}
+
+	if (IsEmptyStr(user_agent)) user_agent = DEFAULT_PROXY_USER_AGENT;
 
 	Zero(server_host_name_tmp, sizeof(server_host_name_tmp));
 	StrCpy(server_host_name_tmp, sizeof(server_host_name_tmp), server_host_name);
@@ -8014,7 +8016,7 @@ SOCK *ProxyConnectEx2NtlmAuth(CONNECTION *c, char *proxy_host_name, UINT proxy_p
 	ntlm_challenge = NtlmGenerateNegotiate();
 
 	h = NewHttpHeader("CONNECT", tmp, "HTTP/1.0");
-	AddHttpValue(h, NewHttpValue("User-Agent", (c->Cedar == NULL ? DEFAULT_USER_AGENT : c->Cedar->HttpUserAgent)));
+	AddHttpValue(h, NewHttpValue("User-Agent", (c->Cedar == NULL ? user_agent : c->Cedar->HttpUserAgent)));
 	AddHttpValue(h, NewHttpValue("Host", server_host_name_tmp));
 	AddHttpValue(h, NewHttpValue("Content-Length", "0"));
 	AddHttpValue(h, NewHttpValue("Proxy-Connection", "Keep-Alive"));
@@ -8290,12 +8292,12 @@ SOCK *ProxyConnectEx(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 {
 	return ProxyConnectEx2(c, proxy_host_name, proxy_port,
 		server_host_name, server_port, username, password, additional_connect,
-		cancel_flag, hWnd, 0);
+		cancel_flag, hWnd, 0, NULL);
 }
 SOCK *ProxyConnectEx2(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 				   char *server_host_name, UINT server_port,
 				   char *username, char *password, bool additional_connect,
-				   bool *cancel_flag, void *hWnd, UINT timeout)
+				   bool *cancel_flag, void *hWnd, UINT timeout, char *user_agent)
 {
 	SOCK *s = NULL;
 	bool use_auth = false;
@@ -8325,6 +8327,8 @@ SOCK *ProxyConnectEx2(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 		c->Err = ERR_USER_CANCEL;
 		return NULL;
 	}
+
+	if (IsEmptyStr(user_agent)) user_agent = DEFAULT_PROXY_USER_AGENT;
 
 	Zero(server_host_name_tmp, sizeof(server_host_name_tmp));
 	StrCpy(server_host_name_tmp, sizeof(server_host_name_tmp), server_host_name);
@@ -8373,7 +8377,7 @@ SOCK *ProxyConnectEx2(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 	}
 
 	h = NewHttpHeader("CONNECT", tmp, "HTTP/1.0");
-	AddHttpValue(h, NewHttpValue("User-Agent", (c->Cedar == NULL ? DEFAULT_USER_AGENT : c->Cedar->HttpUserAgent)));
+	AddHttpValue(h, NewHttpValue("User-Agent", (c->Cedar == NULL ? user_agent : c->Cedar->HttpUserAgent)));
 	AddHttpValue(h, NewHttpValue("Host", server_host_name_tmp));
 	AddHttpValue(h, NewHttpValue("Content-Length", "0"));
 	AddHttpValue(h, NewHttpValue("Proxy-Connection", "Keep-Alive"));
@@ -8463,7 +8467,7 @@ SOCK *ProxyConnectEx2(CONNECTION *c, char *proxy_host_name, UINT proxy_port,
 			c->Err = ERR_PROXY_AUTH_FAILED;
 
 			return ProxyConnectEx2NtlmAuth(c, proxy_host_name, proxy_port, server_host_name,
-				server_port, username, password, additional_connect, cancel_flag, hWnd, timeout);
+				server_port, username, password, additional_connect, cancel_flag, hWnd, timeout, user_agent);
 		}
 	}
 

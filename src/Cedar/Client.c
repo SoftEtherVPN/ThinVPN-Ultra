@@ -10724,6 +10724,11 @@ bool CompareInternetSetting(INTERNET_SETTING *s1, INTERNET_SETTING *s2)
 		return false;
 	}
 
+	if (StrCmp(s1->ProxyUserAgent, s2->ProxyUserAgent) != 0)
+	{
+		return false;
+	}
+
 	return true;
 }
 
