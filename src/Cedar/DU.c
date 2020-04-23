@@ -141,6 +141,7 @@ UINT DuDialupDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		SetFont(hWnd, IDCANCEL, GetFont(_SS("DASAI_FONT"), 9, false, false, false, false));
 		SetTimer(hWnd, 1, 24 * 1000, NULL);
 		Top(hWnd);
+		Center(hWnd);
 		break;
 
 	case WM_TIMER:
@@ -1062,6 +1063,8 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 	}
 	else
 	{
+		bool dialup_ok = true;
+
 		wchar_t exe[MAX_PATH];
 		char arg[MAX_PATH];
 		UINT ret = ERR_NO_ERROR;
@@ -1072,116 +1075,131 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 		bool rdp_file_write_failed = false;
 		UINT urdp_version = 0;
 
-		// リモートデスクトップクライアントの実行
-		if (s->ServiceType == DESK_SERVICE_RDP)
+		if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_ENABLE_RELAX_KEY_NAME))
 		{
-			// RDP
-			UniStrCpy(exe, sizeof(exe), mstsc);
+			Hide(t->hWnd, 0);
+			Hide(t->hWndConnect, 0);
+			dialup_ok = DuDialupDlg(NULL);
+			Show(t->hWndConnect, 0);
+			Show(t->hWnd, 0);
+		}
 
-			ret = DcGetMstscArguments(s, exe, arg, sizeof(arg));
-
-			if (ret == ERR_NO_ERROR)
-			{
-				process = DcRunMstsc(dc, exe, arg, s->Hostname, s->IsShareDisabled, &process_id, &rdp_file_write_failed);
-			}
+		if (dialup_ok == false)
+		{
 		}
 		else
 		{
-			if (s->DsCaps & DS_CAPS_SUPPORT_URDP2)
+			if (s->ServiceType == DESK_SERVICE_RDP)
 			{
-				urdp_version = 2;
-			}
+				// リモートデスクトップクライアントの実行
+				// RDP
+				UniStrCpy(exe, sizeof(exe), mstsc);
 
-			// URDP
-			ret = DcGetUrdpClientArguments(s, arg, sizeof(arg), s->IsShareDisabled, urdp_version);
+				ret = DcGetMstscArguments(s, exe, arg, sizeof(arg));
 
-			if (ret == ERR_NO_ERROR)
-			{
-				process = DcRunUrdpClient(arg, &process_id, urdp_version);
-
-				if (process != NULL)
+				if (ret == ERR_NO_ERROR)
 				{
-					wchar_t *once_msg = NULL;
-					wchar_t tmp[MAX_SIZE];
-
-					if (urdp_version <= 1)
-					{
-						// URDP1 の使い方のメッセージ
-						msg = DuUrdpMsgStart(t);
-					}
-
-					// URDP の場合必ず表示する Once Msg
-					if (s->DsCaps & DS_CAPS_RUDP_VERY_LIMITED)
-					{
-						once_msg = _UU("DU_ONCEMSG_1");
-					}
-					else
-					{
-						if (s->DsCaps & DS_CAPS_WIN_RDP_ENABLED)
-						{
-							once_msg = _UU("DU_ONCEMSG_3");
-						}
-						else
-						{
-							once_msg = _UU("DU_ONCEMSG_2");
-						}
-					}
-
-					UniFormat(tmp, sizeof(tmp), _UU("DU_ONCEMSG_TITLE"), s->Pcid);
-
-					once = StartAsyncOnceMsg(tmp, once_msg, true, ICO_INFORMATION, true);
-				}
-			}
-		}
-
-		if (ret == ERR_NO_ERROR)
-		{
-			if (process == NULL)
-			{
-				// プロセス起動失敗
-				ret = ERR_DESK_PROCESS_EXEC_FAILED;
-
-				if (s->IsShareDisabled && rdp_file_write_failed)
-				{
-					// .rdp ファイルに書き込めない
-					ret = ERR_DESK_RDP_FILE_WRITE_ERROR;
+					process = DcRunMstsc(dc, exe, arg, s->Hostname, s->IsShareDisabled, &process_id, &rdp_file_write_failed);
 				}
 			}
 			else
 			{
-				s->ProcessIdOfClient = process_id;
-
-				// プロセス起動成功
-				Hide(hWnd, 0);
-				Hide(t->hWnd, 0);
-
-				DcWaitForProcessExit(process);
-
-				if (msg != NULL)
+				if (s->DsCaps & DS_CAPS_SUPPORT_URDP2)
 				{
-					DuUrdpMsgStop(t, msg);
+					urdp_version = 2;
 				}
 
-				if (once != NULL)
-				{
-					StopAsyncOnceMsg(once);
-				}
+				// URDP
+				ret = DcGetUrdpClientArguments(s, arg, sizeof(arg), s->IsShareDisabled, urdp_version);
 
-				// お疲れ様でした
-				if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME))
+				if (ret == ERR_NO_ERROR)
 				{
-					DuTheEndDlg(NULL);
-				}
+					process = DcRunUrdpClient(arg, &process_id, urdp_version);
 
-				Show(t->hWnd, 0);
+					if (process != NULL)
+					{
+						wchar_t *once_msg = NULL;
+						wchar_t tmp[MAX_SIZE];
+
+						if (urdp_version <= 1)
+						{
+							// URDP1 の使い方のメッセージ
+							msg = DuUrdpMsgStart(t);
+						}
+
+						// URDP の場合必ず表示する Once Msg
+						if (s->DsCaps & DS_CAPS_RUDP_VERY_LIMITED)
+						{
+							once_msg = _UU("DU_ONCEMSG_1");
+						}
+						else
+						{
+							if (s->DsCaps & DS_CAPS_WIN_RDP_ENABLED)
+							{
+								once_msg = _UU("DU_ONCEMSG_3");
+							}
+							else
+							{
+								once_msg = _UU("DU_ONCEMSG_2");
+							}
+						}
+
+						UniFormat(tmp, sizeof(tmp), _UU("DU_ONCEMSG_TITLE"), s->Pcid);
+
+						once = StartAsyncOnceMsg(tmp, once_msg, true, ICO_INFORMATION, true);
+					}
+				}
 			}
-		}
 
-		if (ret != ERR_NO_ERROR)
-		{
-			if (ret != ERR_RECV_URL && ret != ERR_RECV_MSG)
+			if (ret == ERR_NO_ERROR)
 			{
-				MsgBox(hWnd, MB_ICONEXCLAMATION, _E(ret));
+				if (process == NULL)
+				{
+					// プロセス起動失敗
+					ret = ERR_DESK_PROCESS_EXEC_FAILED;
+
+					if (s->IsShareDisabled && rdp_file_write_failed)
+					{
+						// .rdp ファイルに書き込めない
+						ret = ERR_DESK_RDP_FILE_WRITE_ERROR;
+					}
+				}
+				else
+				{
+					s->ProcessIdOfClient = process_id;
+
+					// プロセス起動成功
+					Hide(hWnd, 0);
+					Hide(t->hWnd, 0);
+
+					DcWaitForProcessExit(process);
+
+					if (msg != NULL)
+					{
+						DuUrdpMsgStop(t, msg);
+					}
+
+					if (once != NULL)
+					{
+						StopAsyncOnceMsg(once);
+					}
+
+					// お疲れ様でした
+					if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME))
+					{
+						DuTheEndDlg(NULL);
+					}
+
+					Show(t->hWnd, 0);
+				}
+			}
+
+			if (ret != ERR_NO_ERROR)
+			{
+				if (ret != ERR_RECV_URL && ret != ERR_RECV_MSG)
+				{
+					MsgBox(hWnd, MB_ICONEXCLAMATION, _E(ret));
+				}
 			}
 		}
 	}
@@ -1424,6 +1442,7 @@ void DuOptionDlgInit(HWND hWnd, DU_OPTION *t)
 	Check(hWnd, C_VER2, dc->EnableVersion2);
 
 	Check(hWnd, C_SHOW_THEEND, MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME));
+	Check(hWnd, C_ENABLE_RELAX, MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_ENABLE_RELAX_KEY_NAME));
 
 	DuOptionDlgInitProxyStr(hWnd, t);
 
@@ -1564,6 +1583,9 @@ void DuOptionDlgOnOk(HWND hWnd, DU_OPTION *t)
 
 	// お疲れ様でした
 	MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME, IsChecked(hWnd, C_SHOW_THEEND));
+
+	// リラックスモード
+	MsRegWriteInt(REG_CURRENT_USER, DU_REGKEY, DU_ENABLE_RELAX_KEY_NAME, IsChecked(hWnd, C_ENABLE_RELAX));
 
 	EndDialog(hWnd, 1);
 }

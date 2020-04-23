@@ -23,7 +23,8 @@
 
 #define DESK_SECURE_PACK_EASY_MODE		// 有効にすると簡易モードになる
 
-#define DU_SHOW_THEEND_KEY_NAME			"ShowTheEndDialog_Ver01"		// お疲れ様でした無効化キー 画像変更時に番号増やす
+#define DU_SHOW_THEEND_KEY_NAME			"ShowTheEndDialog_Ver01"		// お疲れ様でした有効化キー
+#define	DU_ENABLE_RELAX_KEY_NAME		"EnableRelaxMode"				// リラックスモード
 
 
 #define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Server\\Config Tool"

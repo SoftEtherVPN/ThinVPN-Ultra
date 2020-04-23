@@ -4697,8 +4697,8 @@ C_PUBLIC				バージョン 6 の mstsc.exe を起動する場合は、/public �
 IDOK					&OK
 IDCANCEL				キャンセル
 S_UX					テレワーク作業向上を目的としたユーザー・エクスペリエンス機能
+C_ENABLE_RELAX				テレワーク作業開始前の 「リラックス・モード」 を有効にします(&L)
 C_SHOW_THEEND				テレワーク作業完了後に 「お疲れさまでした」 画面を表示します(&T)
-
 
 PREFIX					D_DU_DOWNLOAD
 CAPTION					リモートデスクトップ接続ソフトウェアのダウンロード

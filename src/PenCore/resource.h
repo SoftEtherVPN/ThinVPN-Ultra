@@ -225,7 +225,6 @@
 #define ICO_THINCLIENT                  244
 #define IDI_ICON3                       245
 #define ICO_VB6                         245
-#define IDI_ICON4                       246
 #define ICO_WIN95NET                    246
 #define S_TITLE                         1007
 #define S_INSERT_SECURE                 1008
@@ -1196,6 +1195,8 @@
 #define C_NO_THEEND                     2548
 #define C_SHOW_THEEND                   2548
 #define B_AUTH                          2549
+#define C_RELAX                         2549
+#define C_ENABLE_RELAX                  2549
 #define B_ACCEPT                        2550
 #define C_PUBLIC2                       2551
 #define C_VER2                          2552
