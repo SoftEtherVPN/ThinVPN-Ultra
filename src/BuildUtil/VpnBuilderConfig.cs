@@ -131,7 +131,7 @@ namespace BuildUtil
 	{
 		public static readonly int NumMultipleCompileTasks = 1;
 
-		public static readonly string SignComment = "「シン・テレワークシステム」 - NTT 東日本 コロナウイルス対策プロジェクト特殊局 ＆ IPA サイバー技術研究室";
+		public static readonly string SignComment = "「シン・テレワークシステム」 - NTT 東日本 コロナ対策プロジェクト特殊局 ＆ IPA サイバー技術研究室";
 	}
 
 	// Software List
