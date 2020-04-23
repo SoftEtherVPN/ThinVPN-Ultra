@@ -7473,6 +7473,30 @@ bool MsEnableRemoteDesktop()
 		}
 	}
 
+	if (MsIsWinXPOrGreater())
+	{
+		// Windows XP 以降で、グループポリシーで RDP が無効になっている場合は
+		// 強制的に有効にする
+		if (MsRegReadInt(REG_LOCAL_MACHINE,
+			"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+			"fDenyTSConnections") != 0)
+		{
+			// まずグループポリシーを無効に
+			MsRegWriteInt(REG_LOCAL_MACHINE,
+				"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+				"fDenyTSConnections", 0);
+
+			// 次に RDP を無効化してすぐに有効化
+			MsRegWriteInt(REG_LOCAL_MACHINE,
+				"SYSTEM\\CurrentControlSet\\Control\\Terminal Server",
+				"fDenyTSConnections", 1);
+
+			MsRegWriteInt(REG_LOCAL_MACHINE,
+				"SYSTEM\\CurrentControlSet\\Control\\Terminal Server",
+				"fDenyTSConnections", 0);
+		}
+	}
+
 	if (MsIsRemoteDesktopEnabled())
 	{
 		return true;
