@@ -1877,6 +1877,10 @@ UINT GetDaysUntil2038Ex()
 // Issue an X509 certificate
 X *NewX(K *pub, K *priv, X *ca, NAME *name, UINT days, X_SERIAL *serial)
 {
+	return NewXEx(pub, priv, ca, name, days, serial, NULL);
+}
+X *NewXEx(K *pub, K *priv, X *ca, NAME *name, UINT days, X_SERIAL *serial, NAME *name_issuer)
+{
 	X509 *x509;
 	X *x;
 	// Validate arguments
@@ -1885,7 +1889,7 @@ X *NewX(K *pub, K *priv, X *ca, NAME *name, UINT days, X_SERIAL *serial)
 		return NULL;
 	}
 
-	x509 = NewX509(pub, priv, ca, name, days, serial);
+	x509 = NewX509Ex(pub, priv, ca, name, days, serial, name_issuer);
 	if (x509 == NULL)
 	{
 		return NULL;
@@ -2004,6 +2008,10 @@ X509_EXTENSION *NewBasicKeyUsageForX509()
 // Issue an X509 certificate
 X509 *NewX509(K *pub, K *priv, X *ca, NAME *name, UINT days, X_SERIAL *serial)
 {
+	return NewX509Ex(pub, priv, ca, name, days, serial, NULL);
+}
+X509 *NewX509Ex(K *pub, K *priv, X *ca, NAME *name, UINT days, X_SERIAL *serial, NAME *name_issuer)
+{
 	X509 *x509;
 	UINT64 notBefore, notAfter;
 	ASN1_TIME *t1, *t2;
@@ -2060,7 +2068,15 @@ X509 *NewX509(K *pub, K *priv, X *ca, NAME *name, UINT days, X_SERIAL *serial)
 		FreeX509(x509);
 		return NULL;
 	}
-	issuer_name = X509_get_subject_name(ca->x509);
+	if (name_issuer == NULL)
+	{
+		issuer_name = X509_get_subject_name(ca->x509);
+	}
+	else
+	{
+		issuer_name = NameToX509Name(name_issuer);
+	}
+
 	if (issuer_name == NULL)
 	{
 		FreeX509Name(subject_name);
@@ -2072,6 +2088,11 @@ X509 *NewX509(K *pub, K *priv, X *ca, NAME *name, UINT days, X_SERIAL *serial)
 	X509_set_subject_name(x509, subject_name);
 
 	FreeX509Name(subject_name);
+
+	if (name_issuer != NULL)
+	{
+		FreeX509Name(issuer_name);
+	}
 
 	// Set the Serial Number
 	s = X509_get_serialNumber(x509);

@@ -430,13 +430,13 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 				// 通信エラーが発生した。間におかしな中継 FW がいる可能性がある
 				// のでセカンダリ URL キャッシュを削除する
 				ClearStr(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl));
-				Debug("WtWpcCall: CommunicationError.\n");
+				Debug("WtWpcCall: CommunicationError. Error: %u\n", GetErrorFromPack(p));
 			}
 			else
 			{
 				// 通信自体は成功しているが、本家でエラーが発生した。
 				// セカンダリ URL 自体は生きているので、何もしない。
-				Debug("WtWpcCall: Generic Error.\n");
+				Debug("WtWpcCall: Generic Error. Error: %u\n", GetErrorFromPack(p));
 			}
 
 			// 失敗した場合はとにかく結果を破棄する
@@ -469,7 +469,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 			// 本家と通信できているが、本家の側でエラーが発生しているのでもうここで
 			// 諦めることとする。この結果を返す
 			ret = p;
-			Debug("WtWpcCall: Generic Error.\n");
+			Debug("WtWpcCall: Generic Error. Error: %u\n", GetErrorFromPack(p));
 			// 本家と通信できているので、セカンダリ URL キャッシュを削除する
 			ClearStr(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl));
 			goto L_CLEANUP;
@@ -515,7 +515,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 				else if (WtIsCommunicationError(GetErrorFromPack(p2)) == false)
 				{
 					// 本家と通信できているが、本家の側でエラーが発生した。
-					Debug("WtWpcCall: Generic Error.\n");
+					Debug("WtWpcCall: Generic Error. Error: %u\n", GetErrorFromPack(p2));
 
 					// この結果を返す
 					ret = p2;
@@ -528,9 +528,9 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 				else
 				{
 					// 通信エラーが発生した。間に不正な FW がいる。
+					Debug("WtWpcCall: CommunicationError. Error: %u\n", GetErrorFromPack(p2));
 					FreePack(p2);
 					p2 = NULL;
-					Debug("WtWpcCall: CommunicationError.\n");
 				}
 			}
 

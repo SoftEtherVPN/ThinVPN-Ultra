@@ -291,6 +291,7 @@ void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id);
 void WideGateSetControllerGateSecretKey(WIDE *wide, char *key);
 bool WideGateGetControllerGateSecretKey(WIDE *wide, char *key, UINT key_size);
 void WideGateSetControllerGateSecretKeyFromPack(WIDE *wide, PACK *p);
+void WideGenerateRandomDummyDomain(char *str, UINT size);
 
 void WideGateLoadAggressiveTimeoutSettings(WIDE *wide);
 void WideGateLoadAggressiveTimeoutSettingsWithInterval(WIDE *wide);

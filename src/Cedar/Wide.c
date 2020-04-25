@@ -2496,6 +2496,33 @@ UINT WideGateGetIniEntry(char *name)
 	return ret;
 }
 
+// ランダムドメイン名の生成
+void WideGenerateRandomDummyDomain(char *str, UINT size)
+{
+	UINT len;
+	char tmp[MAX_PATH];
+	UINT i;
+	if (str == NULL)
+	{
+		return;
+	}
+
+	len = Rand32() % 16 + 12;
+
+	Zero(tmp, sizeof(tmp));
+
+	for (i = 0;i < len;i++)
+	{
+		char c = 'a' + Rand32() % ('z' - 'a');
+
+		tmp[i] = c;
+	}
+
+	tmp[len - (Rand32() % 6) - 3] = '.';
+
+	StrCpy(str, size, tmp);
+}
+
 // 証明書のロード
 void WideGateLoadCertKey(X **cert, K **key)
 {
@@ -2509,13 +2536,76 @@ void WideGateLoadCertKey(X **cert, K **key)
 		return;
 	}
 
+	*cert = NULL;
+	*key = NULL;
+
 	o = WideGateLoadIni();
 
 	server_cert = IniStrValue(o, "ServerCert");
 	server_key = IniStrValue(o, "ServerKey");
 
-	*cert = FileToX(server_cert);
-	*key = FileToK(server_key, true, NULL);
+	// 同一ディレクトリにマスター証明書があった場合はそれを用いて自分の証明書
+	// を起動時に動的に自動生成する
+	{
+		X *master_x = FileToX(WT_MASTER_CERT_NAME);
+		K *master_k = FileToK(WT_MASTER_KET_NAME, true, NULL);
+
+		if (master_x != NULL && master_k != NULL)
+		{
+			char domain1[MAX_PATH];
+			char domain2[MAX_PATH];
+			char serial[MAX_PATH];
+			wchar_t domain1w[MAX_PATH];
+			wchar_t domain2w[MAX_PATH];
+
+			WideGenerateRandomDummyDomain(domain1, sizeof(domain1));
+			WideGenerateRandomDummyDomain(domain2, sizeof(domain2));
+			WideGenerateRandomDummyDomain(serial, sizeof(serial));
+
+			StrToUni(domain1w, sizeof(domain1w), domain1);
+			StrToUni(domain2w, sizeof(domain2w), domain2);
+
+			if (CheckXandK(master_x, master_k))
+			{
+				K *pub = NULL;
+				K *pri = NULL;
+				X_SERIAL *x_serial = NewXSerial(serial, StrLen(serial));
+				UINT days = GetDaysUntil2038Ex() - Rand32() % 64;
+				NAME *n = NewName(domain1w, NULL, NULL, L"JP", NULL, NULL);
+				NAME *n_issuer = NewName(domain2w, NULL, NULL, L"JP", NULL, NULL);
+				X *new_x = NULL;
+
+				RsaGen(&pri, &pub, 2048);
+
+				new_x = NewXEx(pub, master_k, master_x, n, days, x_serial, n_issuer);
+
+				FreeXSerial(x_serial);
+				FreeName(n);
+				FreeName(n_issuer);
+				FreeK(pub);
+
+				if (new_x != NULL)
+				{
+					*cert = new_x;
+					*key = pri;
+				}
+				else
+				{
+					FreeK(pri);
+				}
+			}
+		}
+
+		FreeX(master_x);
+		FreeK(master_k);
+	}
+
+	if (*cert == NULL)
+	{
+		// 上記の方法で動的に生成されない場合は、ファイルから静的にロードする
+		*cert = FileToX(server_cert);
+		*key = FileToK(server_key, true, NULL);
+	}
 
 	if (*cert == NULL || *key == NULL)
 	{

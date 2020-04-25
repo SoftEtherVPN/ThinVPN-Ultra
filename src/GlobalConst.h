@@ -85,6 +85,10 @@
 #define SW_SETUP_EXE_X86			L"ThinSetup.exe"
 #define SW_SETUP_EXE_X64			L"ThinSetup_x64.exe"
 
+// マスター証明書ファイル名。このファイルが同一ディレクトリに置いてあったら、自分自身の証明書は動的生成する
+#define WT_MASTER_CERT_NAME			"@00_Master.cer"
+#define WT_MASTER_KET_NAME			"@00_Master.key"
+
 // 関係するファイル名
 #define DI_FILENAME_SETUPINI		L"@ThinSetup.ini"
 
