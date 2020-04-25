@@ -1446,8 +1446,6 @@ void DuOptionDlgInit(HWND hWnd, DU_OPTION *t)
 
 	Check(hWnd, C_MULTIDISPLAY, !dc->DisableMultiDisplay);
 
-	SetShow(hWnd, C_MULTIDISPLAY, MsIsMstscMultiDisplayAvailable());
-
 	DuOptionDlgInitProxyStr(hWnd, t);
 
 	DuOptionDlgUpdate(hWnd, t);
