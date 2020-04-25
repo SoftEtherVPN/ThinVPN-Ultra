@@ -116,6 +116,7 @@ struct DC
 	bool BluetoothDirInited;			// Bluetooth ディレクトリが初期化された
 	LIST *AdvAuthList;					// 拡張認証データリスト
 	bool EnableVersion2;				// URDP2 を有効にする
+	bool DisableMultiDisplay;			// マルチディスプレイ機能を無効にする
 };
 
 // 関数プロトタイプ宣言

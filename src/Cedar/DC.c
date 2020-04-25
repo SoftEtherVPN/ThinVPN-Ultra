@@ -870,6 +870,11 @@ UINT DcGetMstscArguments(DC_SESSION *s, wchar_t *mstsc_exe, char *arg, UINT arg_
 		StrCat(tmp, sizeof(tmp), " /public");
 	}
 
+	if (dc->MstscLocation == DC_MSTSC_SYSTEM32 && MsIsWindows81() && dc->DisableMultiDisplay == false)
+	{
+		StrCat(tmp, sizeof(tmp), " /multimon");
+	}
+
 	StrCpy(arg, arg_size, tmp);
 
 	return ERR_NO_ERROR;
@@ -1443,6 +1448,7 @@ void DcLoadConfig(DC *dc, FOLDER *root)
 	dc->MstscUseShareDisk = CfgGetBool(root, "MstscUseShareDisk");
 	dc->MstscUseSharePrinter = CfgGetBool(root, "MstscUseSharePrinter");
 	dc->MstscUseShareComPort = CfgGetBool(root, "MstscUseShareComPort");
+	dc->DisableMultiDisplay = CfgGetBool(root, "DisableMultiDisplay");
 	if (CfgIsItem(root, "EnableVersion2"))
 	{
 		dc->EnableVersion2 = CfgGetBool(root, "EnableVersion2");

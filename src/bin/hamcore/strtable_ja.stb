@@ -4667,7 +4667,7 @@ IDCANCEL				キャンセル
 
 
 PREFIX					D_DU_MAIN
-CAPTION					NTT 東日本 - IPA 「シン・テレワークシステム クライアント」 (バージョン %u.%02u)
+CAPTION					NTT 東日本 - IPA 「シン・テレワークシステム クライアント」Ver %u.%02u
 S_PCID					接続先コンピュータ I&D:
 IDOK					接続(&N)
 IDCANCEL				キャンセル
@@ -4702,12 +4702,12 @@ IDCANCEL				キャンセル
 S_UX					テレワーク作業向上を目的としたユーザー・エクスペリエンス機能
 C_ENABLE_RELAX				テレワーク作業開始前の 「リラックス・モード」 を有効にします(&L)
 C_SHOW_THEEND				テレワーク作業完了後に 「お疲れさまでした」 画面を表示します(&T)
+C_MULTIDISPLAY			使用可能な場合は、仮想マルチディスプレイ機能を使用(&M)
 
 PREFIX					D_DU_DOWNLOAD
 CAPTION					リモートデスクトップ接続ソフトウェアのダウンロード
 S1						Microsoft Corporation の Web サイト (microsoft.com) から、Microsoft リモートデスクトップ接続ソフトウェアをダウンロードしています。\r\n\r\nダウンロードが完了するまで、しばらくお待ちください...
 IDCANCEL				キャンセル
-
 
 PREFIX					D_DU_URDPMSG
 CAPTION					全画面表示 (フルスクリーン) 機能について

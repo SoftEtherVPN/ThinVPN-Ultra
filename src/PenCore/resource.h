@@ -737,6 +737,7 @@
 #define B_DELETE_SENSITIVE              1285
 #define R_LOG                           1285
 #define C_NOMORE                        1285
+#define C_MULTIDISPLAY                  1285
 #define R_DOUBLE                        1286
 #define C_SITE                          1286
 #define C_JITTER                        1286
@@ -1185,6 +1186,7 @@
 #define B_ACTIVE                        2538
 #define C_ADDPARAM                      2539
 #define B_NOAGAIN                       2540
+#define C_ADDPARAM2                     2540
 #define C_DONTSHOW                      2541
 #define C_USE                           2542
 #define C_SHARE_CLIPBOARD               2543

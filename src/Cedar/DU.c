@@ -1444,6 +1444,10 @@ void DuOptionDlgInit(HWND hWnd, DU_OPTION *t)
 	Check(hWnd, C_SHOW_THEEND, MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME));
 	Check(hWnd, C_ENABLE_RELAX, MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_ENABLE_RELAX_KEY_NAME));
 
+	Check(hWnd, C_MULTIDISPLAY, !dc->DisableMultiDisplay);
+
+	SetShow(hWnd, C_MULTIDISPLAY, MsIsMstscMultiDisplayAvailable());
+
 	DuOptionDlgInitProxyStr(hWnd, t);
 
 	DuOptionDlgUpdate(hWnd, t);
@@ -1578,6 +1582,8 @@ void DuOptionDlgOnOk(HWND hWnd, DU_OPTION *t)
 	}
 
 	dc->MstscUsePublicSwitchForVer6 = IsChecked(hWnd, C_PUBLIC);
+
+	dc->DisableMultiDisplay = !IsChecked(hWnd, C_MULTIDISPLAY);
 
 	DcSaveConfig(dc);
 
@@ -1811,6 +1817,7 @@ void DuMainDlgOnOk(HWND hWnd, DU_MAIN *t)
 	StrToUni(tmp, sizeof(tmp), pcid);
 
 	AddCandidate(t->Du->Dc->Candidate, tmp, DU_CANDIDATE_MAX);
+
 	DcSaveConfig(t->Du->Dc);
 
 	i = CbFindStr(hWnd, C_PCID, tmp);

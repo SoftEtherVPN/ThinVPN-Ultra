@@ -1048,6 +1048,7 @@ UINT64 MsGetScreenSaverTimeout();
 void *MsNoSleepStart(bool no_screensaver);
 void MsNoSleepEnd(void *p);
 bool MsIsRemoteDesktopAvailable();
+bool MsIsMstscMultiDisplayAvailable();
 bool MsIsRemoteDesktopCanEnableByRegistory();
 bool MsIsRemoteDesktopEnabled();
 bool MsEnableRemoteDesktop();

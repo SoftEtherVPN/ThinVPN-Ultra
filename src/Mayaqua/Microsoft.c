@@ -7633,6 +7633,12 @@ bool MsIsWinXPOrGreater()
 	return false;
 }
 
+// Examine whether the remote desktop client's multi display function is available
+bool MsIsMstscMultiDisplayAvailable()
+{
+	return MsIsWindows81();
+}
+
 // Examine whether the remote desktop is available
 bool MsIsRemoteDesktopAvailable()
 {
