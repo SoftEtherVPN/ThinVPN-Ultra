@@ -856,15 +856,23 @@ void WtgAccept(WT *wt, SOCK *s)
 	TSESSION *session = NULL;
 	char ip_str[MAX_PATH];
 	bool support_timeout_param = false;
+	bool check_ssl_ok = false;
 
 	UINT tunnel_timeout = WT_TUNNEL_TIMEOUT;
 	UINT tunnel_keepalive = WT_TUNNEL_KEEPALIVE;
 	bool tunnel_use_aggressive_timeout = false;
 
+	bool continue_ok = false;
+
 	// 引数チェック
 	if (wt == NULL || s == NULL)
 	{
 		return;
+	}
+
+	if (IsEmptyStr(wt->EntranceUrlForProxy))
+	{
+		WideLoadEntryPoint(NULL, wt->EntranceUrlForProxy, sizeof(wt->EntranceUrlForProxy), NULL);
 	}
 
 	IPToStr(ip_str, sizeof(ip_str), &s->RemoteIP);
@@ -895,13 +903,18 @@ void WtgAccept(WT *wt, SOCK *s)
 	}
 
 	// シグネチャのダウンロード
-	if (WtgDownloadSignature(s) == false)
+	continue_ok = WtgDownloadSignature(s, &check_ssl_ok, wt->Wide->GateKeyStr, wt->EntranceUrlForProxy);
+
+	if (check_ssl_ok)
+	{
+		DecrementNoSsl(wt->Cedar, &s->RemoteIP, 2);
+	}
+
+	if (continue_ok == false)
 	{
 		Debug("WtgDownloadSignature Failed.\n");
 		return;
 	}
-
-	DecrementNoSsl(wt->Cedar, &s->RemoteIP, 2);
 
 	// Hello パケットのアップロード
 	if (WtgUploadHello(wt, s, session_id) == false)
@@ -1544,12 +1557,18 @@ bool WtgUploadHello(WT *wt, SOCK *s, void *session_id)
 }
 
 // シグネチャのダウンロード
-bool WtgDownloadSignature(SOCK *s)
+bool WtgDownloadSignature(SOCK *s, bool* check_ssl_ok, char *gate_secret_key, char *entrance_url_for_proxy)
 {
 	HTTP_HEADER *h;
 	UCHAR *data;
 	UINT data_size;
 	UINT num = 0, max = 19;
+	static bool dummy = false;
+	if (check_ssl_ok == NULL)
+	{
+		check_ssl_ok = &dummy;
+	}
+	*check_ssl_ok = false;
 	// 引数チェック
 	if (s == NULL)
 	{
@@ -1572,7 +1591,25 @@ bool WtgDownloadSignature(SOCK *s)
 		}
 
 		// 解釈する
-		if (StrCmpi(h->Method, "POST") == 0)
+		if (StartWith(h->Target, "/widecontrol/"))
+		{
+			char url[MAX_PATH];
+
+			Debug("widecontrol request proxy: '%s'\n", h->Target);
+
+			StrCpy(url, sizeof(url), entrance_url_for_proxy);
+
+			ReplaceStrEx(url, sizeof(url), url, "https://", "http://", false);
+
+			WtgHttpProxy(url, s, s->SecureMode, h, gate_secret_key);
+
+			*check_ssl_ok = true;
+
+			FreeHttpHeader(h);
+
+			return false;
+		}
+		else if (StrCmpi(h->Method, "POST") == 0)
 		{
 			// POST なのでデータを受信する
 			data_size = GetContentLength(h);
@@ -1603,6 +1640,8 @@ bool WtgDownloadSignature(SOCK *s)
 			{
 				Free(data);
 				FreeHttpHeader(h);
+
+				*check_ssl_ok = true;
 				return true;
 			}
 		}
@@ -1617,16 +1656,8 @@ bool WtgDownloadSignature(SOCK *s)
 			}
 			else
 			{
-				if (StrCmpi(h->Target, "/") == 0)
-				{
-					// Free 版以外
-					HttpSendForbidden(s, h->Target, NULL);
-				}
-				else
-				{
-					// Not Found
-					HttpSendNotFound(s, h->Target);
-				}
+				// Not Found
+				HttpSendNotFound(s, h->Target);
 			}
 			FreeHttpHeader(h);
 		}
@@ -1871,4 +1902,272 @@ void WtgStop(WT *wt)
 	FreeK(wt->GateKey);
 }
 
+// HTTP プロキシ機能
+void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, char *shared_secret)
+{
+	URL_DATA url;
+	SOCK *s2 = NULL;
+	UINT num = 0;
+	// Validate arguments
+	if (url_str == NULL || s == NULL)
+	{
+		return;
+	}
+
+	Zero(&url, sizeof(url));
+	if (ParseUrl(&url, url_str, false, NULL) == false)
+	{
+		Zero(&url, sizeof(url));
+	}
+
+#ifndef	VPN_SPEED
+	Debug("HttpProxy: Connected from %r:%u\n", &s->RemoteIP, s->RemotePort);
+#endif	// VPN_SPEED
+
+	num = 0;
+
+	while (true)
+	{
+		// Reception of the HTTP header
+		HTTP_HEADER *h = NULL;
+
+		if (num == 0)
+		{
+			if (first_header != NULL)
+			{
+				h = first_header;
+			}
+		}
+		num++;
+
+		if (h == NULL)
+		{
+			h = RecvHttpHeader(s);
+		}
+
+		if (h == NULL)
+		{
+			break;
+		}
+
+		if (StrCmpi(h->Method, "POST") == 0 || StrCmpi(h->Method, "GET") == 0 || StrCmpi(h->Method, "HEAD") == 0)
+		{
+			// Supported method
+			HTTP_HEADER *h2;
+			char *http_version = h->Version;
+			UINT i;
+			bool err = false;
+			bool disconnect_s2 = false;
+			BUF *post_buf = NULL;
+			char original_host[64];
+
+			Zero(original_host, sizeof(original_host));
+
+			if (StrCmpi(h->Method, "POST") == 0)
+			{
+				// Receive POST data also in the case of POST
+				UINT content_len = GetContentLength(h);
+				UINT buf_size = 65536;
+				UCHAR *buf = Malloc(buf_size);
+
+				content_len = MIN(content_len, WG_PROXY_MAX_POST_SIZE);
+
+				post_buf = NewBuf();
+
+				while (true)
+				{
+					UINT recvsize = MIN(buf_size, content_len - post_buf->Size);
+					UINT size;
+
+					if (recvsize == 0)
+					{
+						break;
+					}
+
+					size = Recv(s, buf, buf_size, ssl);
+					if (size == 0)
+					{
+						// Disconnected
+						break;
+					}
+
+					WriteBuf(post_buf, buf, size);
+				}
+
+				Free(buf);
+			}
+
+			h2 = NewHttpHeaderEx(h->Method, h->Target, h->Version, true);
+
+			// Copy the request header
+			for (i = 0;i < LIST_NUM(h->ValueList);i++)
+			{
+				HTTP_VALUE *v = LIST_DATA(h->ValueList, i);
+				char name[MAX_SIZE], value[MAX_SIZE];
+
+				StrCpy(name, sizeof(name), v->Name);
+				StrCpy(value, sizeof(value), v->Data);
+
+				if (StrCmpi(name, "HOST") == 0)
+				{
+					StrCpy(original_host, sizeof(original_host), value);
+					StrCpy(value, sizeof(value), url.HeaderHostName);
+				}
+
+				AddHttpValue(h2, NewHttpValue(name, value));
+			}
+
+			// Add a special header
+			if (shared_secret != NULL)
+			{
+				char tmp[MAX_SIZE];
+				char src_ip_str[128];
+				char src_port[64];
+				char sign_str[64];
+
+				Format(tmp, sizeof(tmp), "%r:%u", &s->LocalIP, s->LocalPort);
+				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-Server", tmp));
+
+				ToStr(tmp, CEDAR_BUILD);
+				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-Build", tmp));
+
+				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-Host", original_host));
+
+				// 現在時刻
+				ToStr64(tmp, SystemTime64());
+				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-Time", tmp));
+
+				// 署名
+				Format(sign_str, sizeof(sign_str), "%I64u:%s", tmp, shared_secret);
+				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-Sign", sign_str));
+
+				IPToStr(src_ip_str, sizeof(src_ip_str), &s->RemoteIP);
+				ToStr(src_port, s->RemotePort);
+
+				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-SrcIP", src_ip_str));
+				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-SrcPort", src_port));
+			}
+
+			// Connect to the destination server
+			if (s2 == NULL)
+			{
+				s2 = ConnectEx2(url.HostName, url.Port, 0, NULL);
+
+				if (s2 != NULL)
+				{
+					SetTimeout(s2, WG_PROXY_TCP_TIMEOUT_SERVER);
+				}
+			}
+
+			if (s2 == NULL)
+			{
+				// Failed to connect to the destination server
+				HttpSendNotFound(s, h->Target);
+			}
+			else
+			{
+				HTTP_HEADER *r2;
+
+				// Send a request to the destination server
+				PostHttp(s2, h2, (post_buf == NULL ? NULL : post_buf->Buf),  (post_buf == NULL ? 0 : post_buf->Size));
+
+				// Receive a response from the destination server, and transfers to the client
+				r2 = RecvHttpHeader(s2);
+				if (r2 == NULL)
+				{
+					err = true;
+					disconnect_s2 = true;
+				}
+				else
+				{
+					if (PostHttp(s, r2, NULL, 0) == false)
+					{
+						err = true;
+					}
+					else
+					{
+						if (StrCmpi(h->Method, "HEAD") != 0)
+						{
+							UINT content_length = GetContentLength(r2);
+							UINT buf_size = 65536;
+							UCHAR *buf = Malloc(buf_size);
+							UINT pos = 0;
+
+							while (pos < content_length)
+							{
+								UINT r;
+								UINT recv_size;
+
+								recv_size = MIN(buf_size, (content_length - pos));
+
+								r = Recv(s2, buf, recv_size, false);
+
+								if (r == 0)
+								{
+									disconnect_s2 = true;
+									err = true;
+									WHERE;
+									break;
+								}
+
+								if (SendAll(s, buf, r, ssl) == false)
+								{
+									err = true;
+									break;
+								}
+
+								pos += r;
+							}
+
+							Free(buf);
+						}
+					}
+
+					FreeHttpHeader(r2);
+				}
+			}
+
+			FreeHttpHeader(h2);
+
+			if (err)
+			{
+				// An error has occured
+				HttpSendServerError(s, h->Target);
+			}
+
+			if (disconnect_s2)
+			{
+				// Disconnected the communication with the destination server
+				if (s2 != NULL)
+				{
+					Disconnect(s2);
+					ReleaseSock(s2);
+					s2 = NULL;
+				}
+			}
+
+			FreeBuf(post_buf);
+		}
+		else
+		{
+			// Unsupported method
+			HttpSendNotImplemented(s, h->Method, h->Target, h->Version);
+		}
+
+		if (h != first_header)
+		{
+			FreeHttpHeader(h);
+		}
+	}
+
+	if (s2 != NULL)
+	{
+		Disconnect(s2);
+		ReleaseSock(s2);
+	}
+
+#ifndef	VPN_SPEED
+	Debug("HttpProxy: Disconnected from %r:%u\n", &s->RemoteIP, s->RemotePort);
+#endif	// VPN_SPEED
+}
 

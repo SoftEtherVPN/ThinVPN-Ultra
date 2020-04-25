@@ -891,7 +891,7 @@ WT *NewWtFromHamcore()
 	WT *wt;
 	X *master_cert;
 
-	WideLoadEntryPoint(&master_cert, NULL, 0);
+	WideLoadEntryPoint(&master_cert, NULL, 0, NULL);
 
 	wt = NewWt(master_cert);
 

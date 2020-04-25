@@ -25,7 +25,7 @@ UINT WpcCommCheck(WT *wt)
 	p = NewPack();
 	PackAddStr(p, "str", "hello");
 
-	r = WtWpcCall(wt, "CommCheck", p, NULL, NULL, false);
+	r = WtWpcCall(wt, "CommCheck", p, NULL, NULL, false, false);
 	FreePack(p);
 
 	ret = GetErrorFromPack(r);
@@ -35,25 +35,9 @@ UINT WpcCommCheck(WT *wt)
 }
 
 // Entrance URL を取得 (キャッシュ付き)
-UINT WpcGetEntranceUrlEx(WT *wt, char *entrance, UINT entrance_size, UINT cache_expires)
+UINT WpcGetEntranceUrlEx(WT *wt, char *entrance, UINT entrance_size, UINT cache_expires, LIST *secondary_str_list)
 {
-	WideLoadEntryPoint(NULL, entrance, entrance_size);
-
-	return ERR_NO_ERROR;
-}
-
-// Entrance URL を取得 (ローカルディレクトリから)
-bool WpcGetEntranceUrlFromLocalFile(WT *wt, char *entrance, UINT entrance_size)
-{
-	WideLoadEntryPoint(NULL, entrance, entrance_size);
-
-	return true;
-}
-
-// Entrance URL を取得
-UINT WpcGetEntranceUrl(WT *wt, char *entrance, UINT entrance_size)
-{
-	WideLoadEntryPoint(NULL, entrance, entrance_size);
+	WideLoadEntryPoint(NULL, entrance, entrance_size, secondary_str_list);
 
 	return ERR_NO_ERROR;
 }
@@ -357,7 +341,21 @@ void WtGetInternetSetting(WT *wt, INTERNET_SETTING *setting)
 	Unlock(wt->Lock);
 }
 
-PACK *WtWpcCallWithCertAndKey(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only)
+// 通信に起因するエラー (つまり、間の FW 等が問題でネットワーク上のエラーが発生している) かどうか判定
+bool WtIsCommunicationError(UINT error)
+{
+	if (error == ERR_SSL_X509_UNTRUSTED || error == ERR_CERT_NOT_TRUSTED ||
+		error == ERR_SSL_X509_EXPIRED || 
+		error == ERR_PROTOCOL_ERROR || error == ERR_CONNECT_FAILED ||
+		error == ERR_TIMEOUTED || error == ERR_DISCONNECTED)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+PACK *WtWpcCallWithCertAndKey(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only, bool try_secondary)
 {
 	BUF *k_buf;
 	if (wt == NULL || function_name == NULL || pack == NULL)
@@ -381,18 +379,177 @@ PACK *WtWpcCallWithCertAndKey(WT *wt, char *function_name, PACK *pack, X *cert, 
 
 		FreeBuf(k_buf);
 
-		return WtWpcCall(wt, function_name, pack, host_key, host_secret, global_ip_only);
+		return WtWpcCall(wt, function_name, pack, host_key, host_secret, global_ip_only, try_secondary);
 	}
 	else
 	{
-		return WtWpcCall(wt, function_name, pack, NULL, NULL, global_ip_only);
+		return WtWpcCall(wt, function_name, pack, NULL, NULL, global_ip_only, try_secondary);
 	}
 }
 
-PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only)
+PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only, bool try_secondary)
+{
+	UINT error = ERR_NO_ERROR;
+	PACK *ret = NULL;
+	char url[MAX_PATH] = {0};
+	LIST *secondary_list = NewStrList();
+
+	// EntryPoint.txt の読み込み
+	error = WpcGetEntranceUrlEx(wt, url, sizeof(url), wt->DefaultEntranceCacheExpireSpan, secondary_list);
+	if (error != ERR_NO_ERROR)
+	{
+		ret = PackError(error);
+		goto L_CLEANUP;
+	}
+
+	if (try_secondary == false)
+	{
+		// SECONDARY ホストを試さない。普通の URL のみ。従来どおり。
+		ret = WtWpcCallInner(wt, function_name, pack, host_key, host_secret, global_ip_only, url);
+	}
+	else
+	{
+		PACK *p = NULL;
+
+		// SECONDARY ホストを試す。新方式。
+		if (IsEmptyStr(wt->RecommendedSecondaryUrl) == false)
+		{
+			Debug("WtWpcCall: Use wt->RecommendedSecondaryUrl: %s\n", wt->RecommendedSecondaryUrl);
+			// まず、前回成功したセカンダリ URL を覚えている場合はそれに接続をする
+			p = WtWpcCallInner(wt, function_name, pack, host_key, host_secret, global_ip_only, wt->RecommendedSecondaryUrl);
+
+			if (GetErrorFromPack(p) == ERR_NO_ERROR)
+			{
+				// 成功した。この結果を返す
+				Debug("WtWpcCall: OK.\n");
+				ret = p;
+				goto L_CLEANUP;
+			}
+			else if (WtIsCommunicationError(GetErrorFromPack(p)))
+			{
+				// 通信エラーが発生した。間におかしな中継 FW がいる可能性がある
+				// のでセカンダリ URL キャッシュを削除する
+				ClearStr(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl));
+				Debug("WtWpcCall: CommunicationError.\n");
+			}
+			else
+			{
+				// 通信自体は成功しているが、本家でエラーが発生した。
+				// セカンダリ URL 自体は生きているので、何もしない。
+				Debug("WtWpcCall: Generic Error.\n");
+			}
+
+			// 失敗した場合はとにかく結果を破棄する
+			FreePack(p);
+			p = NULL;
+		}
+
+		// 次に、本家に接続する。
+		Debug("WtWpcCall: Use direct: %s\n", url);
+
+#ifndef	WT_TEST_WIDECONTROL_PROXY_CLIENT
+		// 本家接続
+		p = WtWpcCallInner(wt, function_name, pack, host_key, host_secret, global_ip_only, url);
+#else	// WT_TEST_WIDECONTROL_PROXY_CLIENT
+		// テスト: エラーにする
+		p = PackError(ERR_CONNECT_FAILED);
+#endif	// WT_TEST_WIDECONTROL_PROXY_CLIENT
+
+		if (GetErrorFromPack(p) == ERR_NO_ERROR)
+		{
+			// 成功した。この結果を返す
+			ret = p;
+			Debug("WtWpcCall: OK.\n");
+			// 本家と通信できているので、セカンダリ URL キャッシュを削除する
+			ClearStr(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl));
+			goto L_CLEANUP;
+		}
+		else if (WtIsCommunicationError(GetErrorFromPack(p)) == false)
+		{
+			// 本家と通信できているが、本家の側でエラーが発生しているのでもうここで
+			// 諦めることとする。この結果を返す
+			ret = p;
+			Debug("WtWpcCall: Generic Error.\n");
+			// 本家と通信できているので、セカンダリ URL キャッシュを削除する
+			ClearStr(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl));
+			goto L_CLEANUP;
+		}
+		else
+		{
+			// 本家と通信できていない。これは、間におかしな中継 FW がいる可能性がある
+			// ので、リストからセカンダリを 1 つランダムに選んで、そのセカンダリ
+			// との通信を試みる
+			UINT num = LIST_NUM(secondary_list);
+			char secondary_url[MAX_PATH] = {0};
+			PACK *p2 = NULL;
+
+			Zero(secondary_url, sizeof(secondary_url));
+
+			if (num >= 1)
+			{
+				UINT rand_i = Rand32() % num;
+				char *str = LIST_DATA(secondary_list, rand_i);
+
+				StrCpy(secondary_url, sizeof(secondary_url), str);
+			}
+
+			if (IsEmptyStr(secondary_url) == false)
+			{
+				Debug("WtWpcCall: Use choosed secondary: %s\n", secondary_url);
+
+				// セカンダリの URL を決定した。
+				// 接続してみる
+				p2 = WtWpcCallInner(wt, function_name, pack, host_key, host_secret, global_ip_only, secondary_url);
+
+				if (GetErrorFromPack(p2) == ERR_NO_ERROR)
+				{
+					// 成功した。この結果を返す
+					ret = p2;
+					FreePack(p);
+					Debug("WtWpcCall: OK.\n");
+
+					// 本家と通信できているので、セカンダリ URL キャッシュを保存する
+					StrCpy(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl), secondary_url);
+					goto L_CLEANUP;
+				}
+				else if (WtIsCommunicationError(GetErrorFromPack(p2)) == false)
+				{
+					// 本家と通信できているが、本家の側でエラーが発生した。
+					Debug("WtWpcCall: Generic Error.\n");
+
+					// この結果を返す
+					ret = p2;
+					FreePack(p);
+
+					// セカンダリ URL 自体は生きているので、セカンダリ URL キャッシュを保存する
+					StrCpy(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl), secondary_url);
+					goto L_CLEANUP;
+				}
+				else
+				{
+					// 通信エラーが発生した。間に不正な FW がいる。
+					FreePack(p2);
+					p2 = NULL;
+					Debug("WtWpcCall: CommunicationError.\n");
+				}
+			}
+
+			// セカンダリ URL が 1 つも存在しない or セカンダリ URL との通信そのものに失敗
+			// したので、1 つ目 (本家との直接通信) の結果を返す
+			ret = p;
+			goto L_CLEANUP;
+		}
+	}
+
+L_CLEANUP:
+	ReleaseStrList(secondary_list);
+
+	return ret;
+}
+
+PACK *WtWpcCallInner(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only, char *url)
 {
 	URL_DATA data;
-	char url[MAX_PATH];
 	BUF *b, *recv;
 	UINT error;
 	WPC_PACKET packet;
@@ -404,11 +561,6 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 	}
 L_RETRY:
 
-	error = WpcGetEntranceUrlEx(wt, url, sizeof(url), wt->DefaultEntranceCacheExpireSpan);
-	if (error != ERR_NO_ERROR)
-	{
-		return PackError(error);
-	}
 	if (ParseUrl(&data, url, true, NULL) == false)
 	{
 		return PackError(ERR_INTERNAL_ERROR);
@@ -433,10 +585,8 @@ L_RETRY:
 
 	if (recv == NULL)
 	{
-		if (error == ERR_SSL_X509_UNTRUSTED || error == ERR_CERT_NOT_TRUSTED ||
-			error == ERR_SSL_X509_EXPIRED || 
-			error == ERR_PROTOCOL_ERROR || error == ERR_CONNECT_FAILED ||
-			error == ERR_TIMEOUTED || error == ERR_DISCONNECTED)
+#ifndef	WT_TEST_WIDECONTROL_PROXY_CLIENT
+		if (WtIsCommunicationError(error))
 		{
 			if (wt->EnableUpdateEntryPoint && num_retry == 0)
 			{
@@ -457,6 +607,7 @@ L_RETRY:
 				}
 			}
 		}
+#endif	// WT_TEST_WIDECONTROL_PROXY_CLIENT
 
 		return PackError(error);
 	}

@@ -7636,7 +7636,7 @@ bool MsIsWinXPOrGreater()
 // Examine whether the remote desktop client's multi display function is available
 bool MsIsMstscMultiDisplayAvailable()
 {
-	return MsIsWindows81();
+	return MsIsWindows7();
 }
 
 // Examine whether the remote desktop is available

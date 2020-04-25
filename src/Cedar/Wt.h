@@ -161,12 +161,14 @@ struct WT
 	K *GateKey;						// 秘密鍵
 	LIST *SessionList;				// セッションリスト
 	UCHAR GateId[SHA1_SIZE];		// ゲートウェイ ID
+	char EntranceUrlForProxy[MAX_SIZE];
 
 	// Client / Server / Gate 共通
 	char EntranceUrl[MAX_PATH];			// エントランス URL
 	char FixedEntranceUrl[MAX_PATH];	// 固定されたエントランス URL
 	INTERNET_SETTING *InternetSetting;	// インターネット接続設定
 	bool CheckSslTrust;					// SSL 証明書の信頼性を検証するかどうか
+	char RecommendedSecondaryUrl[MAX_PATH];	// 最後に接続に成功したセカンダリ URL
 
 	char CurrentGateIp[64];				// 現在の接続先 Gate の IP アドレス
 };

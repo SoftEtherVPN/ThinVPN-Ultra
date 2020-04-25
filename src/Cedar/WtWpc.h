@@ -100,14 +100,17 @@ LIST *WtLoadNodeRefUrlList();
 void WtFreeNodeRefUrlList(LIST *o);
 bool WtParseNodeRef(WT *wt, PACK *p, char *entrance, UINT entrance_size, UINT64 *timestamp);
 PACK *WtGetPackFromBuf(WT *wt, BUF *buf);
-UINT WpcGetEntranceUrl(WT *wt, char *entrance, UINT entrance_size);
-UINT WpcGetEntranceUrlEx(WT *wt, char *entrance, UINT entrance_size, UINT cache_expires);
-bool WpcGetEntranceUrlFromLocalFile(WT *wt, char *entrance, UINT entrance_size);
+UINT WpcGetEntranceUrlEx(WT *wt, char *entrance, UINT entrance_size, UINT cache_expires, LIST *secondary_str_list);
 UINT WpcCommCheck(WT *wt);
 void WtSetDefaultEntranceUrlCacheExpireSpan(WT *wt, UINT span);
 
-PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only);
-PACK *WtWpcCallWithCertAndKey(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only);
+PACK *WtWpcCallWithCertAndKey(WT *wt, char *function_name, PACK *pack, X *cert, K *key, bool global_ip_only, bool try_secondary);
+
+PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only, bool try_secondary);
+PACK *WtWpcCallInner(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only, char *url);
+
+bool WtIsCommunicationError(UINT error);
+
 
 #endif	// WTWPC_H
 

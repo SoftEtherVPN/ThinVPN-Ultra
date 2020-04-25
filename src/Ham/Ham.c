@@ -890,6 +890,56 @@ void test(UINT num, char **arg)
 {
 	if (true)
 	{
+		if (true)
+		{
+			// Sign EntryPoint.dat for update
+			K *k = FileToK("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.key", true, NULL);
+			BUF *data = ReadDump("C:\\git\\THIN-ThinTeleworkUpdateFiles\\Files\\EntryPoint.dat");
+			UCHAR sign_data[4096 / 8] = {0};
+			BUF *dst;
+
+			if (k == NULL)
+			{
+				Print("Load key fail\n");
+				return;
+			}
+
+			if (data == NULL)
+			{
+				Print("Load data fail\n");
+				return;
+			}
+
+			if (RsaSignEx(sign_data, data->Buf, data->Size, k, 4096) == false)
+			{
+				Print("Sign fail\n");
+			}
+
+			dst = NewBufFromMemory(sign_data, sizeof(sign_data));
+
+			DumpBuf(dst, "C:\\git\\THIN-ThinTeleworkUpdateFiles\\Files\\EntryPointSign.dat");
+
+			Print("SIGN OK !\n");
+		}
+
+		if (true)
+		{
+			X *master_x = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
+			BUF *data = ReadDump("C:\\git\\THIN-ThinTeleworkUpdateFiles\\Files\\EntryPoint.dat");
+			BUF *sign = ReadDump("C:\\git\\THIN-ThinTeleworkUpdateFiles\\Files\\EntryPointSign.dat");
+
+			Print("VERIFY: %u\n", WideVerifyNewEntryPointAndSignature(master_x, data, sign));
+
+			FreeX(master_x);
+			FreeBuf(data);
+			FreeBuf(sign);
+		}
+
+		return;
+	}
+
+	if (true)
+	{
 		char tmp[MAX_SIZE];
 		GenerateDefaultUserProxyAgentStr(tmp, sizeof(tmp));
 		Print("%s\n", tmp);
@@ -955,51 +1005,6 @@ void test(UINT num, char **arg)
 		return;
 	}
 
-	if (false)
-	{
-		X *master_x = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
-		BUF *data = ReadDump("S:\\NTTVPN\\EntryPoint\\200419_test\\EntryPoint.dat");
-		BUF *sign = ReadDump("S:\\NTTVPN\\EntryPoint\\200419_test\\EntryPointSign.dat");
-
-		Print("%u\n", WideVerifyNewEntryPointAndSignature(master_x, data, sign));
-
-		FreeX(master_x);
-		FreeBuf(data);
-		FreeBuf(sign);
-		return;
-	}
-
-	if (false)
-	{
-		// Sign EntryPoint.dat for update
-		K *k = FileToK("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.key", true, NULL);
-		BUF *data = ReadDump("S:\\NTTVPN\\EntryPoint\\200419_test\\EntryPoint.dat");
-		UCHAR sign_data[4096 / 8] = {0};
-		BUF *dst;
-
-		if (k == NULL)
-		{
-			Print("Load key fail\n");
-			return;
-		}
-
-		if (data == NULL)
-		{
-			Print("Load data fail\n");
-			return;
-		}
-
-		if (RsaSignEx(sign_data, data->Buf, data->Size, k, 4096) == false)
-		{
-			Print("Sign fail\n");
-		}
-
-		dst = NewBufFromMemory(sign_data, sizeof(sign_data));
-
-		DumpBuf(dst, "S:\\NTTVPN\\EntryPoint\\200419_test\\EntryPointSign.dat");
-
-		return;
-	}
 
 	if (false)
 	{

@@ -111,6 +111,11 @@ struct TSESSION
 	SOCK *Sock;							// ソケット
 };
 
+// HTTP プロキシ
+#define	WG_PROXY_TCP_TIMEOUT_SERVER		(60 * 1000)
+#define	WG_PROXY_MAX_POST_SIZE			(1024 * 1024)
+
+
 // 関数プロトタイプ
 bool WtGateConnectParamFromPack(WT_GATE_CONNECT_PARAM *g, PACK *p);
 BUF *WtGateConnectParamPayloadToBuf(WT_GATE_CONNECT_PARAM *g);
@@ -120,7 +125,7 @@ void WtgStart(WT *wt, X *cert, K *key, UINT port);
 void WtgStop(WT *wt);
 void WtgAccept(WT *wt, SOCK *s);
 bool WtgSendError(SOCK *s, UINT code);
-bool WtgDownloadSignature(SOCK *s);
+bool WtgDownloadSignature(SOCK *s, bool* check_ssl_ok, char *gate_secret_key, char *entrance_url_for_proxy);
 bool WtgUploadHello(WT *wt, SOCK *s, void *session_id);
 int WtgCompareSession(void *p1, void *p2);
 TSESSION *WtgNewSession(WT *wt, SOCK *sock, char *msid, void *session_id, bool use_compress, bool request_initial_pack, UINT tunnel_timeout, UINT tunnel_keepalive, bool tunnel_use_aggressive_timeout);
@@ -159,6 +164,7 @@ void WtInsertNewBlockToQueue(QUEUE *dest_queue, TTCP *dest_ttcp, UINT src_tunnel
 WT_GATE_CONNECT_PARAM *WtCloneGateConnectParam(WT_GATE_CONNECT_PARAM *p);
 void WtFreeGateConnectParam(WT_GATE_CONNECT_PARAM *p);
 void WtGenerateClientIdFromIP(UCHAR *client_id, IP *ip);
+void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, char *shared_secret);
 
 #endif	// WTGATE_H
 

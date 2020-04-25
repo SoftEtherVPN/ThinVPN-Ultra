@@ -17,7 +17,7 @@
 #define DESK_PUBLISHER_NAME_UNICODE		L"Thin Telework System"		// 元: L"SoftEther Corporation"
 #define DESK_PUBLISHER_NAME_ANSI		"Thin Telework System"			// 元: "SoftEther Corporation"
 #define	DESK_SECURE_PACK_NAME			"THIN_SERVER"			// 元: "DESK_SERVER"
-#define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.cyber.ipa.go.jp"	// TODO: 後で変更する
+#define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.cyber.ipa.go.jp"
 
 #define DESK_SETTINGS_DIR_NAME			L"Thin Telework System Settings"
 
@@ -90,6 +90,9 @@
 
 
 #define	GC_SVC_NAME_THINSVR		"THINSVR"
+
+//#define WT_TEST_WIDECONTROL_PROXY_CLIENT		// 本家と接続できないことのシミュレーション
+
 
 // ここから下は おそらくいじらなくて OK
 #define DC_RDP_PORT_START				3500	// Client の RDP ポートの開始番号
