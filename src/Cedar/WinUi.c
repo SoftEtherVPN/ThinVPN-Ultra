@@ -445,6 +445,10 @@ void UpdateNotifyProcUi(UPDATE_CLIENT *c, UINT latest_build, UINT64 latest_date,
 // Initialize the update notification
 WINUI_UPDATE *InitUpdateUi(wchar_t *title, char *name, char *family_name, UINT64 current_date, UINT current_build, UINT current_ver, char *client_id, bool use_suppress_flag)
 {
+	return InitUpdateUiEx(title, name, family_name, current_date, current_build, current_ver, client_id, use_suppress_flag, NULL);
+}
+WINUI_UPDATE *InitUpdateUiEx(wchar_t *title, char *name, char *family_name, UINT64 current_date, UINT current_build, UINT current_ver, char *client_id, bool use_suppress_flag, WT *wt)
+{
 	WINUI_UPDATE *u;
 	UPDATE_CLIENT_SETTING s;
 	LANGLIST t;
@@ -481,7 +485,7 @@ WINUI_UPDATE *InitUpdateUi(wchar_t *title, char *name, char *family_name, UINT64
 	GetCurrentLang(&t);
 
 	u->UpdateClient = NewUpdateClient(UpdateNotifyProcUi, IsThisProcessForegroundForUpdateUi, u, family_name, u->SoftwareName, u->SoftwareTitle,
-		u->CurrentBuild, u->CurrentDate, t.Name, &s, client_id);
+		u->CurrentBuild, u->CurrentDate, t.Name, &s, client_id, wt);
 
 	if (u->UpdateClient == NULL)
 	{

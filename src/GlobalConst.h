@@ -48,6 +48,10 @@
 #define WT_GATE_DISABLE_TLS1_0		true
 #define WT_GATE_DISABLE_TLS1_1		true
 
+// ソフトウェア更新チェック
+#define	UPDATE_SERVER_URL_GLOBAL	"https://update-check.dynamic-ip.thin.cyber.ipa.go.jp/update/?family=%s&software=%s&mybuild=%u&lang=%s"
+#define	UPDATE_SERVER_URL_CHINA		UPDATE_SERVER_URL_GLOBAL
+
 // イベントログのソース名
 #define	DS_EVENTLOG_SOURCE_NAME		L"Thin Telework System Server"
 

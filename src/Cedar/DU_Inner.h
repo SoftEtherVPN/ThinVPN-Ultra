@@ -29,6 +29,7 @@ typedef struct DU_MAIN
 	HWND hWnd;
 	HWND hWndConnect;
 	char Pcid[MAX_PATH];
+	WINUI_UPDATE *Update;
 } DU_MAIN;
 
 // オプションダイアログ

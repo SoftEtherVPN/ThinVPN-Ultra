@@ -170,6 +170,7 @@ struct UPDATE_CLIENT
 	THREAD *Thread;					// Thread
 	UPDATE_NOTIFY_PROC *Callback;	// Callback function
 	UPDATE_ISFOREGROUND_PROC *IsForegroundCb;	// Callback function for retrieving whether foreground
+	WT *Wt;							// WT
 };
 
 //// Constant related to updating of the software
@@ -180,9 +181,6 @@ struct UPDATE_CLIENT
 // Software update server certificate hash
 #define	UPDATE_SERVER_CERT_HASH		DDNS_CERT_HASH
 
-// URL
-#define	UPDATE_SERVER_URL_GLOBAL	"https://update-check.softether-network.net/update/update.aspx?family=%s&software=%s&mybuild=%u&lang=%s"
-#define	UPDATE_SERVER_URL_CHINA		"https://update-check.uxcom.jp/update/update.aspx?family=%s&software=%s&mybuild=%u&lang=%s"
 
 // Update check interval
 #define	UPDATE_CHECK_INTERVAL_MIN		(12 * 3600 * 1000)
@@ -273,7 +271,7 @@ struct WSP
 
 
 // Function prototype
-UPDATE_CLIENT *NewUpdateClient(UPDATE_NOTIFY_PROC *cb, UPDATE_ISFOREGROUND_PROC *isforeground_cb, void *param, char *family_name, char *software_name, wchar_t *software_title, UINT my_build, UINT64 my_date, char *my_lang, UPDATE_CLIENT_SETTING *current_setting, char *client_id);
+UPDATE_CLIENT *NewUpdateClient(UPDATE_NOTIFY_PROC *cb, UPDATE_ISFOREGROUND_PROC *isforeground_cb, void *param, char *family_name, char *software_name, wchar_t *software_title, UINT my_build, UINT64 my_date, char *my_lang, UPDATE_CLIENT_SETTING *current_setting, char *client_id, WT *wt);
 void FreeUpdateClient(UPDATE_CLIENT *c);
 void UpdateClientThreadProc(THREAD *thread, void *param);
 void UpdateClientThreadMain(UPDATE_CLIENT *c);

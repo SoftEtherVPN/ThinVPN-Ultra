@@ -1401,12 +1401,17 @@ void UpdateClientThreadMain(UPDATE_CLIENT *c)
 
 	cert_hash = StrToBin(UPDATE_SERVER_CERT_HASH);
 
-	StrCpy(data.SniString, sizeof(data.SniString), DDNS_SNI_VER_STRING);
+	StrCpy(data.SniString, sizeof(data.SniString), data.SniString);
 
-	recv = HttpRequestEx3(&data, NULL, UPDATE_CONNECT_TIMEOUT, UPDATE_COMM_TIMEOUT, &ret, false, NULL, NULL,
+	recv = HttpRequestEx5(&data, NULL, UPDATE_CONNECT_TIMEOUT, UPDATE_COMM_TIMEOUT, &ret, true, NULL, NULL,
 		NULL, ((cert_hash != NULL && (cert_hash->Size % SHA1_SIZE) == 0) ? cert_hash->Buf : NULL),
 		(cert_hash != NULL ? (cert_hash->Size / SHA1_SIZE) : 0),
-		(bool *)&c->HaltFlag, 0, NULL, NULL);
+		(bool *)&c->HaltFlag, 0, NULL, NULL, c->Wt, false);
+
+	if (recv == NULL)
+	{
+		UniDebug(L"Update error: %s\n", _E(ret));
+	}
 
 	FreeBuf(cert_hash);
 
@@ -1494,7 +1499,7 @@ void SetUpdateClientSetting(UPDATE_CLIENT *c, UPDATE_CLIENT_SETTING *s)
 }
 
 // Start the update client
-UPDATE_CLIENT *NewUpdateClient(UPDATE_NOTIFY_PROC *cb, UPDATE_ISFOREGROUND_PROC *isforeground_cb, void *param, char *family_name, char *software_name, wchar_t *software_title, UINT my_build, UINT64 my_date, char *my_lang, UPDATE_CLIENT_SETTING *current_setting, char *client_id)
+UPDATE_CLIENT *NewUpdateClient(UPDATE_NOTIFY_PROC *cb, UPDATE_ISFOREGROUND_PROC *isforeground_cb, void *param, char *family_name, char *software_name, wchar_t *software_title, UINT my_build, UINT64 my_date, char *my_lang, UPDATE_CLIENT_SETTING *current_setting, char *client_id, WT *wt)
 {
 	UPDATE_CLIENT *c;
 	// Validate arguments
@@ -1505,6 +1510,12 @@ UPDATE_CLIENT *NewUpdateClient(UPDATE_NOTIFY_PROC *cb, UPDATE_ISFOREGROUND_PROC 
 	}
 
 	c = ZeroMalloc(sizeof(UPDATE_CLIENT));
+
+	c->Wt = wt;
+	if (wt != NULL)
+	{
+		AddRef(wt->Ref);
+	}
 
 	c->Callback = cb;
 	c->IsForegroundCb = isforeground_cb;
@@ -1547,6 +1558,11 @@ void FreeUpdateClient(UPDATE_CLIENT *c)
 
 	ReleaseThread(c->Thread);
 	ReleaseEvent(c->HaltEvent);
+
+	if (c->Wt != NULL)
+	{
+		ReleaseWt(c->Wt);
+	}
 
 	Free(c);
 }

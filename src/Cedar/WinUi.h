@@ -573,6 +573,7 @@ void SetWinUiTitle(wchar_t *title);
 void FreeWinUi();
 
 WINUI_UPDATE *InitUpdateUi(wchar_t *title, char *name, char *family_name, UINT64 current_date, UINT current_build, UINT current_ver, char *client_id, bool use_suppress_flag);
+WINUI_UPDATE *InitUpdateUiEx(wchar_t *title, char *name, char *family_name, UINT64 current_date, UINT current_build, UINT current_ver, char *client_id, bool use_suppress_flag, WT *wt);
 void FreeUpdateUi(WINUI_UPDATE *u);
 void DisableUpdateUi(WINUI_UPDATE *u);
 void LoadUpdateUiSetting(WINUI_UPDATE *u, UPDATE_CLIENT_SETTING *s);

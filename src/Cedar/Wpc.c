@@ -767,6 +767,7 @@ BUF *HttpRequestEx5(URL_DATA *data, INTERNET_SETTING *setting,
 
 	if (data->Secure)
 	{
+		bool trusted_checked = false;
 		// Start the SSL communication
 		if (StartSSLEx(s, NULL, NULL, true, 0, (IsEmptyStr(data->SniString) ? NULL : data->SniString)) == false)
 		{
@@ -789,10 +790,14 @@ BUF *HttpRequestEx5(URL_DATA *data, INTERNET_SETTING *setting,
 					ReleaseSock(s);
 					return NULL;
 				}
+				else
+				{
+					trusted_checked = true;
+				}
 			}
 		}
 
-		if (sha1_cert_hash != NULL && num_hashes >= 1)
+		if (trusted_checked == false && (sha1_cert_hash != NULL && num_hashes >= 1))
 		{
 			UCHAR hash[SHA1_SIZE];
 			UINT i;

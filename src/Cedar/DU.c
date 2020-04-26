@@ -1777,6 +1777,9 @@ void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 
 	SetTimer(hWnd, 1, 100, NULL);
 	SetTimer(hWnd, 2, DU_BANNER_SWITCH_INTERVAL, NULL);
+
+	t->Update = InitUpdateUiEx(_UU("PRODUCT_NAME_DESKCLIENT"), DI_PRODUCT_CLIENT_NAME, NULL, GetCurrentBuildDate(),
+		CEDAR_BUILD, CEDAR_VER, NULL, false, t->Du->Dc->Wide->wt);
 }
 
 // コントロール更新
@@ -1808,6 +1811,8 @@ void DuMainDlgOnOk(HWND hWnd, DU_MAIN *t)
 	{
 		return;
 	}
+
+	DisableUpdateUi(t->Update);
 
 	GetTxtA(hWnd, C_PCID, pcid, sizeof(pcid));
 	Trim(pcid);
@@ -1874,6 +1879,13 @@ void DuMainDlgOnClose(HWND hWnd, DU_MAIN *t)
 	}
 
 	DcSaveConfig(t->Du->Dc);
+
+	if (t->Update != NULL)
+	{
+		FreeUpdateUi(t->Update);
+		t->Update = NULL;
+	}
+
 	EndDialog(hWnd, 0);
 }
 
@@ -1999,7 +2011,7 @@ UINT DuMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 		{
 		case CMD_ABOUT:
 			// バージョン情報
-			About(hWnd, t->Du->Cedar, _UU("PRODUCT_NAME_DESKCLIENT"));
+			AboutEx(hWnd, t->Du->Cedar, _UU("PRODUCT_NAME_DESKCLIENT"), t->Update);
 			break;
 
 		case CMD_OPTION:
