@@ -32,9 +32,11 @@ kKbBPozVgrH05nnFd5rZsleAUhCSjT7HgXX9ITBi+eFVpa0YYlmpmKA28Dsy64lm
 IsrNWH7VSYQKD5mNri0FEaUHAU65oRFMKHHX/4xf+NOJ
 -----END CERTIFICATE-----
 
-http://c__TIME__.controller.dynamic-ip.thin.cyber.ipa.go.jp/widecontrol/
+https://c__TIME__.controller.dynamic-ip.thin.cyber.ipa.go.jp/widecontrol/
 
 Update:https://raw.githubusercontent.com/ThinTelework/THIN-ThinTeleworkUpdateFiles/master/Files/
 
+SECONDARY:[https://telework.cyber.ipa.go.jp/widecontrol/]
 SECONDARY:[https://103-41-61-178.v4.open.ad.jp/widecontrol/]
+SECONDARY:[https://103-41-61-255.v4.open.ad.jp/widecontrol/]
 
