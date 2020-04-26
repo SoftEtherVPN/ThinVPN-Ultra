@@ -1002,14 +1002,11 @@ void DgAuthDlgOnOk(HWND hWnd, DG *dg)
 		{
 			if (StrCmp(pass, HIDDEN_PASSWORD) != 0)
 			{
-				if (CheckPasswordComplexity(pass) == false)
+				if (CheckPasswordComplexity(pass) == false && MsRegReadInt(REG_CURRENT_USER, DG_REGKEY, "DisableCheckPasswordComplexity") == 0)
 				{
-					if (MsgBox(hWnd, MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION,
-						_UU("DG_PASSWORD_POLICY_ERROR")) == IDNO)
-					{
-						FocusEx(hWnd, E_PASSWORD1);
-						return;
-					}
+					MsgBox(hWnd, MB_ICONINFORMATION, _UU("DG_PASSWORD_POLICY_ERROR"));
+					FocusEx(hWnd, E_PASSWORD1);
+					return;
 				}
 
 				HashSha1(t.AuthPassword, pass, StrLen(pass));

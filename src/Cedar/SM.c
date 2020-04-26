@@ -13776,14 +13776,11 @@ void SmEditUserDlgOk(HWND hWnd, SM_EDIT_USER *s)
 
 		if (StrCmp(tmp1, HIDDEN_PASSWORD) != 0)
 		{
-			if (CheckPasswordComplexity(tmp1) == false)
+			if (CheckPasswordComplexity(tmp1) == false && MsRegReadInt(REG_CURRENT_USER, DG_REGKEY, "DisableCheckPasswordComplexity") == 0)
 			{
-				if (MsgBox(hWnd, MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION,
-					_UU("DG_PASSWORD_POLICY_ERROR")) == IDNO)
-				{
-					FocusEx(hWnd, E_PASSWORD1);
-					return;
-				}
+				MsgBox(hWnd, MB_ICONINFORMATION, _UU("DG_PASSWORD_POLICY_ERROR"));
+				FocusEx(hWnd, E_PASSWORD1);
+				return;
 			}
 		}
 		break;

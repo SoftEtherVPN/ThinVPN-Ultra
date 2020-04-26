@@ -154,6 +154,11 @@ bool CheckPasswordComplexity(char *str)
 		return false;
 	}
 
+	if (len >= 24)
+	{
+		return true;
+	}
+
 	for (i = 0;i < len;i++)
 	{
 		char c = str[i];
@@ -177,6 +182,10 @@ bool CheckPasswordComplexity(char *str)
 	}
 
 	if ((type0 + type1 + type2 + type3) >= 3)
+	{
+		return true;
+	}
+	else if (((type0 + type1 + type2 + type3) >= 2) && (len >= 16))
 	{
 		return true;
 	}
