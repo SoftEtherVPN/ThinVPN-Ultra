@@ -870,7 +870,7 @@ UINT DcGetMstscArguments(DC_SESSION *s, wchar_t *mstsc_exe, char *arg, UINT arg_
 		StrCat(tmp, sizeof(tmp), " /public");
 	}
 
-	if (dc->MstscLocation == DC_MSTSC_SYSTEM32 && MsIsWindows81() && dc->DisableMultiDisplay == false)
+	if (dc->MstscLocation == DC_MSTSC_SYSTEM32 && MsIsMstscMultiDisplayAvailable() && dc->DisableMultiDisplay == false)
 	{
 		StrCat(tmp, sizeof(tmp), " /multimon");
 	}
