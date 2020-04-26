@@ -3261,24 +3261,27 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 			break;
 		}
 
-		if (StartWith(line, "http://") || StartWith(line, "https://"))
+		if (StartWith(line, "#") == false)
 		{
-			StrCpy(url_tmp, sizeof(url_tmp), line);
-		}
-
-		if (secondary_str_list != NULL)
-		{
-			if (StartWith(line, secondary_tag))
+			if (StartWith(line, "http://") || StartWith(line, "https://"))
 			{
-				char addr[MAX_PATH];
-				UINT len;
-				StrCpy(addr, sizeof(addr), line + StrLen(secondary_tag));
-				len = StrLen(addr);
-				if (addr[len - 1] == ']')
-				{
-					addr[len - 1] = 0;
+				StrCpy(url_tmp, sizeof(url_tmp), line);
+			}
 
-					AddStrToStrListDistinct(secondary_str_list, addr);
+			if (secondary_str_list != NULL)
+			{
+				if (StartWith(line, secondary_tag))
+				{
+					char addr[MAX_PATH];
+					UINT len;
+					StrCpy(addr, sizeof(addr), line + StrLen(secondary_tag));
+					len = StrLen(addr);
+					if (addr[len - 1] == ']')
+					{
+						addr[len - 1] = 0;
+
+						AddStrToStrListDistinct(secondary_str_list, addr);
+					}
 				}
 			}
 		}
