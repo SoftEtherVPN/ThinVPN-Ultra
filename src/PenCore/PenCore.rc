@@ -1508,7 +1508,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 244
         TOPMARGIN, 5
-        BOTTOMMARGIN, 293
+        BOTTOMMARGIN, 365
     END
 
     D_DU_OTP, DIALOG
@@ -1516,7 +1516,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 244
         TOPMARGIN, 5
-        BOTTOMMARGIN, 149
+        BOTTOMMARGIN, 238
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -5357,8 +5357,8 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "ユーザー認証"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    ICON            ICO_LICENSE,IDC_STATIC,7,7,18,18
-    LTEXT           "Desktop VPN サーバー ""%S"" に接続するためには、ユーザー認証を行う必要があります。\r\n認証方法を選択してから、ユーザー名を入力して、必要なデータを入力してください。",S_TITLE,31,7,237,33,WS_TABSTOP
+    ICON            ICO_LICENSE,IDC_STATIC,7,7,20,20
+    LTEXT           "シン・テレワークシステム サーバー ""%S"" に接続するためには、ユーザー認証を行う必要があります。\r\n認証方法を選択してから、ユーザー名を入力して、必要なデータを入力してください。",S_TITLE,31,7,237,33,WS_TABSTOP
     GROUPBOX        "ユーザー名およびユーザー認証方法",IDC_STATIC,26,46,222,92
     RTEXT           "認証方法(&M):",IDC_STATIC,33,62,49,13
     CONTROL         "パスワード認証(&P)",C_PASSWORD,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,87,61,122,10
@@ -5367,12 +5367,12 @@ BEGIN
     RTEXT           "ユーザー名(&U):",IDC_STATIC,33,112,49,13
     EDITTEXT        E_USERNAME,87,110,141,12,ES_AUTOHSCROLL
     GROUPBOX        "パスワード認証",IDC_STATIC,26,144,222,66
-    ICON            ICO_KEY,IDC_STATIC,33,158,18,18
+    ICON            ICO_KEY,IDC_STATIC,33,158,20,20
     LTEXT           "パスワード認証を使用する場合は、パスワードを入力して [OK] をクリックしてください。",S_S1,61,159,179,24
     RTEXT           "パスワード(&P):",S_S2,33,189,49,13
     EDITTEXT        E_PASSWORD,87,187,141,12,ES_PASSWORD | ES_AUTOHSCROLL
     GROUPBOX        "証明書認証",IDC_STATIC,26,217,222,71
-    ICON            ICO_CERT,IDC_STATIC,33,231,18,18
+    ICON            ICO_CERT,IDC_STATIC,33,231,20,20
     LTEXT           "証明書認証を使用する場合は、[参照] をクリックして PKCS#12 形式の証明書ファイル (.p12 または .pfx) を指定してください。",S_S4,61,233,179,27
     EDITTEXT        E_CERTPATH,61,263,141,12,ES_AUTOHSCROLL
     PUSHBUTTON      "参照(&B)...",B_BROWSE,205,261,39,16
@@ -5448,36 +5448,38 @@ BEGIN
     DEFPUSHBUTTON   "ｷｬﾝｾﾙ",IDCANCEL,94,39,63,18
 END
 
-D_DG_OTP DIALOGEX 0, 0, 251, 298
+D_DG_OTP DIALOGEX 0, 0, 251, 370
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "ワンタイムパスワード (OTP) 認証設定 - シン・テレワークシステム サーバー"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    ICON            ICO_IPSEC,IDC_STATIC,7,5,18,18
-    LTEXT           "ログイン時に、毎回、事前設定したメールアドレスにワンタイムパスワード (OTP) が送付されるようにできます。OTP が一致しなければログインできません。セキュリティポリシー上、二要素認証の利用が必須の企業環境で利用できます。",IDC_STATIC,32,5,212,44
-    CONTROL         "ワンタイムパスワード認証機能 (OTP) を有効にする(&E)",B_OTP_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,49,206,15
-    LTEXT           "OTP 送付先のメールアドレス(&M):",S_1,43,70,104,10
-    EDITTEXT        E_MAIL,43,83,191,15,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "&OK",IDOK,111,276,64,17
-    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,276,64,17
-    LTEXT           "メールアドレスの設定は本コンピュータ上でのみ保持され、中継システムで管理・保管されることはありません (ただし、メール送信時の SMTP サーバーの内部ログに一時的に保持される場合はあります)。",S_4,32,195,212,34
-    LTEXT           "職場の PC で本機能を設定する場合は、退社前に必ず手元の別のパソコンから試しに接続するなど、OTP が正しく作動することのテストをしてください。自宅に帰宅された後、万一 OTP が正しく送信されない場合は、会社に来るまでログインできなくなります。",S_3,32,151,212,41
-    LTEXT           "スマートフォン等でいつでも受信できるメールアドレスの設定をお勧めします。\r\n\r\nOTP メールは、ドメイン 「@otp.cyber.ipa.go.jp」 から送信されます。",S_2,43,104,192,43
-    LTEXT           "「シン・テレワークシステム」は無償・無保証で提供されるものです。万一、システム障害等で OTP が送付されない場合もあり、その場合はこの画面で OTP 機能を無効にするまでログインできなくなる可能性がありますので、ご了承の上設定をお願いします。",S_5,32,233,212,41
+    ICON            ICO_IPSEC,IDC_STATIC,7,93,18,18
+    LTEXT           "ログイン時に、毎回、事前設定したメールアドレスにワンタイムパスワード (OTP) が送付されるようにできます。OTP が一致しなければログインできません。セキュリティポリシー上、二要素認証の利用が必須の企業環境で利用できます。",IDC_STATIC,32,93,212,34
+    CONTROL         "ワンタイムパスワード認証機能 (OTP) を有効にする(&E)",B_OTP_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,125,206,15
+    LTEXT           "OTP 送付先のメールアドレス(&M):",S_1,43,143,104,10
+    EDITTEXT        E_MAIL,43,156,191,15,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,111,347,64,17
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,347,64,17
+    LTEXT           "メールアドレスの設定は本コンピュータ上でのみ保持され、中継システムで管理・保管されることはありません (ただし、メール送信時の SMTP サーバーの内部ログに一時的に保持される場合はあります)。",S_4,32,266,212,34
+    LTEXT           "職場の PC で本機能を設定する場合は、退社前に必ず手元の別のパソコンから試しに接続するなど、OTP が正しく作動することのテストをしてください。自宅に帰宅された後、万一 OTP が正しく送信されない場合は、会社に来るまでログインできなくなります。",S_3,32,222,212,41
+    LTEXT           "スマートフォン等でいつでも受信できるメールアドレスの設定をお勧めします。\r\n\r\nOTP メールは、ドメイン 「@otp.cyber.ipa.go.jp」 から送信されます。",S_2,43,177,192,43
+    LTEXT           "「シン・テレワークシステム」は無償・無保証で提供されるものです。万一、システム障害等で OTP が送付されない場合もあり、その場合はこの画面で OTP 機能を無効にするまでログインできなくなる可能性がありますので、ご了承の上設定をお願いします。",S_5,32,304,212,41
+    CONTROL         247,IDC_STATIC,"Static",SS_BITMAP,9,0,234,89
 END
 
-D_DU_OTP DIALOGEX 0, 0, 251, 154
+D_DU_OTP DIALOGEX 0, 0, 251, 243
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "ワンタイムパスワード (OTP) 認証 - シン・テレワークシステム サーバー"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    ICON            ICO_IPSEC,IDC_STATIC,7,5,18,18
-    LTEXT           "NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 (コンピュータ ID: %S) の設定画面で事前設定されているメールアドレスに、ワンタイムパスワード (OTP) が送付されました。\r\n\r\nメールをご確認いただき、OTP を入力してください。",S_TITLE,32,5,212,53
-    LTEXT           "ワンタイムパスワード (OT&P):",S_1,36,62,104,10
-    EDITTEXT        E_OTP,36,76,191,15,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "しばらく経過してもメールが届かない場合は、一度キャンセルしてから、再度ログインを試行してください。",S_3,32,100,212,27
-    DEFPUSHBUTTON   "&OK",IDOK,111,132,64,17
-    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,132,64,17
+    ICON            ICO_IPSEC,IDC_STATIC,7,98,20,20
+    LTEXT           "NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 (コンピュータ ID: %S) の設定画面で事前設定されているメールアドレスに、ワンタイムパスワード (OTP) が送付されました。\r\n\r\nメールをご確認いただき、OTP を入力してください。",S_TITLE,32,98,212,51
+    LTEXT           "ワンタイムパスワード (OT&P):",S_1,36,152,104,10
+    EDITTEXT        E_OTP,36,168,191,15,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "しばらく経過してもメールが届かない場合は、一度キャンセルしてから、再度ログインを試行してください。",S_3,32,193,212,27
+    DEFPUSHBUTTON   "&OK",IDOK,111,221,64,17
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,221,64,17
+    CONTROL         247,IDC_STATIC,"Static",SS_BITMAP,9,0,234,88
 END
 
 
@@ -5603,6 +5605,7 @@ BMP_PASSWORD2_EN        BITMAP                  "Password2_en.bmp"
 BMP_THANKS_EN           BITMAP                  "Thanks_en.bmp"
 BMP_THEEND              BITMAP                  "TheEnd.bmp"
 BMP_CREDIT              BITMAP                  "CREDIT.bmp"
+BMP_OTP                 BITMAP                  "Otp.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

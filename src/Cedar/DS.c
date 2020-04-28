@@ -1818,7 +1818,6 @@ UINT DtRegistMachine(DS *ds, RPC_PCID *t)
 // PCID の変更
 UINT DtChangePcid(DS *ds, RPC_PCID *t)
 {
-	Print("WideServerSendOtpEmail: %u\n", WideServerSendOtpEmail(ds->Wide, "1234", "dnobori.mobile@gmail.com", "1.2.3.4", "fqdn.abc"));
 	return WideServerRenameMachine(ds->Wide, t->Pcid);
 }
 
