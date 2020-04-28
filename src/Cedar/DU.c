@@ -1046,7 +1046,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 	}
 
 	// セッション接続
-	ret = NewDcSession(dc, pcid, DuPasswordCallback, DuAdvAuthCallback, DuEventCallback, t, &s);
+	ret = NewDcSession(dc, pcid, DuPasswordCallback, NULL, /*TODO*/ DuAdvAuthCallback, DuEventCallback, t, &s);
 	if (ret != ERR_NO_ERROR)
 	{
 		MsgBox(hWnd, MB_ICONEXCLAMATION, _E(ret));

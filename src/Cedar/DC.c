@@ -2307,7 +2307,7 @@ bool DcSessionConnectAuthCallback2(DC *dc, DC_AUTH *auth, void *param)
 }
 
 // 新しいセッション
-UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback,
+UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_OTP_CALLBACK *otp_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback,
 				  void *param, DC_SESSION **session)
 {
 	DC_SESSION *s;
@@ -2332,6 +2332,7 @@ UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, D
 	s->Listener = listener;
 	s->ListenPort = listener->LocalPort;
 	s->PasswordCallback = password_callback;
+	s->OtpCallback = otp_callback;
 	s->AdvAuthCallback = advauth_callback;
 	s->EventCallback = event_callback;
 	DcGetBestHostnameForPcid(s->Hostname, sizeof(s->Hostname), pcid);
@@ -2464,6 +2465,7 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 	UINT ds_caps = 0;
 	bool is_share_disabled = false;
 	bool use_advanced_security = false;
+	bool is_otp_enabled = false;
 	// 引数チェック
 	if (dc == NULL || sock == NULL || pcid == NULL || auth_callback == NULL)
 	{
@@ -2482,6 +2484,7 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 	PackAddBool(p, "CheckPort", check_port);
 	PackAddBool(p, "FirstConnection", first_connection);
 	PackAddBool(p, "HasURDP2Client", MsIsWinXPOrWinVista() && dc->EnableVersion2);
+	PackAddBool(p, "SupportOtp", true);
 	b = SockIoSendPack(sock, p);
 	FreePack(p);
 
@@ -2506,6 +2509,7 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 	PackGetData2(p, "MachineKey", machine_key, sizeof(machine_key));
 	is_share_disabled = PackGetBool(p, "IsShareDisabled");
 	use_advanced_security = PackGetBool(p, "UseAdvancedSecurity");
+	is_otp_enabled = PackGetBool(p, "IsOtpEnabled");
 	FreePack(p);
 	if (ret != ERR_NO_ERROR)
 	{

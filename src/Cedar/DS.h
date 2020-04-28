@@ -96,6 +96,8 @@ struct DS
 	bool DisableShare;					// 共有機能を禁止するかどうか
 	wchar_t AdminUsername[MAX_PATH];	// 管理者のユーザー名
 	UINT NumConfigures;					// 設定接続回数
+	bool EnableOtp;						// OTP 有効
+	char OtpEmail[MAX_PATH];			// OTP 送付先メールアドレス
 };
 
 struct DS_INFO

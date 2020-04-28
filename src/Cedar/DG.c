@@ -51,6 +51,164 @@
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
 
+// OTP ダイアログ
+bool DgOtpDlg(HWND hWnd, DG *dg)
+{
+	if (dg == NULL)
+	{
+		return false;
+	}
+
+	return Dialog(hWnd, D_DG_OTP, DgOtpDlgProc, dg);
+}
+
+// OTP ダイアログ
+UINT DgOtpDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	DG *dg = (DG *)param;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		DgOptDlgInit(hWnd, dg);
+		break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case B_OTP_ENABLE:
+		case E_MAIL:
+			DgOptDlgUpdate(hWnd, dg);
+			break;
+		}
+
+		switch (wParam)
+		{
+		case B_OTP_ENABLE:
+			if (IsChecked(hWnd, B_OTP_ENABLE))
+			{
+				FocusEx(hWnd, E_MAIL);
+			}
+			break;
+
+		case IDOK:
+			DgOptDlgOnOk(hWnd, dg);
+			break;
+
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		break;
+	}
+
+	return 0;
+}
+
+// OTP ダイアログ 初期化
+void DgOptDlgInit(HWND hWnd, DG *dg)
+{
+	RPC_DS_CONFIG t;
+	if (dg == NULL)
+	{
+		return;
+	}
+
+	Zero(&t, sizeof(t));
+
+	SetIcon(hWnd, 0, ICO_IPSEC);
+
+	if (CALL(hWnd, DtcGetConfig(dg->Rpc, &t)) == false)
+	{
+		EndDialog(hWnd, 0);
+		return;
+	}
+
+	Check(hWnd, B_OTP_ENABLE, t.EnableOtp);
+
+	SetTextA(hWnd, E_MAIL, t.OtpEmail);
+
+	if (t.EnableOtp == false)
+	{
+		Focus(hWnd, B_OTP_ENABLE);
+	}
+	else
+	{
+		FocusEx(hWnd, E_MAIL);
+	}
+
+	DlgFont(hWnd, B_OTP_ENABLE, 10, true);
+	DlgFont(hWnd, S_1, 0, true);
+	DlgFont(hWnd, S_2, 0, true);
+
+	SetFont(hWnd, E_MAIL, GetFont("Arial", 12, false, false, false, false));
+
+	DgOptDlgUpdate(hWnd, dg);
+}
+
+// OTP ダイアログ コントロール更新
+void DgOptDlgUpdate(HWND hWnd, DG *dg)
+{
+	char email[MAX_PATH];
+	bool ok = true;
+	bool enabled = false;
+	if (dg == NULL)
+	{
+		return;
+	}
+
+	GetTxtA(hWnd, E_MAIL, email, sizeof(email));
+
+	enabled = IsChecked(hWnd, B_OTP_ENABLE);
+
+	SetEnable(hWnd, S_1, enabled);
+	SetEnable(hWnd, S_2, enabled);
+	SetEnable(hWnd, S_3, enabled);
+	SetEnable(hWnd, S_4, enabled);
+	SetEnable(hWnd, S_5, enabled);
+	SetEnable(hWnd, E_MAIL, enabled);
+
+	if (enabled)
+	{
+		if (!(InStr(email, "@") && InStr(email, ".")))
+		{
+			ok = false;
+		}
+	}
+
+	SetEnable(hWnd, IDOK, ok);
+}
+
+// OTP ダイアログ OK ボタン
+void DgOptDlgOnOk(HWND hWnd, DG *dg)
+{
+	RPC_DS_CONFIG t;
+	if (dg == NULL)
+	{
+		return;
+	}
+
+	Zero(&t, sizeof(t));
+
+	if (CALL(hWnd, DtcGetConfig(dg->Rpc, &t)) == false)
+	{
+		return;
+	}
+
+	t.EnableOtp = IsChecked(hWnd, B_OTP_ENABLE);
+
+	GetTxtA(hWnd, E_MAIL, t.OtpEmail, sizeof(t.OtpEmail));
+
+	CALL(hWnd, DtcSetConfig(dg->Rpc, &t));
+
+	EndDialog(hWnd, 1);
+}
+
 // Bluetooth ディレクトリの指定
 void DgSelectBluetoothDir(HWND hWnd, DG *dg)
 {
@@ -1215,6 +1373,11 @@ UINT DgAuthDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 				SmHubAc(hWnd, &eh);
 			}
 			DgFreeSmServerAndSmHub(s, h);
+			break;
+
+		case B_OTP:
+			// OTP
+			DgOtpDlg(hWnd, dg);
 			break;
 		}
 		break;

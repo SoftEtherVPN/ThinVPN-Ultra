@@ -256,6 +256,7 @@ UINT WideServerGetLoginInfo(WIDE *w, WIDE_LOGIN_INFO *info);
 UINT WideServerGetPcidCandidate(WIDE *w, char *name, UINT size, char *current_username);
 UINT WideServerRegistMachine(WIDE *w, char *pcid, X *cert, K *key);
 UINT WideServerRenameMachine(WIDE *w, char *new_name);
+UINT WideServerSendOtpEmail(WIDE *w, char *otp, char *email, char *ip, char *fqdn);
 UINT WideServerConnect(WIDE *w, WT_CONNECT *c);
 void WideServerConnectMainThread(THREAD *thread, void *param);
 bool WideServerIsConnected(WIDE *w);

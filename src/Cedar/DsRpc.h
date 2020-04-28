@@ -57,6 +57,8 @@ struct RPC_DS_CONFIG
 	bool SaveEventLog;
 	bool DisableShare;
 	wchar_t AdminUsername[MAX_PATH];
+	bool EnableOtp;
+	char OtpEmail[MAX_PATH];
 };
 
 void InInternetSetting(INTERNET_SETTING *t, PACK *p);

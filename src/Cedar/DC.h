@@ -63,6 +63,7 @@ struct DC_SESSION
 	UINT ListenPort;					// Listen しているポート番号
 	SOCK *Listener;						// リスナー
 	DC_PASSWORD_CALLBACK *PasswordCallback;	// パスワードコールバック
+	DC_OTP_CALLBACK *OtpCallback;		// OTP コールバック
 	DC_ADVAUTH_CALLBACK *AdvAuthCallback;	// 新しい認証方法のコールバック
 	DC_EVENT_CALLBACK *EventCallback;	// イベントコールバック
 	char Hostname[MAX_PATH];			// 接続先ホスト名
@@ -128,7 +129,7 @@ UINT DcConnectEx(DC *dc, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *call
 			   SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size);
 UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection);
 void DcSetLocalHostAllowFlag(bool allow);
-UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback,
+UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_OTP_CALLBACK *otp_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback,
 				  void *param, DC_SESSION **session);
 UINT DcSessionConnect(DC_SESSION *s);
 void ReleaseDcSession(DC_SESSION *s);

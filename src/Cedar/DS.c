@@ -538,6 +538,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bool first_connection;
 	bool last_connection = false;
 	bool has_urdp2_client = false;
+	bool support_otp = false;
 	UINT ds_caps = 0;
 	UINT urdp_version = 0;
 	// 引数チェック
@@ -582,6 +583,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bluetooth_mode = false;//PackGetBool(p, "bluetooth_mode");
 	first_connection = PackGetBool(p, "FirstConnection");
 	has_urdp2_client = PackGetBool(p, "HasURDP2Client");
+	support_otp = PackGetBool(p, "SupportOtp");
 
 	if (MsIsWinXPOrWinVista() == false)
 	{
@@ -606,6 +608,13 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
 			return;
 		}
+	}
+
+	if (ds->EnableOtp)
+	{
+		// OTP が有効なのにクライアントが OTP 非サポート
+		DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+		return;
 	}
 
 	if (ds->UseAdvancedSecurity)
@@ -760,6 +769,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 	PackAddBool(p, "IsShareDisabled", is_share_disabled);
 	PackAddBool(p, "UseAdvancedSecurity", ds->UseAdvancedSecurity);
+	PackAddBool(p, "IsOtpEnabled", ds->EnableOtp);
 	ret = SockIoSendPack(sock, p);
 	FreePack(p);
 
@@ -767,6 +777,25 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	{
 		DsSendError(sock, ERR_PROTOCOL_ERROR);
 		return;
+	}
+
+	// OTP 有効の場合は、OTP パスワードを受信
+	if (ds->EnableOtp)
+	{
+		char otp[MAX_PATH];
+
+		// まずこの機会に急いで OTP を発行する
+
+		p = SockIoRecvPack(sock);
+		if (p == NULL)
+		{
+			DsSendError(sock, ERR_PROTOCOL_ERROR);
+			return;
+		}
+
+		PackGetStr(p, "Otp", otp, sizeof(otp));
+
+		FreePack(p);
 	}
 
 	// 認証データを受信
@@ -1724,6 +1753,7 @@ UINT DtRegistMachine(DS *ds, RPC_PCID *t)
 // PCID の変更
 UINT DtChangePcid(DS *ds, RPC_PCID *t)
 {
+	Print("WideServerSendOtpEmail: %u\n", WideServerSendOtpEmail(ds->Wide, "1234", "dnobori.mobile@gmail.com", "1.2.3.4", "fqdn.abc"));
 	return WideServerRenameMachine(ds->Wide, t->Pcid);
 }
 
@@ -1744,6 +1774,9 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 	ds->SaveEventLog = t->SaveEventLog;
 	ds->DisableShare = t->DisableShare;
 	UniStrCpy(ds->AdminUsername, sizeof(ds->AdminUsername), t->AdminUsername);
+
+	ds->EnableOtp = t->EnableOtp;
+	StrCpy(ds->OtpEmail, sizeof(ds->OtpEmail), t->OtpEmail);
 
 	DsNormalizeConfig(ds);
 	DsSaveConfig(ds);
@@ -1770,6 +1803,9 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 	t->SaveEventLog = ds->SaveEventLog;
 	t->DisableShare = ds->DisableShare;
 	UniStrCpy(t->AdminUsername, sizeof(t->AdminUsername), ds->AdminUsername);
+
+	t->EnableOtp = ds->EnableOtp;
+	StrCpy(t->OtpEmail, sizeof(t->OtpEmail), ds->OtpEmail);
 
 	return ERR_NO_ERROR;
 }
@@ -2235,6 +2271,12 @@ void DsNormalizeConfig(DS *ds)
 		// リモートデスクトップを有効にしておく
 		MsEnableRemoteDesktop();
 	}
+
+	if (IsEmptyStr(ds->OtpEmail))
+	{
+		// OTP メールアドレス未設定の場合は EnableOtp を false にする
+		ds->EnableOtp = false;
+	}
 #endif  // OS_WIN32
 }
 
@@ -2336,6 +2378,9 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 
 	ds->NumConfigures = CfgGetInt(root, "NumConfigures");
 
+	ds->EnableOtp = CfgGetBool(root, "EnableOtp");
+	CfgGetStr(root, "OtpEmail", ds->OtpEmail, sizeof(ds->OtpEmail));
+
 	f = CfgGetFolder(root, "ProxySetting");
 
 	if (f != NULL)
@@ -2425,6 +2470,10 @@ FOLDER *DsSaveConfigMain(DS *ds)
 #endif	// DESK_DISABLE_NEW_FEATURE
 
 	CfgAddBool(root, "DisableShare", ds->DisableShare);
+
+	CfgAddBool(root, "EnableOtp", ds->EnableOtp);
+
+	CfgAddStr(root, "OtpEmail", ds->OtpEmail);
 
 	CfgAddBool(root, "IsConfigured", ds->IsConfigured);
 

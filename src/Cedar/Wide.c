@@ -1105,6 +1105,32 @@ UINT WideGetEnvStr(WIDE *w, char *name, char *ret_str, UINT ret_size)
 	return ret;
 }
 
+// OTP 電子メールの送信
+UINT WideServerSendOtpEmail(WIDE *w, char *otp, char *email, char *ip, char *fqdn)
+{
+	UINT ret = ERR_NO_ERROR;
+	PACK *r, *p;
+	// 引数チェック
+	if (w == NULL || otp == NULL || email == NULL || ip == NULL || fqdn == NULL)
+	{
+		return ERR_INTERNAL_ERROR;
+	}
+
+	r = NewPack();
+	PackAddStr(r, "Otp", otp);
+	PackAddStr(r, "Email", email);
+	PackAddStr(r, "Ip", ip);
+	PackAddStr(r, "Fqdn", fqdn);
+
+	p = WideCall(w, "SendOtpEmail", r, false, true);
+	FreePack(r);
+
+	ret = GetErrorFromPack(p);
+	FreePack(p);
+
+	return ret;
+}
+
 // マシン名の変更
 UINT WideServerRenameMachine(WIDE *w, char *new_name)
 {

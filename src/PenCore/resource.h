@@ -738,6 +738,7 @@
 #define R_LOG                           1285
 #define C_NOMORE                        1285
 #define C_MULTIDISPLAY                  1285
+#define B_OTP_ENABLE                    1285
 #define R_DOUBLE                        1286
 #define C_SITE                          1286
 #define C_JITTER                        1286
@@ -1036,6 +1037,8 @@
 #define S_TSUKUBA                       1515
 #define R_DISABLE_NATT                  1516
 #define S_SMARTCARD_ICON                1517
+#define E_MAIL                          1518
+#define E_OTP                           1519
 #define B_ONLINE                        1655
 #define D_NM_CONNECT                    1998
 #define D_NM_MAIN                       1999
@@ -1150,6 +1153,7 @@
 #define B_USAGE                         2502
 #define B_HASH                          2503
 #define B_HASHID                        2504
+#define B_OTP                           2504
 #define B_SHOWID                        2505
 #define BMP_SPLASH_CLIENT               2506
 #define BMP_SPLASH_MANAGER              2507
@@ -1303,6 +1307,8 @@
 #define D_DU_THEEND                     2646
 #define D_DEFAULT4                      2647
 #define D_DU_DIALUP                     2647
+#define D_DG_OTP                        2648
+#define D_DC_OTP                        2649
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021
@@ -1375,7 +1381,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        247
 #define _APS_NEXT_COMMAND_VALUE         40111
-#define _APS_NEXT_CONTROL_VALUE         1518
+#define _APS_NEXT_CONTROL_VALUE         1520
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

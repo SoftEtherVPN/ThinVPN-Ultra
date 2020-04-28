@@ -1290,7 +1290,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 448
         TOPMARGIN, 7
-        BOTTOMMARGIN, 309
+        BOTTOMMARGIN, 374
     END
 
     D_DG_OPTION, DIALOG
@@ -1501,6 +1501,22 @@ BEGIN
         RIGHTMARGIN, 240
         TOPMARGIN, 5
         BOTTOMMARGIN, 61
+    END
+
+    D_DG_OTP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 244
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 293
+    END
+
+    D_DC_OTP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 244
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 148
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -4901,18 +4917,18 @@ FONT 9, "MS UI Gothic", 400, 0, 0x80
 BEGIN
 END
 
-D_DG_AUTH DIALOGEX 0, 0, 455, 317
+D_DG_AUTH DIALOGEX 0, 0, 455, 382
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "@D_DG_AUTH"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    ICON            ICO_LICENSE,IDC_STATIC,7,7,18,18
+    ICON            ICO_LICENSE,IDC_STATIC,7,7,20,20
     LTEXT           "@S1",IDC_STATIC,30,7,418,27
     GROUPBOX        "@S2",S_S2,7,38,247,137
-    ICON            ICO_USER,IDC_STATIC,14,51,18,18
+    ICON            ICO_USER,IDC_STATIC,14,51,20,20
     LTEXT           "@S3",S_S3,38,53,209,20
     CONTROL         "@C_USE_AUTH",C_USE_AUTH,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,79,226,15
-    ICON            ICO_KEY,IDC_STATIC,19,100,18,18
+    ICON            ICO_KEY,IDC_STATIC,19,100,20,20
     LTEXT           "@S_PASSWORD1",S_PASSWORD1,43,99,203,29
     RTEXT           "@S_PASSWORD2",S_PASSWORD2,16,136,56,11
     EDITTEXT        E_PASSWORD1,77,134,155,12,ES_PASSWORD | ES_AUTOHSCROLL
@@ -4925,18 +4941,22 @@ BEGIN
     PUSHBUTTON      "信頼する証明機関の証明書(&T)",B_CA,135,253,104,17
     PUSHBUTTON      "外部認証サーバーの設定(&R)",B_RADIUS,24,279,104,17
     PUSHBUTTON      "無効な証明書(&V)",B_CRL,134,279,104,17
-    GROUPBOX        "@S4",IDC_STATIC,263,38,185,137
-    ICON            ICO_PKCS12,IDC_STATIC,269,51,18,18
-    LTEXT           "@S5",IDC_STATIC,293,51,147,54
-    CONTROL         "@C_CHECK_CERT",C_CHECK_CERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,274,108,167,10
-    LTEXT           "@S_CHECK_CERT",S_CHECK_CERT,277,124,164,47
-    GROUPBOX        "IP アクセス制御リスト(&R)",IDC_STATIC,263,181,185,82
-    ICON            ICO_INTERNET,S_ACL_2,270,195,18,18
-    LTEXT           "クライアントコンピュータの IP アドレスによって、このサーバーへの VPN 接続を許可または拒否することができます。",S_ACL,294,195,146,34
-    PUSHBUTTON      "IP アクセス制御リスト(&L)",B_ACL,337,234,102,19
-    PUSHBUTTON      "@B_HASH",B_HASH,264,292,79,17
-    DEFPUSHBUTTON   "@IDOK",IDOK,347,292,43,17
-    PUSHBUTTON      "@IDCANCEL",IDCANCEL,393,292,55,17
+    GROUPBOX        "ワンタイムパスワード (OTP) 機能 (二要素認証)",IDC_STATIC,263,38,185,85
+    ICON            ICO_IPSEC,IDC_STATIC,269,52,20,20
+    LTEXT           "毎回必ずログイン時に事前設定したメールアドレスにワンタイムパスワード (OTP) が送付されるようにできます。OTP が一致しなければログインできません。セキュリティポリシー上、二要素認証の利用が必須の企業環境で利用できます。",IDC_STATIC,293,52,148,44
+    PUSHBUTTON      "ワンタイムパスワード (O&TP) 機能の設定",B_OTP,305,99,133,17
+    GROUPBOX        "@S4",IDC_STATIC,263,128,185,137
+    ICON            ICO_PKCS12,IDC_STATIC,269,141,20,20
+    LTEXT           "@S5",IDC_STATIC,293,141,147,54
+    CONTROL         "@C_CHECK_CERT",C_CHECK_CERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,274,198,167,10
+    LTEXT           "@S_CHECK_CERT",S_CHECK_CERT,277,214,164,47
+    GROUPBOX        "IP アクセス制御リスト(&R)",IDC_STATIC,263,270,185,76
+    ICON            ICO_INTERNET,S_ACL_2,270,285,20,20
+    LTEXT           "クライアントコンピュータの IP アドレスによって、このサーバーへの VPN 接続を許可または拒否することができます。",S_ACL,294,284,146,34
+    PUSHBUTTON      "IP アクセス制御リスト(&L)",B_ACL,337,323,102,19
+    PUSHBUTTON      "@B_HASH",B_HASH,264,357,79,17
+    DEFPUSHBUTTON   "@IDOK",IDOK,347,357,43,17
+    PUSHBUTTON      "@IDCANCEL",IDCANCEL,393,357,55,17
 END
 
 D_DG_OPTION DIALOGEX 0, 0, 451, 314
@@ -5426,6 +5446,38 @@ BEGIN
     ICON            ICO_WIN95NET,IDC_STATIC,15,14,20,20
     LTEXT           "「特殊局」に高速ﾊﾟｹｯﾄ通信で接続中...",S_STATIC,47,18,190,8
     DEFPUSHBUTTON   "ｷｬﾝｾﾙ",IDCANCEL,94,39,63,18
+END
+
+D_DG_OTP DIALOGEX 0, 0, 251, 298
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ワンタイムパスワード (OTP) 認証設定 - シン・テレワークシステム サーバー"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    ICON            ICO_IPSEC,IDC_STATIC,7,5,18,18
+    LTEXT           "ログイン時に、毎回、事前設定したメールアドレスにワンタイムパスワード (OTP) が送付されるようにできます。OTP が一致しなければログインできません。セキュリティポリシー上、二要素認証の利用が必須の企業環境で利用できます。",IDC_STATIC,32,5,212,44
+    CONTROL         "ワンタイムパスワード認証機能 (OTP) を有効にする(&E)",B_OTP_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,49,206,15
+    LTEXT           "OTP 送付先のメールアドレス(&M):",S_1,43,70,104,10
+    EDITTEXT        E_MAIL,43,83,191,15,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,111,276,64,17
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,276,64,17
+    LTEXT           "メールアドレスの設定は本コンピュータ上でのみ保持され、中継システムで管理・保管されることはありません (ただし、メール送信時の SMTP サーバーの内部ログに一時的に保持される場合はあります)。",S_4,32,195,212,34
+    LTEXT           "職場の PC で本機能を設定する場合は、退社前に必ず手元の別のパソコンから試しに接続するなど、OTP が正しく作動することのテストをしてください。自宅に帰宅された後、万一 OTP が正しく送信されない場合は、会社に来るまでログインできなくなります。",S_3,32,151,212,41
+    LTEXT           "スマートフォン等でいつでも受信できるメールアドレスの設定をお勧めします。\r\n\r\nOTP メールは、ドメイン 「@otp.cyber.ipa.go.jp」 から送信されます。",S_2,43,104,192,43
+    LTEXT           "「シン・テレワークシステム」は無償・無保証で提供されるものです。万一、システム障害等で OTP が送付されない場合もあり、その場合はこの画面で OTP 機能を無効にするまでログインできなくなる可能性がありますので、ご了承の上設定をお願いします。",S_5,32,233,212,41
+END
+
+D_DC_OTP DIALOGEX 0, 0, 251, 153
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "ワンタイムパスワード (OTP) 認証 - シン・テレワークシステム サーバー"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    ICON            ICO_IPSEC,IDC_STATIC,7,5,18,18
+    LTEXT           "NTT 東日本 - IPA 「シン・テレワークシステム サーバー」の設定画面で事前設定されているメールアドレスに、ワンタイムパスワード (OTP) が送付されました。\r\n\r\nメールをご確認いただき、OTP を入力してください。",IDC_STATIC,32,5,212,48
+    LTEXT           "ワンタイムパスワード (OT&P):",S_1,36,56,104,10
+    EDITTEXT        E_OTP,36,69,191,15,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "しばらく経過してもメールが届かない場合は、一度キャンセルしてから、再度ログインを試行してください。",S_3,32,97,212,27
+    DEFPUSHBUTTON   "&OK",IDOK,111,131,64,17
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,131,64,17
 END
 
 

@@ -37,6 +37,8 @@ void InRpcDsConfig(RPC_DS_CONFIG *t, PACK *p)
 	t->SaveEventLog = PackGetBool(p, "SaveEventLog");
 	t->DisableShare = PackGetBool(p, "DisableShare");
 	PackGetUniStr(p, "AdminUsername", t->AdminUsername, sizeof(t->AdminUsername));
+	t->EnableOtp = PackGetBool(p, "EnableOtp");
+	PackGetStr(p, "OtpEmail", t->OtpEmail, sizeof(t->OtpEmail));
 }
 void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 {
@@ -59,6 +61,8 @@ void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 	PackAddBool(p, "SaveEventLog", t->SaveEventLog);
 	PackAddBool(p, "DisableShare", t->DisableShare);
 	PackAddUniStr(p, "AdminUsername", t->AdminUsername);
+	PackAddBool(p, "EnableOtp", t->EnableOtp);
+	PackAddStr(p, "OtpEmail", t->OtpEmail);
 }
 
 // RPC_PCID

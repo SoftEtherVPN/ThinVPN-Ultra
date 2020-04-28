@@ -33,7 +33,7 @@
 
 // 通信関係
 #define DS_WAIT_FOR_URDP_SERVER_TIMEOUT	(15 * 1000)	// URDP Server が利用可能になるまでの待機時間
-#define DS_PROTOCOL_CONNECTING_TIMEOUT	(60 * 1000)	// 接続中のプロトコルでのタイムアウト
+#define DS_PROTOCOL_CONNECTING_TIMEOUT	(3 * 60 * 1000)	// 接続中のプロトコルでのタイムアウト (OTP もあるので 3 分にした)
 
 
 // ユーザー認証

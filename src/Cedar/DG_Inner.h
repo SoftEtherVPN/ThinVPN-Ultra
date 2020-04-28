@@ -84,5 +84,12 @@ void DgSelectBluetoothDir(HWND hWnd, DG *dg);
 void DgInitSmServerAndSmHub(SM_SERVER **ppserver, SM_HUB **pphub, DG *dg);
 void DgFreeSmServerAndSmHub(SM_SERVER *s, SM_HUB *h);
 
+bool DgOtpDlg(HWND hWnd, DG *dg);
+UINT DgOtpDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+void DgOptDlgInit(HWND hWnd, DG *dg);
+void DgOptDlgUpdate(HWND hWnd, DG *dg);
+void DgOptDlgOnOk(HWND hWnd, DG *dg);
+
+
 
 
