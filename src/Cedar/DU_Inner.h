@@ -59,6 +59,13 @@ typedef struct DU_PASSWORD
 	char Hostname[MAX_PATH];
 } DU_PASSWORD;
 
+// OTP ダイアログデータ
+typedef struct DU_OTP
+{
+	char Otp[MAX_PATH];
+	char Hostname[MAX_PATH];
+} DU_OTP;
+
 // ユーザー認証ダイアログデータ
 typedef struct DU_AUTH
 {
@@ -118,6 +125,10 @@ bool DuEventCallback(DC_SESSION *s, UINT event_type, void *event_param);
 bool DuPasswordDlg(HWND hWnd, char *password, UINT password_size, char *hostname);
 UINT DuPasswordDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 void DuPasswordDlgUpdate(HWND hWnd);
+
+bool DuOtpDlg(HWND hWnd, char *otp, UINT otp_size, char *hostname);
+UINT DuOtpDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+void DuOtpDlgUpdate(HWND hWnd);
 
 void DuConnectDlg(HWND hWnd, DU_MAIN *t);
 UINT DuConnectDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);

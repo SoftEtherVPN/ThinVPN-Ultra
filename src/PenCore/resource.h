@@ -1309,6 +1309,7 @@
 #define D_DU_DIALUP                     2647
 #define D_DG_OTP                        2648
 #define D_DC_OTP                        2649
+#define D_DU_OTP                        2649
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021

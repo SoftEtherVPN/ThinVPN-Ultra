@@ -2127,8 +2127,9 @@ void DcConnectThread(THREAD *thread, void *param)
 			}
 
 			// 接続
-			ret = DcConnectEx(s->Dc, s->Pcid, DcSessionConnectAuthCallback2,
-				s, url, sizeof(url), false, &io, false, msg, sizeof(msg));
+			ret = DcConnectEx(s->Dc, s, s->Pcid, DcSessionConnectAuthCallback2,
+				s, url, sizeof(url), false, &io, false, msg, sizeof(msg),
+				DcSessionConnectOtpCallback2, s);
 
 			if (ret == ERR_NO_ERROR)
 			{
@@ -2172,8 +2173,9 @@ UINT DcSessionConnect(DC_SESSION *s)
 	}
 
 	// 1 個目のセッションを接続
-	ret = DcConnectEx(s->Dc, s->Pcid, DcSessionConnectAuthCallback1, s,
-		url, sizeof(url), true, &io, true, msg, sizeof(msg));
+	ret = DcConnectEx(s->Dc, s, s->Pcid, DcSessionConnectAuthCallback1, s,
+		url, sizeof(url), true, &io, true, msg, sizeof(msg),
+		DcSessionConnectOtpCallback1, s);
 
 	if (ret != ERR_NO_ERROR)
 	{
@@ -2204,6 +2206,38 @@ UINT DcSessionConnect(DC_SESSION *s)
 	s->ConnectThread = NewThread(DcConnectThread, s);
 
 	return ERR_NO_ERROR;
+}
+
+// 1 回目の OTP コールバック関数
+bool DcSessionConnectOtpCallback1(DC *dc, char *otp, UINT otp_max_size, void *param)
+{
+	DC_SESSION *s;
+	// 引数チェック
+	if (dc == NULL || otp == NULL || param == NULL)
+	{
+		return false;
+	}
+
+	s = (DC_SESSION *)param;
+
+	return s->OtpCallback(dc, otp, otp_max_size, s);
+}
+
+// 2 回目の OTP コールバック関数
+bool DcSessionConnectOtpCallback2(DC *dc, char *otp, UINT otp_max_size, void *param)
+{
+	DC_SESSION *s;
+	// 引数チェック
+	if (dc == NULL || otp == NULL || param == NULL)
+	{
+		return false;
+	}
+
+	s = (DC_SESSION *)param;
+
+	StrCpy(otp, otp_max_size, s->OtpTicket);
+
+	return true;
 }
 
 // 1 回目の認証コールバック関数
@@ -2452,7 +2486,7 @@ void DcSetLocalHostAllowFlag(bool allow)
 }
 
 // 接続メイン
-UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection)
+UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param)
 {
 #ifdef	OS_WIN32
 	PACK *p;
@@ -2536,6 +2570,62 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 	{
 		// 同一のマシンである
 		return ERR_DESK_LOCALHOST;
+	}
+
+	if (is_otp_enabled)
+	{
+		char otp[MAX_PATH] = {0};
+
+		// OTP が有効なサーバーである。
+		// OTP の入力画面を表示する
+		if (otp_callback == NULL ||
+			otp_callback(dc, otp, sizeof(otp), otp_callback_param) == false)
+		{
+			// OTP キャンセル
+			return ERR_USER_CANCEL;
+		}
+
+		// OTP 送信
+		p = NewPack();
+		PackAddStr(p, "Otp", otp);
+		b = SockIoSendPack(sock, p);
+		FreePack(p);
+
+		if (b == false)
+		{
+			return ERR_DISCONNECTED;
+		}
+
+		// OTP 結果受信
+		p = SockIoRecvPack(sock);
+		if (p == NULL)
+		{
+			return ERR_DISCONNECTED;
+		}
+		ret = GetErrorFromPack(p);
+		if (ret == ERR_NO_ERROR)
+		{
+			// 認証成功時は OTP チケットを受け取っているので、それを保存
+			char otp_ticket[MAX_PATH];
+
+			if (PackGetStr(p, "OtpTicket", otp_ticket, sizeof(otp_ticket)))
+			{
+				if (IsEmptyStr(otp_ticket) == false)
+				{
+					if (dcs != NULL)
+					{
+						StrCpy(dcs->OtpTicket, sizeof(dcs->OtpTicket), otp_ticket);
+					}
+				}
+			}
+		}
+		FreePack(p);
+
+		if (ret != ERR_NO_ERROR)
+		{
+			// エラー発生
+			return ret;
+		}
 	}
 
 	p = NewPack();
@@ -2699,8 +2789,8 @@ UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_call
 }
 
 // 接続
-UINT DcConnectEx(DC *dc, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, char *ret_url, UINT ret_url_size, bool check_port,
-				 SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size)
+UINT DcConnectEx(DC *dc, DC_SESSION *dcs, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, char *ret_url, UINT ret_url_size, bool check_port,
+				 SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param)
 {
 	SOCKIO *sock;
 	UINT ret;
@@ -2730,7 +2820,7 @@ UINT DcConnectEx(DC *dc, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *call
 	}
 
 	// 接続メイン
-	ret = DcConnectMain(dc, sock, pcid, auth_callback, callback_param, check_port, first_connection);
+	ret = DcConnectMain(dc, dcs, sock, pcid, auth_callback, callback_param, check_port, first_connection, otp_callback, otp_callback_param);
 
 	if (ret == ERR_NO_ERROR)
 	{

@@ -29,6 +29,15 @@
 
 #define	DS_CFG_SECURITY_SETTINGS	"AdvancedSecurity"
 
+// OTP 有効期限
+#define DS_OTP_EXPIRES				(5 * 60 * 1000)
+
+// OTP 長さ
+#define	DS_OTP_LENGTH				6
+
+// OTP が変化せず試せる回数
+#define DS_OTP_NUM_TRY				20
+
 // caps
 #define DS_CAPS_SUPPORT_BLUETOOTH	1			// Bluetooth サポート
 #define	DS_CAPS_SUPPORT_URDP2		2			// URDP2 サポート
@@ -98,6 +107,12 @@ struct DS
 	UINT NumConfigures;					// 設定接続回数
 	bool EnableOtp;						// OTP 有効
 	char OtpEmail[MAX_PATH];			// OTP 送付先メールアドレス
+
+	char OtpTicket[MAX_PATH];			// OTP チケット。2 回目以降の認証時に利用可能
+
+	char LastOtp[MAX_PATH];				// 最後に発行された OTP
+	UINT64 LastOtpExpires;				// 最後に発行された OTP の有効期限
+	UINT OtpNumTry;						// OTP が試された回数
 };
 
 struct DS_INFO
@@ -176,7 +191,7 @@ void DsFreeRadiusCacheList(DS *ds);
 bool DsTryRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsAddRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsCleanAllRadiusCache(DS *ds);
-
+void DsGenerateNewOtp(char *dst, UINT size, UINT len);
 
 // RPC Procedures (Server Side)
 UINT DtGetInternetSetting(DS *ds, INTERNET_SETTING *t);

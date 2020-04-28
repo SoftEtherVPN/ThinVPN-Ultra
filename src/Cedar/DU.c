@@ -52,6 +52,94 @@
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
 
+// コントロール更新
+void DuOtpDlgUpdate(HWND hWnd)
+{
+	char pass[MAX_PATH];
+	// 引数チェック
+	if (hWnd == NULL)
+	{
+		return;
+	}
+
+	GetTxtA(hWnd, E_OTP, pass, sizeof(pass));
+
+	SetEnable(hWnd, IDOK, StrLen(pass) == 0 ? false : true);
+}
+
+// OTP ダイアログプロシージャ
+UINT DuOtpDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	DU_OTP *t = (DU_OTP *)param;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		DlgFont(hWnd, S_1, 0, true);
+
+		SetFont(hWnd, E_OTP, GetFont(MsIsWindows7() ? "Consolas" : "Arial", 12, false, false, false, false));
+
+		SetIcon(hWnd, 0, ICO_IPSEC);
+		FormatText(hWnd, S_TITLE, t->Hostname);
+		Focus(hWnd, E_OTP);
+		DuOtpDlgUpdate(hWnd);
+		break;
+
+	case WM_COMMAND:
+		DuOtpDlgUpdate(hWnd);
+
+		switch (wParam)
+		{
+		case IDOK:
+			GetTxtA(hWnd, E_OTP, t->Otp, sizeof(t->Otp));
+			EndDialog(hWnd, 1);
+			break;
+
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		break;
+	}
+
+	return 0;
+}
+
+// OTP ダイアログ
+bool DuOtpDlg(HWND hWnd, char *otp, UINT otp_size, char *hostname)
+{
+	DU_OTP t;
+	UINT ret;
+	// 引数チェック
+	if (otp == NULL)
+	{
+		return false;
+	}
+	if (hostname == NULL)
+	{
+		hostname = "";
+	}
+
+	Zero(&t, sizeof(t));
+
+	StrCpy(t.Hostname, sizeof(t.Hostname), hostname);
+
+	ret = Dialog(hWnd, D_DU_OTP, DuOtpDlgProc, &t);
+
+	if (ret == 0)
+	{
+		return false;
+	}
+
+	StrCpy(otp, otp_size, t.Otp);
+
+	return true;
+}
+
 // 業務完了 Dlg Proc
 UINT DuTheEndDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
 {
@@ -667,6 +755,29 @@ bool DuPasswordCallback(DC_SESSION *s, char *password, UINT password_max_size)
 	return true;
 }
 
+// OTP コールバック
+bool DuOtpCallback(DC *dc, char *otp, UINT otp_max_size, DC_SESSION *dcs)
+{
+	DU_MAIN *t;
+	HWND hWnd;
+	// 引数チェック
+	if (dc == NULL || dcs == NULL || otp == NULL)
+	{
+		return false;
+	}
+
+	t = (DU_MAIN *)dcs->Param;
+
+	hWnd = t->hWnd;
+
+	if (DuOtpDlg(hWnd, otp, otp_max_size, dcs->Pcid) == false)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 // 認証ダイアログ初期化
 void DuAuthDlgInit(HWND hWnd, DU_AUTH *a)
 {
@@ -1046,7 +1157,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 	}
 
 	// セッション接続
-	ret = NewDcSession(dc, pcid, DuPasswordCallback, NULL, /*TODO*/ DuAdvAuthCallback, DuEventCallback, t, &s);
+	ret = NewDcSession(dc, pcid, DuPasswordCallback, DuOtpCallback, DuAdvAuthCallback, DuEventCallback, t, &s);
 	if (ret != ERR_NO_ERROR)
 	{
 		MsgBox(hWnd, MB_ICONEXCLAMATION, _E(ret));

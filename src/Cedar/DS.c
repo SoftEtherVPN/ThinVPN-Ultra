@@ -610,7 +610,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		}
 	}
 
-	if (ds->EnableOtp)
+	if (ds->EnableOtp && support_otp == false)
 	{
 		// OTP が有効なのにクライアントが OTP 非サポート
 		DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
@@ -782,10 +782,24 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	// OTP 有効の場合は、OTP パスワードを受信
 	if (ds->EnableOtp)
 	{
+		UINT64 now = Tick64();
 		char otp[MAX_PATH];
+		bool ok = false;
+		bool ok_ticket = false;
 
 		// まずこの機会に急いで OTP を発行する
+		if (IsEmptyStr(ds->LastOtp) || (now >= ds->LastOtpExpires) || (ds->OtpNumTry >= DS_OTP_NUM_TRY))
+		{
+			DsGenerateNewOtp(ds->LastOtp, sizeof(ds->LastOtp), DS_OTP_LENGTH);
+			ds->OtpNumTry = 0;
+		}
+		ds->LastOtpExpires = now + (UINT64)DS_OTP_EXPIRES;
+		ds->OtpNumTry++;
 
+		// OTP をメール送信する
+		WideServerSendOtpEmail(ds->Wide, ds->LastOtp, ds->OtpEmail, client_ip_str, client_host);
+
+		// クライアントからの OTP を受信する
 		p = SockIoRecvPack(sock);
 		if (p == NULL)
 		{
@@ -794,6 +808,33 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		}
 
 		PackGetStr(p, "Otp", otp, sizeof(otp));
+
+		FreePack(p);
+
+		// OTP 一致 / 不一致を確認し、結果をクライアントに送付する
+		ok = (StrCmp(otp, ds->LastOtp) == 0);
+		ok_ticket = (StrCmp(otp, ds->OtpTicket) == 0);
+
+		if (ok == false && ok_ticket == false)
+		{
+			DsSendError(sock, ERR_DESK_OTP_INVALID);
+			return;
+		}
+
+		// OTP 一致
+
+		if (ok)
+		{
+			// 覚えをクリア
+			ClearStr(ds->LastOtp, sizeof(ds->LastOtp));
+			ds->LastOtpExpires = 0;
+		}
+
+		p = PackError(ERR_NO_ERROR);
+
+		PackAddStr(p, "OtpTicket", ds->OtpTicket);
+
+		SockIoSendPack(sock, p);
 
 		FreePack(p);
 	}
@@ -1348,6 +1389,30 @@ LABEL_END:
 		DeskStopUrdpServer(ds->UrdpServer);
 	}
 #endif  // OS_WIN32
+}
+
+// OTP 文字列の発行
+void DsGenerateNewOtp(char *dst, UINT size, UINT len)
+{
+	UINT i;
+	char tmp[MAX_PATH];
+	if (dst == NULL)
+	{
+		return;
+	}
+
+	len = MIN(len, sizeof(tmp) - 1);
+
+	Zero(tmp, sizeof(tmp));
+
+	for (i = 0;i < len;i++)
+	{
+		char c = '0' + Rand32() % 9;
+
+		tmp[i] = c;
+	}
+
+	StrCpy(dst, size, tmp);
 }
 
 // 認証失敗報告
@@ -2898,6 +2963,8 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 	InitWinUi(_UU("DS_TITLE"), _SS("DEFAULT_FONT"), _II("DEFAULT_FONT_SIZE"));
 
 	ds = ZeroMalloc(sizeof(DS));
+
+	DsGenerateNewOtp(ds->OtpTicket, sizeof(ds->OtpTicket), 128);
 
 	ds->History = NewList(NULL);
 

@@ -84,6 +84,7 @@ struct DC_SESSION
 	DC_BLUE *Blue;						// Bluetooth セッション
 	bool IsShareDisabled;				// 共有が無効化されているかどうか
 	UINT ProcessIdOfClient;				// クライアントソフトウェアのプロセス ID
+	char OtpTicket[MAX_PATH];			// OTP チケット
 };
 
 // 拡張認証データ
@@ -125,9 +126,9 @@ DC *NewDc(bool localconfig);
 void FreeDc(DC *dc);
 void DcGetInternetSetting(DC *dc, INTERNET_SETTING *setting);
 void DcSetInternetSetting(DC *dc, INTERNET_SETTING *setting);
-UINT DcConnectEx(DC *dc, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, char *ret_url, UINT ret_url_size, bool check_port,
-			   SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size);
-UINT DcConnectMain(DC *dc, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection);
+UINT DcConnectEx(DC *dc, DC_SESSION *dcs, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, char *ret_url, UINT ret_url_size, bool check_port,
+			   SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param);
+UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param);
 void DcSetLocalHostAllowFlag(bool allow);
 UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_OTP_CALLBACK *otp_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback,
 				  void *param, DC_SESSION **session);
@@ -139,6 +140,8 @@ void DcGenerateHostname(char *hostname, UINT hostname_size, char *pcid);
 void DcGetBestHostnameForPcid(char *hostname, UINT hostname_size, char *pcid);
 bool DcSessionConnectAuthCallback1(DC *dc, DC_AUTH *auth, void *param);
 bool DcSessionConnectAuthCallback2(DC *dc, DC_AUTH *auth, void *param);
+bool DcSessionConnectOtpCallback1(DC *dc, char *otp, UINT otp_max_size, void *param);
+bool DcSessionConnectOtpCallback2(DC *dc, char *otp, UINT otp_max_size, void *param);
 void DcListenThread(THREAD *thread, void *param);
 void DcListenedSockThread(THREAD *thread, void *param);
 void DcConnectThread(THREAD *thread, void *param);

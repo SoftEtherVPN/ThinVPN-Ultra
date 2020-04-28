@@ -1511,12 +1511,12 @@ BEGIN
         BOTTOMMARGIN, 293
     END
 
-    D_DC_OTP, DIALOG
+    D_DU_OTP, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 244
         TOPMARGIN, 5
-        BOTTOMMARGIN, 148
+        BOTTOMMARGIN, 149
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -5466,18 +5466,18 @@ BEGIN
     LTEXT           "「シン・テレワークシステム」は無償・無保証で提供されるものです。万一、システム障害等で OTP が送付されない場合もあり、その場合はこの画面で OTP 機能を無効にするまでログインできなくなる可能性がありますので、ご了承の上設定をお願いします。",S_5,32,233,212,41
 END
 
-D_DC_OTP DIALOGEX 0, 0, 251, 153
+D_DU_OTP DIALOGEX 0, 0, 251, 154
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "ワンタイムパスワード (OTP) 認証 - シン・テレワークシステム サーバー"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_IPSEC,IDC_STATIC,7,5,18,18
-    LTEXT           "NTT 東日本 - IPA 「シン・テレワークシステム サーバー」の設定画面で事前設定されているメールアドレスに、ワンタイムパスワード (OTP) が送付されました。\r\n\r\nメールをご確認いただき、OTP を入力してください。",IDC_STATIC,32,5,212,48
-    LTEXT           "ワンタイムパスワード (OT&P):",S_1,36,56,104,10
-    EDITTEXT        E_OTP,36,69,191,15,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "しばらく経過してもメールが届かない場合は、一度キャンセルしてから、再度ログインを試行してください。",S_3,32,97,212,27
-    DEFPUSHBUTTON   "&OK",IDOK,111,131,64,17
-    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,131,64,17
+    LTEXT           "NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 (コンピュータ ID: %S) の設定画面で事前設定されているメールアドレスに、ワンタイムパスワード (OTP) が送付されました。\r\n\r\nメールをご確認いただき、OTP を入力してください。",S_TITLE,32,5,212,53
+    LTEXT           "ワンタイムパスワード (OT&P):",S_1,36,62,104,10
+    EDITTEXT        E_OTP,36,76,191,15,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "しばらく経過してもメールが届かない場合は、一度キャンセルしてから、再度ログインを試行してください。",S_3,32,100,212,27
+    DEFPUSHBUTTON   "&OK",IDOK,111,132,64,17
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,132,64,17
 END
 
 
