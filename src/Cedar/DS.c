@@ -787,17 +787,20 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		bool ok = false;
 		bool ok_ticket = false;
 
-		// まずこの機会に急いで OTP を発行する
-		if (IsEmptyStr(ds->LastOtp) || (now >= ds->LastOtpExpires) || (ds->OtpNumTry >= DS_OTP_NUM_TRY))
+		if (first_connection)
 		{
-			DsGenerateNewOtp(ds->LastOtp, sizeof(ds->LastOtp), DS_OTP_LENGTH);
-			ds->OtpNumTry = 0;
-		}
-		ds->LastOtpExpires = now + (UINT64)DS_OTP_EXPIRES;
-		ds->OtpNumTry++;
+			// まずこの機会に急いで OTP を発行する
+			if (IsEmptyStr(ds->LastOtp) || (now >= ds->LastOtpExpires) || (ds->OtpNumTry >= DS_OTP_NUM_TRY))
+			{
+				DsGenerateNewOtp(ds->LastOtp, sizeof(ds->LastOtp), DS_OTP_LENGTH);
+				ds->OtpNumTry = 0;
+			}
+			ds->LastOtpExpires = now + (UINT64)DS_OTP_EXPIRES;
+			ds->OtpNumTry++;
 
-		// OTP をメール送信する
-		WideServerSendOtpEmail(ds->Wide, ds->LastOtp, ds->OtpEmail, client_ip_str, client_host);
+			// OTP をメール送信する
+			WideServerSendOtpEmail(ds->Wide, ds->LastOtp, ds->OtpEmail, client_ip_str, client_host);
+		}
 
 		// クライアントからの OTP を受信する
 		p = SockIoRecvPack(sock);
@@ -812,7 +815,11 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		FreePack(p);
 
 		// OTP 一致 / 不一致を確認し、結果をクライアントに送付する
-		ok = (StrCmp(otp, ds->LastOtp) == 0);
+		if (first_connection)
+		{
+			ok = (StrCmp(otp, ds->LastOtp) == 0);
+		}
+
 		ok_ticket = (StrCmp(otp, ds->OtpTicket) == 0);
 
 		if (ok == false && ok_ticket == false)
