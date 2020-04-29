@@ -2141,13 +2141,11 @@ void DcConnectThread(THREAD *thread, void *param)
 				UnlockQueue(s->SockIoQueue);
 
 				Set(s->EventForListenThread);
-				WHERE;
 			}
 			else
 			{
 				// 接続に失敗したので一定時間待ってリトライする
 				Wait(s->EventForConnectThread, DC_TUNNEL_RECONNECT_RETRY_SPAN);
-				WHERE;
 			}
 		}
 
