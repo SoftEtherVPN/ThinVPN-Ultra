@@ -105,6 +105,9 @@
 // Initial Pack のサイズ
 #define WT_INITIAL_PACK_SIZE	1600
 
+// 1 セッションあたり許容最大トンネル数
+#define WT_MAX_TUNNELS_PER_SESSION		256
+
 // セッション接続情報キャッシュの有効期限のデフォルト値
 #define WT_SESSION_INFO_CACHE_EXPIRES_DEFAULT		(60 * 1000)
 

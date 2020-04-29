@@ -1135,6 +1135,15 @@ void WtgAccept(WT *wt, SOCK *s)
 			return;
 		}
 
+		if (LIST_NUM(session->TunnelList) > WT_MAX_TUNNELS_PER_SESSION)
+		{
+			// セッションあたりトンネル数が多すぎる
+			WtReleaseSession(session);
+			WtgSendError(s, ERR_TOO_MANY_CONNECTION);
+			Debug("Error: ERR_TOO_MANY_CONNECTION\n");
+			return;
+		}
+
 		// 接続成功。
 
 		p = NewPack();
