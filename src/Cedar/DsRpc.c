@@ -134,6 +134,8 @@ void InRpcDsStatus(RPC_DS_STATUS *t, PACK *p)
 	t->MsgForServerArrived = PackGetBool(p, "MsgForServerArrived");
 	PackGetUniStr(p, "MsgForServer", t->MsgForServer, sizeof(t->MsgForServer));
 	t->MsgForServerOnce = PackGetBool(p, "MsgForServerOnce");
+
+	PackGetUniStr(p, "MsgForServer2", t->MsgForServer2, sizeof(t->MsgForServer2));
 }
 void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 {
@@ -168,6 +170,8 @@ void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 	PackAddBool(p, "MsgForServerArrived", t->MsgForServerArrived);
 	PackAddUniStr(p, "MsgForServer", t->MsgForServer);
 	PackAddBool(p, "MsgForServerOnce", t->MsgForServerOnce);
+
+	PackAddUniStr(p, "MsgForServer2", t->MsgForServer2);
 }
 
 // INTERNET_SETTING

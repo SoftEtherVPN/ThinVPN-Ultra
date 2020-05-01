@@ -21,6 +21,9 @@ typedef struct DS_INFO DS_INFO;
 typedef struct DS_CLIENT DS_CLIENT;
 typedef struct DS_HISTORY DS_HISTORY;
 typedef struct DS_RADIUS_CACHE DS_RADIUS_CACHE;
+typedef struct DS_POLICY_CLIENT DS_POLICY_CLIENT;
+typedef struct DS_POLICY_THREAD_CTX DS_POLICY_THREAD_CTX;
+typedef struct DS_POLICY_BODY DS_POLICY_BODY;
 
 // DC.h
 typedef struct DC_ADVAUTH DC_ADVAUTH;

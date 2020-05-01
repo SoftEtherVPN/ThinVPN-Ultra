@@ -34,6 +34,7 @@ struct RPC_DS_STATUS
 	char GateIP[64];
 	bool MsgForServerArrived;			// 新しいメッセージが WideController から届いている
 	wchar_t MsgForServer[MAX_SIZE];		// 届いているメッセージ
+	wchar_t MsgForServer2[MAX_SIZE * 2];	// 届いているメッセージ (ポリシー関係)
 	bool MsgForServerOnce;				// 次回から表示しない を許可
 };
 

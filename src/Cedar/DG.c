@@ -1902,6 +1902,17 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 		}
 	}
 
+	if (UniIsEmptyStr(t.MsgForServer2) == false)
+	{
+		// ポリシー関係のメッセージが届いている
+		// 画面に表示する
+		if (dg->MsgForServerDlg2 == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+		{
+			dg->MsgForServerDlg2 = StartAsyncOnceMsg(_UU("DS_POLICY_MESSAGE_TITLE"), t.MsgForServer2, true,
+				ICO_INFORMATION, true);
+		}
+	}
+
 	// コントロールの更新
 	DgMainDlgUpdate(hWnd, dg);
 }
@@ -2543,6 +2554,13 @@ void DgMain(DG *dg)
 		// メッセージ画面が表示されたままの場合は閉じる
 		StopAsyncOnceMsg(dg->MsgForServerDlg);
 		dg->MsgForServerDlg = NULL;
+	}
+
+	if (dg->MsgForServerDlg2 != NULL)
+	{
+		// メッセージ画面 2 が表示されたままの場合は閉じる
+		StopAsyncOnceMsg(dg->MsgForServerDlg2);
+		dg->MsgForServerDlg2 = NULL;
 	}
 
 	EndRpc(rpc);

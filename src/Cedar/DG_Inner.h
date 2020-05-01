@@ -27,6 +27,7 @@ typedef struct DG
 	UINT64 MainDlgStartTick;
 	bool Hello;
 	ONCEMSG_DLG *MsgForServerDlg;
+	ONCEMSG_DLG *MsgForServerDlg2;
 } DG;
 
 // パスワードダイアログデータ

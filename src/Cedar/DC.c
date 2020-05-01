@@ -2519,6 +2519,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	PackAddBool(p, "FirstConnection", first_connection);
 	PackAddBool(p, "HasURDP2Client", MsIsWinXPOrWinVista() && dc->EnableVersion2);
 	PackAddBool(p, "SupportOtp", true);
+	PackAddBool(p, "SupportOtpEnforcement", true);
 	b = SockIoSendPack(sock, p);
 	FreePack(p);
 

@@ -17,6 +17,256 @@
 #include "..\PenCore\resource.h"
 #endif // _WIN32
 
+// 適用されるポリシーメッセージの表示
+void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
+{
+	wchar_t *msg = _UU("DS_POLICY_NONE");
+	wchar_t *otp_str = _UU("DS_POLICY_NO");
+	wchar_t *disableshare_str = _UU("DS_POLICY_NO");
+	wchar_t syslog_str[256];
+	URL_DATA url = {0};
+
+	UniStrCpy(syslog_str, sizeof(syslog_str), _UU("DS_POLICY_NONE"));
+
+	UniStrCpy(str, str_size, L"");
+
+	if (pol == NULL || str == NULL)
+	{
+		return;
+	}
+
+	if (IsZero(pol, sizeof(DS_POLICY_BODY)))
+	{
+		return;
+	}
+
+	if (UniIsEmptyStr(pol->ServerMessage) == false)
+	{
+		msg = pol->ServerMessage;
+	}
+
+	if (pol->EnforceOtp)
+	{
+		otp_str = _UU("DS_POLICY_YES");
+	}
+
+	if (pol->DisableShare)
+	{
+		disableshare_str = _UU("DS_POLICY_YES");
+	}
+
+	if (IsEmptyStr(pol->SyslogHostname) == false)
+	{
+		UniFormat(syslog_str, sizeof(syslog_str), _UU("DS_POLICY_SYSLOG"), pol->SyslogHostname, pol->SyslogPort);
+	}
+
+	ParseUrl(&url, pol->SrcUrl, false, NULL);
+
+	UniFormat(str, str_size, _UU("DS_POLICY_MESSAGE"), otp_str, disableshare_str, syslog_str, msg,
+		url.HostName);
+}
+
+// ポリシーファイルのパース
+bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
+{
+	LIST *o;
+	char *s;
+	wchar_t *ws;
+	if (b == NULL || buf == NULL)
+	{
+		return false;
+	}
+
+	SeekBufToBegin(buf);
+
+	Zero(b, sizeof(DS_POLICY_BODY));
+
+	o = ReadIni(buf);
+
+	b->EnforceOtp = IniIntValue(o, "ENFORCE_OTP");
+	b->DisableShare = IniIntValue(o, "DISABLE_SHARE");
+
+	s = IniStrValue(o, "SYSLOG_HOSTNAME");
+	if (IsEmptyStr(s) == false)
+	{
+		StrCpy(b->SyslogHostname, sizeof(b->SyslogHostname), s);
+		b->SyslogPort = IniIntValue(o, "SYSLOG_PORT");
+
+		if (b->SyslogPort == 0 || b->SyslogPort >= 65536)
+		{
+			b->SyslogPort = SYSLOG_PORT;
+		}
+	}
+
+	ws = IniUniStrValue(o, "SERVER_MESSAGE");
+	if (UniIsEmptyStr(ws) == false)
+	{
+		wchar_t tmp[1024] = {0};
+
+		UniStrCpy(tmp, sizeof(tmp), ws);
+
+		UniReplaceStrEx(tmp, sizeof(tmp), tmp, L"<br>", L"\r\n", false);
+
+		UniStrCpy(b->ServerMessage, sizeof(b->ServerMessage), tmp);
+	}
+
+	FreeIni(o);
+
+	return true;
+}
+
+// 現在のポリシーの取得
+bool DsPolicyClientGetPolicy(DS_POLICY_CLIENT *c, DS_POLICY_BODY *pol)
+{
+	Zero(pol, sizeof(DS_POLICY_BODY));
+	if (c == NULL || pol == NULL)
+	{
+		return false;
+	}
+
+	if (c->PolicyExpires <= Tick64())
+	{
+		return false;
+	}
+
+	Copy(pol, &c->Policy, sizeof(DS_POLICY_BODY));
+
+	if (IsZero(pol, sizeof(DS_POLICY_BODY)))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+// 現在のポリシーの取得 (DS から)
+bool DsGetPolicy(DS *ds, DS_POLICY_BODY *pol)
+{
+	Zero(pol, sizeof(DS_POLICY_BODY));
+	if (ds == NULL || pol == NULL)
+	{
+		return false;
+	}
+
+	return DsPolicyClientGetPolicy(ds->PolicyClient, pol);
+}
+
+// ポリシークライアントスレッド
+void DsPolicyClientThread(THREAD *thread, void *param)
+{
+	DS_POLICY_CLIENT *c;
+	DS_POLICY_THREAD_CTX *ctx = (DS_POLICY_THREAD_CTX *)param;
+
+	if (thread == NULL || param == NULL)
+	{
+		return;
+	}
+
+	c = ctx->Client;
+
+	while (c->Halt == false)
+	{
+		URL_DATA data;
+		char url[MAX_PATH];
+
+		// URL の確定
+		StrCpy(url, sizeof(url), ctx->Url);
+
+		// この URL からのファイルの受信試行
+		if (ParseUrl(&data, url, false, NULL))
+		{
+			UINT err = 0;
+			BUF *buf = HttpRequestEx5(&data, NULL, 0, 0, &err, false, NULL, NULL, NULL, NULL, 0, &c->Halt,
+				DS_POLICY_CLIENT_MAX_FILESIZE, NULL, NULL, NULL, false);
+
+			if (buf != NULL)
+			{
+				DS_POLICY_BODY pol = {0};
+
+				if (DsParsePolicyFile(&pol, buf))
+				{
+					StrCpy(pol.SrcUrl, sizeof(pol.SrcUrl), url);
+
+					if (Cmp(&c->Policy, &pol, sizeof(DS_POLICY_BODY)) != 0)
+					{
+						Debug("Policy received and updated from '%s'.\n", url);
+						Copy(&c->Policy, &pol, sizeof(DS_POLICY_BODY));
+					}
+
+					c->PolicyExpires = Tick64() + (UINT64)DS_POLICY_EXPIRES;
+				}
+
+				FreeBuf(buf);
+			}
+		}
+
+		// 次の受信まで待機
+		Wait(c->HaltEvent, DS_POLICY_CLIENT_UPDATE_INTERVAL);
+	}
+
+	Free(ctx);
+}
+
+// ポリシークライアントの開始
+DS_POLICY_CLIENT *DsNewPolicyClient(char* server_hash)
+{
+	char args[MAX_SIZE];
+	wchar_t hostname[MAX_PATH] = {0};
+	DS_POLICY_CLIENT *c = ZeroMalloc(sizeof(DS_POLICY_CLIENT));
+
+#ifdef	OS_WIN32
+	MsGetComputerNameFull(hostname, sizeof(hostname));
+#endif	// OS_WIN32
+
+	c->HaltEvent = NewEvent();
+
+	c->ThreadList = NewThreadList();
+
+	StrCpy(c->ServerHash, sizeof(c->ServerHash), server_hash);
+
+	Format(args, sizeof(args), "?server_id=%s&server_build=%u&server_hostname=%S",
+		c->ServerHash, CEDAR_BUILD, hostname);
+
+	if (true)
+	{
+		DS_POLICY_THREAD_CTX *ctx = ZeroMalloc(sizeof(DS_POLICY_THREAD_CTX));
+		THREAD *t;
+
+		ctx->Client = c;
+		StrCpy(ctx->Url, sizeof(ctx->Url), "http://tools.sec.softether.co.jp/get-telework-policy/");
+		StrCat(ctx->Url, sizeof(ctx->Url), args);
+		ctx->ReplaceSuffix = false;
+
+		t = NewThread(DsPolicyClientThread, ctx);
+
+		AddThreadToThreadList(c->ThreadList, t);
+
+		ReleaseThread(t);
+	}
+
+	return c;
+}
+
+// ポリシークライアントの終了
+void DsFreePolicyClient(DS_POLICY_CLIENT *c)
+{
+	if (c == NULL)
+	{
+		return;
+	}
+
+	c->Halt = true;
+
+	Set(c->HaltEvent);
+
+	FreeThreadList(c->ThreadList);
+
+	ReleaseEvent(c->HaltEvent);
+
+	Free(c);
+}
+
+
 //// 指定された IP アドレスがプライベート IP アドレスかどうかチェックする
 //bool IsIPPrivate(IP *ip)
 //{
@@ -295,6 +545,9 @@ void DsLogMain(DS *ds, UINT ds_log_type, char *name, va_list args)
 	wchar_t *typestr = DsGetLogTypeStr(ds_log_type);
 	SYSLOG_SETTING ss;
 	bool lineonly = false;
+	DS_POLICY_BODY pol = {0};
+
+	DsGetPolicy(ds, &pol);
 
 	UniFormatArgs(buf, sizeof(buf), _UU(name), args);
 
@@ -317,6 +570,22 @@ void DsLogMain(DS *ds, UINT ds_log_type, char *name, va_list args)
 		{
 			// イベントログへのログ保存
 			MsWriteEventLog(ds->EventLog, ds_log_type, buf);
+		}
+
+		SiGetSysLogSetting(ds->Server, &ss);
+
+		if (IsEmptyStr(pol.SyslogHostname) == false && pol.SyslogPort != 0)
+		{
+			// 現在の設定と異なる？
+			if (StrCmpi(ss.Hostname, pol.SyslogHostname) != 0 || ss.Port != pol.SyslogPort)
+			{
+				// ポリシーで Syslog が指定されている場合はこれを強制適用する
+				Zero(&ss, sizeof(ss));
+				ss.SaveType = 1;
+				StrCpy(ss.Hostname, sizeof(ss.Hostname), pol.SyslogHostname);
+				ss.Port = pol.SyslogPort;
+				SiSetSysLogSetting(ds->Server, &ss);
+			}
 		}
 
 		SiGetSysLogSetting(ds->Server, &ss);
@@ -352,7 +621,7 @@ void DsSendSyslog(SERVER *s, wchar_t *message)
 	LocalTime(&st);
 	GetDateTimeStrMilli(datetime, sizeof(datetime), &st);
 
-	UniFormat(tmp, sizeof(tmp), L"[%S/DesktopVPN] (%S) : %s",
+	UniFormat(tmp, sizeof(tmp), L"[%S/" DESK_PUBLISHER_NAME_UNICODE L"] (%S) : %s",
 		machinename, datetime, message);
 
 	SendSysLog(s->Syslog, tmp);
@@ -539,13 +808,17 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bool last_connection = false;
 	bool has_urdp2_client = false;
 	bool support_otp = false;
+	bool support_otp_enforcement = false;
 	UINT ds_caps = 0;
 	UINT urdp_version = 0;
+	DS_POLICY_BODY pol = {0};
 	// 引数チェック
 	if (ds == NULL || sock == NULL)
 	{
 		return;
 	}
+
+	DsGetPolicy(ds, &pol);
 
 	// 接続元クライアントの情報を取得する
 	Zero(client_host, sizeof(client_host));
@@ -584,6 +857,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	first_connection = PackGetBool(p, "FirstConnection");
 	has_urdp2_client = PackGetBool(p, "HasURDP2Client");
 	support_otp = PackGetBool(p, "SupportOtp");
+	support_otp_enforcement = PackGetBool(p, "SupportOtpEnforcement");
 
 	if (MsIsWinXPOrWinVista() == false)
 	{
@@ -614,6 +888,22 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	{
 		// OTP が有効なのにクライアントが OTP 非サポート
 		DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+		return;
+	}
+
+	if (pol.EnforceOtp && ds->EnableOtp == false)
+	{
+		// ポリシーで OTP 強制なのに OTP が設定されていない
+		if (support_otp_enforcement == false)
+		{
+			// クライアントが ERR_DESK_OTP_ENFORCED_BUT_NO エラーを表示不能
+			DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+		}
+		else
+		{
+			// クライアントが ERR_DESK_OTP_ENFORCED_BUT_NO エラーを表示可能
+			DsSendError(sock, ERR_DESK_OTP_ENFORCED_BUT_NO);
+		}
 		return;
 	}
 
@@ -1731,6 +2021,7 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 {
 #ifdef	OS_WIN32
 	HUB *h;
+	DS_POLICY_BODY pol;
 	Zero(t, sizeof(RPC_DS_STATUS));
 
 	t->Version = DESK_VERSION;
@@ -1760,6 +2051,16 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 		t->MsgForServerArrived = ds->Wide->MsgForServerArrived;
 		UniStrCpy(t->MsgForServer, sizeof(t->MsgForServer), ds->Wide->MsgForServer);
 		t->MsgForServerOnce = ds->Wide->MsgForServerOnce;
+	}
+
+	if (DsGetPolicy(ds, &pol))
+	{
+		DsPreparePolicyMessage(t->MsgForServer2, sizeof(t->MsgForServer2), &pol);
+
+		if (pol.DisableShare)
+		{
+			t->ForceDisableShare = true;
+		}
 	}
 
 	if (ds->Server != NULL && ds->Server->Cedar != NULL)
@@ -2837,6 +3138,7 @@ UINT64 DsCalcMask(DS *ds)
 {
 #ifdef	OS_WIN32
 	UINT64 ret = 0;
+	DS_POLICY_BODY pol = {0};
 	// 引数チェック
 	if (ds == NULL)
 	{
@@ -2850,6 +3152,16 @@ UINT64 DsCalcMask(DS *ds)
 	else
 	{
 		ret |= DS_MASK_SERVICE_MODE;
+	}
+
+	if (ds->EnableOtp)
+	{
+		ret |= DS_MASK_OTP_ENABLED;
+	}
+
+	if (DsGetPolicy(ds, &pol))
+	{
+		ret |= DS_MASK_POLICY_ENFORCED;
 	}
 
 	if (ds->ServiceType == DESK_SERVICE_RDP)
@@ -2879,6 +3191,7 @@ UINT64 DsCalcMask(DS *ds)
 // 共有機能が無効化されているかどうか調べる
 bool DsIsShareDisabled(DS *ds)
 {
+	DS_POLICY_BODY pol;
 	// 引数チェック
 	if (ds == NULL)
 	{
@@ -2893,6 +3206,14 @@ bool DsIsShareDisabled(DS *ds)
 	if (ds->DisableShare)
 	{
 		return true;
+	}
+
+	if (DsGetPolicy(ds, &pol))
+	{
+		if (pol.DisableShare)
+		{
+			return true;
+		}
 	}
 
 	return false;
@@ -2965,6 +3286,7 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 	DS *ds;
 	X *cert;
 	K *key;
+	char server_hash[128] = {0};
 
 	InitWinUi(_UU("DS_TITLE"), _SS("DEFAULT_FONT"), _II("DEFAULT_FONT_SIZE"));
 
@@ -3046,6 +3368,11 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 
 	FreeX(cert);
 	FreeK(key);
+
+	WideServerGetHash(ds->Wide, server_hash, sizeof(server_hash));
+
+	// ポリシー規制クライアント開始
+	ds->PolicyClient = DsNewPolicyClient(server_hash);
 
 	DsLog(ds, "DSL_START4");
 
@@ -3252,6 +3579,8 @@ void FreeDs(DS *ds)
 	{
 		MsFreeIsLocked(ds->IsLocked);
 	}
+
+	DsFreePolicyClient(ds->PolicyClient);
 
 	Free(ds);
 

@@ -38,6 +38,15 @@
 // OTP が変化せず試せる回数
 #define DS_OTP_NUM_TRY				20
 
+// ポリシークライアント更新間隔
+#define DS_POLICY_CLIENT_UPDATE_INTERVAL	(3 * 1000)
+
+// 受信ポリシーの有効期限
+#define	DS_POLICY_EXPIRES					(10 * 1000)
+
+// ポリシークライアント最大ファイルサイズ
+#define DS_POLICY_CLIENT_MAX_FILESIZE		4096
+
 // caps
 #define DS_CAPS_SUPPORT_BLUETOOTH	1			// Bluetooth サポート
 #define	DS_CAPS_SUPPORT_URDP2		2			// URDP2 サポート
@@ -113,6 +122,8 @@ struct DS
 	char LastOtp[MAX_PATH];				// 最後に発行された OTP
 	UINT64 LastOtpExpires;				// 最後に発行された OTP の有効期限
 	UINT OtpNumTry;						// OTP が試された回数
+
+	DS_POLICY_CLIENT *PolicyClient;		// ポリシークライアント
 };
 
 struct DS_INFO
@@ -133,6 +144,33 @@ struct DS_HISTORY
 {
 	UINT64 Expires;
 	IP Ip;
+};
+
+struct DS_POLICY_THREAD_CTX
+{
+	DS_POLICY_CLIENT *Client;
+	char Url[MAX_PATH];
+	bool ReplaceSuffix;
+};
+
+struct DS_POLICY_BODY
+{
+	char SrcUrl[MAX_PATH];
+	wchar_t ServerMessage[MAX_SIZE];
+	bool EnforceOtp;
+	bool DisableShare;
+	char SyslogHostname[MAX_PATH];
+	UINT SyslogPort;
+};
+
+struct DS_POLICY_CLIENT
+{
+	bool Halt;
+	EVENT *HaltEvent;
+	LIST *ThreadList;
+	UINT64 PolicyExpires;
+	DS_POLICY_BODY Policy;
+	char ServerHash[128];
 };
 
 DS *NewDs(bool is_user_mode, bool force_share_disable);
@@ -192,6 +230,15 @@ bool DsTryRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsAddRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsCleanAllRadiusCache(DS *ds);
 void DsGenerateNewOtp(char *dst, UINT size, UINT len);
+
+DS_POLICY_CLIENT *DsNewPolicyClient(char *server_hash);
+void DsFreePolicyClient(DS_POLICY_CLIENT *c);
+bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf);
+void DsPolicyClientThread(THREAD *thread, void *param);
+bool DsPolicyClientGetPolicy(DS_POLICY_CLIENT *c, DS_POLICY_BODY *pol);
+
+bool DsGetPolicy(DS *ds, DS_POLICY_BODY *pol);
+void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol);
 
 // RPC Procedures (Server Side)
 UINT DtGetInternetSetting(DS *ds, INTERNET_SETTING *t);

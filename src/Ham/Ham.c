@@ -890,6 +890,19 @@ void test(UINT num, char **arg)
 {
 	if (true)
 	{
+		DS_POLICY_CLIENT *c = DsNewPolicyClient("---");
+
+		Print("quit>");
+		GetLine(NULL, 0);
+		Print("Stopping...\n");
+
+		DsFreePolicyClient(c);
+
+		return;
+	}
+
+	if (true)
+	{
 		if (true)
 		{
 			// Sign EntryPoint.dat for update

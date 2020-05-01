@@ -174,6 +174,8 @@ struct WIDE
 	bool MsgForServerArrived;			// 新しいメッセージが WideController から届いている
 	wchar_t MsgForServer[MAX_SIZE];		// 届いているメッセージ
 	bool MsgForServerOnce;				// 次回から表示しない を許可
+
+	wchar_t MsgForServer2[MAX_SIZE * 2];		// ポリシー関係
 };
 
 // 関数プロトタイプ

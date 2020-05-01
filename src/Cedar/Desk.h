@@ -71,6 +71,7 @@
 #define	ERR_DESK_NEED_WINXP				322		// Windows XP 以降が必要
 #define ERR_DESK_PASSWORD_NOT_SET		323		// パスワード未設定
 #define ERR_DESK_OTP_INVALID			324		// OTP 間違い
+#define ERR_DESK_OTP_ENFORCED_BUT_NO	325		// OTP がポリシー強制なのに設定されていてない
 
 
 
@@ -99,6 +100,8 @@
 #define DS_MASK_WIN_RDP_TS				4		// ターミナルサービスの Windows RDP
 #define DS_MASK_USER_MODE				8		// ユーザーモード
 #define DS_MASK_SERVICE_MODE			16		// サービスモード
+#define DS_MASK_POLICY_ENFORCED			32		// ポリシー強制
+#define	DS_MASK_OTP_ENABLED				64		// OTP が有効
 
 
 
