@@ -579,7 +579,7 @@ L_RETRY:
 	SeekBuf(b, 0, 0);
 
 	recv = HttpRequestEx5(&data, NULL, 0, 0, &error,
-		wt->CheckSslTrust, b->Buf, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, wt, global_ip_only);
+		wt->CheckSslTrust, b->Buf, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, wt, global_ip_only, false);
 
 	FreeBuf(b);
 

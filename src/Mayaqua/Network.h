@@ -1168,6 +1168,7 @@ void Win32CleanupSockEvent(SOCK_EVENT *event);
 bool Win32WaitSockEvent(SOCK_EVENT *event, UINT timeout);
 bool Win32GetDefaultDns(IP *ip, char *domain, UINT size);
 bool Win32GetDnsSuffix(char *domain, UINT size);
+LIST *Win32GetDnsSuffixList();
 void Win32RenewDhcp();
 void Win32RenewDhcp9x(UINT if_id);
 void Win32ReleaseDhcp9x(UINT if_id, bool wait);

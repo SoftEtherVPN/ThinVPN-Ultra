@@ -1406,7 +1406,7 @@ void UpdateClientThreadMain(UPDATE_CLIENT *c)
 	recv = HttpRequestEx5(&data, NULL, UPDATE_CONNECT_TIMEOUT, UPDATE_COMM_TIMEOUT, &ret, true, NULL, NULL,
 		NULL, ((cert_hash != NULL && (cert_hash->Size % SHA1_SIZE) == 0) ? cert_hash->Buf : NULL),
 		(cert_hash != NULL ? (cert_hash->Size / SHA1_SIZE) : 0),
-		(bool *)&c->HaltFlag, 0, NULL, NULL, c->Wt, false);
+		(bool *)&c->HaltFlag, 0, NULL, NULL, c->Wt, false, false);
 
 	if (recv == NULL)
 	{

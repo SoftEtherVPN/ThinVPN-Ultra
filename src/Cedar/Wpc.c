@@ -653,13 +653,13 @@ BUF *HttpRequestEx4(URL_DATA *data, INTERNET_SETTING *setting,
 {
 	return HttpRequestEx5(data, setting, timeout_connect, timeout_comm, error_code, check_ssl_trust,
 		post_data, recv_callback, recv_callback_param, sha1_cert_hash, (sha1_cert_hash == NULL ? 0 : 1),
-		cancel, max_recv_size, header_name, header_value, wt, false);
+		cancel, max_recv_size, header_name, header_value, wt, false, false);
 }
 BUF *HttpRequestEx5(URL_DATA *data, INTERNET_SETTING *setting,
 					UINT timeout_connect, UINT timeout_comm,
 					UINT *error_code, bool check_ssl_trust, char *post_data,
 					WPC_RECV_CALLBACK *recv_callback, void *recv_callback_param, void *sha1_cert_hash, UINT num_hashes,
-					bool *cancel, UINT max_recv_size, char *header_name, char *header_value, WT *wt, bool global_ip_only)
+					bool *cancel, UINT max_recv_size, char *header_name, char *header_value, WT *wt, bool global_ip_only, bool dest_private_ip_only)
 {
 	WPC_CONNECT con;
 	SOCK *s;
@@ -757,6 +757,18 @@ BUF *HttpRequestEx5(URL_DATA *data, INTERNET_SETTING *setting,
 	{
 		// Global IP only
 		if (IsIPPrivate(&s->LocalIP))
+		{
+			*error_code = ERR_NOT_SUPPORTED;
+			Disconnect(s);
+			ReleaseSock(s);
+			return NULL;
+		}
+	}
+
+	if (dest_private_ip_only)
+	{
+		// Dest is private IP only
+		if (IsIPPrivate(&s->RemoteIP) == false)
 		{
 			*error_code = ERR_NOT_SUPPORTED;
 			Disconnect(s);

@@ -887,6 +887,35 @@ wchar_t *IniUniStrValue(LIST *o, char *key)
 	return e->UnicodeValue;
 }
 
+void GetDomainSuffixFromFqdn(char *dst, UINT size, char *fqdn)
+{
+	TOKEN_LIST *t;
+	UINT i;
+
+	ClearStr(dst, size);
+	if (dst == NULL || fqdn == NULL)
+	{
+		return;
+	}
+
+	t = ParseTokenWithoutNullStr(fqdn, ".");
+
+	for (i = 0;i < t->NumTokens;i++)
+	{
+		if (i >= 1)
+		{
+			StrCat(dst, size, t->Token[i]);
+
+			if (i < (t->NumTokens - 1))
+			{
+				StrCat(dst, size, ".");
+			}
+		}
+	}
+
+	FreeToken(t);
+}
+
 // Check whether the specified value is in the INI
 bool IniHasValue(LIST *o, char *key)
 {

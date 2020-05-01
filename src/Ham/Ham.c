@@ -888,6 +888,20 @@ void StopProcess()
 
 void test(UINT num, char **arg)
 {
+#ifdef OS_WIN32
+	if (true)
+	{
+		LIST *o = Win32GetDnsSuffixList();
+		UINT i;
+		for (i = 0;i < LIST_NUM(o);i++)
+		{
+			Print("[%s]\n", LIST_DATA(o, i));
+		}
+		FreeStrList(o);
+		return;
+	}
+#endif // OS_WIN32
+
 	if (true)
 	{
 		DS_POLICY_CLIENT *c = DsNewPolicyClient("---");

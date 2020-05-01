@@ -10315,6 +10315,66 @@ FAILED:
 	return ret;
 }
 
+// Get the DNS suffix list
+LIST *Win32GetDnsSuffixList()
+{
+	IP_ADAPTER_ADDRESSES_XP *info;
+	IP_ADAPTER_ADDRESSES_XP *cur;
+	UINT info_size;
+	LIST *o = NewStrList();
+	wchar_t fullname_w[MAX_PATH] = {0};
+	char fullname[MAX_PATH] = {0};
+	char suffix[MAX_PATH] = {0};
+
+	MsGetComputerNameFull(fullname_w, sizeof(fullname_w));
+	UniToStr(fullname, sizeof(fullname), fullname_w);
+
+	GetDomainSuffixFromFqdn(suffix, sizeof(suffix), fullname);
+
+	if (IsEmptyStr(suffix) == false)
+	{
+		AddStrToStrListDistinct(o, suffix);
+	}
+
+	if (w32net->GetAdaptersAddresses == NULL)
+	{
+		goto L_CLEANUP;
+	}
+
+	info_size = 0;
+	info = ZeroMalloc(sizeof(IP_ADAPTER_ADDRESSES_XP));
+	if (w32net->GetAdaptersAddresses(AF_INET, 0, NULL, info, &info_size) == ERROR_BUFFER_OVERFLOW)
+	{
+		Free(info);
+		info = ZeroMalloc(info_size);
+	}
+	if (w32net->GetAdaptersAddresses(AF_INET, 0, NULL, info, &info_size) != NO_ERROR)
+	{
+		Free(info);
+		goto L_CLEANUP;
+	}
+
+	cur = info;
+
+	while (cur != NULL)
+	{
+		if (UniIsEmptyStr(cur->DnsSuffix) == false)
+		{
+			char tmp[MAX_PATH];
+			UniToStr(tmp, sizeof(tmp), cur->DnsSuffix);
+
+			AddStrToStrListDistinct(o, tmp);
+		}
+
+		cur = cur->Next;
+	}
+
+	Free(info);
+
+L_CLEANUP:
+	return o;
+}
+
 // Get the DNS suffix in another way
 bool Win32GetDnsSuffix(char *domain, UINT size)
 {

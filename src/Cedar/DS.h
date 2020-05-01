@@ -39,13 +39,17 @@
 #define DS_OTP_NUM_TRY				20
 
 // ポリシークライアント更新間隔
-#define DS_POLICY_CLIENT_UPDATE_INTERVAL	(3 * 1000)
+#define DS_POLICY_CLIENT_UPDATE_INTERVAL	(5 * 60 * 1000)
 
 // 受信ポリシーの有効期限
-#define	DS_POLICY_EXPIRES					(10 * 1000)
+#define	DS_POLICY_EXPIRES					(DS_POLICY_CLIENT_UPDATE_INTERVAL * 2)
 
 // ポリシークライアント最大ファイルサイズ
 #define DS_POLICY_CLIENT_MAX_FILESIZE		4096
+
+// ポリシーサーバー関係定数
+#define DS_POLICY_INDOMAIN_SERVER_NAME	"thin-telework-policy-server"
+#define DS_POLICY_IP_SERVER_NAME		"10.255.255.127"
 
 // caps
 #define DS_CAPS_SUPPORT_BLUETOOTH	1			// Bluetooth サポート
@@ -151,6 +155,7 @@ struct DS_POLICY_THREAD_CTX
 	DS_POLICY_CLIENT *Client;
 	char Url[MAX_PATH];
 	bool ReplaceSuffix;
+	EVENT *HaltEvent;
 };
 
 struct DS_POLICY_BODY
@@ -171,6 +176,7 @@ struct DS_POLICY_CLIENT
 	UINT64 PolicyExpires;
 	DS_POLICY_BODY Policy;
 	char ServerHash[128];
+	LIST *HaltEventList;
 };
 
 DS *NewDs(bool is_user_mode, bool force_share_disable);

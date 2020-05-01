@@ -244,6 +244,7 @@ void NormalizeIntListStr(char *dst, UINT dst_size, char *src, bool sorted, char 
 void ClearStr(char *str, UINT str_size);
 void SetStrCaseAccordingToBits(char *str, UINT bits);
 char *UrlDecode(char *url_str);
+void GetDomainSuffixFromFqdn(char *dst, UINT size, char *fqdn);
 
 bool CheckPasswordComplexity(char *str);
 

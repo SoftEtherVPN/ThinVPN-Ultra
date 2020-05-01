@@ -166,43 +166,85 @@ void DsPolicyClientThread(THREAD *thread, void *param)
 
 	while (c->Halt == false)
 	{
-		URL_DATA data;
-		char url[MAX_PATH];
+		UINT i;
+		LIST *dns_suffix_list = NULL;
 
-		// URL の確定
-		StrCpy(url, sizeof(url), ctx->Url);
-
-		// この URL からのファイルの受信試行
-		if (ParseUrl(&data, url, false, NULL))
+		if (ctx->ReplaceSuffix)
 		{
-			UINT err = 0;
-			BUF *buf = HttpRequestEx5(&data, NULL, 0, 0, &err, false, NULL, NULL, NULL, NULL, 0, &c->Halt,
-				DS_POLICY_CLIENT_MAX_FILESIZE, NULL, NULL, NULL, false);
+#ifdef OS_WIN32
+			dns_suffix_list = Win32GetDnsSuffixList();
+#else	// OS_WIN32
+			dns_suffix_list = NewStrList();
+#endif	// OS_WIN32
+		}
 
-			if (buf != NULL)
+		for (i = 0;i < (dns_suffix_list == NULL ? 1 : LIST_NUM(dns_suffix_list));i++)
+		{
+			URL_DATA data;
+			char url[MAX_PATH];
+
+			if (c->Halt)
 			{
-				DS_POLICY_BODY pol = {0};
+				break;
+			}
 
-				if (DsParsePolicyFile(&pol, buf))
+			// URL の確定
+			StrCpy(url, sizeof(url), ctx->Url);
+
+			if (dns_suffix_list != NULL)
+			{
+				char *suffix = LIST_DATA(dns_suffix_list, i);
+
+				ReplaceStrEx(url, sizeof(url), url, "__DOMAIN__", suffix, false);
+			}
+
+			//Debug("Policy trying from %s ...\n", url);
+
+			// この URL からのファイルの受信試行
+			if (ParseUrl(&data, url, false, NULL))
+			{
+				UINT err = 0;
+				BUF *buf = HttpRequestEx5(&data, NULL, 0, 0, &err, false, NULL, NULL, NULL, NULL, 0, &c->Halt,
+					DS_POLICY_CLIENT_MAX_FILESIZE, NULL, NULL, NULL, false, true);
+
+				if (buf != NULL)
 				{
-					StrCpy(pol.SrcUrl, sizeof(pol.SrcUrl), url);
+					DS_POLICY_BODY pol = {0};
 
-					if (Cmp(&c->Policy, &pol, sizeof(DS_POLICY_BODY)) != 0)
+					if (DsParsePolicyFile(&pol, buf))
 					{
-						Debug("Policy received and updated from '%s'.\n", url);
-						Copy(&c->Policy, &pol, sizeof(DS_POLICY_BODY));
+						StrCpy(pol.SrcUrl, sizeof(pol.SrcUrl), url);
+
+						if (Cmp(&c->Policy, &pol, sizeof(DS_POLICY_BODY)) != 0)
+						{
+							//Debug("Policy received and updated from '%s'.\n", url);
+							Copy(&c->Policy, &pol, sizeof(DS_POLICY_BODY));
+						}
+
+						c->PolicyExpires = Tick64() + (UINT64)DS_POLICY_EXPIRES;
 					}
 
-					c->PolicyExpires = Tick64() + (UINT64)DS_POLICY_EXPIRES;
+					FreeBuf(buf);
 				}
-
-				FreeBuf(buf);
+				else
+				{
+					//UniDebug(L"%s\n", _E(err));
+				}
 			}
 		}
 
+		FreeStrList(dns_suffix_list);
+
+		if (c->Halt)
+		{
+			break;
+		}
+
 		// 次の受信まで待機
-		Wait(c->HaltEvent, DS_POLICY_CLIENT_UPDATE_INTERVAL);
+		Wait(ctx->HaltEvent, DS_POLICY_CLIENT_UPDATE_INTERVAL);
 	}
+
+	ReleaseEvent(ctx->HaltEvent);
 
 	Free(ctx);
 }
@@ -218,7 +260,7 @@ DS_POLICY_CLIENT *DsNewPolicyClient(char* server_hash)
 	MsGetComputerNameFull(hostname, sizeof(hostname));
 #endif	// OS_WIN32
 
-	c->HaltEvent = NewEvent();
+	c->HaltEventList = NewList(NULL);
 
 	c->ThreadList = NewThreadList();
 
@@ -233,7 +275,34 @@ DS_POLICY_CLIENT *DsNewPolicyClient(char* server_hash)
 		THREAD *t;
 
 		ctx->Client = c;
-		StrCpy(ctx->Url, sizeof(ctx->Url), "http://tools.sec.softether.co.jp/get-telework-policy/");
+
+		ctx->HaltEvent = NewEvent();
+		AddRef(ctx->HaltEvent->ref);
+		Add(c->HaltEventList, ctx->HaltEvent);
+
+		StrCpy(ctx->Url, sizeof(ctx->Url), "https://" DS_POLICY_INDOMAIN_SERVER_NAME ".__DOMAIN__/get-telework-policy/");
+		StrCat(ctx->Url, sizeof(ctx->Url), args);
+		ctx->ReplaceSuffix = true;
+
+		t = NewThread(DsPolicyClientThread, ctx);
+
+		AddThreadToThreadList(c->ThreadList, t);
+
+		ReleaseThread(t);
+	}
+
+	if (true)
+	{
+		DS_POLICY_THREAD_CTX *ctx = ZeroMalloc(sizeof(DS_POLICY_THREAD_CTX));
+		THREAD *t;
+
+		ctx->Client = c;
+
+		ctx->HaltEvent = NewEvent();
+		AddRef(ctx->HaltEvent->ref);
+		Add(c->HaltEventList, ctx->HaltEvent);
+
+		StrCpy(ctx->Url, sizeof(ctx->Url), "https://" DS_POLICY_IP_SERVER_NAME "/get-telework-policy/");
 		StrCat(ctx->Url, sizeof(ctx->Url), args);
 		ctx->ReplaceSuffix = false;
 
@@ -250,6 +319,7 @@ DS_POLICY_CLIENT *DsNewPolicyClient(char* server_hash)
 // ポリシークライアントの終了
 void DsFreePolicyClient(DS_POLICY_CLIENT *c)
 {
+	UINT i;
 	if (c == NULL)
 	{
 		return;
@@ -257,11 +327,24 @@ void DsFreePolicyClient(DS_POLICY_CLIENT *c)
 
 	c->Halt = true;
 
-	Set(c->HaltEvent);
+	for (i = 0; i < LIST_NUM(c->HaltEventList);i++)
+	{
+		EVENT *e = LIST_DATA(c->HaltEventList, i);
+
+		Set(e);
+	}
 
 	FreeThreadList(c->ThreadList);
 
-	ReleaseEvent(c->HaltEvent);
+
+	for (i = 0; i < LIST_NUM(c->HaltEventList);i++)
+	{
+		EVENT *e = LIST_DATA(c->HaltEventList, i);
+
+		ReleaseEvent(e);
+	}
+
+	ReleaseList(c->HaltEventList);
 
 	Free(c);
 }
