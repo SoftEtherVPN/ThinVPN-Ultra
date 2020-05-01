@@ -177,6 +177,8 @@ struct DS_POLICY_CLIENT
 	DS_POLICY_BODY Policy;
 	char ServerHash[128];
 	LIST *HaltEventList;
+	UINT NumThreads;
+	UINT NumTryCompleted;
 };
 
 DS *NewDs(bool is_user_mode, bool force_share_disable);
@@ -244,6 +246,7 @@ void DsPolicyClientThread(THREAD *thread, void *param);
 bool DsPolicyClientGetPolicy(DS_POLICY_CLIENT *c, DS_POLICY_BODY *pol);
 
 bool DsGetPolicy(DS *ds, DS_POLICY_BODY *pol);
+bool DsIsTryCompleted(DS *ds);
 void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol);
 
 // RPC Procedures (Server Side)

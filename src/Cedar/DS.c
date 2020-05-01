@@ -139,6 +139,27 @@ bool DsPolicyClientGetPolicy(DS_POLICY_CLIENT *c, DS_POLICY_BODY *pol)
 	return true;
 }
 
+// ポリシー取得試行が完了しているかどうか
+bool DsIsTryCompleted(DS *ds)
+{
+	if (ds == NULL)
+	{
+		return false;
+	}
+
+	if (ds->PolicyClient == NULL)
+	{
+		return false;
+	}
+
+	if (ds->PolicyClient->NumTryCompleted >= ds->PolicyClient->NumThreads)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 // 現在のポリシーの取得 (DS から)
 bool DsGetPolicy(DS *ds, DS_POLICY_BODY *pol)
 {
@@ -156,6 +177,7 @@ void DsPolicyClientThread(THREAD *thread, void *param)
 {
 	DS_POLICY_CLIENT *c;
 	DS_POLICY_THREAD_CTX *ctx = (DS_POLICY_THREAD_CTX *)param;
+	UINT num_try = 0;
 
 	if (thread == NULL || param == NULL)
 	{
@@ -168,6 +190,8 @@ void DsPolicyClientThread(THREAD *thread, void *param)
 	{
 		UINT i;
 		LIST *dns_suffix_list = NULL;
+
+		num_try++;
 
 		if (ctx->ReplaceSuffix)
 		{
@@ -233,6 +257,11 @@ void DsPolicyClientThread(THREAD *thread, void *param)
 			}
 		}
 
+		if (num_try == 1)
+		{
+			c->NumTryCompleted++;
+		}
+
 		FreeStrList(dns_suffix_list);
 
 		if (c->Halt)
@@ -274,6 +303,8 @@ DS_POLICY_CLIENT *DsNewPolicyClient(char* server_hash)
 		DS_POLICY_THREAD_CTX *ctx = ZeroMalloc(sizeof(DS_POLICY_THREAD_CTX));
 		THREAD *t;
 
+		c->NumThreads++;
+
 		ctx->Client = c;
 
 		ctx->HaltEvent = NewEvent();
@@ -295,6 +326,8 @@ DS_POLICY_CLIENT *DsNewPolicyClient(char* server_hash)
 	{
 		DS_POLICY_THREAD_CTX *ctx = ZeroMalloc(sizeof(DS_POLICY_THREAD_CTX));
 		THREAD *t;
+
+		c->NumThreads++;
 
 		ctx->Client = c;
 
@@ -2138,11 +2171,51 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 
 	if (DsGetPolicy(ds, &pol))
 	{
+		// 規制が設定されている
 		DsPreparePolicyMessage(t->MsgForServer2, sizeof(t->MsgForServer2), &pol);
 
 		if (pol.DisableShare)
 		{
 			t->ForceDisableShare = true;
+		}
+	}
+	else
+	{
+		if (DsIsTryCompleted(ds))
+		{
+			if (UniIsEmptyStr(t->MsgForServer))
+			{
+				// 特に規制が設定されていない
+				// 利用禁止ブラックリストにも入っていない
+				char list_msg[256] = {0};
+				UINT i;
+				LIST *dns_list = Win32GetDnsSuffixList();
+
+				if (LIST_NUM(dns_list) == 0)
+				{
+					char dom2[128];
+					StrCpy(dom2, sizeof(dom2), "- Local Area Network\r\n");
+					StrCat(list_msg, sizeof(list_msg), dom2);
+				}
+				else
+				{
+					for (i = 0; i < LIST_NUM(dns_list);i++)
+					{
+						char *dom = LIST_DATA(dns_list, i);
+
+						if (IsEmptyStr(dom) == false)
+						{
+							char dom2[128];
+							Format(dom2, sizeof(dom2), "- %s\r\n", dom);
+							StrCat(list_msg, sizeof(list_msg), dom2);
+						}
+					}
+				}
+
+				UniFormat(t->MsgForServer2, sizeof(t->MsgForServer2), _UU("DS_POLICY_DEFAULT_MSG"), list_msg);
+
+				ReleaseStrList(dns_list);
+			}
 		}
 	}
 
