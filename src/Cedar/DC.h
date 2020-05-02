@@ -94,6 +94,10 @@ struct DC_ADVAUTH
 	UINT AuthType;						// 認証方法
 	char Username[MAX_SIZE];			// ユーザー名
 	wchar_t CertPath[MAX_PATH];			// 証明書のパス
+
+	UINT SecureDeviceId;				// スマートカードデバイス ID
+	char SecureCertName[MAX_PATH];		// スマートカード証明書名
+	char SecureKeyName[MAX_PATH];		// スマートカード秘密鍵名
 };
 
 // DC

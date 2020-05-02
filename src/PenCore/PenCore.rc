@@ -1476,7 +1476,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 268
         TOPMARGIN, 7
-        BOTTOMMARGIN, 314
+        BOTTOMMARGIN, 376
     END
 
     D_DG_MAIN, DIALOG
@@ -5352,32 +5352,40 @@ BEGIN
     EDITTEXT        E_IP,7,74,97,13,ES_AUTOHSCROLL | ES_READONLY
 END
 
-D_DU_AUTH DIALOGEX 0, 0, 275, 321
+D_DU_AUTH DIALOGEX 0, 0, 275, 383
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "ユーザー認証"
+CAPTION "高度なユーザー認証"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_LICENSE,IDC_STATIC,7,7,20,20
-    LTEXT           "シン・テレワークシステム サーバー ""%S"" に接続するためには、ユーザー認証を行う必要があります。\r\n認証方法を選択してから、ユーザー名を入力して、必要なデータを入力してください。",S_TITLE,31,7,237,33,WS_TABSTOP
-    GROUPBOX        "ユーザー名およびユーザー認証方法",IDC_STATIC,26,46,222,92
-    RTEXT           "認証方法(&M):",IDC_STATIC,33,62,49,13
-    CONTROL         "パスワード認証(&P)",C_PASSWORD,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,87,61,122,10
-    CONTROL         "証明書認証(&C)",C_CERT,"Button",BS_AUTORADIOBUTTON,87,78,122,10
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,41,96,191,1
-    RTEXT           "ユーザー名(&U):",IDC_STATIC,33,112,49,13
-    EDITTEXT        E_USERNAME,87,110,141,12,ES_AUTOHSCROLL
-    GROUPBOX        "パスワード認証",IDC_STATIC,26,144,222,66
-    ICON            ICO_KEY,IDC_STATIC,33,158,20,20
-    LTEXT           "パスワード認証を使用する場合は、パスワードを入力して [OK] をクリックしてください。",S_S1,61,159,179,24
-    RTEXT           "パスワード(&P):",S_S2,33,189,49,13
-    EDITTEXT        E_PASSWORD,87,187,141,12,ES_PASSWORD | ES_AUTOHSCROLL
-    GROUPBOX        "証明書認証",IDC_STATIC,26,217,222,71
-    ICON            ICO_CERT,IDC_STATIC,33,231,20,20
-    LTEXT           "証明書認証を使用する場合は、[参照] をクリックして PKCS#12 形式の証明書ファイル (.p12 または .pfx) を指定してください。",S_S4,61,233,179,27
-    EDITTEXT        E_CERTPATH,61,263,141,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "参照(&B)...",B_BROWSE,205,261,39,16
-    DEFPUSHBUTTON   "&OK",IDOK,158,298,52,16
-    PUSHBUTTON      "キャンセル",IDCANCEL,216,298,52,16
+    LTEXT           "シン・テレワークシステム サーバー ""%S"" に接続するためには、ユーザー認証を行う必要があります。\r\n認証方法を選択してから、ユーザー名を入力して、必要なデータを入力してください。",S_TITLE,31,7,237,29,WS_TABSTOP
+    GROUPBOX        "ユーザー名およびユーザー認証方法",IDC_STATIC,26,43,222,85
+    RTEXT           "認証方法(&M):",IDC_STATIC,33,56,49,13
+    CONTROL         "パスワード認証(&P)",C_PASSWORD,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,87,55,122,10
+    CONTROL         "証明書認証(&C)",C_CERT,"Button",BS_AUTORADIOBUTTON,87,70,122,10
+    CONTROL         "スマートカード認証(&S)",C_SMARTCARD,"Button",BS_AUTORADIOBUTTON,87,85,122,10
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,41,99,191,1
+    RTEXT           "ユーザー名(&U):",IDC_STATIC,33,109,49,13
+    EDITTEXT        E_USERNAME,87,107,141,12,ES_AUTOHSCROLL
+    GROUPBOX        "パスワード認証",IDC_STATIC,26,131,222,59
+    ICON            ICO_KEY,IDC_STATIC,33,142,18,18
+    LTEXT           "パスワード認証を使用する場合は、パスワードを入力して [OK] をクリックしてください。",S_S1,61,143,179,20
+    RTEXT           "パスワード(&P):",S_S2,33,168,49,13
+    EDITTEXT        E_PASSWORD,87,166,141,12,ES_PASSWORD | ES_AUTOHSCROLL
+    GROUPBOX        "証明書認証",IDC_STATIC,26,193,222,55
+    ICON            ICO_CERT,IDC_STATIC,33,202,18,18
+    LTEXT           "証明書認証を使用する場合は、[参照] をクリックして PKCS#12 形式の証明書ファイル (.p12 または .pfx) を指定してください。",S_S4,61,204,183,19
+    EDITTEXT        E_CERTPATH,61,227,141,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "参照(&B)...",B_BROWSE,205,225,39,16
+    GROUPBOX        "スマートカード認証",IDC_STATIC,26,254,222,100
+    ICON            ICO_SECURE,IDC_STATIC,32,264,18,18
+    LTEXT           "1. 認証に使用するスマートカードを選択してください。",S_SMARTCARD_DEVICE,58,268,179,20
+    PUSHBUTTON      "スマートカードの選択(&E)...",B_SELECT_SMARTCARD,59,288,95,16
+    LTEXT           "2. スマートカード内の証明書と秘密鍵を指定してください。",S_CERT_STR,58,312,179,10
+    PUSHBUTTON      "証明書と秘密鍵の指定(&K)...",B_SELECT_SCARD_CERT,59,325,94,16
+    LTEXT           "AAA: \r\nBBB: \r\n",S_CERT_AND_KEY,157,324,89,27
+    DEFPUSHBUTTON   "&OK",IDOK,158,360,52,16
+    PUSHBUTTON      "キャンセル",IDCANCEL,216,360,52,16
 END
 
 D_DG_MAIN DIALOGEX 0, 0, 307, 361

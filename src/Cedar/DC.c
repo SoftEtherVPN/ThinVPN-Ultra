@@ -1525,10 +1525,17 @@ void DcLoadConfig(DC *dc, FOLDER *root)
 					case DESK_AUTH_CERT:
 						CfgGetUniStr(ff, "CertPath", a->CertPath, sizeof(a->CertPath));
 						break;
+
+					case DESK_AUTH_SMARTCARD:
+						a->SecureDeviceId = CfgGetInt(ff, "SecureDeviceId");
+						CfgGetStr(ff, "SecureCertName", a->SecureCertName, sizeof(a->SecureCertName));
+						CfgGetStr(ff, "SecureKeyName", a->SecureKeyName, sizeof(a->SecureKeyName));
+						break;
 					}
 
 					if (IsEmptyStr(a->Username) ||
-						(a->AuthType == DESK_AUTH_CERT && UniIsEmptyStr(a->CertPath)))
+						(a->AuthType == DESK_AUTH_CERT && UniIsEmptyStr(a->CertPath)) ||
+						(a->AuthType == DESK_AUTH_SMARTCARD && (a->SecureDeviceId == 0 || IsEmptyStr(a->SecureCertName) || IsEmptyStr(a->SecureKeyName))))
 					{
 						Free(a);
 					}
@@ -1615,6 +1622,12 @@ void DcSaveConfig(DC *dc)
 		{
 		case DESK_AUTH_CERT:
 			CfgAddUniStr(ff, "CertPath", a->CertPath);
+			break;
+
+		case DESK_AUTH_SMARTCARD:
+			CfgAddInt(ff, "SecureDeviceId", a->SecureDeviceId);
+			CfgAddStr(ff, "SecureCertName", a->SecureCertName);
+			CfgAddStr(ff, "SecureKeyName", a->SecureKeyName);
 			break;
 		}
 	}

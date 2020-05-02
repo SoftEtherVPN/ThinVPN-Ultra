@@ -1003,7 +1003,9 @@
 #define B_BROWSE                        1480
 #define S_DEST                          1481
 #define B_BROWSE_OUT                    1481
+#define B_SELECT_SMARTCARD              1481
 #define S_UAC                           1482
+#define B_SELECT_SCARD_CERT             1482
 #define E_SETTING                       1483
 #define E_OUT                           1484
 #define B_BROWSE_SETTING                1485
@@ -1276,9 +1278,14 @@
 #define S_S4                            2614
 #define E_CERTPATH                      2615
 #define D_DG_MAIN                       2616
+#define C_SMARTCARD                     2616
 #define D_DG_PROXY                      2617
+#define S_SMARTCARD_DEVICE              2617
 #define D_DEFAULT_DIALOG                2618
+#define S_CERT_STR                      2618
 #define D_DG_AUTH                       2619
+#define S_S7                            2619
+#define S_CERT_AND_KEY                  2619
 #define D_DG_OPTION                     2620
 #define D_DG_PASSWORD                   2621
 #define D_DG_LOGIN                      2622

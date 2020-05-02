@@ -41,6 +41,7 @@
 #define DESK_AUTH_PASSWORD				1		// パスワード認証
 #define	DESK_AUTH_USERPASSWORD			CLIENT_AUTHTYPE_PLAIN_PASSWORD	// 2: ユーザー名とパスワードによる認証
 #define	DESK_AUTH_CERT					CLIENT_AUTHTYPE_CERT		// 3: 証明書認証
+#define DESK_AUTH_SMARTCARD				CLIENT_AUTHTYPE_SECURE		// 4: スマートカード認証
 
 // 提供するサービス
 #define DESK_SERVICE_RDP				0		// RDP

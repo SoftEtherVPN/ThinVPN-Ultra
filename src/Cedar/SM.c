@@ -14411,11 +14411,11 @@ UINT SmEditUserDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *
 
 		case B_LOAD_CERT:
 			// Specify the certificate
-#ifndef	CEDAR_DESKVPN
+//#ifndef	CEDAR_DESKVPN
 			if (CmLoadXFromFileOrSecureCard(hWnd, &x))
-#else	// CEDAR_DESKVPN
-			if (CmLoadX(hWnd, &x))
-#endif	// CEDAR_DESKVPN
+//#else	// CEDAR_DESKVPN
+//			if (CmLoadX(hWnd, &x))
+//#endif	// CEDAR_DESKVPN
 			{
 UPDATE_CERT:
 				if (s->SetUser.AuthType == AUTHTYPE_USERCERT)

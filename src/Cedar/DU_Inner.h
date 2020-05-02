@@ -73,6 +73,10 @@ typedef struct DU_AUTH
 	DC *Dc;
 	char Pcid[MAX_PATH];		// PCID
 	DC_AUTH Auth;				// 認証データ
+
+	UINT SecureDeviceId;				// スマートカードデバイス ID
+	char SecureCertName[MAX_PATH];		// スマートカード証明書名
+	char SecureKeyName[MAX_PATH];		// スマートカード秘密鍵名
 } DU_AUTH;
 
 // URDP に関するメッセージ

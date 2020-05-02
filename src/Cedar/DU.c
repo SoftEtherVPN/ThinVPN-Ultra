@@ -788,6 +788,8 @@ void DuAuthDlgInit(HWND hWnd, DU_AUTH *a)
 		return;
 	}
 
+	SetTextA(hWnd, S_CERT_AND_KEY, "");
+
 	FormatText(hWnd, S_TITLE, a->Pcid);
 
 	aa = DcGetAdvAuth(a->Dc, a->Pcid);
@@ -795,10 +797,11 @@ void DuAuthDlgInit(HWND hWnd, DU_AUTH *a)
 	{
 		SetTextA(hWnd, E_USERNAME, aa->Username);
 
-		if (aa->AuthType != DESK_AUTH_CERT)
+		if (aa->AuthType == DESK_AUTH_USERPASSWORD)
 		{
 			Check(hWnd, C_PASSWORD, true);
 			Check(hWnd, C_CERT, false);
+			Check(hWnd, C_SMARTCARD, false);
 
 			DuAuthDlgUpdate(hWnd, a);
 
@@ -811,10 +814,11 @@ void DuAuthDlgInit(HWND hWnd, DU_AUTH *a)
 				FocusEx(hWnd, E_USERNAME);
 			}
 		}
-		else
+		else if (aa->AuthType == DESK_AUTH_CERT)
 		{
 			Check(hWnd, C_CERT, true);
 			Check(hWnd, C_PASSWORD, false);
+			Check(hWnd, C_SMARTCARD, false);
 
 			DuAuthDlgUpdate(hWnd, a);
 
@@ -836,11 +840,63 @@ void DuAuthDlgInit(HWND hWnd, DU_AUTH *a)
 				FocusEx(hWnd, E_USERNAME);
 			}
 		}
+		else if (aa->AuthType == DESK_AUTH_SMARTCARD)
+		{
+			wchar_t tmp[MAX_PATH];
+			SECURE_DEVICE *dev = NULL;
+
+			Check(hWnd, C_SMARTCARD, true);
+			Check(hWnd, C_PASSWORD, false);
+			Check(hWnd, C_CERT, false);
+
+			dev = GetSecureDevice(aa->SecureDeviceId);
+
+			if (dev != NULL)
+			{
+				UniFormat(tmp, sizeof(tmp), _UU("DU_AUTH_SMARTCARD_STR1"), dev->DeviceName);
+				SetText(hWnd, S_SMARTCARD_DEVICE, tmp);
+				SetText(hWnd, B_SELECT_SMARTCARD, _UU("DU_AUTH_SMARTCARD_CHANGE"));
+				DlgFont(hWnd, S_SMARTCARD_DEVICE, 0, true);
+			}
+
+			if (IsEmptyStr(aa->SecureCertName) == false && IsEmptyStr(aa->SecureKeyName) == false)
+			{
+				SetText(hWnd, S_CERT_STR, _UU("DU_AUTH_SMARTCARD_CERT_STR1"));
+				DlgFont(hWnd, S_CERT_STR, 0, true);
+				UniFormat(tmp, sizeof(tmp), _UU("DU_AUTH_SMARTCARD_CERT_AND_KEY"), aa->SecureCertName, aa->SecureKeyName);
+				SetText(hWnd, S_CERT_AND_KEY, tmp);
+			}
+
+			DlgFont(hWnd, S_CERT_AND_KEY, 0, true);
+
+			DuAuthDlgUpdate(hWnd, a);
+
+			if (IsEmpty(hWnd, E_USERNAME) == false)
+			{
+				if (dev == NULL)
+				{
+					Focus(hWnd, B_SELECT_SMARTCARD);
+				}
+				else
+				{
+					Focus(hWnd, B_SELECT_SCARD_CERT);
+				}
+			}
+			else
+			{
+				FocusEx(hWnd, E_USERNAME);
+			}
+
+			a->SecureDeviceId = aa->SecureDeviceId;
+			StrCpy(a->SecureCertName, sizeof(a->SecureCertName), aa->SecureCertName);
+			StrCpy(a->SecureKeyName, sizeof(a->SecureKeyName), aa->SecureKeyName);
+		}
 	}
 	else
 	{
 		Check(hWnd, C_PASSWORD, true);
 		Check(hWnd, C_CERT, false);
+		Check(hWnd, C_SMARTCARD, false);
 
 		FocusEx(hWnd, E_USERNAME);
 	}
@@ -852,7 +908,8 @@ void DuAuthDlgInit(HWND hWnd, DU_AUTH *a)
 // 認証ダイアログ更新
 void DuAuthDlgUpdate(HWND hWnd, DU_AUTH *a)
 {
-	bool b = true, b1 = true, b2 = true;
+	bool b = true, b1 = true, b2 = true, b3 = true;
+	bool b4 = false;
 	// 引数チェック
 	if (hWnd == NULL || a == NULL)
 	{
@@ -862,15 +919,32 @@ void DuAuthDlgUpdate(HWND hWnd, DU_AUTH *a)
 	if (IsChecked(hWnd, C_CERT))
 	{
 		b1 = false;
+		b3 = false;
 
 		if (IsEmpty(hWnd, E_CERTPATH))
 		{
 			b = false;
 		}
 	}
+	else if (IsChecked(hWnd, C_SMARTCARD))
+	{
+		b1 = false;
+		b2 = false;
+
+		if (a->SecureDeviceId == 0 || IsEmptyStr(a->SecureCertName) || IsEmptyStr(a->SecureKeyName))
+		{
+			b = false;
+		}
+
+		if (a->SecureDeviceId != 0)
+		{
+			b4 = true;
+		}
+	}
 	else
 	{
 		b2 = false;
+		b3 = false;
 	}
 
 	if (IsEmpty(hWnd, E_USERNAME))
@@ -885,6 +959,12 @@ void DuAuthDlgUpdate(HWND hWnd, DU_AUTH *a)
 	SetEnable(hWnd, S_S4, b2);
 	SetEnable(hWnd, E_CERTPATH, b2);
 	SetEnable(hWnd, B_BROWSE, b2);
+
+	SetEnable(hWnd, S_SMARTCARD_DEVICE, b3);
+	SetEnable(hWnd, B_SELECT_SMARTCARD, b3);
+	SetEnable(hWnd, S_CERT_STR, b3 && b4);
+	SetEnable(hWnd, B_SELECT_SCARD_CERT, b3 && b4);
+	SetEnable(hWnd, S_CERT_AND_KEY, b3 && b4);
 
 	SetEnable(hWnd, IDOK, b);
 }
@@ -953,6 +1033,11 @@ void DuAuthDlgOnOk(HWND hWnd, DU_AUTH *a)
 		FreeBuf(buf_x);
 		FreeBuf(buf_k);
 	}
+	else if (IsChecked(hWnd, C_SMARTCARD))
+	{
+		// スマートカード認証
+		aa.AuthType = DESK_AUTH_SMARTCARD;
+	}
 	else
 	{
 		// パスワード認証
@@ -967,6 +1052,13 @@ void DuAuthDlgOnOk(HWND hWnd, DU_AUTH *a)
 	if (IsChecked(hWnd, C_CERT))
 	{
 		UniStrCpy(ad.CertPath, sizeof(ad.CertPath), tmp);
+	}
+
+	if (IsChecked(hWnd, C_SMARTCARD))
+	{
+		ad.SecureDeviceId = a->SecureDeviceId;
+		StrCpy(ad.SecureCertName, sizeof(ad.SecureCertName), a->SecureCertName);
+		StrCpy(ad.SecureKeyName, sizeof(ad.SecureKeyName), a->SecureKeyName);
 	}
 	
 	StrCpy(ad.Username, sizeof(ad.Username), aa.RetUsername);
@@ -1054,6 +1146,74 @@ UINT DuAuthDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 				else
 				{
 					FocusEx(hWnd, E_USERNAME);
+				}
+			}
+			break;
+
+		case C_SMARTCARD:
+			DuAuthDlgUpdate(hWnd, a);
+
+			if (IsChecked(hWnd, C_SMARTCARD))
+			{
+				if (IsEmpty(hWnd, E_USERNAME) == false)
+				{
+					if (a->SecureDeviceId == 0)
+					{
+						Focus(hWnd, B_SELECT_SMARTCARD);
+					}
+					else
+					{
+						Focus(hWnd, B_SELECT_SCARD_CERT);
+					}
+				}
+				else
+				{
+					FocusEx(hWnd, E_USERNAME);
+				}
+			}
+			break;
+
+		case B_SELECT_SMARTCARD: // スマートカード選択
+			{
+				wchar_t tmp[MAX_PATH];
+				SECURE_DEVICE *dev = NULL;
+				UINT id = CmSelectSecure(hWnd, a->SecureDeviceId);
+				if (id != 0)
+				{
+					dev = GetSecureDevice(id);
+
+					if (dev != NULL)
+					{
+						UniFormat(tmp, sizeof(tmp), _UU("DU_AUTH_SMARTCARD_STR1"), dev->DeviceName);
+						SetText(hWnd, S_SMARTCARD_DEVICE, tmp);
+						SetText(hWnd, B_SELECT_SMARTCARD, _UU("DU_AUTH_SMARTCARD_CHANGE"));
+						DlgFont(hWnd, S_SMARTCARD_DEVICE, 0, true);
+
+						a->SecureDeviceId = id;
+					}
+				}
+
+				DuAuthDlgUpdate(hWnd, a);
+			}
+			break;
+
+		case B_SELECT_SCARD_CERT:	// スマートカード内の鍵選択
+			{
+				wchar_t tmp[MAX_PATH];
+				char cert[MAX_SECURE_DEVICE_FILE_LEN + 1], priv[MAX_SECURE_DEVICE_FILE_LEN + 1];
+
+				// Select a certificate in the smart card
+				if (SmSelectKeyPair(hWnd, cert, sizeof(cert), priv, sizeof(priv)))
+				{
+					StrCpy(a->SecureCertName, sizeof(a->SecureCertName), cert);
+					StrCpy(a->SecureKeyName, sizeof(a->SecureKeyName), priv);
+
+					SetText(hWnd, S_CERT_STR, _UU("DU_AUTH_SMARTCARD_CERT_STR1"));
+					DlgFont(hWnd, S_CERT_STR, 0, true);
+					UniFormat(tmp, sizeof(tmp), _UU("DU_AUTH_SMARTCARD_CERT_AND_KEY"), a->SecureCertName, a->SecureKeyName);
+					SetText(hWnd, S_CERT_AND_KEY, tmp);
+
+					DuAuthDlgUpdate(hWnd, a);
 				}
 			}
 			break;

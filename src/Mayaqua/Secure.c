@@ -147,6 +147,7 @@ HINSTANCE Win32SecureLoadLibraryEx(char *dllname, DWORD flags)
 	char tmp1[MAX_PATH];
 	char tmp2[MAX_PATH];
 	char tmp3[MAX_PATH];
+	char tmp4[MAX_PATH];
 	HINSTANCE h;
 	// Validate arguments
 	if (dllname == NULL)
@@ -155,8 +156,9 @@ HINSTANCE Win32SecureLoadLibraryEx(char *dllname, DWORD flags)
 	}
 
 	Format(tmp1, sizeof(tmp1), "%s\\%s", MsGetSystem32Dir(), dllname);
-	Format(tmp2, sizeof(tmp2), "%s\\JPKI\\%s", MsGetProgramFilesDir(), dllname);
+	Format(tmp2, sizeof(tmp2), "%s\\JPKI\\%s", MsGetProgramFilesDirX64(), dllname);
 	Format(tmp3, sizeof(tmp3), "%s\\LGWAN\\%s", MsGetProgramFilesDir(), dllname);
+	Format(tmp4, sizeof(tmp4), "%s\\JPKI\\%s", MsGetProgramFilesDirX86(), dllname);
 
 	h = LoadLibraryEx(dllname, NULL, flags);
 	if (h != NULL)
@@ -182,6 +184,12 @@ HINSTANCE Win32SecureLoadLibraryEx(char *dllname, DWORD flags)
 		return h;
 	}
 
+	h = LoadLibraryEx(tmp4, NULL, flags);
+	if (h != NULL)
+	{
+		return h;
+	}
+
 	return NULL;
 }
 
@@ -193,6 +201,11 @@ bool Win32IsDeviceSupported(SECURE_DEVICE *dev)
 	if (dev == NULL)
 	{
 		return false;
+	}
+
+	if (dev->Id == 9)
+	{
+		DoNothing();
 	}
 
 	// Check whether the DLL is readable
@@ -331,7 +344,7 @@ void Win32FreeSecModule(SECURE *sec)
 // Whether the specified device is a JPKI
 bool IsJPKI(bool id)
 {
-	if (id == 9 || id == 13)
+	if (id == 9 || id == 13 || id == 24)
 	{
 		return true;
 	}
