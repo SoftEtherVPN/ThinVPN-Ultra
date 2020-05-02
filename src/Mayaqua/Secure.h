@@ -302,6 +302,7 @@ SECURE_DEVICE SupportedList[] =
 	{22,	SECURE_USB_TOKEN,	"CryptoID",				"Longmai Technology",	"cryptoide_pkcs11.dll"},
 	{23,	SECURE_USB_TOKEN,	"RuToken",				"Aktiv Co.",			"rtPKCS11.dll"},
 	{24,	SECURE_IC_CARD,		"JPKI IC Card (64-bit)",	"Japanese Government",	"JPKIPKCS1164.DLL"},
+	{25,	SECURE_IC_CARD,		"OpenSC Smart Card",	"OpenSC",	"opensc-pkcs11.dll"},
 };
 
 #ifdef	OS_WIN32

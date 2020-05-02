@@ -148,6 +148,7 @@ HINSTANCE Win32SecureLoadLibraryEx(char *dllname, DWORD flags)
 	char tmp2[MAX_PATH];
 	char tmp3[MAX_PATH];
 	char tmp4[MAX_PATH];
+	char tmp5[MAX_PATH];
 	HINSTANCE h;
 	// Validate arguments
 	if (dllname == NULL)
@@ -159,6 +160,7 @@ HINSTANCE Win32SecureLoadLibraryEx(char *dllname, DWORD flags)
 	Format(tmp2, sizeof(tmp2), "%s\\JPKI\\%s", MsGetProgramFilesDirX64(), dllname);
 	Format(tmp3, sizeof(tmp3), "%s\\LGWAN\\%s", MsGetProgramFilesDir(), dllname);
 	Format(tmp4, sizeof(tmp4), "%s\\JPKI\\%s", MsGetProgramFilesDirX86(), dllname);
+	Format(tmp5, sizeof(tmp5), "%s\\OpenSC Project\\OpenSC\\pkcs11\\%s", MsGetProgramFilesDirX86(), dllname);
 
 	h = LoadLibraryEx(dllname, NULL, flags);
 	if (h != NULL)
@@ -185,6 +187,12 @@ HINSTANCE Win32SecureLoadLibraryEx(char *dllname, DWORD flags)
 	}
 
 	h = LoadLibraryEx(tmp4, NULL, flags);
+	if (h != NULL)
+	{
+		return h;
+	}
+
+	h = LoadLibraryEx(tmp5, NULL, flags);
 	if (h != NULL)
 	{
 		return h;
