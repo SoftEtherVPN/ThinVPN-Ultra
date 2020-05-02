@@ -2098,6 +2098,7 @@ void DcListenThread(THREAD *thread, void *param)
 void DcConnectThread(THREAD *thread, void *param)
 {
 	DC_SESSION *s = (DC_SESSION *)param;
+	UINT num_retry = 0;
 	// 引数チェック
 	if (thread == NULL || param == NULL)
 	{
@@ -2154,11 +2155,24 @@ void DcConnectThread(THREAD *thread, void *param)
 				UnlockQueue(s->SockIoQueue);
 
 				Set(s->EventForListenThread);
+
+				num_retry = 0;
 			}
 			else
 			{
+				UINT wait_time = DC_TUNNEL_RECONNECT_RETRY_SPAN;
+
 				// 接続に失敗したので一定時間待ってリトライする
-				Wait(s->EventForConnectThread, DC_TUNNEL_RECONNECT_RETRY_SPAN);
+				num_retry++;
+
+				wait_time = MIN(wait_time * num_retry, DC_TUNNEL_RECONNECT_RETRY_SPAN_MAX) * 2;
+
+				if (wait_time == 0) wait_time = 1;
+				wait_time = Rand32() % wait_time;
+
+				Debug("Additional tunnel establish failed. Wait for %u msecs...\n", wait_time);
+
+				Wait(s->EventForConnectThread, wait_time);
 			}
 		}
 
@@ -2296,6 +2310,8 @@ bool DcSessionConnectAuthCallback1(DC *dc, DC_AUTH *auth, void *param)
 
 		Zero(&a, sizeof(a));
 
+		Copy(a.InRand, auth->InRand, SHA1_SIZE);
+
 		if (s->AdvAuthCallback(s, &a) == false)
 		{
 			return false;
@@ -2318,6 +2334,7 @@ bool DcSessionConnectAuthCallback1(DC *dc, DC_AUTH *auth, void *param)
 bool DcSessionConnectAuthCallback2(DC *dc, DC_AUTH *auth, void *param)
 {
 	DC_SESSION *s;
+	UINT auth_type;
 	// 引数チェック
 	if (dc == NULL || auth == NULL || param == NULL)
 	{
@@ -2325,6 +2342,8 @@ bool DcSessionConnectAuthCallback2(DC *dc, DC_AUTH *auth, void *param)
 	}
 
 	s = (DC_SESSION *)param;
+
+	auth_type = auth->AuthType;
 
 	if (auth->UseAdvancedSecurity == false)
 	{
@@ -2345,6 +2364,12 @@ bool DcSessionConnectAuthCallback2(DC *dc, DC_AUTH *auth, void *param)
 	{
 		// 新しい認証方法 キャッシュを取得
 		Copy(auth, &s->CachedAuthData, sizeof(DC_AUTH));
+
+		if (auth->AuthType == DESK_AUTH_SMARTCARD)
+		{
+			// スマートカード認証の場合は認証済みチケットを渡す
+			Copy(auth->SmartCardTicket, s->SmartCardTicket, SHA1_SIZE);
+		}
 
 		return true;
 	}
@@ -2513,6 +2538,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	bool is_share_disabled = false;
 	bool use_advanced_security = false;
 	bool is_otp_enabled = false;
+	UCHAR smart_card_ticket[SHA1_SIZE];
 	// 引数チェック
 	if (dc == NULL || sock == NULL || pcid == NULL || auth_callback == NULL)
 	{
@@ -2691,11 +2717,13 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	}
 	else
 	{
-		// 新しいユーザー認証
+		// 高度なユーザー認証
 		DC_AUTH a;
 		UCHAR sign[4096 / 8];
 
 		Zero(&a, sizeof(a));
+
+		Copy(a.InRand, rand, SHA1_SIZE);
 
 		a.UseAdvancedSecurity = true;
 
@@ -2764,6 +2792,61 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 				return ERR_PROTOCOL_ERROR;
 			}
 			break;
+
+		case DESK_AUTH_SMARTCARD:
+			// スマートカード認証
+			FreePack(p);
+
+			p = NULL;
+
+			// 送られてきたデータにスマートカードで署名した結果を返す
+			if (IsZero(a.SmartCardTicket, SHA1_SIZE))
+			{
+				// 1 回目の認証
+				BUF *x_buf;
+				X *x;
+
+				x_buf = NewBuf();
+
+				WriteBuf(x_buf, a.RetCertData, a.RetCertSize);
+
+				x = BufToX(x_buf, false);
+
+				if (x != NULL && x->is_compatible_bit &&
+					x->bits != 0 && (x->bits / 8) <= sizeof(sign))
+				{
+					Copy(sign, a.RetSignedData, a.RetSignedDataSize);
+
+					p = PackLoginWithCert(CEDAR_DESKVPN_HUBNAME,
+						a.RetUsername,
+						x,
+						sign,
+						x->bits / 8);
+
+					PackAddBool(p, "IsSmartCardAuth", true);
+				}
+
+				FreeX(x);
+
+				FreeBuf(x_buf);
+			}
+			else
+			{
+				// 2 回目以降はスマートカード認証済みチケットを渡す
+				p = NewPack();
+				PackAddStr(p, "method", "login");
+				PackAddStr(p, "hubname", CEDAR_DESKVPN_HUBNAME);
+				PackAddStr(p, "username", a.RetUsername);
+				PackAddInt(p, "authtype", CLIENT_AUTHTYPE_SMART_CARD_TICKET);
+				PackAddData(p, "SmartCardTicket", a.SmartCardTicket, SHA1_SIZE);
+			}
+
+			if (p == NULL)
+			{
+				FreePack(p);
+				return ERR_PROTOCOL_ERROR;
+			}
+			break;
 		}
 	}
 
@@ -2782,6 +2865,13 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 		return ERR_DISCONNECTED;
 	}
 	ret = GetErrorFromPack(p);
+
+	if (PackGetData2(p, "SmartCardTicket", smart_card_ticket, SHA1_SIZE))
+	{
+		// スマートカード認証済みチケットを受信
+		Copy(dcs->SmartCardTicket, smart_card_ticket, SHA1_SIZE);
+	}
+
 	FreePack(p);
 
 	if (ret != ERR_NO_ERROR)

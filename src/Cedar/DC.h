@@ -32,6 +32,12 @@ struct DC_AUTH
 	UINT RetCertSize;					// 返却証明書サイズ
 	UCHAR RetKeyData[DC_MAX_SIZE_CERT];	// 返却秘密鍵データ
 	UINT RetKeySize;					// 返却秘密鍵サイズ
+
+	UCHAR InRand[SHA1_SIZE];
+	UCHAR RetSignedData[4096 / 8];
+	UINT RetSignedDataSize;
+
+	UCHAR SmartCardTicket[SHA1_SIZE];	// スマートカード認証済みチケット
 };
 
 // スレッド用パラメータ
@@ -85,6 +91,7 @@ struct DC_SESSION
 	bool IsShareDisabled;				// 共有が無効化されているかどうか
 	UINT ProcessIdOfClient;				// クライアントソフトウェアのプロセス ID
 	char OtpTicket[MAX_PATH];			// OTP チケット
+	UCHAR SmartCardTicket[SHA1_SIZE];	// スマートカード認証済みチケット
 };
 
 // 拡張認証データ

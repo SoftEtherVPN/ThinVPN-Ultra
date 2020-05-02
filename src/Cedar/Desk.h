@@ -79,6 +79,7 @@
 // DC 関係パラメータ
 #define DC_TUNNEL_QUEUE_SIZE			2		// トンネルキューサイズ
 #define DC_TUNNEL_RECONNECT_RETRY_SPAN	(2 * 1000)	// トンネル確立に失敗した場合のリトライ間隔
+#define DC_TUNNEL_RECONNECT_RETRY_SPAN_MAX	(3 * 60 * 1000)	// トンネル確立に失敗した場合のリトライ間隔
 #define DC_TUNNEL_ESTABLISH_TIMEOUT		(30 * 1000)	// トンネル確立完了まで待機する時間
 
 // DC のイベント

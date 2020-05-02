@@ -925,6 +925,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bool has_urdp2_client = false;
 	bool support_otp = false;
 	bool support_otp_enforcement = false;
+	bool is_smartcard_auth = false;
 	UINT ds_caps = 0;
 	UINT urdp_version = 0;
 	DS_POLICY_BODY pol = {0};
@@ -1395,6 +1396,8 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		Zero(auth_username, sizeof(auth_username));
 		PackGetStr(p, "username", auth_username, sizeof(auth_username));
 
+		is_smartcard_auth = PackGetBool(p, "IsSmartCardAuth");
+
 		// まず匿名認証を試行する
 		auth_ret = SamAuthUserByAnonymous(hub, auth_username);
 
@@ -1520,6 +1523,21 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 						}
 					}
 					Free(cert_buf);
+				}
+				break;
+
+			case CLIENT_AUTHTYPE_SMART_CARD_TICKET:
+				// 既にスマートカードで認証済みのクライアントによるチケット受信
+				{
+					UCHAR ticket[SHA1_SIZE];
+
+					if (PackGetData2(p, "SmartCardTicket", ticket, SHA1_SIZE))
+					{
+						if (Cmp(ticket, ds->SmartCardTicket, SHA1_SIZE) == 0)
+						{
+							auth_ret = true;
+						}
+					}
 				}
 				break;
 			}
@@ -1694,8 +1712,16 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		}
 	}
 
-	// 開始成功
-	DsSendError(sock, ERR_NO_ERROR);
+	if (is_smartcard_auth == false)
+	{
+		// 開始成功
+		DsSendError(sock, ERR_NO_ERROR);
+	}
+	else
+	{
+		// スマートカード認証の場合はチケットも渡す
+		DsSendErrorEx(sock, ERR_NO_ERROR, "SmartCardTicket", ds->SmartCardTicket, SHA1_SIZE);
+	}
 
 	SockIoSetTimeout(sock, INFINITE);
 
@@ -1878,6 +1904,10 @@ SOCK *DsConnectToLocalHostService(UINT svc_type, UINT rdp_port)
 // エラーの送信
 void DsSendError(SOCKIO *sock, UINT error_code)
 {
+	DsSendErrorEx(sock, error_code, NULL, 0, 0);
+}
+void DsSendErrorEx(SOCKIO *sock, UINT error_code, char *add_value_name, UCHAR *add_value_data, UINT data_size)
+{
 	PACK *p;
 	// 引数チェック
 	if (sock == NULL)
@@ -1886,6 +1916,11 @@ void DsSendError(SOCKIO *sock, UINT error_code)
 	}
 
 	p = PackError(error_code);
+
+	if (IsEmptyStr(add_value_name) == false)
+	{
+		PackAddData(p, add_value_name, add_value_data, data_size);
+	}
 
 	SockIoSendPack(sock, p);
 
@@ -3447,6 +3482,8 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 	InitWinUi(_UU("DS_TITLE"), _SS("DEFAULT_FONT"), _II("DEFAULT_FONT_SIZE"));
 
 	ds = ZeroMalloc(sizeof(DS));
+
+	Rand(ds->SmartCardTicket, SHA1_SIZE);
 
 	DsGenerateNewOtp(ds->OtpTicket, sizeof(ds->OtpTicket), 128);
 

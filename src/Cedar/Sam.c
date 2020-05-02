@@ -356,12 +356,6 @@ bool SamAuthUserByCert(HUB *h, char *username, X *x)
 		return false;
 	}
 
-	// Check expiration date
-	if (CheckXDateNow(x) == false)
-	{
-		return false;
-	}
-
 	// Check the Certification Revocation List
 	if (IsValidCertInHub(h, x) == false)
 	{
@@ -405,6 +399,11 @@ bool SamAuthUserByCert(HUB *h, char *username, X *x)
 							if (root_cert != NULL)
 							{
 								b = true;
+								// Check expiration date
+								if (CheckXDateNow(x) == false)
+								{
+									b = false;
+								}
 								if (auth->CommonName != NULL && UniIsEmptyStr(auth->CommonName) == false)
 								{
 									// Compare the CN

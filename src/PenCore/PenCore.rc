@@ -5368,17 +5368,17 @@ BEGIN
     RTEXT           "ユーザー名(&U):",IDC_STATIC,33,109,49,13
     EDITTEXT        E_USERNAME,87,107,141,12,ES_AUTOHSCROLL
     GROUPBOX        "パスワード認証",IDC_STATIC,26,131,222,59
-    ICON            ICO_KEY,IDC_STATIC,33,142,18,18
+    ICON            ICO_KEY,IDC_STATIC,33,142,20,20
     LTEXT           "パスワード認証を使用する場合は、パスワードを入力して [OK] をクリックしてください。",S_S1,61,143,179,20
     RTEXT           "パスワード(&P):",S_S2,33,168,49,13
     EDITTEXT        E_PASSWORD,87,166,141,12,ES_PASSWORD | ES_AUTOHSCROLL
     GROUPBOX        "証明書認証",IDC_STATIC,26,193,222,55
-    ICON            ICO_CERT,IDC_STATIC,33,202,18,18
+    ICON            ICO_CERT,IDC_STATIC,33,202,20,20
     LTEXT           "証明書認証を使用する場合は、[参照] をクリックして PKCS#12 形式の証明書ファイル (.p12 または .pfx) を指定してください。",S_S4,61,204,183,19
     EDITTEXT        E_CERTPATH,61,227,141,12,ES_AUTOHSCROLL
     PUSHBUTTON      "参照(&B)...",B_BROWSE,205,225,39,16
     GROUPBOX        "スマートカード認証",IDC_STATIC,26,254,222,100
-    ICON            ICO_SECURE,IDC_STATIC,32,264,18,18
+    ICON            ICO_SECURE,IDC_STATIC,32,264,20,20
     LTEXT           "1. 認証に使用するスマートカードを選択してください。",S_SMARTCARD_DEVICE,58,268,179,20
     PUSHBUTTON      "スマートカードの選択(&E)...",B_SELECT_SMARTCARD,59,288,95,16
     LTEXT           "2. スマートカード内の証明書と秘密鍵を指定してください。",S_CERT_STR,58,312,179,10

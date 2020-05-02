@@ -869,7 +869,7 @@ void DuAuthDlgInit(HWND hWnd, DU_AUTH *a)
 
 			DlgFont(hWnd, S_CERT_AND_KEY, 0, true);
 
-			DuAuthDlgUpdate(hWnd, a);
+			//DuAuthDlgUpdate(hWnd, a);
 
 			if (IsEmpty(hWnd, E_USERNAME) == false)
 			{
@@ -879,7 +879,14 @@ void DuAuthDlgInit(HWND hWnd, DU_AUTH *a)
 				}
 				else
 				{
-					Focus(hWnd, B_SELECT_SCARD_CERT);
+					if (IsEmptyStr(aa->SecureCertName) == false && IsEmptyStr(aa->SecureKeyName) == false)
+					{
+						Focus(hWnd, IDOK);
+					}
+					else
+					{
+						Focus(hWnd, B_SELECT_SCARD_CERT);
+					}
 				}
 			}
 			else
@@ -1056,9 +1063,45 @@ void DuAuthDlgOnOk(HWND hWnd, DU_AUTH *a)
 
 	if (IsChecked(hWnd, C_SMARTCARD))
 	{
+		bool ok = false;
+		SECURE_SIGN sign;
+
 		ad.SecureDeviceId = a->SecureDeviceId;
 		StrCpy(ad.SecureCertName, sizeof(ad.SecureCertName), a->SecureCertName);
 		StrCpy(ad.SecureKeyName, sizeof(ad.SecureKeyName), a->SecureKeyName);
+
+		Zero(&sign, sizeof(sign));
+
+		StrCpy(sign.SecurePublicCertName, sizeof(sign.SecurePublicCertName), ad.SecureCertName);
+		StrCpy(sign.SecurePrivateKeyName, sizeof(sign.SecurePrivateKeyName), ad.SecureKeyName);
+		Copy(sign.Random, a->Auth.InRand, sizeof(sign.Random));
+		sign.UseSecureDeviceId = a->SecureDeviceId;
+
+		ok = Win32CiSecureSign(&sign);
+
+		if (ok)
+		{
+			BUF *x_buf = XToBuf(sign.ClientCert, false);
+
+			if (x_buf != NULL && x_buf->Size <= DC_MAX_SIZE_CERT && sign.ClientCert->is_compatible_bit)
+			{
+				Copy(aa.RetCertData, x_buf->Buf, x_buf->Size);
+				aa.RetCertSize = x_buf->Size;
+
+				Copy(aa.RetSignedData, sign.Signature, sign.ClientCert->bits / 8);
+				aa.RetSignedDataSize = sign.ClientCert->bits / 8;
+			}
+
+			FreeBuf(x_buf);
+		}
+
+		FreeRpcSecureSign(&sign);
+
+		if (ok == false)
+		{
+			// 署名失敗
+			return;
+		}
 	}
 	
 	StrCpy(ad.Username, sizeof(ad.Username), aa.RetUsername);
@@ -1245,6 +1288,8 @@ bool DuAuthDlg(HWND hWnd, DU_MAIN *t, char *pcid, DC_AUTH *auth)
 	a.Dc = a.Du->Dc;
 
 	StrCpy(a.Pcid, sizeof(a.Pcid), pcid);
+
+	Copy(a.Auth.InRand, auth->InRand, SHA1_SIZE);
 
 	ret = Dialog(hWnd, D_DU_AUTH, DuAuthDlgProc, &a);
 

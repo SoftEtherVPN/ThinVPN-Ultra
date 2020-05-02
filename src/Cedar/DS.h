@@ -127,6 +127,8 @@ struct DS
 	UINT64 LastOtpExpires;				// 最後に発行された OTP の有効期限
 	UINT OtpNumTry;						// OTP が試された回数
 
+	UCHAR SmartCardTicket[SHA1_SIZE];	// スマートカード認証済みトークン
+
 	DS_POLICY_CLIENT *PolicyClient;		// ポリシークライアント
 };
 
@@ -211,6 +213,7 @@ void DsDecryptPassword(BUF *b, char *str, UINT str_size);
 UINT DtcConnect(char *password, RPC **rpc);
 void DsServerMain(DS *ds, SOCKIO *sock);
 void DsSendError(SOCKIO *sock, UINT error_code);
+void DsSendErrorEx(SOCKIO *sock, UINT error_code, char *add_value_name, UCHAR *add_value_data, UINT data_size);
 SOCK *DsConnectToLocalHostService(UINT svc_type, UINT rdp_port);
 UINT DsGetRdpPortFromRegistry();
 void DsLog(DS *ds, char *name, ...);
