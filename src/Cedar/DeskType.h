@@ -26,6 +26,7 @@ typedef struct DS_POLICY_THREAD_CTX DS_POLICY_THREAD_CTX;
 typedef struct DS_POLICY_BODY DS_POLICY_BODY;
 
 // DC.h
+typedef struct DC_INSPECT DC_INSPECT;
 typedef struct DC_ADVAUTH DC_ADVAUTH;
 typedef struct DC DC;
 typedef struct DC_AUTH DC_AUTH;
@@ -33,6 +34,7 @@ typedef bool (DC_AUTH_CALLBACK)(DC *dc, DC_AUTH *dc_auth, void *param);
 typedef struct DC_SESSION DC_SESSION;
 typedef bool (DC_PASSWORD_CALLBACK)(DC_SESSION *s, char *password, UINT password_max_size);
 typedef bool (DC_OTP_CALLBACK)(DC *dc, char *otp, UINT otp_max_size, DC_SESSION *param);
+typedef bool (DC_INSPECT_CALLBACK)(DC *dc, DC_INSPECT *ins, DC_SESSION *param);
 typedef bool (DC_ADVAUTH_CALLBACK)(DC_SESSION *s, DC_AUTH *auth);
 typedef void (DC_EVENT_CALLBACK)(DC_SESSION *s, UINT event_type, void *event_param);
 typedef struct DC_LISTENED_SOCK_THREAD_PARAM DC_LISTENED_SOCK_THREAD_PARAM;

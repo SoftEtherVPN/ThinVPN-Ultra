@@ -1214,7 +1214,7 @@ void dc(UINT num, char **arg)
 		DcDownloadMstsc(dc, NULL, NULL);
 	}
 
-	NewDcSession(dc, pcid, dc_password_cb, NULL, NULL, dc_event_cb,
+	NewDcSession(dc, pcid, dc_password_cb, NULL, NULL, dc_event_cb, NULL,
 		NULL, &s);
 
 	ret = DcSessionConnect(s);

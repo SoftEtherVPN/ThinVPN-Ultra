@@ -2143,7 +2143,8 @@ void DcConnectThread(THREAD *thread, void *param)
 			// 接続
 			ret = DcConnectEx(s->Dc, s, s->Pcid, DcSessionConnectAuthCallback2,
 				s, url, sizeof(url), false, &io, false, msg, sizeof(msg),
-				DcSessionConnectOtpCallback2, s);
+				DcSessionConnectOtpCallback2, s,
+				DcSessionConnectInspectionCallback2, s);
 
 			if (ret == ERR_NO_ERROR)
 			{
@@ -2202,7 +2203,8 @@ UINT DcSessionConnect(DC_SESSION *s)
 	// 1 個目のセッションを接続
 	ret = DcConnectEx(s->Dc, s, s->Pcid, DcSessionConnectAuthCallback1, s,
 		url, sizeof(url), true, &io, true, msg, sizeof(msg),
-		DcSessionConnectOtpCallback1, s);
+		DcSessionConnectOtpCallback1, s,
+		DcSessionConnectInspectionCallback1, s);
 
 	if (ret != ERR_NO_ERROR)
 	{
@@ -2233,6 +2235,38 @@ UINT DcSessionConnect(DC_SESSION *s)
 	s->ConnectThread = NewThread(DcConnectThread, s);
 
 	return ERR_NO_ERROR;
+}
+
+// 1 回目の検疫コールバック関数
+bool DcSessionConnectInspectionCallback1(DC *dc, DC_INSPECT *ins, void *param)
+{
+	DC_SESSION *s;
+	// 引数チェック
+	if (dc == NULL || ins == NULL || param == NULL)
+	{
+		return false;
+	}
+
+	s = (DC_SESSION *)param;
+
+	return s->InspectionCallback(dc, ins, s);
+}
+
+// 2 回目の検疫コールバック関数
+bool DcSessionConnectInspectionCallback2(DC *dc, DC_INSPECT *ins, void *param)
+{
+	DC_SESSION *s;
+	// 引数チェック
+	if (dc == NULL || ins == NULL || param == NULL)
+	{
+		return false;
+	}
+
+	s = (DC_SESSION *)param;
+
+	StrCpy(ins->Ticket, sizeof(ins->Ticket), s->InspectionTicket);
+
+	return true;
 }
 
 // 1 回目の OTP コールバック関数
@@ -2379,7 +2413,7 @@ bool DcSessionConnectAuthCallback2(DC *dc, DC_AUTH *auth, void *param)
 }
 
 // 新しいセッション
-UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_OTP_CALLBACK *otp_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback,
+UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_OTP_CALLBACK *otp_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback, DC_INSPECT_CALLBACK *inspect_callback,
 				  void *param, DC_SESSION **session)
 {
 	DC_SESSION *s;
@@ -2407,6 +2441,7 @@ UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, D
 	s->OtpCallback = otp_callback;
 	s->AdvAuthCallback = advauth_callback;
 	s->EventCallback = event_callback;
+	s->InspectionCallback = inspect_callback;
 	DcGetBestHostnameForPcid(s->Hostname, sizeof(s->Hostname), pcid);
 	StrCpy(s->Pcid, sizeof(s->Pcid), pcid);
 	Trim(s->Pcid);
@@ -2524,7 +2559,7 @@ void DcSetLocalHostAllowFlag(bool allow)
 }
 
 // 接続メイン
-UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param)
+UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param, DC_INSPECT_CALLBACK *ins_callback, DC_SESSION *ins_callback_param)
 {
 #ifdef	OS_WIN32
 	PACK *p;
@@ -2538,6 +2573,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	bool is_share_disabled = false;
 	bool use_advanced_security = false;
 	bool is_otp_enabled = false;
+	bool run_inspect = false;
 	UCHAR smart_card_ticket[SHA1_SIZE];
 	// 引数チェック
 	if (dc == NULL || sock == NULL || pcid == NULL || auth_callback == NULL)
@@ -2559,6 +2595,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	PackAddBool(p, "HasURDP2Client", MsIsWinXPOrWinVista() && dc->EnableVersion2);
 	PackAddBool(p, "SupportOtp", true);
 	PackAddBool(p, "SupportOtpEnforcement", true);
+	PackAddBool(p, "SupportInspect", true);
 	b = SockIoSendPack(sock, p);
 	FreePack(p);
 
@@ -2584,6 +2621,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	is_share_disabled = PackGetBool(p, "IsShareDisabled");
 	use_advanced_security = PackGetBool(p, "UseAdvancedSecurity");
 	is_otp_enabled = PackGetBool(p, "IsOtpEnabled");
+	run_inspect = PackGetBool(p, "RunInspect");
 	FreePack(p);
 	if (ret != ERR_NO_ERROR)
 	{
@@ -2655,6 +2693,64 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 					if (dcs != NULL)
 					{
 						StrCpy(dcs->OtpTicket, sizeof(dcs->OtpTicket), otp_ticket);
+					}
+				}
+			}
+		}
+		FreePack(p);
+
+		if (ret != ERR_NO_ERROR)
+		{
+			// エラー発生
+			return ret;
+		}
+	}
+
+	if (run_inspect)
+	{
+		// 検疫を実施する
+		DC_INSPECT ins;
+		Zero(&ins, sizeof(ins));
+
+		if (ins_callback == NULL || ins_callback(dc, &ins, ins_callback_param) == false)
+		{
+			// ユーザーキャンセル
+			return ERR_USER_CANCEL;
+		}
+
+		// 結果送信
+		p = NewPack();
+		PackAddBool(p, "AntiVirusOk", ins.AntiVirusOk);
+		PackAddBool(p, "WindowsUpdateOk", ins.WindowsUpdateOk);
+		PackAddStr(p, "MacAddressList", ins.MacAddressList);
+		PackAddStr(p, "Ticket", ins.Ticket);
+
+		b = SockIoSendPack(sock, p);
+		FreePack(p);
+
+		if (b == false)
+		{
+			return ERR_DISCONNECTED;
+		}
+		// OTP 結果受信
+		p = SockIoRecvPack(sock);
+		if (p == NULL)
+		{
+			return ERR_DISCONNECTED;
+		}
+		ret = GetErrorFromPack(p);
+		if (ret == ERR_NO_ERROR)
+		{
+			// 認証成功時はチケットを受け取っているので、それを保存
+			char ticket[64];
+
+			if (PackGetStr(p, "InspectionTicket", ticket, sizeof(ticket)))
+			{
+				if (IsEmptyStr(ticket) == false)
+				{
+					if (dcs != NULL)
+					{
+						StrCpy(dcs->InspectionTicket, sizeof(dcs->InspectionTicket), ticket);
 					}
 				}
 			}
@@ -2894,7 +2990,8 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 
 // 接続
 UINT DcConnectEx(DC *dc, DC_SESSION *dcs, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, char *ret_url, UINT ret_url_size, bool check_port,
-				 SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param)
+				 SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param,
+				 DC_INSPECT_CALLBACK *ins_callback, DC_SESSION *ins_callback_param)
 {
 	SOCKIO *sock;
 	UINT ret;
@@ -2924,7 +3021,9 @@ UINT DcConnectEx(DC *dc, DC_SESSION *dcs, char *pcid, DC_AUTH_CALLBACK *auth_cal
 	}
 
 	// 接続メイン
-	ret = DcConnectMain(dc, dcs, sock, pcid, auth_callback, callback_param, check_port, first_connection, otp_callback, otp_callback_param);
+	ret = DcConnectMain(dc, dcs, sock, pcid, auth_callback, callback_param,
+		check_port, first_connection, otp_callback, otp_callback_param,
+		ins_callback, ins_callback_param);
 
 	if (ret == ERR_NO_ERROR)
 	{

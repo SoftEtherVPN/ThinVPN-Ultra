@@ -1526,6 +1526,14 @@ BEGIN
         TOPMARGIN, 5
         BOTTOMMARGIN, 293
     END
+
+    D_DU_INSPECT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 259
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 118
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -5518,6 +5526,16 @@ BEGIN
     LTEXT           "「MAC アドレス」とは、端末に内蔵されているハードウェア固有のアドレスです。予めクライアントコンピュータの画面で確認しておいたものを、正確に入力する必要があります。1 文字でも異なっていると、接続が許可されません。\r\n\r\nクライアント端末の Windows の「コマンド プロンプト」を開き、\r\n> ipconfig /all\r\nと入力することで、MAC アドレスを確認できます。",S_INFO,39,198,222,64
     DEFPUSHBUTTON   "&OK",IDOK,131,276,64,17
     PUSHBUTTON      "キャンセル",IDCANCEL,203,276,64,17
+END
+
+D_DU_INSPECT DIALOGEX 0, 0, 266, 125
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "NTT 東日本 - IPA 「シン・テレワークシステム」 - クライアント検疫"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    ICON            ICO_SHIELD,IDC_STATIC,7,7,20,20
+    LTEXT           "接続先の NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 の設定に基づき、クライアント検疫処理を実行しています。しばらくお待ちください...\r\n\r\n「クライアント検疫機能」は、下記を検証します:",S_INFO,30,7,229,42
+    LTEXT           "- アンチウイルスソフトウェアがインストールされ、最新のパターンファイルがインストールされていることを検証します。\r\n\r\n- 最近の Windows Update が適用されていることを検証します。\r\n\r\n- クライアント MAC アドレス認証により、端末の MAC アドレスがサーバー側に登録されていることを検証します。",S_BOLD,30,47,229,71
 END
 
 

@@ -70,6 +70,7 @@ struct DC_SESSION
 	SOCK *Listener;						// リスナー
 	DC_PASSWORD_CALLBACK *PasswordCallback;	// パスワードコールバック
 	DC_OTP_CALLBACK *OtpCallback;		// OTP コールバック
+	DC_INSPECT_CALLBACK *InspectionCallback;	// 検疫コールバック
 	DC_ADVAUTH_CALLBACK *AdvAuthCallback;	// 新しい認証方法のコールバック
 	DC_EVENT_CALLBACK *EventCallback;	// イベントコールバック
 	char Hostname[MAX_PATH];			// 接続先ホスト名
@@ -92,6 +93,7 @@ struct DC_SESSION
 	UINT ProcessIdOfClient;				// クライアントソフトウェアのプロセス ID
 	char OtpTicket[MAX_PATH];			// OTP チケット
 	UCHAR SmartCardTicket[SHA1_SIZE];	// スマートカード認証済みチケット
+	char InspectionTicket[64];			// インスペクション済みチケット
 };
 
 // 拡張認証データ
@@ -105,6 +107,15 @@ struct DC_ADVAUTH
 	UINT SecureDeviceId;				// スマートカードデバイス ID
 	char SecureCertName[MAX_PATH];		// スマートカード証明書名
 	char SecureKeyName[MAX_PATH];		// スマートカード秘密鍵名
+};
+
+// 検疫結果
+struct DC_INSPECT
+{
+	bool AntiVirusOk;
+	bool WindowsUpdateOk;
+	char MacAddressList[1024];
+	char Ticket[64];
 };
 
 // DC
@@ -138,10 +149,11 @@ void FreeDc(DC *dc);
 void DcGetInternetSetting(DC *dc, INTERNET_SETTING *setting);
 void DcSetInternetSetting(DC *dc, INTERNET_SETTING *setting);
 UINT DcConnectEx(DC *dc, DC_SESSION *dcs, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, char *ret_url, UINT ret_url_size, bool check_port,
-			   SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param);
-UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param);
+				 SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param,
+				 DC_INSPECT_CALLBACK *ins_callback, DC_SESSION *ins_callback_param);
+UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param, DC_INSPECT_CALLBACK *ins_callback, DC_SESSION *ins_callback_param);
 void DcSetLocalHostAllowFlag(bool allow);
-UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_OTP_CALLBACK *otp_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback,
+UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_OTP_CALLBACK *otp_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback, DC_INSPECT_CALLBACK *inspect_callback,
 				  void *param, DC_SESSION **session);
 UINT DcSessionConnect(DC_SESSION *s);
 void ReleaseDcSession(DC_SESSION *s);
@@ -153,6 +165,8 @@ bool DcSessionConnectAuthCallback1(DC *dc, DC_AUTH *auth, void *param);
 bool DcSessionConnectAuthCallback2(DC *dc, DC_AUTH *auth, void *param);
 bool DcSessionConnectOtpCallback1(DC *dc, char *otp, UINT otp_max_size, void *param);
 bool DcSessionConnectOtpCallback2(DC *dc, char *otp, UINT otp_max_size, void *param);
+bool DcSessionConnectInspectionCallback1(DC *dc, DC_INSPECT *ins, void *param);
+bool DcSessionConnectInspectionCallback2(DC *dc, DC_INSPECT *ins, void *param);
 void DcListenThread(THREAD *thread, void *param);
 void DcListenedSockThread(THREAD *thread, void *param);
 void DcConnectThread(THREAD *thread, void *param);

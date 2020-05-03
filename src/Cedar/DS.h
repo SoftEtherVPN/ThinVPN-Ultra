@@ -122,6 +122,7 @@ struct DS
 	char OtpEmail[MAX_PATH];			// OTP 送付先メールアドレス
 
 	char OtpTicket[MAX_PATH];			// OTP チケット。2 回目以降の認証時に利用可能
+	char InspectionTicket[MAX_PATH];	// 検疫チケット。2 回目以降の認証時に利用可能
 
 	char LastOtp[MAX_PATH];				// 最後に発行された OTP
 	UINT64 LastOtpExpires;				// 最後に発行された OTP の有効期限

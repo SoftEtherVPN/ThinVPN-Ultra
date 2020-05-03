@@ -125,6 +125,7 @@ void DuDownloadDlgPrintStatus(HWND hWnd, UINT current, UINT total);
 bool DuPasswordCallback(DC_SESSION *s, char *password, UINT password_max_size);
 bool DuAdvAuthCallback(DC_SESSION *s, DC_AUTH *auth);
 bool DuEventCallback(DC_SESSION *s, UINT event_type, void *event_param);
+bool DuInspectionCallback(DC *dc, DC_INSPECT *ins, DC_SESSION *dcs);
 
 bool DuPasswordDlg(HWND hWnd, char *password, UINT password_size, char *hostname);
 UINT DuPasswordDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);

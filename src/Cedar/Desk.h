@@ -73,6 +73,10 @@
 #define ERR_DESK_PASSWORD_NOT_SET		323		// パスワード未設定
 #define ERR_DESK_OTP_INVALID			324		// OTP 間違い
 #define ERR_DESK_OTP_ENFORCED_BUT_NO	325		// OTP がポリシー強制なのに設定されていてない
+#define ERR_DESK_INSPECTION_AVS_ERROR	326		// 検疫 AVS エラー
+#define ERR_DESK_INSPECTION_WU_ERROR	327		// 検疫 Windows Update エラー
+#define ERR_DESK_INSPECTION_MAC_ERROR	328		// MAC エラー
+
 
 
 

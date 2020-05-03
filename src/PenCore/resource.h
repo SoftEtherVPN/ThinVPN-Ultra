@@ -228,7 +228,6 @@
 #define ICO_WIN95NET                    246
 #define IDB_BITMAP3                     247
 #define BMP_OTP                         247
-#define IDI_ICON4                       248
 #define ICO_SHIELD                      248
 #define S_TITLE                         1007
 #define S_INSERT_SECURE                 1008
@@ -1327,6 +1326,8 @@
 #define D_DC_OTP                        2649
 #define D_DU_OTP                        2649
 #define D_DG_MAC                        2650
+#define D_DU_CONNECT1                   2651
+#define D_DU_INSPECT                    2651
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021

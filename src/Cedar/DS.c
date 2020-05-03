@@ -967,9 +967,11 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bool support_otp = false;
 	bool support_otp_enforcement = false;
 	bool is_smartcard_auth = false;
+	bool support_inspect = false;
 	UINT ds_caps = 0;
 	UINT urdp_version = 0;
 	DS_POLICY_BODY pol = {0};
+	bool run_inspect = false;
 	// 引数チェック
 	if (ds == NULL || sock == NULL)
 	{
@@ -1030,6 +1032,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	has_urdp2_client = PackGetBool(p, "HasURDP2Client");
 	support_otp = PackGetBool(p, "SupportOtp");
 	support_otp_enforcement = PackGetBool(p, "SupportOtpEnforcement");
+	support_inspect = PackGetBool(p, "SupportInspect");
 
 	if (MsIsWinXPOrWinVista() == false)
 	{
@@ -1077,6 +1080,17 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			DsSendError(sock, ERR_DESK_OTP_ENFORCED_BUT_NO);
 		}
 		return;
+	}
+
+	if (ds->EnableInspection || ds->EnableMacCheck)
+	{
+		run_inspect = true;
+
+		if (support_inspect == false)
+		{
+			// クライアント検疫が設定されているのに対応していないバージョンのクライアント
+			DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+		}
 	}
 
 	if (ds->UseAdvancedSecurity)
@@ -1232,6 +1246,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	PackAddBool(p, "IsShareDisabled", is_share_disabled);
 	PackAddBool(p, "UseAdvancedSecurity", ds->UseAdvancedSecurity);
 	PackAddBool(p, "IsOtpEnabled", ds->EnableOtp);
+	PackAddBool(p, "RunInspect", run_inspect);
 	ret = SockIoSendPack(sock, p);
 	FreePack(p);
 
@@ -1302,6 +1317,67 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		p = PackError(ERR_NO_ERROR);
 
 		PackAddStr(p, "OtpTicket", ds->OtpTicket);
+
+		SockIoSendPack(sock, p);
+
+		FreePack(p);
+	}
+
+	// クライアント検疫処理の実行
+	if (run_inspect)
+	{
+		DC_INSPECT ins;
+		// クライアントからの DC_INSPECT を受信する
+		p = SockIoRecvPack(sock);
+		if (p == NULL)
+		{
+			DsSendError(sock, ERR_PROTOCOL_ERROR);
+			return;
+		}
+
+		Zero(&ins, sizeof(ins));
+
+		ins.AntiVirusOk = PackGetBool(p, "AntiVirusOk");
+		ins.WindowsUpdateOk = PackGetBool(p, "WindowsUpdateOk");
+		PackGetStr(p, "MacAddressList", ins.MacAddressList, sizeof(ins.MacAddressList));
+		PackGetStr(p, "Ticket", ins.Ticket, sizeof(ins.Ticket));
+
+		FreePack(p);
+
+		if (StrCmpi(ins.Ticket, ds->InspectionTicket) == 0)
+		{
+			// チケットで OK
+		}
+		else
+		{
+			// 結果を吟味
+			if (ds->EnableInspection)
+			{
+				if (ins.AntiVirusOk == false)
+				{
+					DsSendError(sock, ERR_DESK_INSPECTION_AVS_ERROR);
+					return;
+				}
+				if (ins.WindowsUpdateOk == false)
+				{
+					DsSendError(sock, ERR_DESK_INSPECTION_WU_ERROR);
+					return;
+				}
+			}
+			if (ds->EnableMacCheck)
+			{
+				if (CheckStrListIncludedInOtherStrMac(ds->MacAddressList, ins.MacAddressList) == false)
+				{
+					DsSendError(sock, ERR_DESK_INSPECTION_MAC_ERROR);
+					return;
+				}
+			}
+		}
+
+		// OK
+		p = PackError(ERR_NO_ERROR);
+
+		PackAddStr(p, "InspectionTicket", ds->InspectionTicket);
 
 		SockIoSendPack(sock, p);
 
@@ -3587,6 +3663,8 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 	Rand(ds->SmartCardTicket, SHA1_SIZE);
 
 	DsGenerateNewOtp(ds->OtpTicket, sizeof(ds->OtpTicket), 128);
+
+	DsGenerateNewOtp(ds->InspectionTicket, sizeof(ds->InspectionTicket), 48);
 
 	ds->History = NewList(NULL);
 

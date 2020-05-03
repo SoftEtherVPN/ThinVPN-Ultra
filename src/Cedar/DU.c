@@ -755,6 +755,33 @@ bool DuPasswordCallback(DC_SESSION *s, char *password, UINT password_max_size)
 	return true;
 }
 
+// 検疫 コールバック
+bool DuInspectionCallback(DC *dc, DC_INSPECT *ins, DC_SESSION *dcs)
+{
+	DU_MAIN *t;
+	HWND hWnd;
+	// 引数チェック
+	if (dc == NULL || dcs == NULL || ins == NULL)
+	{
+		return false;
+	}
+
+	t = (DU_MAIN *)dcs->Param;
+
+	hWnd = t->hWnd;
+
+	//if (DuOtpDlg(hWnd, otp, otp_max_size, dcs->Pcid) == false)
+	//{
+	//	return false;
+	//}
+
+	ins->AntiVirusOk = true;
+	ins->WindowsUpdateOk = true;
+	StrCpy(ins->MacAddressList,0, "00-00-00-11-10-10\n00-00-00-11-11-10\n00-00-00-22-11-10");
+
+	return true;
+}
+
 // OTP コールバック
 bool DuOtpCallback(DC *dc, char *otp, UINT otp_max_size, DC_SESSION *dcs)
 {
@@ -1362,7 +1389,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 	}
 
 	// セッション接続
-	ret = NewDcSession(dc, pcid, DuPasswordCallback, DuOtpCallback, DuAdvAuthCallback, DuEventCallback, t, &s);
+	ret = NewDcSession(dc, pcid, DuPasswordCallback, DuOtpCallback, DuAdvAuthCallback, DuEventCallback, DuInspectionCallback, t, &s);
 	if (ret != ERR_NO_ERROR)
 	{
 		MsgBox(hWnd, MB_ICONEXCLAMATION, _E(ret));
