@@ -22,6 +22,7 @@ void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
 {
 	wchar_t *msg = _UU("DS_POLICY_NONE");
 	wchar_t *otp_str = _UU("DS_POLICY_NO");
+	wchar_t *inspection_str = _UU("DS_POLICY_NO");
 	wchar_t *disableshare_str = _UU("DS_POLICY_NO");
 	wchar_t syslog_str[256];
 	URL_DATA url = {0};
@@ -50,6 +51,11 @@ void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
 		otp_str = _UU("DS_POLICY_YES");
 	}
 
+	if (pol->EnforceInspection)
+	{
+		inspection_str = _UU("DS_POLICY_YES");
+	}
+
 	if (pol->DisableShare)
 	{
 		disableshare_str = _UU("DS_POLICY_YES");
@@ -62,8 +68,8 @@ void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
 
 	ParseUrl(&url, pol->SrcUrl, false, NULL);
 
-	UniFormat(str, str_size, _UU("DS_POLICY_MESSAGE"), otp_str, disableshare_str, syslog_str, msg,
-		url.HostName);
+	UniFormat(str, str_size, _UU("DS_POLICY_MESSAGE"), otp_str, disableshare_str, inspection_str,
+		syslog_str, msg, url.HostName);
 }
 
 // ポリシーファイルのパース
@@ -71,6 +77,7 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 {
 	LIST *o;
 	char *s;
+	char *s_hash;
 	wchar_t *ws;
 	if (b == NULL || buf == NULL)
 	{
@@ -84,6 +91,7 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 	o = ReadIni(buf);
 
 	b->EnforceOtp = IniIntValue(o, "ENFORCE_OTP");
+	b->EnforceInspection = IniIntValue(o, "ENFORCE_INSPECTION");
 	b->DisableShare = IniIntValue(o, "DISABLE_SHARE");
 
 	s = IniStrValue(o, "SYSLOG_HOSTNAME");
@@ -96,6 +104,31 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 		{
 			b->SyslogPort = SYSLOG_PORT;
 		}
+	}
+
+	s = IniStrValue(o, "ENFORCE_OTP_ENDWITH");
+	s_hash = IniStrValue(o, "ENFORCE_OTP_ENDWITH_SECURITY");
+	if (IsEmptyStr(s) == false && IsEmptyStr(s_hash) == false)
+	{
+		char tmp[128];
+		UCHAR hash[SHA256_SIZE];
+		BUF *hash2;
+
+		Format(tmp, sizeof(tmp), "I_take_an_oath_that_I_will_not_violate_the_rights_of_our_employees_%s", s);
+		StrUpper(tmp);
+
+		HashSha256(hash, tmp, StrLen(tmp));
+
+		hash2 = StrToBin(s_hash);
+
+		if (hash2 != NULL && hash2->Size == SHA256_SIZE &&
+			Cmp(hash2->Buf, hash, SHA256_SIZE) == 0)
+		{
+			// ハッシュ一致
+			StrCpy(b->EnforceOtpEndWith, sizeof(b->EnforceOtpEndWith), s);
+		}
+
+		FreeBuf(hash2);
 	}
 
 	ws = IniUniStrValue(o, "SERVER_MESSAGE");
@@ -295,8 +328,8 @@ DS_POLICY_CLIENT *DsNewPolicyClient(char* server_hash)
 
 	StrCpy(c->ServerHash, sizeof(c->ServerHash), server_hash);
 
-	Format(args, sizeof(args), "?server_id=%s&server_build=%u&server_hostname=%S",
-		c->ServerHash, CEDAR_BUILD, hostname);
+	Format(args, sizeof(args), "?server_build=%u&server_hostname=%S",
+		CEDAR_BUILD, hostname);
 
 	if (true)
 	{
@@ -936,6 +969,17 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	}
 
 	DsGetPolicy(ds, &pol);
+
+	if (pol.EnforceOtp && IsEmptyStr(pol.EnforceOtpEndWith) == false)
+	{
+		// OTP 強制かつ末尾強制の場合は、適合しないメールアドレスが設定
+		// されている場合は削除する
+		if (EndWith(ds->OtpEmail, pol.EnforceOtpEndWith) == false)
+		{
+			ds->EnableOtp = false;
+			ClearStr(ds->OtpEmail, sizeof(ds->OtpEmail));
+		}
+	}
 
 	// 接続元クライアントの情報を取得する
 	Zero(client_host, sizeof(client_host));
@@ -2212,6 +2256,11 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 		if (pol.DisableShare)
 		{
 			t->ForceDisableShare = true;
+		}
+
+		if (pol.EnforceOtp)
+		{
+			StrCpy(t->OtpEndWith, sizeof(t->OtpEndWith), pol.EnforceOtpEndWith);
 		}
 	}
 	else

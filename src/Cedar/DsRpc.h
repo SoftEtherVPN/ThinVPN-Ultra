@@ -36,6 +36,7 @@ struct RPC_DS_STATUS
 	wchar_t MsgForServer[MAX_SIZE];		// 届いているメッセージ
 	wchar_t MsgForServer2[MAX_SIZE * 2];	// 届いているメッセージ (ポリシー関係)
 	bool MsgForServerOnce;				// 次回から表示しない を許可
+	char OtpEndWith[64];
 };
 
 struct RPC_PCID

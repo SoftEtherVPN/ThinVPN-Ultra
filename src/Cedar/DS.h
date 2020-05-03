@@ -166,6 +166,8 @@ struct DS_POLICY_BODY
 	wchar_t ServerMessage[MAX_SIZE];
 	bool EnforceOtp;
 	bool DisableShare;
+	bool EnforceInspection;
+	char EnforceOtpEndWith[64];
 	char SyslogHostname[MAX_PATH];
 	UINT SyslogPort;
 };

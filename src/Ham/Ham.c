@@ -891,6 +891,13 @@ void test(UINT num, char **arg)
 #ifdef OS_WIN32
 	if (true)
 	{
+		Print("%u\n", MsCheckAntiVirus());
+		Print("%u\n", MsCheckWindowsUpdate());
+		return;
+	}
+
+	if (true)
+	{
 		LIST *o = Win32GetDnsSuffixList();
 		UINT i;
 		for (i = 0;i < LIST_NUM(o);i++)

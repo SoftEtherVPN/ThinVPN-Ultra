@@ -1174,6 +1174,9 @@ UINT64 MsGetSuspendModeBeginTick();
 
 UINT64 MsGetCurrentFileTime();
 
+bool MsCheckAntiVirus();
+bool MsCheckWindowsUpdate();
+
 // Inner functions
 #ifdef	MICROSOFT_C
 

@@ -322,6 +322,118 @@ void MsInitProcessCallOnce(bool restricted_mode)
 	}
 }
 
+bool MsCheckWindowsUpdate()
+{
+	wchar_t *batch_src_filename = L"|CheckWindowsUpdate.vbs";
+	wchar_t *tmp_filename = L"CheckWindowsUpdate.vbs";
+	wchar_t batch_tmp_filename[MAX_PATH] = {0};
+	wchar_t cscript_exe[MAX_PATH] = {0};
+	wchar_t tmp[MAX_SIZE];
+	bool ret = false;
+	void *process = NULL;
+
+	if (MsIsNt() == false)
+	{
+		goto L_CLEANUP;
+	}
+
+	if (MsIsVista() == false)
+	{
+		goto L_CLEANUP;
+	}
+
+	CombinePathW(cscript_exe, sizeof(cscript_exe), MsGetSystem32DirW(), L"cscript.exe");
+
+	CombinePathW(batch_tmp_filename, sizeof(batch_tmp_filename), MsGetMyTempDirW(), tmp_filename);
+
+	if (FileCopyW(batch_src_filename, batch_tmp_filename) == false)
+	{
+		goto L_CLEANUP;
+	}
+
+	UniFormat(tmp, sizeof(tmp), L"\"%s\"", batch_tmp_filename);
+
+	process = Win32RunEx3W(cscript_exe, tmp, true, NULL, true);
+
+	if (process == NULL)
+	{
+		goto L_CLEANUP;
+	}
+
+	if (Win32WaitProcess(process, 60 * 1000))
+	{
+		DWORD exit_code = 0;
+
+		if (GetExitCodeProcess(process, &exit_code))
+		{
+			if (exit_code == 0)
+			{
+				ret = true;
+			}
+		}
+	}
+
+L_CLEANUP:
+	Win32CloseProcess(process);
+	return ret;
+}
+
+bool MsCheckAntiVirus()
+{
+	wchar_t *batch_src_filename = L"|CheckAntiVirus.vbs";
+	wchar_t *tmp_filename = L"CheckAntiVirus.vbs";
+	wchar_t batch_tmp_filename[MAX_PATH] = {0};
+	wchar_t cscript_exe[MAX_PATH] = {0};
+	wchar_t tmp[MAX_SIZE];
+	bool ret = false;
+	void *process = NULL;
+
+	if (MsIsNt() == false)
+	{
+		goto L_CLEANUP;
+	}
+
+	if (MsIsVista() == false)
+	{
+		goto L_CLEANUP;
+	}
+
+	CombinePathW(cscript_exe, sizeof(cscript_exe), MsGetSystem32DirW(), L"cscript.exe");
+
+	CombinePathW(batch_tmp_filename, sizeof(batch_tmp_filename), MsGetMyTempDirW(), tmp_filename);
+
+	if (FileCopyW(batch_src_filename, batch_tmp_filename) == false)
+	{
+		goto L_CLEANUP;
+	}
+
+	UniFormat(tmp, sizeof(tmp), L"\"%s\"", batch_tmp_filename);
+
+	process = Win32RunEx3W(cscript_exe, tmp, true, NULL, true);
+
+	if (process == NULL)
+	{
+		goto L_CLEANUP;
+	}
+
+	if (Win32WaitProcess(process, 60 * 1000))
+	{
+		DWORD exit_code = 0;
+
+		if (GetExitCodeProcess(process, &exit_code))
+		{
+			if (exit_code == 0)
+			{
+				ret = true;
+			}
+		}
+	}
+
+L_CLEANUP:
+	Win32CloseProcess(process);
+	return ret;
+}
+
 // Collect the information of the VPN software
 bool MsCollectVpnInfo(BUF *bat, char *tmpdir, char *svc_name, wchar_t *config_name, wchar_t *logdir_name)
 {
