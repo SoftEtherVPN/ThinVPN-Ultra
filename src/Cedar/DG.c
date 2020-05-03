@@ -70,6 +70,8 @@ UINT DgMacDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 			return 0;
 		}
 
+		SetFont(hWnd, E_TEXT, GetFont(MsIsWindows7() ? "Consolas" : "Arial", 12, false, false, false, false));
+
 		SetTextA(hWnd, E_TEXT, t.MacAddressList);
 
 		Focus(hWnd, E_TEXT);

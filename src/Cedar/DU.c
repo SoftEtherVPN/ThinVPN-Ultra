@@ -770,16 +770,68 @@ bool DuInspectionCallback(DC *dc, DC_INSPECT *ins, DC_SESSION *dcs)
 
 	hWnd = t->hWnd;
 
-	//if (DuOtpDlg(hWnd, otp, otp_max_size, dcs->Pcid) == false)
-	//{
-	//	return false;
-	//}
-
-	ins->AntiVirusOk = true;
-	ins->WindowsUpdateOk = true;
-	StrCpy(ins->MacAddressList,0, "00-00-00-11-10-10\n00-00-00-11-11-10\n00-00-00-22-11-10");
+	if (DuInspectionDlg(hWnd, ins) == false)
+	{
+		return false;
+	}
 
 	return true;
+}
+
+// 検疫ダイアログ
+bool DuInspectionDlg(HWND hWnd, DC_INSPECT *ins)
+{
+	if (ins == NULL)
+	{
+		return false;
+	}
+
+	return Dialog(hWnd, D_DU_INSPECT, DuInspectionDlgProc, ins);
+}
+
+// 検疫ダイアログプロシージャ
+UINT DuInspectionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	DC_INSPECT *ins = (DC_INSPECT *)param;
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		SetIcon(hWnd, 0, ICO_SHIELD);
+		DisableClose(hWnd);
+		SetTimer(hWnd, 1, 300, NULL);
+		break;
+
+	case WM_TIMER:
+		switch (wParam)
+		{
+		case 1:
+			{
+				KillTimer(hWnd, 1);
+
+				DoEvents(hWnd);
+				ins->AntiVirusOk = MsCheckAntiVirus();
+
+				DoEvents(hWnd);
+				ins->WindowsUpdateOk = MsCheckWindowsUpdate();
+
+				DoEvents(hWnd);
+				GetMacAddressListLocalComputer(ins->MacAddressList, sizeof(ins->MacAddressList));
+
+				DoEvents(hWnd);
+
+				EndDialog(hWnd, 1);
+
+				break;
+			}
+		}
+
+		break;
+
+	case WM_CLOSE:
+		break;
+	}
+
+	return 0;
 }
 
 // OTP コールバック

@@ -165,4 +165,7 @@ UINT DuTheEndDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 bool DuDialupDlg(HWND hWnd);
 UINT DuDialupDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 
+bool DuInspectionDlg(HWND hWnd, DC_INSPECT *ins);
+UINT DuInspectionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+
 

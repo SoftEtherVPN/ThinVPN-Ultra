@@ -734,7 +734,7 @@ void DsLogMain(DS *ds, UINT ds_log_type, char *name, va_list args)
 		if (IsEmptyStr(pol.SyslogHostname) == false && pol.SyslogPort != 0)
 		{
 			// 現在の設定と異なる？
-			if (StrCmpi(ss.Hostname, pol.SyslogHostname) != 0 || ss.Port != pol.SyslogPort)
+			if (StrCmpi(ss.Hostname, pol.SyslogHostname) != 0 || ss.Port != pol.SyslogPort || ss.SaveType != 1)
 			{
 				// ポリシーで Syslog が指定されている場合はこれを強制適用する
 				Zero(&ss, sizeof(ss));

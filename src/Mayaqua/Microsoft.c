@@ -459,6 +459,7 @@ bool MsCheckAntiVirus()
 			}
 		}
 	}
+	//ret=true;//TODO
 
 L_CLEANUP:
 	Win32CloseProcess(process);

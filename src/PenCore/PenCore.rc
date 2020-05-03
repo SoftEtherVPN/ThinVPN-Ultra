@@ -1530,9 +1530,9 @@ BEGIN
     D_DU_INSPECT, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 259
+        RIGHTMARGIN, 260
         TOPMARGIN, 7
-        BOTTOMMARGIN, 118
+        BOTTOMMARGIN, 51
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -5528,14 +5528,13 @@ BEGIN
     PUSHBUTTON      "キャンセル",IDCANCEL,203,276,64,17
 END
 
-D_DU_INSPECT DIALOGEX 0, 0, 266, 125
+D_DU_INSPECT DIALOGEX 0, 0, 267, 58
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "NTT 東日本 - IPA 「シン・テレワークシステム」 - クライアント検疫"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    ICON            ICO_SHIELD,IDC_STATIC,7,7,20,20
-    LTEXT           "接続先の NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 の設定に基づき、クライアント検疫処理を実行しています。しばらくお待ちください...\r\n\r\n「クライアント検疫機能」は、下記を検証します:",S_INFO,30,7,229,42
-    LTEXT           "- アンチウイルスソフトウェアがインストールされ、最新のパターンファイルがインストールされていることを検証します。\r\n\r\n- 最近の Windows Update が適用されていることを検証します。\r\n\r\n- クライアント MAC アドレス認証により、端末の MAC アドレスがサーバー側に登録されていることを検証します。",S_BOLD,30,47,229,71
+    ICON            ICO_SHIELD,IDC_STATIC,7,19,18,18
+    LTEXT           "接続先の NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 の設定に基づき、クライアント端末のセキュリティチェックを実行しています。しばらくお待ちください...",S_INFO,31,19,229,27
 END
 
 
