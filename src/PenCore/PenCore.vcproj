@@ -577,6 +577,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Shield.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\SpecialListener.bmp"
 				>
 			</File>

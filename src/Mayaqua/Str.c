@@ -237,9 +237,9 @@ bool NormalizeMacAddressListStr(char *dst, UINT size, char *src)
 	LIST *o = NULL;
 	UINT i;
 
-	ClearStr(dst, size);
 	if (dst == NULL || src == NULL)
 	{
+		ClearStr(dst, size);
 		return false;
 	}
 
@@ -273,6 +273,8 @@ bool NormalizeMacAddressListStr(char *dst, UINT size, char *src)
 	}
 
 	FreeBuf(buf);
+
+	ClearStr(dst, size);
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{

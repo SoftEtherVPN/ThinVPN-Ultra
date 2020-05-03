@@ -24,6 +24,7 @@ void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
 	wchar_t *otp_str = _UU("DS_POLICY_NO");
 	wchar_t *inspection_str = _UU("DS_POLICY_NO");
 	wchar_t *disableshare_str = _UU("DS_POLICY_NO");
+	wchar_t *maccheck_str = _UU("DS_POLICY_NO");
 	wchar_t syslog_str[256];
 	URL_DATA url = {0};
 
@@ -56,6 +57,11 @@ void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
 		inspection_str = _UU("DS_POLICY_YES");
 	}
 
+	if (pol->EnforceMacCheck)
+	{
+		maccheck_str = _UU("DS_POLICY_YES");
+	}
+
 	if (pol->DisableShare)
 	{
 		disableshare_str = _UU("DS_POLICY_YES");
@@ -68,7 +74,8 @@ void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
 
 	ParseUrl(&url, pol->SrcUrl, false, NULL);
 
-	UniFormat(str, str_size, _UU("DS_POLICY_MESSAGE"), otp_str, disableshare_str, inspection_str,
+	UniFormat(str, str_size, _UU("DS_POLICY_MESSAGE"),
+		otp_str, disableshare_str, inspection_str, maccheck_str,
 		syslog_str, msg, url.HostName);
 }
 
@@ -92,6 +99,7 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 
 	b->EnforceOtp = IniIntValue(o, "ENFORCE_OTP");
 	b->EnforceInspection = IniIntValue(o, "ENFORCE_INSPECTION");
+	b->EnforceMacCheck = IniIntValue(o, "ENFORCE_MACCHECK");
 	b->DisableShare = IniIntValue(o, "DISABLE_SHARE");
 
 	s = IniStrValue(o, "SYSLOG_HOSTNAME");
@@ -967,6 +975,9 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	{
 		return;
 	}
+
+	// Config 正規化
+	DsNormalizeConfig(ds, false);
 
 	DsGetPolicy(ds, &pol);
 
@@ -2262,6 +2273,9 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 		{
 			StrCpy(t->OtpEndWith, sizeof(t->OtpEndWith), pol.EnforceOtpEndWith);
 		}
+
+		t->EnforceInspection = pol.EnforceInspection;
+		t->EnforceMacCheck = pol.EnforceMacCheck;
 	}
 	else
 	{
@@ -2390,7 +2404,11 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 	ds->EnableOtp = t->EnableOtp;
 	StrCpy(ds->OtpEmail, sizeof(ds->OtpEmail), t->OtpEmail);
 
-	DsNormalizeConfig(ds);
+	ds->EnableInspection = t->EnableInspection;
+	ds->EnableMacCheck = t->EnableMacCheck;
+	StrCpy(ds->MacAddressList, sizeof(ds->MacAddressList), t->MacAddressList);
+
+	DsNormalizeConfig(ds, true);
 	DsSaveConfig(ds);
 	DsUpdatePowerKeepSetting(ds);
 
@@ -2401,6 +2419,8 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 {
 	Zero(t, sizeof(RPC_DS_CONFIG));
+
+	DsNormalizeConfig(ds, false);
 
 	t->Active = ds->Active;
 	t->PowerKeep = ds->PowerKeep;
@@ -2418,6 +2438,11 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 
 	t->EnableOtp = ds->EnableOtp;
 	StrCpy(t->OtpEmail, sizeof(t->OtpEmail), ds->OtpEmail);
+
+	t->EnableInspection = ds->EnableInspection;
+	t->EnableMacCheck = ds->EnableMacCheck;
+
+	StrCpy(t->MacAddressList, sizeof(t->MacAddressList), ds->MacAddressList);
 
 	return ERR_NO_ERROR;
 }
@@ -2851,43 +2876,62 @@ void DsInitDefaultConfig(DS *ds)
 
 	WideSetDontCheckCert(ds->Wide, false);
 
-	DsNormalizeConfig(ds);
+	DsNormalizeConfig(ds, true);
 }
 
 // 設定の正規化
-void DsNormalizeConfig(DS *ds)
+void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 {
 #ifdef	OS_WIN32
+	DS_POLICY_BODY pol;
 	// 引数チェック
 	if (ds == NULL)
 	{
 		return;
 	}
 
-	if (MsIsRemoteDesktopAvailable() == false)
+	if (change_rdp_status)
 	{
-		// OS がリモートデスクトップをサポートしていない場合は URDP を使用する
-		ds->ServiceType = DESK_SERVICE_VNC;
-	}
+		if (MsIsRemoteDesktopAvailable() == false)
+		{
+			// OS がリモートデスクトップをサポートしていない場合は URDP を使用する
+			ds->ServiceType = DESK_SERVICE_VNC;
+		}
 
-	if (ds->IsUserMode == false)
-	{
-		// ただしサービスモードの場合は必ず RDP を使用する
-		// 例: Windows XP Home Edition などでもここに到達する可能性はある
-		//     が、そもそもインストーラの時点で弾かれるべきである
-		ds->ServiceType = DESK_SERVICE_RDP;
-	}
+		if (ds->IsUserMode == false)
+		{
+			// ただしサービスモードの場合は必ず RDP を使用する
+			// 例: Windows XP Home Edition などでもここに到達する可能性はある
+			//     が、そもそもインストーラの時点で弾かれるべきである
+			ds->ServiceType = DESK_SERVICE_RDP;
+		}
 
-	if (ds->ServiceType == DESK_SERVICE_RDP)
-	{
-		// リモートデスクトップを有効にしておく
-		MsEnableRemoteDesktop();
+		if (ds->ServiceType == DESK_SERVICE_RDP)
+		{
+			// リモートデスクトップを有効にしておく
+			MsEnableRemoteDesktop();
+		}
 	}
 
 	if (IsEmptyStr(ds->OtpEmail))
 	{
 		// OTP メールアドレス未設定の場合は EnableOtp を false にする
 		ds->EnableOtp = false;
+	}
+
+	NormalizeMacAddressListStr(ds->MacAddressList, sizeof(ds->MacAddressList), ds->MacAddressList);
+
+	if (DsGetPolicy(ds, &pol))
+	{
+		if (pol.EnforceInspection)
+		{
+			ds->EnableInspection = true;
+		}
+
+		if (pol.EnforceMacCheck)
+		{
+			ds->EnableMacCheck = true;
+		}
 	}
 #endif  // OS_WIN32
 }
@@ -2915,7 +2959,7 @@ bool DsLoadConfig(DS *ds)
 
 	CfgDeleteFolder(root);
 
-	DsNormalizeConfig(ds);
+	DsNormalizeConfig(ds, true);
 
 	return ret;
 }
@@ -2992,6 +3036,10 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 
 	ds->EnableOtp = CfgGetBool(root, "EnableOtp");
 	CfgGetStr(root, "OtpEmail", ds->OtpEmail, sizeof(ds->OtpEmail));
+
+	ds->EnableInspection = CfgGetBool(root, "EnableInspection");
+	ds->EnableMacCheck = CfgGetBool(root, "EnableMacCheck");
+	CfgGetStr(root, "MacAddressList", ds->MacAddressList, sizeof(ds->MacAddressList));
 
 	f = CfgGetFolder(root, "ProxySetting");
 
@@ -3086,6 +3134,10 @@ FOLDER *DsSaveConfigMain(DS *ds)
 	CfgAddBool(root, "EnableOtp", ds->EnableOtp);
 
 	CfgAddStr(root, "OtpEmail", ds->OtpEmail);
+
+	CfgAddBool(root, "EnableInspection", ds->EnableInspection);
+	CfgAddBool(root, "EnableMacCheck", ds->EnableMacCheck);
+	CfgAddStr(root, "MacAddressList", ds->MacAddressList);
 
 	CfgAddBool(root, "IsConfigured", ds->IsConfigured);
 

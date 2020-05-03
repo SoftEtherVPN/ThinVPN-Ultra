@@ -39,6 +39,9 @@ void InRpcDsConfig(RPC_DS_CONFIG *t, PACK *p)
 	PackGetUniStr(p, "AdminUsername", t->AdminUsername, sizeof(t->AdminUsername));
 	t->EnableOtp = PackGetBool(p, "EnableOtp");
 	PackGetStr(p, "OtpEmail", t->OtpEmail, sizeof(t->OtpEmail));
+	t->EnableInspection = PackGetBool(p, "EnableInspection");
+	t->EnableMacCheck = PackGetBool(p, "EnableMacCheck");
+	PackGetStr(p, "MacAddressList", t->MacAddressList, sizeof(t->MacAddressList));
 }
 void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 {
@@ -63,6 +66,9 @@ void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 	PackAddUniStr(p, "AdminUsername", t->AdminUsername);
 	PackAddBool(p, "EnableOtp", t->EnableOtp);
 	PackAddStr(p, "OtpEmail", t->OtpEmail);
+	PackAddBool(p, "EnableInspection", t->EnableInspection);
+	PackAddBool(p, "EnableMacCheck", t->EnableMacCheck);
+	PackAddStr(p, "MacAddressList", t->MacAddressList);
 }
 
 // RPC_PCID
@@ -138,6 +144,9 @@ void InRpcDsStatus(RPC_DS_STATUS *t, PACK *p)
 	PackGetUniStr(p, "MsgForServer2", t->MsgForServer2, sizeof(t->MsgForServer2));
 
 	PackGetStr(p, "OtpEndWith", t->OtpEndWith, sizeof(t->OtpEndWith));
+
+	t->EnforceInspection = PackGetBool(p, "EnforceInspection");
+	t->EnforceMacCheck = PackGetBool(p, "EnforceMacCheck");
 }
 void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 {
@@ -176,6 +185,9 @@ void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 	PackAddUniStr(p, "MsgForServer2", t->MsgForServer2);
 
 	PackAddStr(p, "OtpEndWith", t->OtpEndWith);
+
+	PackAddBool(p, "EnforceInspection", t->EnforceInspection);
+	PackAddBool(p, "EnforceMacCheck", t->EnforceMacCheck);
 }
 
 // INTERNET_SETTING

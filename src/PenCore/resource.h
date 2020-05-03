@@ -228,6 +228,8 @@
 #define ICO_WIN95NET                    246
 #define IDB_BITMAP3                     247
 #define BMP_OTP                         247
+#define IDI_ICON4                       248
+#define ICO_SHIELD                      248
 #define S_TITLE                         1007
 #define S_INSERT_SECURE                 1008
 #define S_TITLE2                        1008
@@ -544,6 +546,7 @@
 #define S_RADIUS_2                      1177
 #define R_C                             1177
 #define B_LOG_FILE                      1177
+#define B_MAC                           1177
 #define R_POLICY                        1178
 #define S_RADIUS_4                      1178
 #define R_ST                            1178
@@ -1208,7 +1211,9 @@
 #define C_SHOW_THEEND                   2548
 #define B_AUTH                          2549
 #define C_ENABLE_RELAX                  2549
+#define C_INSPECTION                    2549
 #define B_ACCEPT                        2550
+#define C_CHECKMAC                      2550
 #define C_PUBLIC2                       2551
 #define C_VER2                          2552
 #define B_DENY                          2553
@@ -1270,7 +1275,9 @@
 #define S_S10                           2606
 #define S_S11                           2607
 #define S_MACHINE                       2608
+#define S_S12                           2608
 #define S_ICON1                         2609
+#define S_S13                           2609
 #define S_ICON3                         2610
 #define C_PASSWORD                      2611
 #define C_CERT                          2612
@@ -1319,6 +1326,7 @@
 #define D_DG_OTP                        2648
 #define D_DC_OTP                        2649
 #define D_DU_OTP                        2649
+#define D_DG_MAC                        2650
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021
@@ -1389,7 +1397,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        248
+#define _APS_NEXT_RESOURCE_VALUE        249
 #define _APS_NEXT_COMMAND_VALUE         40111
 #define _APS_NEXT_CONTROL_VALUE         1520
 #define _APS_NEXT_SYMED_VALUE           102

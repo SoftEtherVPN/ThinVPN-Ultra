@@ -92,5 +92,8 @@ void DgOptDlgUpdate(HWND hWnd, DG *dg);
 void DgOptDlgOnOk(HWND hWnd, DG *dg);
 
 
+bool DgMacDlg(HWND hWnd, DG *dg);
+UINT DgMacDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+
 
 

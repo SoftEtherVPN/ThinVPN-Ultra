@@ -51,6 +51,82 @@
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
 
+// MAC 登録ダイアログプロシージャ
+UINT DgMacDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	RPC_DS_CONFIG t;
+	DG *dg = (DG *)param;
+	bool ok = false;
+	Zero(&t, sizeof(t));
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		SetIcon(hWnd, 0, ICO_NIC_ONLINE);
+
+		if (CALL(hWnd, DtcGetConfig(dg->Rpc, &t)) == false)
+		{
+			EndDialog(hWnd, 0);
+			return 0;
+		}
+
+		SetTextA(hWnd, E_TEXT, t.MacAddressList);
+
+		Focus(hWnd, E_TEXT);
+
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+			{
+				char *s = GetTextA(hWnd, E_TEXT);
+
+				if (CALL(hWnd, DtcGetConfig(dg->Rpc, &t)))
+				{
+					StrCpy(t.MacAddressList, sizeof(t.MacAddressList), s);
+
+					if (CALL(hWnd, DtcSetConfig(dg->Rpc, &t)))
+					{
+						ok = true;
+					}
+				}
+
+				Free(s);
+
+				if (ok)
+				{
+					EndDialog(hWnd, 1);
+				}
+				break;
+			}
+
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		break;
+	}
+
+	return 0;
+}
+
+// MAC 登録ダイアログ
+bool DgMacDlg(HWND hWnd, DG *dg)
+{
+	if (dg == NULL)
+	{
+		return false;
+	}
+
+	return Dialog(hWnd, D_DG_MAC, DgMacDlgProc, dg);
+}
+
 // OTP ダイアログ
 bool DgOtpDlg(HWND hWnd, DG *dg)
 {
@@ -1028,6 +1104,7 @@ bool DgOptionDlg(HWND hWnd, DG *dg)
 void DgAuthDlgInit(HWND hWnd, DG *dg)
 {
 	RPC_DS_CONFIG t;
+	RPC_DS_STATUS st;
 	// 引数チェック
 	if (hWnd == NULL || dg == NULL)
 	{
@@ -1035,8 +1112,15 @@ void DgAuthDlgInit(HWND hWnd, DG *dg)
 	}
 
 	Zero(&t, sizeof(t));
+	Zero(&st, sizeof(st));
 
 	if (CALL(hWnd, DtcGetConfig(dg->Rpc, &t)) == false)
+	{
+		EndDialog(hWnd, 0);
+		return;
+	}
+
+	if (CALL(hWnd, DtcGetStatus(dg->Rpc, &st)) == false)
 	{
 		EndDialog(hWnd, 0);
 		return;
@@ -1075,6 +1159,12 @@ void DgAuthDlgInit(HWND hWnd, DG *dg)
 	Hide(hWnd, B_RADIUS);
 	Hide(hWnd, B_CRL);
 #endif	// DESK_DISABLE_NEW_FEATURE
+
+	Check(hWnd, C_INSPECTION, t.EnableInspection);
+	Check(hWnd, C_CHECKMAC, t.EnableMacCheck);
+
+	SetEnable(hWnd, C_INSPECTION, !st.EnforceInspection);
+	SetEnable(hWnd, C_CHECKMAC, !st.EnforceMacCheck);
 
 	DgAuthDlgUpdate(hWnd);
 }
@@ -1142,6 +1232,8 @@ void DgAuthDlgUpdate(HWND hWnd)
 	SetEnable(hWnd, B_CRL, b4);
 
 	SetEnable(hWnd, S_CHECK_CERT, IsChecked(hWnd, C_CHECK_CERT));
+
+	SetEnable(hWnd, B_MAC, IsChecked(hWnd, C_CHECKMAC));
 }
 
 // セキュリティ設定 OK ボタン
@@ -1236,6 +1328,9 @@ void DgAuthDlgOnOk(HWND hWnd, DG *dg)
 			return;
 		}
 	}
+
+	t.EnableInspection = IsChecked(hWnd, C_INSPECTION);
+	t.EnableMacCheck = IsChecked(hWnd, C_CHECKMAC);
 
 	if (CALL(hWnd, DtcSetConfig(dg->Rpc, &t)) == false)
 	{
@@ -1351,6 +1446,8 @@ UINT DgAuthDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 			break;
 
 		case C_CHECK_CERT:
+		case C_INSPECTION:
+		case C_CHECKMAC:
 			DgAuthDlgUpdate(hWnd);
 			break;
 
@@ -1415,6 +1512,11 @@ UINT DgAuthDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 		case B_OTP:
 			// OTP
 			DgOtpDlg(hWnd, dg);
+			break;
+
+		case B_MAC:
+			// MAC
+			DgMacDlg(hWnd,dg);
 			break;
 		}
 		break;

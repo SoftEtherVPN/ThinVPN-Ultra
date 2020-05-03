@@ -37,6 +37,8 @@ struct RPC_DS_STATUS
 	wchar_t MsgForServer2[MAX_SIZE * 2];	// 届いているメッセージ (ポリシー関係)
 	bool MsgForServerOnce;				// 次回から表示しない を許可
 	char OtpEndWith[64];
+	bool EnforceInspection;
+	bool EnforceMacCheck;
 };
 
 struct RPC_PCID
@@ -61,6 +63,10 @@ struct RPC_DS_CONFIG
 	wchar_t AdminUsername[MAX_PATH];
 	bool EnableOtp;
 	char OtpEmail[MAX_PATH];
+
+	bool EnableInspection;
+	bool EnableMacCheck;
+	char MacAddressList[1024];
 };
 
 void InInternetSetting(INTERNET_SETTING *t, PACK *p);

@@ -129,6 +129,10 @@ struct DS
 
 	UCHAR SmartCardTicket[SHA1_SIZE];	// スマートカード認証済みトークン
 
+	bool EnableInspection;
+	bool EnableMacCheck;
+	char MacAddressList[1024];
+
 	DS_POLICY_CLIENT *PolicyClient;		// ポリシークライアント
 };
 
@@ -167,6 +171,7 @@ struct DS_POLICY_BODY
 	bool EnforceOtp;
 	bool DisableShare;
 	bool EnforceInspection;
+	bool EnforceMacCheck;
 	char EnforceOtpEndWith[64];
 	char SyslogHostname[MAX_PATH];
 	UINT SyslogPort;
@@ -201,7 +206,7 @@ bool DsLoadConfig(DS *ds);
 bool DsLoadConfigMain(DS *ds, FOLDER *root);
 void DsInitDefaultConfig(DS *ds);
 void DsSaveConfig(DS *ds);
-void DsNormalizeConfig(DS *ds);
+void DsNormalizeConfig(DS *ds, bool change_rdp_status);
 FOLDER *DsSaveConfigMain(DS *ds);
 PACK *DsRpcServer(RPC *r, char *name, PACK *p);
 void DsUpdatePowerKeepSetting(DS *ds);

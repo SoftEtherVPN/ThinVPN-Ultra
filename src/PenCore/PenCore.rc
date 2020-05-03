@@ -1518,6 +1518,14 @@ BEGIN
         TOPMARGIN, 5
         BOTTOMMARGIN, 238
     END
+
+    D_DG_MAC, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 268
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 293
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -4934,13 +4942,20 @@ BEGIN
     EDITTEXT        E_PASSWORD1,77,134,155,12,ES_PASSWORD | ES_AUTOHSCROLL
     RTEXT           "@S_PASSWORD3",S_PASSWORD3,16,153,56,12
     EDITTEXT        E_PASSWORD2,77,151,155,12,ES_PASSWORD | ES_AUTOHSCROLL
-    GROUPBOX        "高度なユーザー認証機能の設定",S_S10,7,181,247,128
+    GROUPBOX        "高度なユーザー認証機能の設定",S_S10,7,181,247,123
     LTEXT           "高度なユーザー認証機能を使用すると、ユーザー名とパスワードによる認証や、外部の Radius サーバーや Active Directory サーバーを使用した認証、X.509 証明書を利用した PKI 認証などが利用できるようになります。パスワードのみによる簡易ユーザー認証は利用できなくなります。",S_S11,14,195,233,36
     CONTROL         "高度なユーザー認証機能を使用する(&A)",C_USE_ADVANCED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,232,226,15
     PUSHBUTTON      "ユーザーの管理(&U)",B_USER,24,253,104,17
     PUSHBUTTON      "信頼する証明機関の証明書(&T)",B_CA,135,253,104,17
     PUSHBUTTON      "外部認証サーバーの設定(&R)",B_RADIUS,24,279,104,17
     PUSHBUTTON      "無効な証明書(&V)",B_CRL,134,279,104,17
+    GROUPBOX        "クライアント端末のセキュリティチェック機能",S_S12,7,309,247,65
+    ICON            ICO_SHIELD,IDC_STATIC,16,319,18,18
+    LTEXT           "「シン・テレワークシステム クライアント」 がこのサーバーに接続する際のセキュリティチェックを実施することができます。",S_S13,40,320,207,20
+    CONTROL         "クライアント検疫の実施 (アンチウイルスおよび Windows Update 適用検査)",C_INSPECTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,340,234,10
+    CONTROL         "クライアント MAC アドレス認証",C_CHECKMAC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,356,110,10
+    PUSHBUTTON      "接続許可 MAC アドレスの登録",B_MAC,125,353,118,17
     GROUPBOX        "ワンタイムパスワード (OTP) 機能 (二要素認証)",IDC_STATIC,263,38,185,85
     ICON            ICO_IPSEC,IDC_STATIC,269,52,20,20
     LTEXT           "毎回必ずログイン時に事前設定したメールアドレスにワンタイムパスワード (OTP) が送付されるようにできます。OTP が一致しなければログインできません。セキュリティポリシー上、二要素認証の利用が必須の企業環境で利用できます。",IDC_STATIC,293,52,148,44
@@ -5490,6 +5505,21 @@ BEGIN
     CONTROL         247,IDC_STATIC,"Static",SS_BITMAP,9,0,234,88
 END
 
+D_DG_MAC DIALOGEX 0, 0, 275, 298
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "クライアント MAC アドレス認証"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    ICON            ICO_NIC_ONLINE,S_ACL_5,7,5,20,20
+    LTEXT           "「シン・テレワークシステム クライアント」 のクライアント端末の MAC アドレスが一致した場合のみ、接続を許可することができます。\r\n\r\nMAC アドレスを登録してください。 (最大 50 個程度まで登録できます。)\r\n\r\nMAC アドレスは、00-12-34-AA-BB-CC のように 1 行につき 1 個入力します。改行により、複数個登録可能です。大文字・小文字は区別されません。ハイフンまたはコロンは省略できます。",S_MSG_2,31,5,237,76,WS_TABSTOP
+    EDITTEXT        E_TEXT,30,84,233,97,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
+    GROUPBOX        "MAC アドレスについて",IDC_STATIC,7,185,261,84
+    ICON            ICO_INFORMATION,IDC_STATIC,14,197,20,20
+    LTEXT           "「MAC アドレス」とは、端末に内蔵されているハードウェア固有のアドレスです。予めクライアントコンピュータの画面で確認しておいたものを、正確に入力する必要があります。1 文字でも異なっていると、接続が許可されません。\r\n\r\nクライアント端末の Windows の「コマンド プロンプト」を開き、\r\n> ipconfig /all\r\nと入力することで、MAC アドレスを確認できます。",S_INFO,39,198,222,64
+    DEFPUSHBUTTON   "&OK",IDOK,131,276,64,17
+    PUSHBUTTON      "キャンセル",IDCANCEL,203,276,64,17
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -5578,6 +5608,7 @@ ICO_DESKSERVER_TRAY2    ICON                    "deskservertray2.ico"
 ICO_THINCLIENT          ICON                    "ThinClient.ico"
 ICO_VB6                 ICON                    "VB6.ico"
 ICO_WIN95NET            ICON                    "Win95Net.ico"
+ICO_SHIELD              ICON                    "Shield.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
