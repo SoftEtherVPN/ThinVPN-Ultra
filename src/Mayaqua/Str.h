@@ -245,6 +245,11 @@ void ClearStr(char *str, UINT str_size);
 void SetStrCaseAccordingToBits(char *str, UINT bits);
 char *UrlDecode(char *url_str);
 void GetDomainSuffixFromFqdn(char *dst, UINT size, char *fqdn);
+bool NormalizeMacAddressListStr(char *dst, UINT size, char *src);
+LIST *GetStrListFromLines(char *str);
+bool CheckStrListIncludedInOther(LIST *o1, LIST *o2);
+bool CheckStrListIncludedInOtherStr(char *str1, char *str2);
+bool CheckStrListIncludedInOtherStrMac(char *str1, char *str2);
 
 bool CheckPasswordComplexity(char *str);
 

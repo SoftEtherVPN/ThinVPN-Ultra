@@ -259,6 +259,33 @@ static LIST *g_dyn_value_list = NULL;
 
 
 
+void GetMacAddressListLocalComputer(char *dst, UINT size)
+{
+	ClearStr(dst, size);
+	if (dst == NULL || size == 0)
+	{
+		return;
+	}
+
+#ifdef	OS_WIN32
+	{
+		LIST *o = MsGetMacAddressList();
+		UINT i;
+
+		for (i = 0;i < LIST_NUM(o);i++)
+		{
+			char *mac = LIST_DATA(o, i);
+
+			StrCat(dst, size, mac);
+
+			StrCat(dst, size, "\r\n");
+		}
+
+		FreeStrList(o);
+	}
+#endif	// OS_WIN32
+}
+
 
 // Get a value from a dynamic value list (Returns a default value if the value is not found)
 UINT64 GetDynValueOrDefault(char *name, UINT64 default_value, UINT64 min_value, UINT64 max_value)

@@ -1706,6 +1706,7 @@ UINT64 GetDynValue(char *name);
 UINT64 GetDynValueOrDefault(char *name, UINT64 default_value, UINT64 min_value, UINT64 max_value);
 UINT64 GetDynValueOrDefaultSafe(char *name, UINT64 default_value);
 
+void GetMacAddressListLocalComputer(char *dst, UINT size);
 
 #endif	// NETWORK_H
 

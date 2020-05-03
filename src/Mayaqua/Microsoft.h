@@ -1176,6 +1176,7 @@ UINT64 MsGetCurrentFileTime();
 
 bool MsCheckAntiVirus();
 bool MsCheckWindowsUpdate();
+LIST *MsGetMacAddressList();
 
 // Inner functions
 #ifdef	MICROSOFT_C

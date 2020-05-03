@@ -322,6 +322,37 @@ void MsInitProcessCallOnce(bool restricted_mode)
 	}
 }
 
+LIST *MsGetMacAddressList()
+{
+	MS_ADAPTER_LIST *o;
+	UINT i;
+	LIST *ret = NewStrList();
+
+	o = MsCreateAdapterList();
+	if (o != NULL)
+	{
+		for (i = 0;i < o->Num;i++)
+		{
+			MS_ADAPTER *a = o->Adapters[i];
+
+			if (a->AddressSize == 6 && IsZero(a->Address, 6) == false)
+			{
+				char tmp[64];
+
+				MacToStr(tmp, sizeof(tmp), a->Address);
+
+				AddStrToStrListDistinct(ret, tmp);
+			}
+		}
+
+		MsFreeAdapterList(o);
+	}
+
+	Sort(ret);
+
+	return ret;
+}
+
 bool MsCheckWindowsUpdate()
 {
 	wchar_t *batch_src_filename = L"|CheckWindowsUpdate.vbs";

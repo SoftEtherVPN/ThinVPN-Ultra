@@ -891,6 +891,21 @@ void test(UINT num, char **arg)
 #ifdef OS_WIN32
 	if (true)
 	{
+		char tmp[4096];
+		GetMacAddressListLocalComputer(tmp, sizeof(tmp));
+		
+		while (true)
+		{
+			char str[64];
+			GetLine(str, sizeof(str));
+
+			Print("%u\n", CheckStrListIncludedInOtherStrMac(tmp, str));
+		}
+		return;
+	}
+
+	if (true)
+	{
 		Print("%u\n", MsCheckAntiVirus());
 		Print("%u\n", MsCheckWindowsUpdate());
 		return;

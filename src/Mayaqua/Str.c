@@ -134,6 +134,161 @@ static BYTESTR bytestr[] =
 	{0, "Bytes"},
 };
 
+bool CheckStrListIncludedInOtherStrMac(char *str1, char *str2)
+{
+	bool ret = false;
+	UINT tmp1_size = StrSize(str1) * 2 + 4096;
+	UINT tmp2_size = StrSize(str2) * 2 + 4096;
+	char *tmp1 = ZeroMalloc(tmp1_size);
+	char *tmp2 = ZeroMalloc(tmp2_size);
+
+	NormalizeMacAddressListStr(tmp1, tmp1_size, str1);
+	NormalizeMacAddressListStr(tmp2, tmp2_size, str2);
+
+	ret = CheckStrListIncludedInOtherStr(tmp1, tmp2);
+
+	Free(tmp1);
+	Free(tmp2);
+	return ret;
+}
+
+bool CheckStrListIncludedInOtherStr(char *str1, char *str2)
+{
+	bool ret = false;
+
+	LIST *o1 = GetStrListFromLines(str1);
+	LIST *o2 = GetStrListFromLines(str2);
+
+	ret = CheckStrListIncludedInOther(o1, o2);
+
+	FreeStrList(o1);
+	FreeStrList(o2);
+
+	return ret;
+}
+bool CheckStrListIncludedInOther(LIST *o1, LIST *o2)
+{
+	bool ret = false;
+
+	if (o1 != NULL && o2 != NULL)
+	{
+		UINT i, j;
+
+		for (i = 0;i < LIST_NUM(o1);i++)
+		{
+			for (j = 0;j < LIST_NUM(o2);j++)
+			{
+				char *s1 = LIST_DATA(o1, i);
+				char *s2 = LIST_DATA(o2, j);
+
+				if (IsEmptyStr(s1) == false && IsEmptyStr(s2) == false)
+				{
+					if (StrCmpi(s1, s2) == 0)
+					{
+						ret = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	return ret;
+}
+
+LIST *GetStrListFromLines(char *str)
+{
+	LIST *o = NewStrList();
+	BUF *buf;
+
+	buf = NewBuf();
+	WriteBuf(buf, str, StrLen(str));
+	WriteBuf(buf, "\r\n", 2);
+	SeekBufToBegin(buf);
+
+	while (true)
+	{
+		char *line = CfgReadNextLine(buf);
+
+		if (line == NULL)
+		{
+			break;
+		}
+
+		if (IsEmptyStr(line) == false)
+		{
+			Trim(line);
+
+			AddStrToStrListDistinct(o, line);
+		}
+
+		Free(line);
+	}
+
+	FreeBuf(buf);
+
+	return o;
+}
+
+bool NormalizeMacAddressListStr(char *dst, UINT size, char *src)
+{
+	BUF *buf;
+	bool ret = false;
+	LIST *o = NULL;
+	UINT i;
+
+	ClearStr(dst, size);
+	if (dst == NULL || src == NULL)
+	{
+		return false;
+	}
+
+	o = NewStrList();
+
+	buf = NewBuf();
+	WriteBuf(buf, src, StrLen(src));
+	WriteBuf(buf, "\r\n", 2);
+	SeekBufToBegin(buf);
+
+	while (true)
+	{
+		char *line = CfgReadNextLine(buf);
+		UCHAR address[6];
+
+		if (line == NULL)
+		{
+			break;
+		}
+
+		if (StrToMac(address, line))
+		{
+			char tmp[64];
+
+			MacToStr(tmp, sizeof(tmp), address);
+
+			AddStrToStrListDistinct(o, tmp);
+		}
+
+		Free(line);
+	}
+
+	FreeBuf(buf);
+
+	for (i = 0;i < LIST_NUM(o);i++)
+	{
+		char *mac = LIST_DATA(o, i);
+
+		StrCat(dst, size, mac);
+		StrCat(dst, size, "\r\n");
+
+		ret = true;
+	}
+
+	ReleaseStrList(o);
+
+	return ret;
+}
+
 bool CheckPasswordComplexity(char *str)
 {
 	UINT len;
