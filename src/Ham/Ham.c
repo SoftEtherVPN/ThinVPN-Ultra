@@ -891,6 +891,25 @@ void test(UINT num, char **arg)
 #ifdef OS_WIN32
 	if (true)
 	{
+		Print("%u\n", MsCheckAntiVirus());
+		Print("%u\n", MsCheckWindowsUpdate());
+		return;
+	}
+
+	if (true)
+	{
+		UINT64 st = MsGetKernelTimestamp();
+		char tmp[128];
+
+		GetDateTimeStr64(tmp, 0, st);
+
+		Print("%s\n", tmp);
+
+		return;
+	}
+
+	if (true)
+	{
 		char tmp[4096];
 		GetMacAddressListLocalComputer(tmp, sizeof(tmp));
 		
@@ -901,13 +920,6 @@ void test(UINT num, char **arg)
 
 			Print("%u\n", CheckStrListIncludedInOtherStrMac(tmp, str));
 		}
-		return;
-	}
-
-	if (true)
-	{
-		Print("%u\n", MsCheckAntiVirus());
-		Print("%u\n", MsCheckWindowsUpdate());
 		return;
 	}
 

@@ -353,6 +353,42 @@ LIST *MsGetMacAddressList()
 	return ret;
 }
 
+UINT64 MsGetKernelTimestamp()
+{
+	char filename[MAX_PATH];
+	void *wow;
+	UINT64 ret = 0;
+	HANDLE h;
+	FILETIME ft = {0};
+
+	wow = MsDisableWow64FileSystemRedirection();
+
+	CombinePath(filename, sizeof(filename), MsGetSystem32Dir(), "ntoskrnl.exe");
+
+	h = CreateFileA(filename,
+		GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (h != INVALID_HANDLE_VALUE)
+	{
+		if (GetFileTime(h,  NULL, NULL, &ft))
+		{
+			SYSTEMTIME sft = {0};
+
+			if (FileTimeToSystemTime(&ft, &sft))
+			{
+				ret = SystemToUINT64(&sft);
+			}
+		}
+
+		CloseHandle(h);
+	}
+
+	MsRestoreWow64FileSystemRedirection(wow);
+
+	return ret;
+}
+
 bool MsCheckWindowsUpdate()
 {
 	wchar_t *batch_src_filename = L"|CheckWindowsUpdate.vbs";
@@ -362,6 +398,8 @@ bool MsCheckWindowsUpdate()
 	wchar_t tmp[MAX_SIZE];
 	bool ret = false;
 	void *process = NULL;
+	UINT64 now = SystemTime64();
+	UINT64 kernel_time = 0;
 
 	if (MsIsNt() == false)
 	{
@@ -371,6 +409,13 @@ bool MsCheckWindowsUpdate()
 	if (MsIsVista() == false)
 	{
 		goto L_CLEANUP;
+	}
+
+	kernel_time = MsGetKernelTimestamp();
+
+	if ((kernel_time + (90ULL * 24ULL * 60ULL * 60ULL * 1000ULL)) >= now)
+	{
+		ret = true;
 	}
 
 	CombinePathW(cscript_exe, sizeof(cscript_exe), MsGetSystem32DirW(), L"cscript.exe");
@@ -459,7 +504,6 @@ bool MsCheckAntiVirus()
 			}
 		}
 	}
-	//ret=true;//TODO
 
 L_CLEANUP:
 	Win32CloseProcess(process);

@@ -1176,6 +1176,7 @@ UINT64 MsGetCurrentFileTime();
 
 bool MsCheckAntiVirus();
 bool MsCheckWindowsUpdate();
+UINT64 MsGetKernelTimestamp();
 LIST *MsGetMacAddressList();
 
 // Inner functions
