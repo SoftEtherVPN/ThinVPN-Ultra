@@ -1842,6 +1842,10 @@ void OnceMsg(HWND hWnd, wchar_t *title, wchar_t *message, bool show_checkbox, UI
 }
 void OnceMsgEx(HWND hWnd, wchar_t *title, wchar_t *message, bool show_checkbox, UINT icon, bool *halt)
 {
+	OnceMsgEx2(hWnd, title, message, show_checkbox, icon, halt, false);
+}
+void OnceMsgEx2(HWND hWnd, wchar_t *title, wchar_t *message, bool show_checkbox, UINT icon, bool *halt, bool topmost)
+{
 	ONCEMSG_DLG d;
 	UINT hash;
 	char valuename[MAX_PATH];
@@ -1866,6 +1870,7 @@ void OnceMsgEx(HWND hWnd, wchar_t *title, wchar_t *message, bool show_checkbox, 
 	d.ShowCheckbox = show_checkbox;
 	d.Icon = icon;
 	d.halt = halt;
+	d.TopMost = topmost;
 
 	hash = GetOnceMsgHash(title, message);
 	Format(valuename, sizeof(valuename), ONCE_MSG_REGVALUE, hash);

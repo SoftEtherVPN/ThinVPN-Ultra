@@ -876,6 +876,7 @@ void WinUiDebugInit();
 void WinUiDebugFree();
 void OnceMsg(HWND hWnd, wchar_t *title, wchar_t *message, bool show_checkbox, UINT icon);
 void OnceMsgEx(HWND hWnd, wchar_t *title, wchar_t *message, bool show_checkbox, UINT icon, bool *halt);
+void OnceMsgEx2(HWND hWnd, wchar_t *title, wchar_t *message, bool show_checkbox, UINT icon, bool *halt, bool topmost);
 UINT GetOnceMsgHash(wchar_t *title, wchar_t *message);
 UINT OnceMsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 bool CheckBadProcesses(HWND hWnd);

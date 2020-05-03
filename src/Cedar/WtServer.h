@@ -31,6 +31,10 @@ struct WT_CONNECT
 	wchar_t MsgForServer[MAX_SIZE];
 	bool MsgForServerOnce;
 
+	// Server が Wide Controller からもらってきた Lifetime
+	UINT64 SessionLifeTime;
+	wchar_t SessionLifeTimeMsg[MAX_PATH];
+
 	// Server 用
 	WT_GATE_CONNECT_PARAM *GateConnectParam;	// 接続パラメータ
 	char Pcid[MAX_PATH];						// PCID

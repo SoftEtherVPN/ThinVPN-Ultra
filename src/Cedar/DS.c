@@ -1214,6 +1214,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	PackAddData(p, "Rand", rand, sizeof(rand));
 	PackAddData(p, "MachineKey", machine_key, sizeof(machine_key));
 
+	if (ds->Wide != NULL && ds->Wide->SessionLifeTime != 0)
+	{
+		PackAddInt64(p, "Lifetime", ds->Wide->SessionLifeTime);
+		PackAddUniStr(p, "LifeTimeMsg", ds->Wide->SessionLifeTimeMsg);
+	}
+
 	ds_caps = DsGetCaps(ds);
 	if (has_urdp2_client)
 	{

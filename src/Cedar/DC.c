@@ -688,18 +688,31 @@ wchar_t *DcReadRdpFile(wchar_t *name, bool *is_empty)
 }
 
 // プロセスの終了まで待機する
-void DcWaitForProcessExit(void *h)
+bool DcWaitForProcessExit(void *h, UINT timeout)
 {
+	bool ret = false;
 #ifdef	OS_WIN32
 	// 引数チェック
 	if (h == NULL)
 	{
-		return;
+		return true;
 	}
 
-	Win32WaitProcess(h, INFINITE);
+	if (Win32WaitProcess(h, timeout) == false)
+	{
+		// タイムアウトした場合はプロセスを Kill する
+		Win32TerminateProcess(h);
+		ret = false;
+	}
+	else
+	{
+		ret = true;
+	}
+
 	Win32CloseProcess(h);
+
 #endif  // OS_WIN32
+	return ret;
 }
 
 // URDP Client を起動する
@@ -2575,6 +2588,8 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	bool is_otp_enabled = false;
 	bool run_inspect = false;
 	UCHAR smart_card_ticket[SHA1_SIZE];
+	UINT64 lifetime = 0;
+	wchar_t lifetime_msg[MAX_PATH];
 	// 引数チェック
 	if (dc == NULL || sock == NULL || pcid == NULL || auth_callback == NULL)
 	{
@@ -2622,6 +2637,10 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	use_advanced_security = PackGetBool(p, "UseAdvancedSecurity");
 	is_otp_enabled = PackGetBool(p, "IsOtpEnabled");
 	run_inspect = PackGetBool(p, "RunInspect");
+
+	lifetime = PackGetInt64(p, "Lifetime");
+	PackGetUniStr(p, "LifeTimeMsg", lifetime_msg, sizeof(lifetime_msg));
+
 	FreePack(p);
 	if (ret != ERR_NO_ERROR)
 	{
@@ -2975,6 +2994,9 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 		// エラー発生
 		return ret;
 	}
+
+	dcs->LifeTime = lifetime;
+	UniStrCpy(dcs->LifeTimeMsg, sizeof(dcs->LifeTimeMsg), lifetime_msg);
 
 	sock->UserData1 = svc_type;
 	sock->UserData3 = is_share_disabled;

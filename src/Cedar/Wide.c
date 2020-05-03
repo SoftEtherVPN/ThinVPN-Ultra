@@ -598,6 +598,9 @@ LABEL_CONNECT_RETRY:
 			w->MsgForServerArrived = false;
 		}
 
+		UniStrCpy(w->SessionLifeTimeMsg, sizeof(w->SessionLifeTimeMsg), c.SessionLifeTimeMsg);
+		w->SessionLifeTime = c.SessionLifeTime;
+
 		if (ret != ERR_NO_ERROR)
 		{
 			last_wide_controller_connect_ok = false;
@@ -1067,6 +1070,9 @@ UINT WideServerConnect(WIDE *w, WT_CONNECT *c)
 
 	PackGetUniStr(p, "MsgForServer", c->MsgForServer, sizeof(c->MsgForServer));
 	c->MsgForServerOnce = PackGetBool(p, "MsgForServerOnce");
+
+	c->SessionLifeTime = PackGetInt64(p, "SessionLifeTime");
+	PackGetUniStr(p, "SessionLifeTimeMsg", c->SessionLifeTimeMsg, sizeof(c->SessionLifeTimeMsg));
 
 	FreePack(p);
 

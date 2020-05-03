@@ -175,6 +175,10 @@ struct WIDE
 	wchar_t MsgForServer[MAX_SIZE];		// 届いているメッセージ
 	bool MsgForServerOnce;				// 次回から表示しない を許可
 
+	// Server が Wide Controller からもらってきた Lifetime
+	UINT64 SessionLifeTime;
+	wchar_t SessionLifeTimeMsg[MAX_PATH];
+
 	wchar_t MsgForServer2[MAX_SIZE * 2];		// ポリシー関係
 };
 

@@ -1413,11 +1413,14 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 	DC_SESSION *s;
 	DC *dc;
 	UINT ret;
+	wchar_t lifetime_msg[MAX_PATH] = {0};
 	// 引数チェック
 	if (hWnd == NULL || t == NULL || pcid == NULL)
 	{
 		return;
 	}
+
+	Zero(lifetime_msg, sizeof(lifetime_msg));
 
 	dc = t->Du->Dc;
 
@@ -1561,13 +1564,22 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 				}
 				else
 				{
+					UINT timeout = INFINITE;
+					bool timeouted = false;
 					s->ProcessIdOfClient = process_id;
 
 					// プロセス起動成功
 					Hide(hWnd, 0);
 					Hide(t->hWnd, 0);
 
-					DcWaitForProcessExit(process);
+					if (s->LifeTime != 0 && s->LifeTime < INFINITE)
+					{
+						// 有効期限あり
+						timeout = (UINT)s->LifeTime;
+					}
+
+					// プロセスが終了 or タイムアウト するまで待つ
+					timeouted = !DcWaitForProcessExit(process, timeout);
 
 					if (msg != NULL)
 					{
@@ -1579,10 +1591,22 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 						StopAsyncOnceMsg(once);
 					}
 
-					// お疲れ様でした
-					if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME))
+					// 有効期限満了メッセージの準備
+					if (timeout != INFINITE && timeouted)
 					{
-						DuTheEndDlg(NULL);
+						if (UniIsEmptyStr(s->LifeTimeMsg) == false)
+						{
+							UniStrCpy(lifetime_msg, sizeof(lifetime_msg), s->LifeTimeMsg);
+						}
+					}
+
+					if (UniIsEmptyStr(lifetime_msg))
+					{
+						// お疲れ様でした
+						if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME))
+						{
+							DuTheEndDlg(NULL);
+						}
 					}
 
 					Show(t->hWnd, 0);
@@ -1600,6 +1624,12 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 	}
 
 	ReleaseDcSession(s);
+
+	if (UniIsEmptyStr(lifetime_msg) == false)
+	{
+		// 有効期限満了メッセージの表示
+		OnceMsgEx2(NULL, _UU("DU_LIFETIME_TITLE"), lifetime_msg, false, ICO_THINCLIENT, NULL, true);
+	}
 }
 
 // 初期化

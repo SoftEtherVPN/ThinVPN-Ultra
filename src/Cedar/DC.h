@@ -94,6 +94,8 @@ struct DC_SESSION
 	char OtpTicket[MAX_PATH];			// OTP チケット
 	UCHAR SmartCardTicket[SHA1_SIZE];	// スマートカード認証済みチケット
 	char InspectionTicket[64];			// インスペクション済みチケット
+	UINT64 LifeTime;					// 有効期限
+	wchar_t LifeTimeMsg[MAX_PATH];		// 有効期限満了時のメッセージ
 };
 
 // 拡張認証データ
@@ -194,7 +196,7 @@ UINT DcGetMstscArguments(DC_SESSION *s, wchar_t *mstsc_exe, char *arg, UINT arg_
 UINT DcGetUrdpClientArguments(DC_SESSION *s, char *arg, UINT arg_size, bool disable_share, UINT version);
 void *DcRunMstsc(DC *dc, wchar_t *mstsc_exe, char *arg, char *target, bool disable_share, UINT *process_id, bool *rdp_file_write_failed);
 void *DcRunUrdpClient(char *arg, UINT *process_id, UINT version);
-void DcWaitForProcessExit(void *h);
+bool DcWaitForProcessExit(void *h, UINT timeout);
 void DcInitMstscRdpFile();
 bool DcSetMstscRdpFileInt(char *key_name, UINT value);
 bool DcSetMstscRdpFileStr(char *key_name, char *value);
