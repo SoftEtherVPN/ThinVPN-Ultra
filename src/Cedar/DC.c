@@ -768,6 +768,12 @@ void *DcRunMstsc(DC *dc, wchar_t *mstsc_exe, char *arg, char *target, bool disab
 	DcSetMstscRdpFileInt("redirectcomports", (dc->MstscUseShareComPort && (!disable_share)) ? 1 : 0);
 	DcSetMstscRdpFileInt("redirectclipboard", (dc->MstscUseShareClipboard && (!disable_share)) ? 1 : 0);
 	DcSetMstscRdpFileStr("drivestoredirect", (dc->MstscUseShareDisk && (!disable_share)) ? "*" : "");
+	if (MsIsWindows10())
+	{
+		DcSetMstscRdpFileStr("camerastoredirect", dc->MstscUseShareCamera ? "*" : "");
+	}
+	DcSetMstscRdpFileInt("audiocapturemode", dc->MstscUseShareAudioRec ? 1 : 0);
+	DcSetMstscRdpFileInt("audiomode", 0);
 	if (disable_share)
 	{
 		DcSetMstscRdpFileStr("devicestoredirect", "");
@@ -1458,9 +1464,11 @@ void DcLoadConfig(DC *dc, FOLDER *root)
 	dc->MstscUsePublicSwitchForVer6 = CfgGetBool(root, "MstscUsePublicSwitchForVer6");
 	dc->DontShowFullScreenMessage = CfgGetBool(root, "DontShow_FullScreenMessage");
 	dc->MstscUseShareClipboard = CfgIsItem(root, "MstscUseShareClipboard") ? CfgGetBool(root, "MstscUseShareClipboard") : true;
+	dc->MstscUseShareCamera = CfgGetBool(root, "MstscUseShareCamera");
 	dc->MstscUseShareDisk = CfgGetBool(root, "MstscUseShareDisk");
 	dc->MstscUseSharePrinter = CfgGetBool(root, "MstscUseSharePrinter");
 	dc->MstscUseShareComPort = CfgGetBool(root, "MstscUseShareComPort");
+	dc->MstscUseShareAudioRec = CfgGetBool(root, "MstscUseShareAudioRec");
 	dc->DisableMultiDisplay = CfgGetBool(root, "DisableMultiDisplay");
 	if (CfgIsItem(root, "EnableVersion2"))
 	{
@@ -1596,6 +1604,8 @@ void DcSaveConfig(DC *dc)
 	CfgAddBool(root, "MstscUseSharePrinter", dc->MstscUseSharePrinter);
 	CfgAddBool(root, "MstscUseShareComPort", dc->MstscUseShareComPort);
 	CfgAddBool(root, "EnableVersion2", dc->EnableVersion2);
+	CfgAddBool(root, "MstscUseShareAudioRec", dc->MstscUseShareAudioRec);
+	CfgAddBool(root, "MstscUseShareCamera", dc->MstscUseShareCamera);
 
 	if (dc->SupportBluetooth)
 	{
@@ -1680,6 +1690,7 @@ void DcInitDefaultConfig(DC *dc)
 
 	dc->MstscUseShareClipboard = true;
 	dc->MstscUsePublicSwitchForVer6 = true;
+	dc->MstscUseShareCamera = true;
 	dc->EnableVersion2 = true;
 
 	// システムのインターネット接続設定を取得

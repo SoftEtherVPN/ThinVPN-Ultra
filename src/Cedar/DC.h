@@ -136,6 +136,8 @@ struct DC
 	bool MstscUseShareDisk;				// ディスクの共有機能を使用する
 	bool MstscUseSharePrinter;			// プリンタの共有機能を使用する
 	bool MstscUseShareComPort;			// COM ポートの共有機能を使用する
+	bool MstscUseShareAudioRec;			// マイク共用を使用する
+	bool MstscUseShareCamera;			// カメラ共有を使用する
 	bool DontShowFullScreenMessage;		// フルスクリーンメッセージを表示しない
 	LIST *Candidate;					// 候補
 	wchar_t BluetoothDir[MAX_PATH];		// Bluetooth ディレクトリ

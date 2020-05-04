@@ -296,11 +296,15 @@ UINT DuShareDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *par
 		DlgFont(hWnd, C_SHARE_DISK, 0, true);
 		DlgFont(hWnd, C_SHARE_PRINTER, 0, true);
 		DlgFont(hWnd, C_SHARE_COMPORT, 0, true);
+		DlgFont(hWnd, C_SHARE_CAMERA, 0, true);
+		DlgFont(hWnd, C_SHARE_AUDIOREC, 0, true);
 
 		Check(hWnd, C_SHARE_CLIPBOARD, dc->MstscUseShareClipboard);
 		Check(hWnd, C_SHARE_DISK, dc->MstscUseShareDisk);
 		Check(hWnd, C_SHARE_PRINTER, dc->MstscUseSharePrinter);
 		Check(hWnd, C_SHARE_COMPORT, dc->MstscUseShareComPort);
+		Check(hWnd, C_SHARE_CAMERA, dc->MstscUseShareCamera);
+		Check(hWnd, C_SHARE_AUDIOREC, dc->MstscUseShareAudioRec);
 
 		SetEnable(hWnd, C_SHARE_CLIPBOARD, DcGetCurrentMstscVersion(dc) == DC_MSTSC_VER_VISTA);
 		if (IsEnable(hWnd, C_SHARE_CLIPBOARD) == false)
@@ -332,6 +336,14 @@ UINT DuShareDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *par
 			dc->MstscUseShareDisk = IsChecked(hWnd, C_SHARE_DISK);
 			dc->MstscUseSharePrinter = IsChecked(hWnd, C_SHARE_PRINTER);
 			dc->MstscUseShareComPort = IsChecked(hWnd, C_SHARE_COMPORT);
+			dc->MstscUseShareCamera = IsChecked(hWnd, C_SHARE_CAMERA);
+			dc->MstscUseShareAudioRec = IsChecked(hWnd, C_SHARE_AUDIOREC);
+
+			if (dc->MstscUseShareCamera)
+			{
+				OnceMsgEx2(hWnd, _UU("PRODUCT_NAME_DESKCLIENT"), _UU("DU_MSTSC_CAMERA_WARNING"), true,
+					ICO_INFORMATION, NULL, false);
+			}
 
 			EndDialog(hWnd, 1);
 
