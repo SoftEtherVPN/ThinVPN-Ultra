@@ -2538,6 +2538,19 @@ void WideGatePackGateInfo(PACK *p, WT *wt)
 		{
 			StrCpy(tmp, sizeof(tmp), "-");
 		}
+		else
+		{
+			TOKEN_LIST *t = ParseTokenWithoutNullStr(tmp, " ");
+			if (t != NULL)
+			{
+				if (t->NumTokens >= 12)
+				{
+					Format(tmp, sizeof(tmp), "%s %s", t->Token[2], t->Token[11]);
+				}
+
+				FreeToken(t);
+			}
+		}
 
 		StrCpy(wt->OsInfo, sizeof(wt->OsInfo), tmp);
 	}
