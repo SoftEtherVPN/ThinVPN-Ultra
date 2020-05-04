@@ -1269,6 +1269,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		char otp[MAX_PATH];
 		bool ok = false;
 		bool ok_ticket = false;
+		UINT i;
 
 		if (first_connection)
 		{
@@ -1282,7 +1283,15 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			ds->OtpNumTry++;
 
 			// OTP をメール送信する
-			WideServerSendOtpEmail(ds->Wide, ds->LastOtp, ds->OtpEmail, client_ip_str, client_host);
+			for (i = 0;i < 5;i++)
+			{
+				// 失敗した場合に備えて念のため 5 通くらい送信する
+				UINT otp_err = WideServerSendOtpEmail(ds->Wide, ds->LastOtp, ds->OtpEmail, client_ip_str, client_host);
+				if (otp_err == ERR_NO_ERROR)
+				{
+					break;
+				}
+			}
 		}
 
 		// クライアントからの OTP を受信する
