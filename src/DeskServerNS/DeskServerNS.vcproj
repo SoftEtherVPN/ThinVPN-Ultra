@@ -66,7 +66,7 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot; /POSTFIX:&quot;(ShareDisabled)&quot;"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -154,7 +154,7 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot; /POSTFIX:&quot;(ShareDisabled)&quot;"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -245,7 +245,7 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot; /POSTFIX:&quot;(ShareDisabled)&quot;"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -341,7 +341,7 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
+				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot; /POSTFIX:&quot;(ShareDisabled)&quot;"
 			/>
 			<Tool
 				Name="VCLinkerTool"
