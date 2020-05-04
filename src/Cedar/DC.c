@@ -856,6 +856,7 @@ UINT DcGetUrdpClientArguments(DC_SESSION *s, char *arg, UINT arg_size, bool disa
 // mstsc.exe に渡す引数の取得
 UINT DcGetMstscArguments(DC_SESSION *s, wchar_t *mstsc_exe, char *arg, UINT arg_size)
 {
+#ifdef	OS_WIN32
 	UINT ver;
 	char tmp[MAX_PATH * 2];
 	DC *dc;
@@ -896,6 +897,7 @@ UINT DcGetMstscArguments(DC_SESSION *s, wchar_t *mstsc_exe, char *arg, UINT arg_
 
 	StrCpy(arg, arg_size, tmp);
 
+#endif	// OS_WIN32
 	return ERR_NO_ERROR;
 }
 
