@@ -63,6 +63,7 @@ struct RPC_DS_CONFIG
 	wchar_t AdminUsername[MAX_PATH];
 	bool EnableOtp;
 	char OtpEmail[MAX_PATH];
+	char EmergencyOtp[128];
 
 	bool EnableInspection;
 	bool EnableMacCheck;

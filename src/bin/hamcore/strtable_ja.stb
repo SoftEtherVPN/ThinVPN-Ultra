@@ -440,6 +440,7 @@ DG_AUTH_NO_PASSWORD		パスワード認証のパスワードが設定されて�
 DG_AUTH_ANONYMOUS_WARNING	匿名認証を有効にすると、誰でもこのサーバーにリモートアクセスすることができるようになりセキュリティ上危険です。\r\n\r\n本当に匿名認証を有効にしますか?
 DG_OTP_ENDWITH			メールアドレスの文字列の末尾は、「%S」 である必要があります。\r\nOTP メールは、ドメイン 「@otp.cyber.ipa.go.jp」 から送信されます。
 DG_OTP_ENDWITH_ERROR	メールアドレスの文字列の末尾は、「%S」 である必要があります。
+DG_EMERGENCY_OTP_GENERATED	新しい「非常用 OTP 代替コード」が発行されました。\r\n\r\n古いコードは無効になりました。\r\n\r\nなお、OTP 認証設定ダイアログボックスで「OK」をクリックするまで、この変更は保存されません。
 
 
 # Cedar エンジンからのコピー分

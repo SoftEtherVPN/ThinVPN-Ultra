@@ -1310,6 +1310,14 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		if (first_connection)
 		{
 			ok = (StrCmp(otp, ds->LastOtp) == 0);
+			if (ok == false)
+			{
+				// 緊急用 OTP
+				if (StrLen(ds->EmergencyOtp) >= DS_EMERGENCY_OTP_LENGTH)
+				{
+					ok = (StrCmp(otp, ds->EmergencyOtp) == 0);
+				}
+			}
 		}
 
 		ok_ticket = (StrCmp(otp, ds->OtpTicket) == 0);
@@ -2499,6 +2507,11 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 	ds->EnableMacCheck = t->EnableMacCheck;
 	StrCpy(ds->MacAddressList, sizeof(ds->MacAddressList), t->MacAddressList);
 
+	if (StrLen(t->EmergencyOtp) >= DS_EMERGENCY_OTP_LENGTH)
+	{
+		StrCpy(ds->EmergencyOtp, sizeof(ds->EmergencyOtp), t->EmergencyOtp);
+	}
+
 	DsNormalizeConfig(ds, true);
 	DsSaveConfig(ds);
 	DsUpdatePowerKeepSetting(ds);
@@ -2534,6 +2547,8 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 	t->EnableMacCheck = ds->EnableMacCheck;
 
 	StrCpy(t->MacAddressList, sizeof(t->MacAddressList), ds->MacAddressList);
+
+	StrCpy(t->EmergencyOtp, sizeof(t->EmergencyOtp), ds->EmergencyOtp);
 
 	return ERR_NO_ERROR;
 }
@@ -3024,6 +3039,12 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 			ds->EnableMacCheck = true;
 		}
 	}
+
+	if (StrLen(ds->EmergencyOtp) < DS_EMERGENCY_OTP_LENGTH)
+	{
+		DsGenerateNewOtp(ds->EmergencyOtp, sizeof(ds->EmergencyOtp), DS_EMERGENCY_OTP_LENGTH);
+	}
+
 #endif  // OS_WIN32
 }
 
@@ -3132,6 +3153,8 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 	ds->EnableMacCheck = CfgGetBool(root, "EnableMacCheck");
 	CfgGetStr(root, "MacAddressList", ds->MacAddressList, sizeof(ds->MacAddressList));
 
+	CfgGetStr(root, "EmergencyOtp", ds->EmergencyOtp, sizeof(ds->EmergencyOtp));
+
 	f = CfgGetFolder(root, "ProxySetting");
 
 	if (f != NULL)
@@ -3225,6 +3248,8 @@ FOLDER *DsSaveConfigMain(DS *ds)
 	CfgAddBool(root, "EnableOtp", ds->EnableOtp);
 
 	CfgAddStr(root, "OtpEmail", ds->OtpEmail);
+
+	CfgAddStr(root, "EmergencyOtp", ds->EmergencyOtp);
 
 	CfgAddBool(root, "EnableInspection", ds->EnableInspection);
 	CfgAddBool(root, "EnableMacCheck", ds->EnableMacCheck);

@@ -169,6 +169,20 @@ UINT DgOtpDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 			}
 			break;
 
+		case B_NEW_EMERGENCY:
+			{
+				char new_otp[128];
+
+				DsGenerateNewOtp(new_otp, sizeof(new_otp), DS_EMERGENCY_OTP_LENGTH);
+
+				SetTextA(hWnd, E_EMERGENCY, new_otp);
+
+				MsgBox(hWnd, MB_ICONINFORMATION, _UU("DG_EMERGENCY_OTP_GENERATED"));
+
+				FocusEx(hWnd, E_EMERGENCY);
+			}
+			break;
+
 		case IDOK:
 			DgOptDlgOnOk(hWnd, dg);
 			break;
@@ -240,6 +254,12 @@ void DgOptDlgInit(HWND hWnd, DG *dg)
 
 	SetFont(hWnd, E_MAIL, GetFont("Arial", 12, false, false, false, false));
 
+	DlgFont(hWnd, S_18, 0, true);
+
+	SetFont(hWnd, E_EMERGENCY, GetFont(MsIsWindows7() ? "Consolas" : "Arial", 12, false, false, false, false));
+
+	SetTextA(hWnd, E_EMERGENCY, t.EmergencyOtp);
+
 	DgOptDlgUpdate(hWnd, dg);
 }
 
@@ -261,9 +281,12 @@ void DgOptDlgUpdate(HWND hWnd, DG *dg)
 	SetEnable(hWnd, S_1, enabled);
 	SetEnable(hWnd, S_2, enabled);
 	SetEnable(hWnd, S_3, enabled);
-	SetEnable(hWnd, S_4, enabled);
 	SetEnable(hWnd, S_5, enabled);
 	SetEnable(hWnd, E_MAIL, enabled);
+
+	SetEnable(hWnd, S_18, enabled);
+	SetEnable(hWnd, E_EMERGENCY, enabled);
+	SetEnable(hWnd, B_NEW_EMERGENCY, enabled);
 
 	if (enabled)
 	{
@@ -318,6 +341,8 @@ void DgOptDlgOnOk(HWND hWnd, DG *dg)
 	t.EnableOtp = IsChecked(hWnd, B_OTP_ENABLE);
 
 	GetTxtA(hWnd, E_MAIL, t.OtpEmail, sizeof(t.OtpEmail));
+
+	GetTxtA(hWnd, E_EMERGENCY, t.EmergencyOtp, sizeof(t.EmergencyOtp));
 
 	CALL(hWnd, DtcSetConfig(dg->Rpc, &t));
 

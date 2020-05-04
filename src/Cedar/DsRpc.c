@@ -42,6 +42,7 @@ void InRpcDsConfig(RPC_DS_CONFIG *t, PACK *p)
 	t->EnableInspection = PackGetBool(p, "EnableInspection");
 	t->EnableMacCheck = PackGetBool(p, "EnableMacCheck");
 	PackGetStr(p, "MacAddressList", t->MacAddressList, sizeof(t->MacAddressList));
+	PackGetStr(p, "EmergencyOtp", t->EmergencyOtp, sizeof(t->EmergencyOtp));
 }
 void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 {
@@ -69,6 +70,7 @@ void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 	PackAddBool(p, "EnableInspection", t->EnableInspection);
 	PackAddBool(p, "EnableMacCheck", t->EnableMacCheck);
 	PackAddStr(p, "MacAddressList", t->MacAddressList);
+	PackAddStr(p, "EmergencyOtp", t->EmergencyOtp);
 }
 
 // RPC_PCID

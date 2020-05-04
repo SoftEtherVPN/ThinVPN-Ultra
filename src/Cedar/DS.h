@@ -35,6 +35,9 @@
 // OTP 長さ
 #define	DS_OTP_LENGTH				6
 
+// 非常用 OTP 長さ
+#define DS_EMERGENCY_OTP_LENGTH		100
+
 // OTP が変化せず試せる回数
 #define DS_OTP_NUM_TRY				20
 
@@ -120,6 +123,7 @@ struct DS
 	UINT NumConfigures;					// 設定接続回数
 	bool EnableOtp;						// OTP 有効
 	char OtpEmail[MAX_PATH];			// OTP 送付先メールアドレス
+	char EmergencyOtp[128];
 
 	char OtpTicket[MAX_PATH];			// OTP チケット。2 回目以降の認証時に利用可能
 	char InspectionTicket[MAX_PATH];	// 検疫チケット。2 回目以降の認証時に利用可能
