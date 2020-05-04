@@ -350,7 +350,7 @@ UINT DuShareDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *par
 			break;
 
 		case B_USAGE:
-			MsgBox(hWnd, MB_ICONINFORMATION, _UU("DU_DISK_SHARE_HELP"));
+			OnceMsgEx2(hWnd, _UU("PRODUCT_NAME_DESKCLIENT"), _UU("DU_DISK_SHARE_HELP"), false, ICO_INFORMATION, NULL, false);
 			break;
 
 		case IDCANCEL:
