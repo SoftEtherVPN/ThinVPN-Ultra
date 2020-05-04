@@ -256,7 +256,7 @@ void DgOptDlgInit(HWND hWnd, DG *dg)
 
 	DlgFont(hWnd, S_18, 0, true);
 
-	SetFont(hWnd, E_EMERGENCY, GetFont(MsIsWindows7() ? "Consolas" : "Arial", 12, false, false, false, false));
+	SetFont(hWnd, E_EMERGENCY, GetFont(MsIsWindows7() ? "Consolas" : "Arial", 11, false, false, false, false));
 
 	SetTextA(hWnd, E_EMERGENCY, t.EmergencyOtp);
 

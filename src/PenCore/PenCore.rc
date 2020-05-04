@@ -1508,7 +1508,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 244
         TOPMARGIN, 5
-        BOTTOMMARGIN, 381
+        BOTTOMMARGIN, 373
     END
 
     D_DU_OTP, DIALOG
@@ -5482,7 +5482,7 @@ BEGIN
     DEFPUSHBUTTON   "ｷｬﾝｾﾙ",IDCANCEL,94,39,63,18
 END
 
-D_DG_OTP DIALOGEX 0, 0, 251, 386
+D_DG_OTP DIALOGEX 0, 0, 251, 378
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "ワンタイムパスワード (OTP) 認証設定 - シン・テレワークシステム サーバー"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
@@ -5494,12 +5494,12 @@ BEGIN
     EDITTEXT        E_MAIL,43,146,191,15,ES_AUTOHSCROLL
     LTEXT           "スマートフォン等でいつでも受信できるメールアドレスの設定をお勧めします。\r\n\r\nOTP メールは、ドメイン 「@otp.cyber.ipa.go.jp」 から送信されます。",S_2,43,165,192,43
     LTEXT           "職場の PC で本機能を設定する場合は、退社前に必ず手元の別のパソコンから試しに接続するなど、OTP が正しく作動することのテストをしてください。自宅に帰宅された後、万一 OTP が正しく送信されない場合は、会社に来るまでログインできなくなります。\r\n\r\nメールアドレス文字列は本コンピュータ上でのみ保持され、中継システムで管理・保管されることはありません (ただし、メール送信時の SMTP サーバーの内部ログに一時的に保持される場合はあります)。",S_3,32,210,212,68
-    LTEXT           "何らの原因で「ワンタイムパスワード」(OTP) が受信できなかった場合のセキュリティ低下 (可用性の低下) を防止するため、以下の「非常用 OTP 代替コード」が提供されます。代替コードは、メモをして自宅等の安全な場所に保管してください。非常時のみ使用できます。普段は使用しないでください。",S_5,32,277,212,36
-    LTEXT           "非常用 OTP 代替コード (100 桁):",S_18,32,316,212,10
-    EDITTEXT        E_EMERGENCY,32,330,155,27,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_HSCROLL
-    PUSHBUTTON      "新規コード(&N)",B_NEW_EMERGENCY,191,329,53,18
-    DEFPUSHBUTTON   "&OK",IDOK,111,363,64,17
-    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,363,64,17
+    LTEXT           "何らの原因で「ワンタイムパスワード」(OTP) が受信できなかった場合の情報セキュリティの低下 (可用性の低下) を防止するため、以下の「非常用 OTP 代替コード」が提供されます。代替コードは、メモをして自宅等の安全な場所に保管してください。非常時のみ使用できます。普段は使用しないでください。",S_5,32,277,212,36
+    LTEXT           "非常用 OTP 代替コード (30 桁):",S_18,32,316,212,10
+    EDITTEXT        E_EMERGENCY,32,330,155,15,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "新規コード(&N)",B_NEW_EMERGENCY,191,328,53,18
+    DEFPUSHBUTTON   "&OK",IDOK,111,356,64,17
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,356,64,17
     CONTROL         247,IDC_STATIC,"Static",SS_BITMAP,9,0,234,86
 END
 

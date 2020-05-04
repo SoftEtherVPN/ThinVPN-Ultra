@@ -36,7 +36,7 @@
 #define	DS_OTP_LENGTH				6
 
 // 非常用 OTP 長さ
-#define DS_EMERGENCY_OTP_LENGTH		100
+#define DS_EMERGENCY_OTP_LENGTH		30
 
 // OTP が変化せず試せる回数
 #define DS_OTP_NUM_TRY				20
