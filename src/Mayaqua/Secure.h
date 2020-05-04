@@ -286,7 +286,7 @@ SECURE_DEVICE SupportedList[] =
 	{6,		SECURE_IC_CARD,		"ASECard",				"Athena",				"ASEPKCS.DLL"},
 	{7,		SECURE_IC_CARD,		"Gemplus IC Card",		"Gemplus",				"PK2PRIV.DLL"},
 	{8,		SECURE_IC_CARD,		"1-Wire & iButton",		"DALLAS SEMICONDUCTOR",	"DSPKCS.DLL"},
-	{9,		SECURE_IC_CARD,		"My Number Card",			"Japanese Government",	"JPKIPKCS11.DLL"},
+	{9,		SECURE_IC_CARD,		"JPKI Card",		"Japanese Government",	"JPKIPKCS11.DLL"},
 	{10,	SECURE_IC_CARD,		"LGWAN IC Card",		"Japanese Government",	"P11STD9.DLL"},
 	{11,	SECURE_IC_CARD,		"LGWAN IC Card",		"Japanese Government",	"P11STD9A.DLL"},
 	{12,	SECURE_USB_TOKEN,	"iKey 1000",			"Rainbow Technologies",	"K1PK112.DLL"},
@@ -301,8 +301,10 @@ SECURE_DEVICE SupportedList[] =
 	{21,	SECURE_USB_TOKEN,	"ePass 1000ND/2000/3000",			"Feitian Technologies",	"ngp11v211.dll"},
 	{22,	SECURE_USB_TOKEN,	"CryptoID",				"Longmai Technology",	"cryptoide_pkcs11.dll"},
 	{23,	SECURE_USB_TOKEN,	"RuToken",				"Aktiv Co.",			"rtPKCS11.dll"},
-	{24,	SECURE_IC_CARD,		"My Number Card (64bit)",	"Japanese Government",	"JPKIPKCS1164.DLL"},
+	{24,	SECURE_IC_CARD,		"JPKI Card (64bit)",			"Japanese Government",	"JPKIPKCS1164.DLL"},
 	{25,	SECURE_IC_CARD,		"OpenSC Smart Card",	"OpenSC",	"opensc-pkcs11.dll"},
+	{26,	SECURE_IC_CARD,		"My Number Card",	"Japanese Government",	"JPKIPKCS11Sign.dll"},
+	{27,	SECURE_IC_CARD,		"My Number Card (64bit)",	"Japanese Government",	"JPKIPKCS11Sign64.dll"},
 };
 
 #ifdef	OS_WIN32

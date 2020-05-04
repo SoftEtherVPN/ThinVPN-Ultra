@@ -352,7 +352,7 @@ void Win32FreeSecModule(SECURE *sec)
 // Whether the specified device is a JPKI
 bool IsJPKI(bool id)
 {
-	if (id == 9 || id == 13 || id == 24)
+	if (id == 9 || id == 13 || id == 24 || id == 26 || id == 27)
 	{
 		return true;
 	}
