@@ -1140,6 +1140,9 @@ void RUDPAddIpToValidateList(RUDP_STACK *r, IP *ip);
 bool GetBestLocalIpForTarget(IP *local_ip, IP *target_ip);
 SOCK *NewUDP4ForSpecificIp(IP *target_ip, UINT port);
 
+bool LinuxGetWanMacAddress(UCHAR *mac);
+bool LinuxGetOsInfo(char *str, UINT size);
+
 #ifdef	OS_WIN32
 
 // Function prototype for Win32

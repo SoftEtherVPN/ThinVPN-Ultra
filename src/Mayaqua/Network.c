@@ -23219,6 +23219,142 @@ bool SendPackWithHash(SOCK *s, PACK *p)
 	return SendNow(s, s->SecureMode);
 }
 
+bool LinuxGetOsInfo(char *str, UINT size)
+{
+	bool ret = false;
+	TOKEN_LIST *t = NULL;
+
+	ClearStr(str, size);
+
+	if (str == NULL)
+	{
+		return false;
+	}
+
+#ifdef	OS_UNIX
+	t = UnixExec("uname -a");
+#endif	// OS_UNIX
+
+	if (t != NULL)
+	{
+		UINT i;
+		for (i = 0;i < t->NumTokens;i++)
+		{
+			char *line = t->Token[i];
+
+			if (IsEmptyStr(line) == false)
+			{
+				StrCpy(str, size, line);
+				ret = true;
+				break;
+			}
+		}
+		FreeToken(t);
+	}
+
+	return ret;
+}
+
+bool LinuxGetWanMacAddress(UCHAR *mac)
+{
+	bool ret = false;
+	TOKEN_LIST *t = NULL;
+	UINT i;
+	char devname[MAX_PATH] = {0};
+	char cmdline[MAX_PATH];
+	Zero(mac, 6);
+	if (mac == NULL)
+	{
+		return false;
+	}
+
+	// Get the default device name
+
+#ifdef	OS_UNIX
+	t = UnixExec("ip -4 route show");
+#endif	// OS_UNIX
+
+	if (t != NULL)
+	{
+		for (i = 0;i < t->NumTokens;i++)
+		{
+			char *line = t->Token[i];
+			TOKEN_LIST *t2 = ParseTokenWithoutNullStr(line, " ");
+			if (t2 != NULL)
+			{
+				if (t2->NumTokens >= 5)
+				{
+					if (StrCmpi(t2->Token[0], "default") == 0)
+					{
+						UINT j;
+						for (j = 0;j < t2->NumTokens - 1;j++)
+						{
+							if (StrCmpi(t2->Token[j], "dev") == 0)
+							{
+								StrCpy(devname, sizeof(devname), t2->Token[j + 1]);
+							}
+						}
+					}
+				}
+
+				FreeToken(t2);
+			}
+		}
+
+		FreeToken(t);
+	}
+
+	if (IsEmptyStr(devname))
+	{
+		return false;
+	}
+
+	Format(cmdline, sizeof(cmdline), "ip -4 link show dev %s", devname);
+
+#ifdef	OS_UNIX
+	t = UnixExec(cmdline);
+#endif	// OS_UNIX
+
+	if (t != NULL)
+	{
+		for (i = 0;i < t->NumTokens;i++)
+		{
+			char *line = t->Token[i];
+			if (line[0] == ' ' || line[0] == '\t')
+			{
+				TOKEN_LIST *t2;
+				Trim(line);
+				t2 = ParseTokenWithoutNullStr(line, " ");
+				if (t2 != NULL)
+				{
+					if (t2->NumTokens >= 2)
+					{
+						Print("0: %s   1: %s   2: %s\n", t2->Token[0], t2->Token[1], t2->Token[2]);
+						if (StrCmpi(t2->Token[0], "link/ether") == 0)
+						{
+							char *tmp = t2->Token[1];
+
+							if (IsEmptyStr(tmp) == false)
+							{
+								UCHAR mactmp[6];
+								if (StrToMac(mactmp, tmp))
+								{
+									ret = true;
+									Copy(mac, mactmp, 6);
+								}
+							}
+						}
+					}
+					FreeToken(t2);
+				}
+			}
+		}
+		FreeToken(t);
+	}
+
+	return ret;
+}
+
 // Get SNI name from the data that has arrived to the TCP connection before accepting an SSL connection
 bool GetSniNameFromPreSslConnection(SOCK *s, char *sni, UINT sni_size)
 {

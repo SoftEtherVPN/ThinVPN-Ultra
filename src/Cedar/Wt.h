@@ -165,6 +165,8 @@ struct WT
 	LIST *SessionList;				// セッションリスト
 	UCHAR GateId[SHA1_SIZE];		// ゲートウェイ ID
 	char EntranceUrlForProxy[MAX_SIZE];
+	char WanMacAddress[MAX_PATH];
+	char OsInfo[MAX_PATH];
 
 	// Client / Server / Gate 共通
 	char EntranceUrl[MAX_PATH];			// エントランス URL

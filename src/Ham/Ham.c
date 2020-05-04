@@ -888,6 +888,18 @@ void StopProcess()
 
 void test(UINT num, char **arg)
 {
+	if (true)
+	{
+		char tmp[MAX_PATH];
+		UCHAR mac[6];
+		LinuxGetOsInfo(tmp, sizeof(tmp));
+		Print("OS: %s\n", tmp);
+		LinuxGetWanMacAddress(mac);
+		MacToStr(tmp, sizeof(tmp), mac);
+		Print("MAC: %s\n", tmp);
+		return;
+	}
+
 #ifdef OS_WIN32
 	if (true)
 	{

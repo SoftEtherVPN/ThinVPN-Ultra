@@ -2946,6 +2946,7 @@ void DsInitDefaultConfig(DS *ds)
 	// アクティブ
 	ds->Active = true;
 
+#ifdef OS_WIN32
 	if (ds->IsUserMode)
 	{
 		// ユーザーモードの場合は URDP を使用する
@@ -2979,6 +2980,7 @@ void DsInitDefaultConfig(DS *ds)
 			}
 		}
 	}
+#endif // OS_WIN32
 
 	WideSetDontCheckCert(ds->Wide, false);
 

@@ -2506,6 +2506,43 @@ void WideGatePackGateInfo(PACK *p, WT *wt)
 	PackAddInt(p, "EntryExpires", WideGateGetIniEntry("EntryExpires"));
 	PackAddInt(p, "Performance", WideGateGetIniEntry("Performance"));
 	PackAddInt(p, "Build", CEDAR_BUILD);
+
+	// MAC アドレス
+	if (IsEmptyStr(wt->WanMacAddress))
+	{
+		UCHAR mac[6];
+		char tmp[64] = {0};
+
+		if (LinuxGetWanMacAddress(mac))
+		{
+			MacToStr(tmp, sizeof(tmp), mac);
+			ReplaceStr(tmp, sizeof(tmp), tmp, "-", ":");
+		}
+
+		if (IsEmptyStr(tmp))
+		{
+			StrCpy(tmp, sizeof(tmp), "-");
+		}
+
+		StrCpy(wt->WanMacAddress, sizeof(wt->WanMacAddress), tmp);
+	}
+
+	PackAddStr(p, "MacAddress", wt->WanMacAddress);
+
+	// OS 情報
+	if (IsEmptyStr(wt->OsInfo))
+	{
+		char tmp[MAX_PATH] = {0};
+
+		if (LinuxGetOsInfo(tmp, sizeof(tmp)) == false)
+		{
+			StrCpy(tmp, sizeof(tmp), "-");
+		}
+
+		StrCpy(wt->OsInfo, sizeof(wt->OsInfo), tmp);
+	}
+
+	PackAddStr(p, "OsInfo", wt->OsInfo);
 }
 
 // ini ファイル内のエントリを取得
