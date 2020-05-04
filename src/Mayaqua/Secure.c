@@ -373,6 +373,7 @@ bool SignSec(SECURE *sec, char *name, void *dst, void *src, UINT size)
 	if (name == NULL || dst == NULL || src == NULL)
 	{
 		sec->Error = SEC_ERROR_BAD_PARAMETER;
+		sec->ErrorLine = __LINE__;
 		return false;
 	}
 
@@ -403,21 +404,25 @@ bool SignSecByObject(SECURE *sec, SEC_OBJ *obj, void *dst, void *src, UINT size)
 	if (obj == NULL || dst == NULL || src == NULL)
 	{
 		sec->Error = SEC_ERROR_BAD_PARAMETER;
+		sec->ErrorLine = __LINE__;
 		return false;
 	}
 	if (sec->SessionCreated == false)
 	{
 		sec->Error = SEC_ERROR_NO_SESSION;
+		sec->ErrorLine = __LINE__;
 		return false;
 	}
 	if (sec->LoginFlag == false && obj->Private)
 	{
 		sec->Error = SEC_ERROR_NOT_LOGIN;
+		sec->ErrorLine = __LINE__;
 		return false;
 	}
 	if (obj->Type != SEC_K)
 	{
 		sec->Error = SEC_ERROR_BAD_PARAMETER;
+		sec->ErrorLine = __LINE__;
 		return false;
 	}
 
@@ -430,23 +435,25 @@ bool SignSecByObject(SECURE *sec, SEC_OBJ *obj, void *dst, void *src, UINT size)
 	{
 		// Failure
 		sec->Error = SEC_ERROR_HARDWARE_ERROR;
+		sec->ErrorLine = __LINE__;
 		Debug("C_SignInit Error: 0x%x\n", ret);
 		return false;
 	}
 
 	// Perform Signing
-	size = 128;
-	// First try with 1024 bit
-	ret = sec->Api->C_Sign(sec->SessionId, hash, sizeof(hash), dst, &size);
-	if (ret != CKR_OK && 128 < size && size <= 4096/8)
+	size = 0;
+	// Try to get the required signature size
+	ret = sec->Api->C_Sign(sec->SessionId, hash, sizeof(hash), NULL, &size);
+	if (size >= 128 && size <= 4096/8)
 	{
-		// Retry with expanded bits
+		// Try the sign
 		ret = sec->Api->C_Sign(sec->SessionId, hash, sizeof(hash), dst, &size);
 	}
 	if (ret != CKR_OK || size == 0 || size > 4096/8)
 	{
 		// Failure
 		sec->Error = SEC_ERROR_HARDWARE_ERROR;
+		sec->ErrorLine = __LINE__;
 		Debug("C_Sign Error: 0x%x  size:%d\n", ret, size);
 		return false;
 	}
@@ -1130,11 +1137,13 @@ SEC_OBJ *FindSecObject(SECURE *sec, char *name, UINT type)
 	if (name == NULL)
 	{
 		sec->Error = SEC_ERROR_BAD_PARAMETER;
+		sec->ErrorLine = __LINE__;
 		return NULL;
 	}
 	if (sec->SessionCreated == false)
 	{
 		sec->Error = SEC_ERROR_NO_SESSION;
+		sec->ErrorLine = __LINE__;
 		return 0;
 	}
 
@@ -1162,6 +1171,7 @@ SEC_OBJ *FindSecObject(SECURE *sec, char *name, UINT type)
 	if (ret == NULL)
 	{
 		sec->Error = SEC_ERROR_OBJ_NOT_FOUND;
+		sec->ErrorLine = __LINE__;
 	}
 
 	return ret;
@@ -1302,6 +1312,7 @@ LIST *EnumSecObject(SECURE *sec)
 	if (sec->SessionCreated == false)
 	{
 		sec->Error = SEC_ERROR_NO_SESSION;
+		sec->ErrorLine = __LINE__;
 		return NULL;
 	}
 
@@ -1328,12 +1339,14 @@ LIST *EnumSecObject(SECURE *sec)
 	if (ret != CKR_OK)
 	{
 		sec->Error = SEC_ERROR_HARDWARE_ERROR;
+		sec->ErrorLine = __LINE__;
 		return NULL;
 	}
 	if (sec->Api->C_FindObjects(sec->SessionId, objects, sizeof(objects) / sizeof(objects[0]), &num_objects) != CKR_OK)
 	{
 		sec->Api->C_FindObjectsFinal(sec->SessionId);
 		sec->Error = SEC_ERROR_HARDWARE_ERROR;
+		sec->ErrorLine = __LINE__;
 		return NULL;
 	}
 	sec->Api->C_FindObjectsFinal(sec->SessionId);

@@ -8501,8 +8501,11 @@ DELETE_OBJECT:
 		SetText(hWnd, S_STATUS, _UU("SEC_SIGN"));
 		if (SignSec(sec, batch->Name, batch->OutputSign, batch->InputData->Buf, batch->InputData->Size) == false)
 		{
-			p->ErrorMessage = UniCopyStr(dev->Type != SECURE_USB_TOKEN ?
-				_UU("SEC_ERROR_SIGN_1") : _UU("SEC_ERROR_SIGN_2"));
+			wchar_t tmp[MAX_PATH];
+			UniFormat(tmp, sizeof(tmp), 
+				dev->Type != SECURE_USB_TOKEN ? _UU("SEC_ERROR_SIGN_1") : _UU("SEC_ERROR_SIGN_2"),
+				sec->Error, sec->ErrorLine);
+			p->ErrorMessage = UniCopyStr(tmp);
 			return false;
 		}
 		break;

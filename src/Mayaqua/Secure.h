@@ -155,6 +155,7 @@ struct SECURE
 	LOCK *lock;								// Lock
 	SECURE_DEVICE *Dev;						// Device Information
 	UINT Error;								// The error that last occurred
+	UINT ErrorLine;
 	struct CK_FUNCTION_LIST *Api;			// API
 	bool Initialized;						// Initialization flag
 	UINT NumSlot;							// The number of slots
@@ -303,8 +304,8 @@ SECURE_DEVICE SupportedList[] =
 	{23,	SECURE_USB_TOKEN,	"RuToken",				"Aktiv Co.",			"rtPKCS11.dll"},
 	{24,	SECURE_IC_CARD,		"JPKI Card (64bit)",			"Japanese Government",	"JPKIPKCS1164.DLL"},
 	{25,	SECURE_IC_CARD,		"OpenSC Smart Card",	"OpenSC",	"opensc-pkcs11.dll"},
-	{26,	SECURE_IC_CARD,		"My Number Card",	"Japanese Government",	"JPKIPKCS11Sign.dll"},
-	{27,	SECURE_IC_CARD,		"My Number Card (64bit)",	"Japanese Government",	"JPKIPKCS11Sign64.dll"},
+	{26,	SECURE_IC_CARD,		"My Number Card 2",	"Japanese Government",	"JPKIPKCS11Auth.dll"},
+	{27,	SECURE_IC_CARD,		"My Number Card 2 (64bit)",	"Japanese Government",	"JPKIPKCS11Auth64.dll"},
 };
 
 #ifdef	OS_WIN32
