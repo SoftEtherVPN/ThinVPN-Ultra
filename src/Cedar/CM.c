@@ -3359,10 +3359,10 @@ UINT CmSelectSecureDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *
 
 					if (old_id != id)
 					{
-						//if (CmCheckPkcsEula(hWnd, id) == false)
-						//{
-						//	break;
-						//}
+						if (CmCheckPkcsEula(hWnd, id) == false)
+						{
+							break;
+						}
 					}
 					EndDialog(hWnd, id);
 				}
