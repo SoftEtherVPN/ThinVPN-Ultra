@@ -1421,7 +1421,7 @@ void ping_test(UINT num, char **arg)
 
 	pcid = arg[0];
 
-	count = 30;
+	count = 0x7FFFFFFF;
 	if (num >= 2)
 	{
 		count = ToInt(arg[1]);
