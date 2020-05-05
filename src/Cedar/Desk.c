@@ -374,6 +374,35 @@ bool DeskCheckUrdpIsInstalledOnProgramFiles(UINT version)
 	return IsFileExistsW(tmp);
 }
 
+// 現在 URDP プロセスが起動しているかどうか調べる
+bool DeskCheckUrdpProcessIsRunning()
+{
+	bool ret = false;
+#ifdef OS_WIN32
+	LIST *o = MsGetProcessList();
+	if (o != NULL)
+	{
+		UINT i;
+		for (i = 0;i < LIST_NUM(o);i++)
+		{
+			MS_PROCESS *proc = LIST_DATA(o, i);
+			wchar_t filename[MAX_PATH];
+
+			GetFileNameFromFilePathW(filename, sizeof(filename), proc->ExeFilenameW);
+
+			if (UniInStrEx(filename, L"urdpserver.exe", false) ||
+				UniInStrEx(filename, L"urdpserver2.exe", false))
+			{
+				ret = true;
+			}
+		}
+		MsFreeProcessList(o);
+	}
+#endif	// OS_WIN32
+
+	return ret;
+}
+
 // URDP Server の開始
 void DeskStartUrdpServer(URDP_SERVER *u, UINT version)
 {

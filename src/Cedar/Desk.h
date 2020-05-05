@@ -178,6 +178,7 @@ bool DeskInstallRudpServerToProgramFilesDir();
 void DeskGetRudpServerProgramFilesDir(wchar_t *dir, UINT size);
 bool DeskIsUacSettingStrict();
 void DeskMitigateUacSetting();
+bool DeskCheckUrdpProcessIsRunning();
 
 bool DeskCheckUrdpIsInstalledOnProgramFiles(UINT version);
 

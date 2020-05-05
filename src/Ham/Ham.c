@@ -890,6 +890,12 @@ void test(UINT num, char **arg)
 {
 	if (true)
 	{
+		Print("DeskCheckUrdpProcessIsRunning = %u\n", DeskCheckUrdpProcessIsRunning());
+		return;
+	}
+
+	if (true)
+	{
 		char tmp[MAX_PATH];
 		UCHAR mac[6];
 		LinuxGetOsInfo(tmp, sizeof(tmp));

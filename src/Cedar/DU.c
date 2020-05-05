@@ -1530,6 +1530,8 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 					{
 						wchar_t *once_msg = NULL;
 						wchar_t tmp[MAX_SIZE];
+						UINT tmp2_size = 3600;
+						wchar_t *tmp2 = ZeroMalloc(tmp2_size);
 
 						if (urdp_version <= 1)
 						{
@@ -1556,7 +1558,11 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 						UniFormat(tmp, sizeof(tmp), _UU("DU_ONCEMSG_TITLE"), s->Pcid);
 
-						once = StartAsyncOnceMsg(tmp, once_msg, true, ICO_INFORMATION, true);
+						UniFormat(tmp2, tmp2_size, once_msg, s->Pcid);
+
+						once = StartAsyncOnceMsg(tmp, tmp2, true, ICO_INFORMATION, true);
+
+						Free(tmp2);
 					}
 				}
 			}

@@ -6085,6 +6085,17 @@ UINT SwWelcomeDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wiz
 			}
 		}
 
+		if (MsIsAdmin() == false && MsIsVista() && sw->IsReExecForUac == false)
+		{
+			if (DeskCheckUrdpProcessIsRunning())
+			{
+				// URDP の画面経由で接続しているときに UAC Popup が起動するとおかしくなるので警告を表示する
+				if (DeskCheckUrdpIsInstalledOnProgramFiles(2) == false || DeskIsUacSettingStrict())	// RUDP が特権的にインストールされていない or UAC 設定が厳しいまま
+				{
+				}
+			}
+		}
+
 		if (sw->DoubleClickBlocker)
 		{
 			break;
