@@ -886,6 +886,62 @@ void StopProcess()
 	FreeCedar();
 }
 
+void proxy_test(UINT num, char **arg)
+{
+	char *proxy_host = "proxy1.lab.coe.ad.jp";
+	UINT proxy_port = 3128;
+
+	char *server_host = "c20540145.controller.dynamic-ip.thin.cyber.ipa.go.jp";
+	char *ua = DEFAULT_USER_AGENT;
+	CONNECTION c = {0};
+
+	SOCK *s;
+
+	s = ProxyConnectEx2(&c, proxy_host, proxy_port, server_host, 443, NULL, NULL, false, NULL,
+		NULL, 0, ua);
+
+	if (s == NULL)
+	{
+		Print("ProxyConnectEx2 error.\n");
+	}
+	else
+	{
+		Print("ProxyConnectEx2 ok.\n");
+
+		if (StartSSLEx(s, NULL, NULL, true, 0, server_host) == false)
+		{
+			Print("StartSSLEx error.\n");
+		}
+		else
+		{
+			UCHAR sha1[SHA1_SIZE] = {0};
+			char tmp[MAX_SIZE];
+
+			Print("StartSSLEx OK.\n");
+
+			GetXDigest(s->RemoteX, sha1, true);
+
+			BinToStr(tmp, sizeof(tmp), sha1, SHA1_SIZE);
+
+			Print("Hash: %s\n", tmp);
+
+			if (StrCmpi(tmp, "4498F763E7A6F3C971E20E40576684B3B353A515") == 0)
+			{
+				Print("Hash OK.\n");
+			}
+			else
+			{
+				Print("Hash NG. MITM.\n");
+			}
+		}
+
+		Disconnect(s);
+		ReleaseSock(s);
+	}
+
+
+}
+
 void test(UINT num, char **arg)
 {
 	if (true)
@@ -1847,6 +1903,7 @@ TEST_LIST test_list[] =
 	{"arg", arg_test},
 	{"prompt", prompt_test},
 	{"unicode", unicode_test},
+	{"proxy", proxy_test},
 };
 
 // ÉeÉXÉgä÷êî
