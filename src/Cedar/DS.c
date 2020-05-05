@@ -1048,6 +1048,25 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 	FreePack(p);
 
+	if (pingmode)
+	{
+		// ping mode (テスト用)
+		while (true)
+		{
+			UINT64 tick;
+			if (SockIoRecvAll(sock, &tick, sizeof(tick)) == false)
+			{
+				break;
+			}
+			if (SockIoSendAll(sock, &tick, sizeof(tick)) == false)
+			{
+				break;
+			}
+		}
+
+		return;
+	}
+
 	if (is_share_disabled)
 	{
 		if (client_build < 5599)
@@ -1164,25 +1183,6 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		return;
 	}
 #endif
-
-	if (pingmode)
-	{
-		// ping mode (テスト用)
-		while (true)
-		{
-			UINT64 tick;
-			if (SockIoRecvAll(sock, &tick, sizeof(tick)) == false)
-			{
-				break;
-			}
-			if (SockIoSendAll(sock, &tick, sizeof(tick)) == false)
-			{
-				break;
-			}
-		}
-
-		return;
-	}
 
 	if (client_ver == 0 || client_build == 0)
 	{
