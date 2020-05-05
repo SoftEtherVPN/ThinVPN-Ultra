@@ -307,6 +307,12 @@ BUF *WpcGeneratePacket(PACK *pack, UCHAR *host_key, UCHAR *host_secret)
 
 	if (host_key != NULL && host_secret != NULL)
 	{
+		// 2020/5/6 バグ！ HOSTKEY, HOSTSECRET ともキー名が 4 文字を超えるため、最初の 4 文字 "HOST" のみが送信されている。
+		// そして、サーバー側では おなじ "HOST" が 2 個くるので、最初の 1 個目、つまり "HOSTKEY" のみを読み込んで、"HOSTSECRET" は無視している。
+		// つまり、HOSTKEY と HOSTSECRET の両方に HOSTKEY が使われている。
+		// しかし、この挙動は今から変更することができないため、当面このままとする。(セキュリティ上の問題はない)
+		// 今後、サーバー側で別のキーが必要となる時は、新たに 2 個目の "HOST" を読むことで対応することにする。
+
 		WpcAddDataEntryBin(b, "HOSTKEY", host_key, SHA1_SIZE);
 		WpcAddDataEntryBin(b, "HOSTSECRET", host_secret, SHA1_SIZE);
 	}
