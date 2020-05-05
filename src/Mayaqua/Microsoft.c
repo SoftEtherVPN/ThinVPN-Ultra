@@ -424,6 +424,7 @@ bool MsCheckWindowsUpdate()
 
 	if (FileCopyW(batch_src_filename, batch_tmp_filename) == false)
 	{
+		ret = true;
 		goto L_CLEANUP;
 	}
 
@@ -433,6 +434,7 @@ bool MsCheckWindowsUpdate()
 
 	if (process == NULL)
 	{
+		ret = true;
 		goto L_CLEANUP;
 	}
 
@@ -480,6 +482,7 @@ bool MsCheckAntiVirus()
 
 	if (FileCopyW(batch_src_filename, batch_tmp_filename) == false)
 	{
+		ret = true;
 		goto L_CLEANUP;
 	}
 
@@ -489,6 +492,7 @@ bool MsCheckAntiVirus()
 
 	if (process == NULL)
 	{
+		ret = true;
 		goto L_CLEANUP;
 	}
 
