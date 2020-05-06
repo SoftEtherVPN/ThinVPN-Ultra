@@ -748,6 +748,7 @@
 #define C_JITTER                        1286
 #define R_REDIRECT                      1286
 #define R_L2TP                          1286
+#define R_LIMITED                       1286
 #define E_LIST                          1287
 #define C_OTHER                         1287
 #define C_LOSS                          1287
@@ -1008,6 +1009,8 @@
 #define B_SELECT_SMARTCARD              1481
 #define S_UAC                           1482
 #define B_SELECT_SCARD_CERT             1482
+#define B_BROWSE2                       1482
+#define B_LIMITED_HELP                  1482
 #define E_SETTING                       1483
 #define E_OUT                           1484
 #define B_BROWSE_SETTING                1485

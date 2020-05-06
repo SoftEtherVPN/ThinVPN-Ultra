@@ -195,6 +195,7 @@ static char *sfx_ntt_files[] =
 	"thinconfig.exe",
 	"hamcore.se2",
 	"EntryPoint.dat",
+	"EntryPoint_LimitedMode.dat",
 };
 
 static char *sfx_ntt_files_share_disabled[] =
@@ -205,6 +206,7 @@ static char *sfx_ntt_files_share_disabled[] =
 	"thinconfig.exe",
 	"hamcore.se2",
 	"EntryPoint.dat",
+	"EntryPoint_LimitedMode.dat",
 };
 
 // Global variables to be used out of necessity
@@ -411,6 +413,7 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 	}
 
 	Add(o, SwNewSfxFile("EntryPoint.dat", L"|EntryPoint.dat"));
+	Add(o, SwNewSfxFile("EntryPoint_LimitedMode.dat", L"|EntryPoint_LimitedMode.dat"));
 	Add(o, SwNewSfxFile("install_src.dat", L"|install_src.dat"));
 
 	return true;
@@ -2984,19 +2987,28 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 			tmp2, false));
 	}
 
-	// Hamcore!
-	Add(t->CopyTasks, SwNewCopyTask(L"hamcore.se2", NULL, sw->InstallSrc, sw->InstallDir, true, true));
-
 	// EntryPoint.dat
 	{
-		SW_TASK_COPY *et;
+		SW_TASK_COPY *et = NULL;
 		wchar_t tmp[MAX_PATH];
 
-		Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint.dat", NULL, sw->InstallSrc, sw->InstallDir, true, false));
+		if (sw->InstallLimitedMode == false)
+		{
+			// 通常モード
+			Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint.dat", NULL, sw->InstallSrc, sw->InstallDir, true, false));
+		}
+		else
+		{
+			// 行政情報システム用 IP 特定モード
+			Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint_LimitedMode.dat", L"EntryPoint.dat", sw->InstallSrc, sw->InstallDir, true, false));
+		}
 
 		CombinePathW(tmp, sizeof(tmp), et->DstDir, et->DstFileName);
 		Add(t->SetSecurityPathsEveryone, CopyUniStr(tmp));
 	}
+
+	// Hamcore!
+	Add(t->CopyTasks, SwNewCopyTask(L"hamcore.se2", NULL, sw->InstallSrc, sw->InstallDir, true, true));
 }
 
 // Build the Web installer
@@ -5083,6 +5095,7 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 	wchar_t *s;
 	SW_LOGFILE *logfile;
 	bool is_system_mode;
+	bool is_limited_mode;
 	bool skip_ver_check = false;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
@@ -5099,6 +5112,9 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 			// の場合はユーザーモードにここで強制切替えする
 			sw->IsSystemMode = false;
 		}
+
+		Check(hWnd, R_LIMITED, MsRegReadIntEx2(REG_CURRENT_USER, SW_REG_KEY_LIMITED,
+			sw->CurrentComponent->Name, false, true));
 
 		SetIcon(hWnd, S_ICON, sw->CurrentComponent->Icon);
 
@@ -5164,6 +5180,10 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 		}
 
 		is_system_mode = IsChecked(hWnd, R_FOR_SYSTEM);
+
+		is_limited_mode = IsChecked(hWnd, R_LIMITED);
+		MsRegWriteIntEx2(REG_CURRENT_USER, SW_REG_KEY_LIMITED, sw->CurrentComponent->Name,
+			is_limited_mode, false, true);
 
 		if (is_system_mode == false)
 		{
@@ -5314,6 +5334,8 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 		UniStrCpy(sw->InstallDir, sizeof(sw->InstallDir), tmp);
 		sw->IsSystemMode = IsChecked(hWnd, R_FOR_SYSTEM);
 
+		sw->InstallLimitedMode = is_limited_mode;
+
 		sw->OnlyAutoSettingMode = skip_ver_check;
 
 		return D_SW_READY;
@@ -5363,6 +5385,11 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 
 				Free(s);
 			}
+			break;
+
+		case B_LIMITED_HELP:
+			OnceMsgEx2(hWnd, _UU("DG_LIMITED_MODE_HELP_TITLE"), _UU("DG_LIMITED_MODE_HELP"),
+				false, ICO_INFORMATION, NULL, false);
 			break;
 		}
 

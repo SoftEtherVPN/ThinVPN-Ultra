@@ -136,6 +136,7 @@
 #define	SW_VPN_CLIENT_VPNFILE_SHELLOPEN_CMD_REGKEY_SUB2	"SOFTWARE\\Classes\\vpnfile\\shell"
 
 #define	SW_REG_KEY_EULA					"Software\\" GC_REG_COMPANY_NAME "\\Setup Wizard Settings\\Eula"
+#define SW_REG_KEY_LIMITED				"Software\\" GC_REG_COMPANY_NAME "\\Setup Wizard Settings\\EnableLimitedModeDefault"
 
 
 // Component ID
@@ -344,6 +345,8 @@ typedef struct SW
 	UINT CurrentEulaHash;				// Hash of the license agreement
 
 	bool EnableRdpLogonScreen;			// RDP ログオン画面を有効にする処理をするかどうか
+
+	bool InstallLimitedMode;			// 行政情報システム用 IP 特定モードでインストール
 
 	bool OverwriteFlag_DisableSystemMode;
 	bool OverwriteFlag_DisableUserMode;
