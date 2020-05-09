@@ -484,6 +484,11 @@ LANGLIST *GetBestLangByLcid(LIST *o, UINT lcid)
 
 	ret = GetBestLangByName(o, "en");
 
+	if (ret == NULL)
+	{
+		ret = GetBestLangByName(o, "ja");
+	}
+
 	return ret;
 }
 
