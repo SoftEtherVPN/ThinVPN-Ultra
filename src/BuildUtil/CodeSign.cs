@@ -128,9 +128,9 @@ namespace BuildUtil
 {
 	public static class SignClient
 	{
-		const string SeInternalPasswordFilePath = @"\\192.168.3.2\share\tmp\signserver\password.txt";
+		const string SeInternalPasswordFilePath = @"\\labfs.lab.coe.ad.jp\share\tmp\signserver\password.txt";
 
-		const string Url = "https://codesignserver:7006/sign";
+		const string Url = "https://dn-labsign1.lab.coe.ad.jp:7006/sign";
 
 		public static byte[] Sign(byte[] srcData, string certName, string flags, string comment)
 		{
@@ -195,7 +195,7 @@ namespace BuildUtil
 		public static byte[] SignMemory(byte[] srcData, string comment, bool kernelModeDriver, bool evCert)
 		{
 			// 2020/01/19 switch to the new system
-			return SignClient.Sign(srcData, evCert ? "SoftEtherEv" : "DaiyuuNoboriFile", kernelModeDriver ? "Driver" : "", comment);
+			return SignClient.Sign(srcData, evCert ? "IpaFile" : "IpaFile", kernelModeDriver ? "Driver" : "", comment);
 
 			/*
 			int i;
