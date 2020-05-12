@@ -43,6 +43,11 @@ void InRpcDsConfig(RPC_DS_CONFIG *t, PACK *p)
 	t->EnableMacCheck = PackGetBool(p, "EnableMacCheck");
 	PackGetStr(p, "MacAddressList", t->MacAddressList, sizeof(t->MacAddressList));
 	PackGetStr(p, "EmergencyOtp", t->EmergencyOtp, sizeof(t->EmergencyOtp));
+
+	t->RdpEnableGroupKeeper = PackGetBool(p, "RdpEnableGroupKeeper");
+	PackGetUniStr(p, "RdpGroupKeepUserName", t->RdpGroupKeepUserName, sizeof(t->RdpGroupKeepUserName));
+	t->RdpEnableOptimizer = PackGetBool(p, "RdpEnableOptimizer");
+	PackGetStr(p, "RdpStopServicesList", t->RdpStopServicesList, sizeof(t->RdpStopServicesList));
 }
 void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 {
@@ -71,6 +76,11 @@ void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 	PackAddBool(p, "EnableMacCheck", t->EnableMacCheck);
 	PackAddStr(p, "MacAddressList", t->MacAddressList);
 	PackAddStr(p, "EmergencyOtp", t->EmergencyOtp);
+
+	PackAddBool(p, "RdpEnableGroupKeeper", t->RdpEnableGroupKeeper);
+	PackAddUniStr(p, "RdpGroupKeepUserName", t->RdpGroupKeepUserName);
+	PackAddBool(p, "RdpEnableOptimizer", t->RdpEnableOptimizer);
+	PackAddStr(p, "RdpStopServicesList", t->RdpStopServicesList);
 }
 
 // RPC_PCID
@@ -149,6 +159,8 @@ void InRpcDsStatus(RPC_DS_STATUS *t, PACK *p)
 
 	t->EnforceInspection = PackGetBool(p, "EnforceInspection");
 	t->EnforceMacCheck = PackGetBool(p, "EnforceMacCheck");
+
+	t->IsAdminOrSystem = PackGetBool(p, "IsAdminOrSystem");
 }
 void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 {
@@ -190,6 +202,8 @@ void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 
 	PackAddBool(p, "EnforceInspection", t->EnforceInspection);
 	PackAddBool(p, "EnforceMacCheck", t->EnforceMacCheck);
+
+	PackAddBool(p, "IsAdminOrSystem", t->IsAdminOrSystem);
 }
 
 // INTERNET_SETTING

@@ -39,6 +39,7 @@ struct RPC_DS_STATUS
 	char OtpEndWith[64];
 	bool EnforceInspection;
 	bool EnforceMacCheck;
+	bool IsAdminOrSystem;
 };
 
 struct RPC_PCID
@@ -68,6 +69,11 @@ struct RPC_DS_CONFIG
 	bool EnableInspection;
 	bool EnableMacCheck;
 	char MacAddressList[1024];
+
+	bool RdpEnableGroupKeeper;
+	wchar_t RdpGroupKeepUserName[MAX_PATH];
+	bool RdpEnableOptimizer;
+	char RdpStopServicesList[MAX_PATH];
 };
 
 void InInternetSetting(INTERNET_SETTING *t, PACK *p);

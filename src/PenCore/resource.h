@@ -261,6 +261,8 @@
 #define C_TYPE                          1024
 #define E_HUBNAME                       1024
 #define E_REALNAME                      1024
+#define E_USERNAME3                     1024
+#define E_STOPSVC                       1024
 #define P_PROGRESS                      1025
 #define E_NOTE                          1025
 #define E_NICNAME                       1025
@@ -534,6 +536,7 @@
 #define B_RADIUS2                       1173
 #define B_VIEW_CERT                     1173
 #define B_CA                            1173
+#define B_CURRENTUSER                   1173
 #define R_CN                            1174
 #define B_SNAT                          1174
 #define R_SERIAL                        1175
@@ -1209,7 +1212,10 @@
 #define C_SECURITY                      2544
 #define B_POWERKEEP                     2545
 #define C_PUBLIC                        2546
+#define B_ADDGROUP                      2546
 #define C_CHECK_CERT                    2547
+#define B_ADDGROUP2                     2547
+#define B_RDP_OPTIMIZE                  2547
 #define C_USE_ADVANCED                  2548
 #define C_CHECK_CERT2                   2548
 #define C_NO_THEEND                     2548

@@ -1835,6 +1835,85 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			// 有効な場合でも再度有効にする
 			MsEnableRemoteDesktop();
 		}
+
+		if (ds->RdpEnableOptimizer)
+		{
+			if (MsIsRemoteDesktopAvailable())
+			{
+				if (MsIsVista())
+				{
+					MsSetRdpAllowLoginScreen(true);
+					MsRegWriteInt(REG_LOCAL_MACHINE,
+						"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
+						"UserAuthentication", 0);
+				}
+			}
+		}
+
+		if (MsIsRemoteDesktopAvailable())
+		{
+			if (ds->RdpEnableGroupKeeper && MsIsAdmin() && UniIsEmptyStr(ds->RdpGroupKeepUserName) == false)
+			{
+				if (UniInStr(ds->RdpGroupKeepUserName, L"\"") == false)
+				{
+					wchar_t net_exe[MAX_PATH];
+					wchar_t args[300];
+					void *proc_handle = NULL;
+					void *wow = NULL;
+
+					wow = MsDisableWow64FileSystemRedirection();
+
+					CombinePathW(net_exe, sizeof(net_exe), MsGetSystem32DirW(), L"net.exe");
+					UniFormat(args, sizeof(args), L"localgroup \"Remote Desktop Users\" \"%s\" /add", ds->RdpGroupKeepUserName);
+
+					if (IsFileExistsW(net_exe))
+					{
+						if (MsExecuteEx3W(net_exe, args, &proc_handle, false, true))
+						{
+							MsWaitProcessExitWithTimeout(proc_handle, 5 * 1000);
+						}
+					}
+
+					MsRestoreWow64FileSystemRedirection(wow);
+				}
+			}
+
+			if (MsIsAdmin() && IsEmptyStr(ds->RdpStopServicesList) == false)
+			{
+				wchar_t net_exe[MAX_PATH];
+				void *wow = NULL;
+				TOKEN_LIST *t = NULL;
+
+				wow = MsDisableWow64FileSystemRedirection();
+				CombinePathW(net_exe, sizeof(net_exe), MsGetSystem32DirW(), L"net.exe");
+
+				if (IsFileExistsW(net_exe))
+				{
+					t = ParseTokenWithoutNullStr(ds->RdpStopServicesList, " \t");
+					if (t != NULL)
+					{
+						UINT i;
+						for (i = 0; i < t->NumTokens;i++)
+						{
+							char *svc_name = t->Token[i];
+							if (IsEmptyStr(svc_name) == false && InStr(svc_name, "\"") == false && InStr(svc_name, " ") == false)
+							{
+								wchar_t args[300];
+								void *proc_handle = NULL;
+								UniFormat(args, sizeof(args), L"stop %S", svc_name);
+								if (MsExecuteEx3W(net_exe, args, &proc_handle, false, true))
+								{
+									MsWaitProcessExitWithTimeout(proc_handle, 5 * 1000);
+								}
+							}
+						}
+						FreeToken(t);
+					}
+				}
+
+				MsRestoreWow64FileSystemRedirection(wow);
+			}
+		}
 	}
 
 	if (svc_type == DESK_SERVICE_VNC)
@@ -2348,6 +2427,7 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 	t->ForceDisableShare = ds->ForceDisableShare;
 	t->SupportEventLog = ds->SupportEventLog;
 	t->NumConfigures = ds->NumConfigures;
+	t->IsAdminOrSystem = MsIsAdmin();
 
 	if (ds->Wide != NULL && ds->Wide->wt != NULL)
 	{
@@ -2512,6 +2592,11 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 		StrCpy(ds->EmergencyOtp, sizeof(ds->EmergencyOtp), t->EmergencyOtp);
 	}
 
+	ds->RdpEnableGroupKeeper = t->RdpEnableGroupKeeper;
+	UniStrCpy(ds->RdpGroupKeepUserName, sizeof(ds->RdpGroupKeepUserName), t->RdpGroupKeepUserName);
+	ds->RdpEnableOptimizer = t->RdpEnableOptimizer;
+	StrCpy(ds->RdpStopServicesList, sizeof(ds->RdpStopServicesList), t->RdpStopServicesList);
+
 	DsNormalizeConfig(ds, true);
 	DsSaveConfig(ds);
 	DsUpdatePowerKeepSetting(ds);
@@ -2549,6 +2634,11 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 	StrCpy(t->MacAddressList, sizeof(t->MacAddressList), ds->MacAddressList);
 
 	StrCpy(t->EmergencyOtp, sizeof(t->EmergencyOtp), ds->EmergencyOtp);
+
+	t->RdpEnableGroupKeeper = ds->RdpEnableGroupKeeper;
+	UniStrCpy(t->RdpGroupKeepUserName, sizeof(t->RdpGroupKeepUserName), ds->RdpGroupKeepUserName);
+	t->RdpEnableOptimizer = ds->RdpEnableOptimizer;
+	StrCpy(t->RdpStopServicesList, sizeof(t->RdpStopServicesList), ds->RdpStopServicesList);
 
 	return ERR_NO_ERROR;
 }
@@ -2982,6 +3072,9 @@ void DsInitDefaultConfig(DS *ds)
 	}
 #endif // OS_WIN32
 
+	ds->RdpEnableGroupKeeper = true;
+	ds->RdpEnableOptimizer = true;
+
 	WideSetDontCheckCert(ds->Wide, false);
 
 	DsNormalizeConfig(ds, true);
@@ -3112,6 +3205,11 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 
 	ds->PowerKeep = CfgGetBool(root, "PowerKeep");
 	ds->SaveLogFile = CfgGetBool(root, "DontSaveLogFile") ? false : true;
+
+	ds->RdpEnableGroupKeeper = CfgGetBoolEx(root, "RdpEnableGroupKeeper", true);
+	CfgGetUniStr(root, "RdpGroupKeepUserName", ds->RdpGroupKeepUserName, sizeof(ds->RdpGroupKeepUserName));
+	ds->RdpEnableOptimizer = CfgGetBoolEx(root, "RdpEnableOptimizer", true);
+	CfgGetStr(root, "RdpStopServicesList", ds->RdpStopServicesList, sizeof(ds->RdpStopServicesList));
 
 	Zero(ds->HashedPassword, SHA1_SIZE);
 	CfgGetByte(root, "HashedPassword", ds->HashedPassword, SHA1_SIZE);
@@ -3260,6 +3358,11 @@ FOLDER *DsSaveConfigMain(DS *ds)
 	CfgAddBool(root, "IsConfigured", ds->IsConfigured);
 
 	CfgAddBool(root, "Active", ds->Active);
+
+	CfgAddBool(root, "RdpEnableGroupKeeper", ds->RdpEnableGroupKeeper);
+	CfgAddUniStr(root, "RdpGroupKeepUserName", ds->RdpGroupKeepUserName);
+	CfgAddBool(root, "RdpEnableOptimizer", ds->RdpEnableOptimizer);
+	CfgAddStr(root, "RdpStopServicesList", ds->RdpStopServicesList);
 
 	CfgAddUniStr(root, "AdminUsername", ds->AdminUsername);
 

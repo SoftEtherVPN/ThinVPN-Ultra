@@ -2300,6 +2300,22 @@ UINT MsWaitProcessExit(void *process_handle)
 
 	return ret;
 }
+bool MsWaitProcessExitWithTimeout(void *process_handle, UINT timeout)
+{
+	HANDLE h = (HANDLE)process_handle;
+	bool ret = false;
+
+	if (h == NULL)
+	{
+		return false;
+	}
+
+	ret = (WaitForSingleObject(h, timeout) != WAIT_TIMEOUT);
+
+	CloseHandle(h);
+
+	return ret;
+}
 
 // Execution of the file (to get process handle)
 bool MsExecuteEx(char *exe, char *arg, void **process_handle)

@@ -799,6 +799,11 @@ void DgOptionDlgOnOk(HWND hWnd, DG *dg)
 		c.ServiceType = DESK_SERVICE_RDP;
 	}
 
+	c.RdpEnableGroupKeeper = IsChecked(hWnd, B_ADDGROUP);
+	GetTxt(hWnd, E_USERNAME, c.RdpGroupKeepUserName, sizeof(c.RdpGroupKeepUserName));
+	c.RdpEnableOptimizer = IsChecked(hWnd, B_RDP_OPTIMIZE);
+	GetTxtA(hWnd, E_STOPSVC, c.RdpStopServicesList, sizeof(c.RdpStopServicesList));
+
 	if (CALL(hWnd, DtcSetConfig(dg->Rpc, &c)) == false)
 	{
 		return;
@@ -920,7 +925,14 @@ void DgOptionDlgInit(HWND hWnd, DG *dg)
 	Hide(hWnd, E_SYSLOG_PORT);
 #endif	// DESK_DISABLE_NEW_FEATURE
 
-	DgOptionDlgUpdate(hWnd);
+	Check(hWnd, B_ADDGROUP, c.RdpEnableGroupKeeper);
+	SetText(hWnd, E_USERNAME, c.RdpGroupKeepUserName);
+	Check(hWnd, B_RDP_OPTIMIZE, c.RdpEnableOptimizer);
+	SetTextA(hWnd, E_STOPSVC, c.RdpStopServicesList);
+
+	dg->IsAdminOrSystem_Cache = s.IsAdminOrSystem;
+
+	DgOptionDlgUpdate(hWnd, dg);
 }
 
 // URDP の設定画面
@@ -943,14 +955,16 @@ void DgOptionDlgUrdpConfig(HWND hWnd, DG *dg)
 }
 
 // コントロール更新
-void DgOptionDlgUpdate(HWND hWnd)
+void DgOptionDlgUpdate(HWND hWnd, DG *dg)
 {
 	bool b = true;
 	bool b2 = false;
 	bool show_disable_share = true;
+	bool is_rdp = false;
+	bool add_group = false;
 	UINT port;
 	// 引数チェック
-	if (hWnd == NULL)
+	if (hWnd == NULL || dg == NULL)
 	{
 		return;
 	}
@@ -977,6 +991,8 @@ void DgOptionDlgUpdate(HWND hWnd)
 		//{
 		//	b = false;
 		//}
+
+		is_rdp = true;
 	}
 	else
 	{
@@ -984,6 +1000,16 @@ void DgOptionDlgUpdate(HWND hWnd)
 		Disable(hWnd, E_PORT);
 		//Disable(hWnd, B_DEFAULT);
 	}
+
+	add_group = IsChecked(hWnd, B_ADDGROUP);
+
+	SetEnable(hWnd, B_ADDGROUP, is_rdp && dg->IsAdminOrSystem_Cache);
+	SetEnable(hWnd, S_1, is_rdp && dg->IsAdminOrSystem_Cache && add_group);
+	SetEnable(hWnd, E_USERNAME, is_rdp && dg->IsAdminOrSystem_Cache && add_group);
+	SetEnable(hWnd, B_CURRENTUSER, is_rdp && dg->IsAdminOrSystem_Cache && add_group);
+	SetEnable(hWnd, B_RDP_OPTIMIZE, is_rdp && dg->IsAdminOrSystem_Cache);
+	SetEnable(hWnd, S_18, is_rdp && dg->IsAdminOrSystem_Cache);
+	SetEnable(hWnd, E_STOPSVC, is_rdp && dg->IsAdminOrSystem_Cache);
 
 	if (IsChecked(hWnd, C_SYSLOG))
 	{
@@ -1044,7 +1070,8 @@ UINT DgOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		case S_02:
 		case E_SYSLOG_HOSTNAME:
 		case E_SYSLOG_PORT:
-			DgOptionDlgUpdate(hWnd);
+		case B_ADDGROUP:
+			DgOptionDlgUpdate(hWnd, dg);
 			break;
 		}
 
@@ -1065,11 +1092,12 @@ UINT DgOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		case B_RDP:
 		case B_URDP:
 		case C_EVENTLOG:
-			DgOptionDlgUpdate(hWnd);
+		case B_ADDGROUP:
+			DgOptionDlgUpdate(hWnd, dg);
 			break;
 
 		case C_SYSLOG:
-			DgOptionDlgUpdate(hWnd);
+			DgOptionDlgUpdate(hWnd, dg);
 			if (IsChecked(hWnd, C_SYSLOG))
 			{
 				FocusEx(hWnd, E_SYSLOG_HOSTNAME);
@@ -1098,6 +1126,11 @@ UINT DgOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 					MsExecuteW(tmp, L"");
 				}
 			}
+			break;
+
+		case B_CURRENTUSER:
+			SetText(hWnd, E_USERNAME, MsGetUserNameExW());
+			FocusEx(hWnd, E_USERNAME);
 			break;
 		}
 		break;
@@ -2077,6 +2110,13 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 			dg->MsgForServerDlg2 = StartAsyncOnceMsg(_UU("DS_POLICY_MESSAGE_TITLE"), t.MsgForServer2, true,
 				ICO_INFORMATION, true);
 		}
+	}
+
+	// Init user name
+	if (UniIsEmptyStr(c.RdpGroupKeepUserName))
+	{
+		UniStrCpy(c.RdpGroupKeepUserName, sizeof(c.RdpGroupKeepUserName), MsGetUserNameExW());
+		DtcSetConfig(dg->Rpc, &c);
 	}
 
 	// コントロールの更新

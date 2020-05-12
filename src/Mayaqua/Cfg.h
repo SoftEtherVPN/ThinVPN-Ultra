@@ -195,6 +195,7 @@ ITEM *CfgAddUniStr(FOLDER *f, char *name, wchar_t *str);
 FOLDER *CfgGetFolder(FOLDER *parent, char *name);
 UINT CfgGetInt(FOLDER *f, char *name);
 bool CfgGetBool(FOLDER *f, char *name);
+bool CfgGetBoolEx(FOLDER *f, char *name, bool default_value);
 UINT64 CfgGetInt64(FOLDER *f, char *name);
 UINT CfgGetByte(FOLDER *f, char *name, void *buf, UINT size);
 BUF *CfgGetBuf(FOLDER *f, char *name);

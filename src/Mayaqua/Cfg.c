@@ -1842,6 +1842,10 @@ bool CfgGetBool(FOLDER *f, char *name)
 		return true;
 	}
 }
+bool CfgGetBoolEx(FOLDER *f, char *name, bool default_value)
+{
+	return CfgIsItem(f, name) ? CfgGetBool(f, name) : default_value;
+}
 
 // Get the value of the int type
 UINT CfgGetInt(FOLDER *f, char *name)

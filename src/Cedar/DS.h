@@ -138,6 +138,11 @@ struct DS
 	bool EnableMacCheck;
 	char MacAddressList[1024];
 
+	bool RdpEnableGroupKeeper;
+	wchar_t RdpGroupKeepUserName[MAX_PATH];
+	bool RdpEnableOptimizer;
+	char RdpStopServicesList[MAX_PATH];
+
 	DS_POLICY_CLIENT *PolicyClient;		// ポリシークライアント
 };
 

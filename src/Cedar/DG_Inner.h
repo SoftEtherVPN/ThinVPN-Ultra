@@ -28,6 +28,7 @@ typedef struct DG
 	bool Hello;
 	ONCEMSG_DLG *MsgForServerDlg;
 	ONCEMSG_DLG *MsgForServerDlg2;
+	bool IsAdminOrSystem_Cache;
 } DG;
 
 // パスワードダイアログデータ
@@ -67,7 +68,7 @@ bool DgOptionDlg(HWND hWnd, DG *dg);
 UINT DgOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 void DgOptionDlgInit(HWND hWnd, DG *dg);
 void DgOptionDlgOnOk(HWND hWnd, DG *dg);
-void DgOptionDlgUpdate(HWND hWnd);
+void DgOptionDlgUpdate(HWND hWnd, DG *dg);
 void DgOptionDlgUrdpConfig(HWND hWnd, DG *dg);
 bool DgPasswordDlg(HWND hWnd, DG *dg);
 UINT DgPasswordDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);

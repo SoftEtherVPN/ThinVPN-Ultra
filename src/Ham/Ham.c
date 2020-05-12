@@ -946,6 +946,14 @@ void test(UINT num, char **arg)
 {
 	if (true)
 	{
+#ifdef  OS_WIN32
+		UniPrint(L"username = %s\n", MsGetUserNameExW());
+#endif
+		return;
+	}
+
+	if (true)
+	{
 		Print("DeskCheckUrdpProcessIsRunning = %u\n", DeskCheckUrdpProcessIsRunning());
 		return;
 	}
