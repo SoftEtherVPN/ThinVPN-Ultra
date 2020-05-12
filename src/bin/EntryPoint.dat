@@ -82,10 +82,13 @@ Update:https://raw.githubusercontent.com/ThinTelework/THIN-ThinTeleworkUpdateFil
 # 「シン・テレワークシステム」のサーバーおよびクライアントは、動作時に、
 # GitHub から最新の SECONDARY リストをダウンロードして使用します。
 
+SECONDARY:[https://219.100.94.1/widecontrol/]
 SECONDARY:[https://140.227.26.102/widecontrol/]
 SECONDARY:[https://h128-22-151-69.ablenetvps.ne.jp/widecontrol/]
 SECONDARY:[https://v118-27-25-70.4l0s.static.cnode.io/widecontrol/]
 SECONDARY:[https://ik1-424-44228.vs.sakura.ne.jp/widecontrol/]
 SECONDARY:[https://ec2-52-194-229-250.ap-northeast-1.compute.amazonaws.com/widecontrol/]
 SECONDARY:[https://ec2-54-190-62-125.us-west-2.compute.amazonaws.com/widecontrol/]
+
+ADDITIONAL_SECONDARY
 

@@ -3307,6 +3307,7 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 {
 	char url_tmp[MAX_SIZE];
 	X *cert_tmp;
+	bool additional_secondary = false;
 
 	UINT64 now = SystemTime64();
 
@@ -3365,6 +3366,11 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 						Add(secondary_str_list, CopyStr(addr));
 					}
 				}
+
+				if (StrCmpi(line, "ADDITIONAL_SECONDARY") == 0)
+				{
+					additional_secondary = true;
+				}
 			}
 		}
 
@@ -3372,6 +3378,22 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 	}
 
 	FreeBuf(buf);
+
+	if (additional_secondary)
+	{
+		UINT a, b, c, d;
+		char tmp[MAX_PATH];
+
+		Add(secondary_str_list, CopyStr(ADDITIONAL_SECONDARY));
+
+		a = 163; b = 220; c = 245; d = Rand32() % 15 + 1;
+		Format(tmp, sizeof(tmp), "https://%u.%u.%u.%u/widecontrol/", a, b, c, d);
+		Add(secondary_str_list, CopyStr(tmp));
+
+		a = 219; b = 100; c = 39; d = Rand32() % 16 + 32;
+		Format(tmp, sizeof(tmp), "https://%u.%u.%u.%u/widecontrol/", a, b, c, d);
+		Add(secondary_str_list, CopyStr(tmp));
+	}
 
 	if (IsEmptyStr(url_tmp))
 	{

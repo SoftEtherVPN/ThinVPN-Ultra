@@ -48,6 +48,8 @@
 #define WT_GATE_DISABLE_TLS1_0		true
 #define WT_GATE_DISABLE_TLS1_1		true
 
+#define ADDITIONAL_SECONDARY		"https://219.100.94.11/widecontrol/"
+
 
 // ソフトウェア更新チェック
 #define	UPDATE_SERVER_URL_GLOBAL	"https://update-check.dynamic-ip.thin.cyber.ipa.go.jp/update/?family=%s&software=%s&mybuild=%u&lang=%s"
