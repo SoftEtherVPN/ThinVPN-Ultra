@@ -1846,6 +1846,9 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 					MsRegWriteInt(REG_LOCAL_MACHINE,
 						"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
 						"UserAuthentication", 0);
+					MsRegWriteInt(REG_LOCAL_MACHINE,
+						"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+						"UserAuthentication", 0);
 				}
 			}
 		}

@@ -5003,6 +5003,15 @@ BEGIN
     CONTROL         "@B_URDP",B_URDP,"Button",BS_AUTORADIOBUTTON,41,227,216,10
     ICON            ICO_INFORMATION,S_ICON,23,247,20,20
     LTEXT           "@S_INFO",S_INFO,48,246,208,31
+    CONTROL         "以下のユーザーを常に Remote Desktop Users グループに追加(&G)",B_ADDGROUP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,281,226,12
+    RTEXT           "ユーザー名:",S_1,14,302,60,11
+    EDITTEXT        E_USERNAME,78,300,102,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "現在のユーザーを指定",B_CURRENTUSER,185,298,73,15
+    CONTROL         "Windows の RDP の設定のシン・テレワークシステムへの最適化を維持(&O)",B_RDP_OPTIMIZE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,318,226,12
+    LTEXT           "RDP 接続受付時に以下のサービスを停止(&S): (スペース区切りで複数指定可)",S_18,33,334,222,11
+    EDITTEXT        E_STOPSVC,33,347,220,12,ES_AUTOHSCROLL
     PUSHBUTTON      "@B_URDPCONFIG",B_URDPCONFIG,134,7,168,16,NOT WS_VISIBLE
     GROUPBOX        "@S7",IDC_STATIC,268,29,176,163
     CONTROL         "@C_LOG",C_LOG,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,275,44,162,20
@@ -5019,15 +5028,6 @@ BEGIN
     CONTROL         "共有機能の使用を禁止する(&D)",C_DISABLESHARE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,263,136,14
     DEFPUSHBUTTON   "@IDOK",IDOK,311,290,64,17
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,380,290,64,17
-    CONTROL         "以下のユーザーを常に Remote Desktop Users グループに追加(&G)",B_ADDGROUP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,281,226,12
-    RTEXT           "ユーザー名:",S_1,14,302,60,11
-    EDITTEXT        E_USERNAME,78,300,102,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "現在のユーザーを指定",B_CURRENTUSER,185,298,73,15
-    CONTROL         "Windows の RDP の設定のシン・テレワークシステムへの最適化を維持(&O)",B_RDP_OPTIMIZE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,318,226,12
-    LTEXT           "RDP 接続受付時に以下のサービスを停止(&S): (スペース区切りで複数指定可)",S_18,33,334,222,11
-    EDITTEXT        E_STOPSVC,33,347,220,12,ES_AUTOHSCROLL
 END
 
 D_DG_PASSWORD DIALOGEX 0, 0, 287, 243
