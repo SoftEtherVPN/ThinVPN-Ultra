@@ -3362,7 +3362,7 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 					{
 						addr[len - 1] = 0;
 
-						AddStrToStrListDistinct(secondary_str_list, addr);
+						Add(secondary_str_list, CopyStr(addr));
 					}
 				}
 			}
