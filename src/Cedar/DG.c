@@ -1670,7 +1670,23 @@ UINT DgHashDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 		{
 		case IDOK:
 		case IDCANCEL:
+		case IDCANCEL2:
 			Close(hWnd);
+			break;
+
+		case B_RESET:
+			if (MsgBox(hWnd, MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2, _UU("DG_RESET_CERT_MSG")) == IDYES)
+			{
+				RPC_TEST t;
+
+				Zero(&t, sizeof(t));
+
+				if (CALL(hWnd, DtcResetCertOnNextBoot(dg->Rpc, &t)))
+				{
+					MsgBox(hWnd, MB_ICONINFORMATION, _UU("DG_RESET_CERT_DONE"));
+					Close(hWnd);
+				}
+			}
 			break;
 		}
 		break;

@@ -240,6 +240,7 @@ void DsSendSyslog(SERVER *s, wchar_t *message);
 wchar_t *DsGetLogTypeStr(UINT ds_log_type);
 void DsUpdateTaskIcon(DS *ds);
 void DsResetCertProc(WIDE *wide, void *param);
+void DsResetCertOnNextBoot();
 UINT DsGetCaps(DS *ds);
 void DsBluetoothMain(DS *ds, SOCKIO *sock);
 bool DsIsShareDisabled(DS *ds);
@@ -278,6 +279,7 @@ UINT DtChangePcid(DS *ds, RPC_PCID *t);
 UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t);
 UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t);
 UINT DtGetPcidCandidate(DS *ds, RPC_PCID *t);
+UINT DtResetCertOnNextBoot(DS *ds, RPC_TEST *t);
 
 // RPC Procedures (Client Side)
 UINT DtcGetInternetSetting(RPC *r, INTERNET_SETTING *t);
@@ -288,6 +290,7 @@ UINT DtcChangePcid(RPC *r, RPC_PCID *t);
 UINT DtcSetConfig(RPC *r, RPC_DS_CONFIG *t);
 UINT DtcGetConfig(RPC *r, RPC_DS_CONFIG *t);
 UINT DtcGetPcidCandidate(RPC *r, RPC_PCID *t);
+UINT DtcResetCertOnNextBoot(RPC *r, RPC_TEST *t);
 
 
 

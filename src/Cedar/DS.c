@@ -2319,6 +2319,7 @@ PACK *DsRpcServer(RPC *r, char *name, PACK *p)
 	DECLARE_RPC("SetConfig", RPC_DS_CONFIG, DtSetConfig, InRpcDsConfig, OutRpcDsConfig)
 	DECLARE_RPC("GetConfig", RPC_DS_CONFIG, DtGetConfig, InRpcDsConfig, OutRpcDsConfig)
 	DECLARE_RPC("GetPcidCandidate", RPC_PCID, DtGetPcidCandidate, InRpcPcid, OutRpcPcid)
+	DECLARE_RPC("ResetCertOnNextBoot", RPC_TEST, DtResetCertOnNextBoot, InRpcTest, OutRpcTest)
 
 	// 仮想 HUB 操作系 RPC
 	DECLARE_RPCHUB("GetHubRadius", RPC_RADIUS, StGetHubRadius, InRpcRadius, OutRpcRadius)
@@ -2361,6 +2362,17 @@ DECLARE_SC("ChangePcid", RPC_PCID, DtcChangePcid, InRpcPcid, OutRpcPcid)
 DECLARE_SC("SetConfig", RPC_DS_CONFIG, DtcSetConfig, InRpcDsConfig, OutRpcDsConfig)
 DECLARE_SC("GetConfig", RPC_DS_CONFIG, DtcGetConfig, InRpcDsConfig, OutRpcDsConfig)
 DECLARE_SC("GetPcidCandidate", RPC_PCID, DtcGetPcidCandidate, InRpcPcid, OutRpcPcid)
+DECLARE_SC("ResetCertOnNextBoot", RPC_TEST, DtcResetCertOnNextBoot, InRpcTest, OutRpcTest)
+
+// 次回起動時に証明書リセット
+UINT DtResetCertOnNextBoot(DS *ds, RPC_TEST *t)
+{
+	Zero(t, sizeof(RPC_TEST));
+
+	DsResetCertOnNextBoot();
+
+	return ERR_NO_ERROR;
+}
 
 // PCID 候補の取得
 UINT DtGetPcidCandidate(DS *ds, RPC_PCID *t)
@@ -3623,13 +3635,23 @@ void DsInitConfig(DS *ds)
 	DsUpdatePowerKeepSetting(ds);
 }
 
+// 次回起動時に証明書をリセット
+void DsResetCertOnNextBoot()
+{
+	PACK *p;
+
+	p = NewPack();
+	WideWriteSecurePack(DESK_SECURE_PACK_NAME, p);
+	FreePack(p);
+}
+
 // 証明書のリセット用プロシージャ
 void DsResetCertProc(WIDE *wide, void *param)
 {
 	X *cert = NULL;
 	K *key = NULL;
 	// 引数チェック
-	if (wide == NULL || param == NULL)
+	if (wide == NULL)
 	{
 		return;
 	}
