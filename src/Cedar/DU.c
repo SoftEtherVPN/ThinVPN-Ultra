@@ -110,8 +110,8 @@ typedef struct DU_WFP_FUNCTIONS
 
 } DU_WFP_FUNCTIONS;
 
-static DU_WFP_FUNCTIONS *api = NULL;
-static HINSTANCE hDll = NULL;
+static DU_WFP_FUNCTIONS *du_wfp_api = NULL;
+static HINSTANCE du_wfp_dll = NULL;
 
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
@@ -2633,72 +2633,72 @@ void DUExec()
 // Initialization of the API
 bool DuInitWfpApi()
 {
-	if (api != NULL)
+	if (du_wfp_api != NULL)
 	{
 		return true;
 	}
 
-	if (hDll == NULL)
+	if (du_wfp_dll == NULL)
 	{
-		hDll = LoadLibraryA("FWPUCLNT.DLL");
+		du_wfp_dll = LoadLibraryA("FWPUCLNT.DLL");
 	}
 
-	if (hDll == NULL)
+	if (du_wfp_dll == NULL)
 	{
 		return false;
 	}
 
-	api = malloc(sizeof(DU_WFP_FUNCTIONS));
-	Zero(api, sizeof(DU_WFP_FUNCTIONS));
+	du_wfp_api = malloc(sizeof(DU_WFP_FUNCTIONS));
+	Zero(du_wfp_api, sizeof(DU_WFP_FUNCTIONS));
 
-	api->FwpmEngineOpen0 = 
+	du_wfp_api->FwpmEngineOpen0 = 
 		(DWORD (__stdcall *)(const wchar_t *,UINT32,SEC_WINNT_AUTH_IDENTITY_W *,const FWPM_SESSION0 *,HANDLE *))
-		GetProcAddress(hDll, "FwpmEngineOpen0");
+		GetProcAddress(du_wfp_dll, "FwpmEngineOpen0");
 
-	api->FwpmEngineClose0 =
+	du_wfp_api->FwpmEngineClose0 =
 		(DWORD (__stdcall *)(HANDLE))
-		GetProcAddress(hDll, "FwpmEngineClose0");
+		GetProcAddress(du_wfp_dll, "FwpmEngineClose0");
 
-	api->FwpmFreeMemory0 =
+	du_wfp_api->FwpmFreeMemory0 =
 		(void (__stdcall *)(void **))
-		GetProcAddress(hDll, "FwpmFreeMemory0");
+		GetProcAddress(du_wfp_dll, "FwpmFreeMemory0");
 
-	api->FwpmFilterAdd0 =
+	du_wfp_api->FwpmFilterAdd0 =
 		(DWORD (__stdcall *)(HANDLE,const FWPM_FILTER0 *,PSECURITY_DESCRIPTOR,UINT64 *))
-		GetProcAddress(hDll, "FwpmFilterAdd0");
+		GetProcAddress(du_wfp_dll, "FwpmFilterAdd0");
 
-	api->IPsecSaContextCreate0 =
+	du_wfp_api->IPsecSaContextCreate0 =
 		(DWORD (__stdcall *)(HANDLE,const IPSEC_TRAFFIC0 *,UINT64 *,UINT64 *))
-		GetProcAddress(hDll, "IPsecSaContextCreate0");
+		GetProcAddress(du_wfp_dll, "IPsecSaContextCreate0");
 
-	api->IPsecSaContextGetSpi0 =
+	du_wfp_api->IPsecSaContextGetSpi0 =
 		(DWORD (__stdcall *)(HANDLE,UINT64,const IPSEC_GETSPI0 *,IPSEC_SA_SPI *))
-		GetProcAddress(hDll, "IPsecSaContextGetSpi0");
+		GetProcAddress(du_wfp_dll, "IPsecSaContextGetSpi0");
 
-	api->IPsecSaContextAddInbound0 =
+	du_wfp_api->IPsecSaContextAddInbound0 =
 		(DWORD (__stdcall *)(HANDLE,UINT64,const IPSEC_SA_BUNDLE0 *))
-		GetProcAddress(hDll, "IPsecSaContextAddInbound0");
+		GetProcAddress(du_wfp_dll, "IPsecSaContextAddInbound0");
 
-	api->IPsecSaContextAddOutbound0 =
+	du_wfp_api->IPsecSaContextAddOutbound0 =
 		(DWORD (__stdcall *)(HANDLE,UINT64,const IPSEC_SA_BUNDLE0 *))
-		GetProcAddress(hDll, "IPsecSaContextAddOutbound0");
+		GetProcAddress(du_wfp_dll, "IPsecSaContextAddOutbound0");
 
-	api->FwpmCalloutAdd0 =
+	du_wfp_api->FwpmCalloutAdd0 =
 		(DWORD (__stdcall *)(HANDLE,const FWPM_CALLOUT0 *,PSECURITY_DESCRIPTOR,UINT32 *))
-		GetProcAddress(hDll, "FwpmCalloutAdd0");
+		GetProcAddress(du_wfp_dll, "FwpmCalloutAdd0");
 
-	if (api->FwpmEngineOpen0 == NULL ||
-		api->FwpmEngineClose0 == NULL ||
-		api->FwpmFreeMemory0 == NULL ||
-		api->FwpmFilterAdd0 == NULL ||
-		api->IPsecSaContextCreate0 == NULL ||
-		api->IPsecSaContextGetSpi0 == NULL ||
-		api->IPsecSaContextAddInbound0 == NULL ||
-		api->IPsecSaContextAddOutbound0 == NULL ||
-		api->FwpmCalloutAdd0 == NULL)
+	if (du_wfp_api->FwpmEngineOpen0 == NULL ||
+		du_wfp_api->FwpmEngineClose0 == NULL ||
+		du_wfp_api->FwpmFreeMemory0 == NULL ||
+		du_wfp_api->FwpmFilterAdd0 == NULL ||
+		du_wfp_api->IPsecSaContextCreate0 == NULL ||
+		du_wfp_api->IPsecSaContextGetSpi0 == NULL ||
+		du_wfp_api->IPsecSaContextAddInbound0 == NULL ||
+		du_wfp_api->IPsecSaContextAddOutbound0 == NULL ||
+		du_wfp_api->FwpmCalloutAdd0 == NULL)
 	{
-		free(api);
-		api = NULL;
+		free(du_wfp_api);
+		du_wfp_api = NULL;
 		return false;
 	}
 
@@ -2739,7 +2739,7 @@ void DuWfpAddPortAcl(HANDLE hEngine, bool ipv6, UCHAR protocol, UINT port, UINT 
 	filter.filterCondition = c;
 	filter.numFilterConditions = 2;
 
-	ret = api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
+	ret = du_wfp_api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
 	if (ret)
 	{
 		Debug("DuWfpAddPortAcl: FwpmFilterAdd0 Failed: 0x%X\n", ret);
@@ -2810,7 +2810,7 @@ void DuWfpAddIpAcl(HANDLE hEngine, IP *ip, IP *mask, UINT index, bool permit)
 	filter.filterCondition = &c;
 	filter.numFilterConditions = 1;
 
-	ret = api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
+	ret = du_wfp_api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
 	if (ret)
 	{
 		Debug("DuWfpAddIpAcl: FwpmFilterAdd0 Failed: 0x%X\n", ret);
@@ -2831,7 +2831,7 @@ void DuWfpTest()
 	// Open the WFP (Dynamic Session)
 	Zero(&session, sizeof(session));
 	session.flags = FWPM_SESSION_FLAG_DYNAMIC;
-	ret = api->FwpmEngineOpen0(NULL, RPC_C_AUTHN_DEFAULT, NULL, &session, &hEngine);
+	ret = du_wfp_api->FwpmEngineOpen0(NULL, RPC_C_AUTHN_DEFAULT, NULL, &session, &hEngine);
 	if (ret)
 	{
 		Debug("FwpmEngineOpen0 Failed.\n");
@@ -2864,7 +2864,7 @@ void DuWfpTest()
 		filter.weight.uint64 = &weight;
 		filter.action.type = FWP_ACTION_PERMIT;
 		filter.displayData.name = L"Test1";
-		ret = api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
+		ret = du_wfp_api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
 		if (ret)
 		{
 			Debug("FwpmFilterAdd0 for IPv4 Failed: 0x%X\n", ret);
@@ -2882,7 +2882,7 @@ void DuWfpTest()
 		filter.weight.uint64 = &weight;
 		filter.action.type = FWP_ACTION_BLOCK;
 		filter.displayData.name = L"Test1";
-		ret = api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
+		ret = du_wfp_api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
 		if (ret)
 		{
 			Debug("FwpmFilterAdd0 for IPv4 Failed: 0x%X\n", ret);
@@ -2910,7 +2910,7 @@ void *DuStartApplyWhiteListRules()
 	// Open the WFP (Dynamic Session)
 	Zero(&session, sizeof(session));
 	session.flags = FWPM_SESSION_FLAG_DYNAMIC;
-	ret = api->FwpmEngineOpen0(NULL, RPC_C_AUTHN_DEFAULT, NULL, &session, &hEngine);
+	ret = du_wfp_api->FwpmEngineOpen0(NULL, RPC_C_AUTHN_DEFAULT, NULL, &session, &hEngine);
 	if (ret)
 	{
 		Debug("FwpmEngineOpen0 Failed.\n");
@@ -2996,12 +2996,12 @@ void *DuStartApplyWhiteListRules()
 // Stop applying White List Rules
 void DuStopApplyWhiteListRules(void *handle)
 {
-	if (api	== NULL || handle == NULL)
+	if (du_wfp_api	== NULL || handle == NULL)
 	{
 		return;
 	}
 
-	api->FwpmEngineClose0((HANDLE)handle);
+	du_wfp_api->FwpmEngineClose0((HANDLE)handle);
 }
 
 #endif	// WIN32
