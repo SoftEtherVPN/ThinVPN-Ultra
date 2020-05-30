@@ -1279,6 +1279,7 @@ void ReleaseGetIPThreadParam(GETIP_THREAD_PARAM *p);
 void CleanupGetIPThreadParam(GETIP_THREAD_PARAM *p);
 bool GetIP4Inner(IP *ip, char *hostname);
 bool GetIP6Inner(IP *ip, char *hostname);
+bool GetIP4InnerWithNoCache(IP *ip, char *hostname);
 bool GetHostNameInner(char *hostname, UINT size, IP *ip);
 bool GetHostNameInner6(char *hostname, UINT size, IP *ip);
 bool GetHostName(char *hostname, UINT size, IP *ip);

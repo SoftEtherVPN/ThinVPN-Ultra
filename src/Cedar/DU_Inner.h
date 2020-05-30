@@ -95,6 +95,11 @@ typedef struct DU_ABOUT
 	char *BuildInfo;
 } DU_ABOUT;
 
+
+
+
+
+
 // 関数プロトタイプ宣言
 void DuMain(DU *du);
 UINT DuMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
@@ -167,5 +172,13 @@ UINT DuDialupDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 
 bool DuInspectionDlg(HWND hWnd, DC_INSPECT *ins);
 UINT DuInspectionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+
+bool DuInitWfpApi();
+void DuWfpTest();
+void DuWfpAddIpAcl(HANDLE hEngine, IP *ip, IP *mask, UINT index, bool permit);
+void DuWfpAddPortAcl(HANDLE hEngine, bool ipv6, UCHAR protocol, UINT port, UINT index, bool permit);
+
+void *DuStartApplyWhiteListRules();
+void DuStopApplyWhiteListRules(void *handle);
 
 

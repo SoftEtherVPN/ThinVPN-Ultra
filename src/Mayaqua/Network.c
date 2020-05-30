@@ -17790,6 +17790,56 @@ bool GetIP4Inner(IP *ip, char *hostname)
 
 	return true;
 }
+bool GetIP4InnerWithNoCache(IP *ip, char *hostname)
+{
+	struct sockaddr_in in;
+	struct in_addr addr;
+	struct addrinfo hint;
+	struct addrinfo *info;
+	// Validate arguments
+	if (ip == NULL || hostname == NULL)
+	{
+		return false;
+	}
+
+	if (IsEmptyStr(hostname))
+	{
+		return false;
+	}
+
+	if (StrCmpi(hostname, "localhost") == 0)
+	{
+		SetIP(ip, 127, 0, 0, 1);
+		return true;
+	}
+
+	if (StrToIP6(ip, hostname) == false && StrToIP(ip, hostname) == false)
+	{
+		// Forward resolution
+		Zero(&hint, sizeof(hint));
+		hint.ai_family = AF_INET;
+		hint.ai_socktype = SOCK_STREAM;
+		hint.ai_protocol = IPPROTO_TCP;
+		info = NULL;
+
+		if (getaddrinfo(hostname, NULL, &hint, &info) != 0 ||
+			info->ai_family != AF_INET)
+		{
+			if (info)
+			{
+				freeaddrinfo(info);
+			}
+			return false;
+		}
+		// Forward resolution success
+		Copy(&in, info->ai_addr, sizeof(struct sockaddr_in));
+		freeaddrinfo(info);
+		Copy(&addr, &in.sin_addr, sizeof(addr));
+		InAddrToIP(ip, &addr);
+	}
+
+	return true;
+}
 
 // Search in the DNS cache
 bool QueryDnsCache(IP *ip, char *hostname)

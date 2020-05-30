@@ -2498,7 +2498,7 @@ void DcGetBestHostnameForPcid(char *hostname, UINT hostname_size, char *pcid)
 
 	DcGenerateHostname(hostname, hostname_size, pcid);
 
-	if (GetIP(&ip, hostname) == false)
+	if (GetIP4InnerWithNoCache(&ip, hostname) == false)
 	{
 		b = false;
 	}

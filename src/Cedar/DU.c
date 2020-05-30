@@ -30,6 +30,8 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #include <Dbghelp.h>
+#include <Fwpmu.h>
+#include <Fwpmtypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,6 +50,68 @@
 #include "DG_Inner.h"
 #include "DU_Inner.h"
 #include "../PenCore/resource.h"
+
+
+// For WFP
+// API function
+typedef struct DU_WFP_FUNCTIONS
+{
+	DWORD (WINAPI *FwpmEngineOpen0)(
+		IN OPTIONAL const wchar_t* serverName,
+		IN UINT32 authnService,
+		IN OPTIONAL SEC_WINNT_AUTH_IDENTITY_W* authIdentity,
+		IN OPTIONAL const FWPM_SESSION0* session,
+		OUT HANDLE* engineHandle
+		);
+
+	DWORD (WINAPI *FwpmEngineClose0)(IN HANDLE engineHandle);
+
+	void (WINAPI *FwpmFreeMemory0)(IN OUT void** p);
+
+	DWORD (WINAPI *FwpmFilterAdd0)(
+		IN HANDLE engineHandle,
+		IN const FWPM_FILTER0* filter,
+		IN OPTIONAL PSECURITY_DESCRIPTOR sd,
+		OUT OPTIONAL UINT64* id
+		);
+
+	DWORD (WINAPI *IPsecSaContextCreate0)(
+		IN HANDLE engineHandle,
+		IN const IPSEC_TRAFFIC0* outboundTraffic,
+		OUT OPTIONAL UINT64* inboundFilterId,
+		OUT UINT64* id
+		);
+
+	DWORD (WINAPI *IPsecSaContextGetSpi0)(
+		IN HANDLE engineHandle,
+		IN UINT64 id,
+		IN const IPSEC_GETSPI0* getSpi,
+		OUT IPSEC_SA_SPI* inboundSpi
+		);
+
+	DWORD (WINAPI *IPsecSaContextAddInbound0)(
+		IN HANDLE engineHandle,
+		IN UINT64 id,
+		IN const IPSEC_SA_BUNDLE0* inboundBundle
+		);
+
+	DWORD (WINAPI *IPsecSaContextAddOutbound0)(
+		IN HANDLE engineHandle,
+		IN UINT64 id,
+		IN const IPSEC_SA_BUNDLE0* outboundBundle
+		);
+
+	DWORD (WINAPI *FwpmCalloutAdd0)(
+		IN HANDLE engineHandle,
+		IN const FWPM_CALLOUT0* callout,
+		IN OPTIONAL PSECURITY_DESCRIPTOR sd,
+		OUT OPTIONAL UINT32* id
+		);
+
+} DU_WFP_FUNCTIONS;
+
+static DU_WFP_FUNCTIONS *api = NULL;
+static HINSTANCE hDll = NULL;
 
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
@@ -2561,6 +2625,309 @@ void DUExec()
 	FreeWinUi();
 
 	Free(du);
+}
+
+
+
+
+// Initialization of the API
+bool DuInitWfpApi()
+{
+	if (api != NULL)
+	{
+		return true;
+	}
+
+	if (hDll == NULL)
+	{
+		hDll = LoadLibraryA("FWPUCLNT.DLL");
+	}
+
+	if (hDll == NULL)
+	{
+		return false;
+	}
+
+	api = malloc(sizeof(DU_WFP_FUNCTIONS));
+	Zero(api, sizeof(DU_WFP_FUNCTIONS));
+
+	api->FwpmEngineOpen0 = 
+		(DWORD (__stdcall *)(const wchar_t *,UINT32,SEC_WINNT_AUTH_IDENTITY_W *,const FWPM_SESSION0 *,HANDLE *))
+		GetProcAddress(hDll, "FwpmEngineOpen0");
+
+	api->FwpmEngineClose0 =
+		(DWORD (__stdcall *)(HANDLE))
+		GetProcAddress(hDll, "FwpmEngineClose0");
+
+	api->FwpmFreeMemory0 =
+		(void (__stdcall *)(void **))
+		GetProcAddress(hDll, "FwpmFreeMemory0");
+
+	api->FwpmFilterAdd0 =
+		(DWORD (__stdcall *)(HANDLE,const FWPM_FILTER0 *,PSECURITY_DESCRIPTOR,UINT64 *))
+		GetProcAddress(hDll, "FwpmFilterAdd0");
+
+	api->IPsecSaContextCreate0 =
+		(DWORD (__stdcall *)(HANDLE,const IPSEC_TRAFFIC0 *,UINT64 *,UINT64 *))
+		GetProcAddress(hDll, "IPsecSaContextCreate0");
+
+	api->IPsecSaContextGetSpi0 =
+		(DWORD (__stdcall *)(HANDLE,UINT64,const IPSEC_GETSPI0 *,IPSEC_SA_SPI *))
+		GetProcAddress(hDll, "IPsecSaContextGetSpi0");
+
+	api->IPsecSaContextAddInbound0 =
+		(DWORD (__stdcall *)(HANDLE,UINT64,const IPSEC_SA_BUNDLE0 *))
+		GetProcAddress(hDll, "IPsecSaContextAddInbound0");
+
+	api->IPsecSaContextAddOutbound0 =
+		(DWORD (__stdcall *)(HANDLE,UINT64,const IPSEC_SA_BUNDLE0 *))
+		GetProcAddress(hDll, "IPsecSaContextAddOutbound0");
+
+	api->FwpmCalloutAdd0 =
+		(DWORD (__stdcall *)(HANDLE,const FWPM_CALLOUT0 *,PSECURITY_DESCRIPTOR,UINT32 *))
+		GetProcAddress(hDll, "FwpmCalloutAdd0");
+
+	if (api->FwpmEngineOpen0 == NULL ||
+		api->FwpmEngineClose0 == NULL ||
+		api->FwpmFreeMemory0 == NULL ||
+		api->FwpmFilterAdd0 == NULL ||
+		api->IPsecSaContextCreate0 == NULL ||
+		api->IPsecSaContextGetSpi0 == NULL ||
+		api->IPsecSaContextAddInbound0 == NULL ||
+		api->IPsecSaContextAddOutbound0 == NULL ||
+		api->FwpmCalloutAdd0 == NULL)
+	{
+		free(api);
+		api = NULL;
+		return false;
+	}
+
+	return true;
+}
+
+// Add ACL rule with port
+void DuWfpAddPortAcl(HANDLE hEngine, bool ipv6, UCHAR protocol, UINT port, UINT index, bool permit)
+{
+	FWPM_FILTER0 filter;
+	UINT64 weight = ((UINT64)~((UINT64)0)) - (UINT64)index;
+	wchar_t name[256];
+	UINT ret;
+	FWPM_FILTER_CONDITION0 c[2];
+	bool isv4 = !ipv6;
+
+	UniFormat(name, sizeof(name), L"DU_DuWfpAddPortAcl_%u", index);
+
+	Zero(c, sizeof(c));
+	c[0].fieldKey = FWPM_CONDITION_IP_REMOTE_PORT;
+	c[0].matchType = FWP_MATCH_EQUAL;
+	c[0].conditionValue.type = FWP_UINT16;
+	c[0].conditionValue.uint16 = port;
+
+	c[1].fieldKey = FWPM_CONDITION_IP_PROTOCOL;
+	c[1].matchType = FWP_MATCH_EQUAL;
+	c[1].conditionValue.type = FWP_UINT8;
+	c[1].conditionValue.uint8 = protocol;
+
+	Zero(&filter, sizeof(filter));
+	filter.flags = 0;
+	filter.layerKey = isv4 ? FWPM_LAYER_OUTBOUND_TRANSPORT_V4 : FWPM_LAYER_OUTBOUND_TRANSPORT_V6;
+	filter.weight.type = FWP_UINT64;
+	filter.weight.uint64 = &weight;
+	filter.action.type = permit ? FWP_ACTION_PERMIT : FWP_ACTION_BLOCK;
+	filter.displayData.name = name;
+
+	filter.filterCondition = c;
+	filter.numFilterConditions = 2;
+
+	ret = api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
+	if (ret)
+	{
+		Debug("DuWfpAddPortAcl: FwpmFilterAdd0 Failed: 0x%X\n", ret);
+	}
+}
+
+// Add ACL rule with IP
+void DuWfpAddIpAcl(HANDLE hEngine, IP *ip, IP *mask, UINT index, bool permit)
+{
+	FWPM_FILTER0 filter;
+	UINT64 weight = ((UINT64)~((UINT64)0)) - (UINT64)index;
+	wchar_t name[256];
+	UINT ret;
+	FWPM_FILTER_CONDITION0 c;
+	FWP_V4_ADDR_AND_MASK subnetv4;
+	FWP_V6_ADDR_AND_MASK subnetv6;
+
+	bool isv4 = false;
+
+	if (IsIP4(ip) == false || IsIP4(mask) == false)
+	{
+		if (IsIP6(ip) == false || IsIP6(mask) == false)
+		{
+			return;
+		}
+	}
+
+	isv4 = IsIP4(ip);
+
+	UniFormat(name, sizeof(name), L"DU_DuWfpAddIpAcl_%u", index);
+
+	Zero(&subnetv4, sizeof(subnetv4));
+	if (isv4)
+	{
+		subnetv4.addr = Endian32(IPToUINT(ip));
+		subnetv4.mask = Endian32(IPToUINT(mask));
+	}
+
+	Zero(&subnetv6, sizeof(subnetv6));
+	if (isv4 == false)
+	{
+		Copy(subnetv6.addr, ip->ipv6_addr, 16);
+		subnetv6.prefixLength = SubnetMaskToInt6(mask);
+	}
+
+	Zero(&c, sizeof(c));
+	c.fieldKey = FWPM_CONDITION_IP_REMOTE_ADDRESS;
+	c.matchType = FWP_MATCH_EQUAL;
+	c.conditionValue.type = isv4 ? FWP_V4_ADDR_MASK : FWP_V6_ADDR_MASK;
+
+	if (isv4)
+	{
+		c.conditionValue.v4AddrMask = &subnetv4;
+	}
+	else
+	{
+		c.conditionValue.v6AddrMask = &subnetv6;
+	}
+
+	Zero(&filter, sizeof(filter));
+	filter.flags = 0;
+	filter.layerKey = isv4 ? FWPM_LAYER_OUTBOUND_TRANSPORT_V4 : FWPM_LAYER_OUTBOUND_TRANSPORT_V6;
+	filter.weight.type = FWP_UINT64;
+	filter.weight.uint64 = &weight;
+	filter.action.type = permit ? FWP_ACTION_PERMIT : FWP_ACTION_BLOCK;
+	filter.displayData.name = name;
+
+	filter.filterCondition = &c;
+	filter.numFilterConditions = 1;
+
+	ret = api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
+	if (ret)
+	{
+		Debug("DuWfpAddIpAcl: FwpmFilterAdd0 Failed: 0x%X\n", ret);
+	}
+}
+
+void DuWfpTest()
+{
+	FWPM_SESSION0 session;
+	UINT ret;
+	HANDLE hEngine;
+	FWPM_FILTER0 filter;
+	UINT64 weight = ((UINT64)~((UINT64)0));
+	UINT64 FilterIPv4Id = 0;
+
+	DuInitWfpApi();
+
+	// Open the WFP (Dynamic Session)
+	Zero(&session, sizeof(session));
+	session.flags = FWPM_SESSION_FLAG_DYNAMIC;
+	ret = api->FwpmEngineOpen0(NULL, RPC_C_AUTHN_DEFAULT, NULL, &session, &hEngine);
+	if (ret)
+	{
+		Debug("FwpmEngineOpen0 Failed.\n");
+		return;
+	}
+
+	if (true)
+	{
+		IP ip, mask;
+
+		DuWfpAddPortAcl(hEngine, false, IP_PROTO_UDP, 53, 50, true);
+
+		SetIP(&ip, 8, 8, 8, 8);
+		SetIP(&mask, 255, 255, 255, 255);
+
+		DuWfpAddIpAcl(hEngine, &ip, &mask, 200, true);
+
+		SetIP(&ip, 8, 8, 8, 0);
+		SetIP(&mask, 255, 255, 255, 0);
+
+		DuWfpAddIpAcl(hEngine, &ip, &mask, 100, false);
+	}
+	else
+	{
+		// Create the Filter (IPv4)
+		Zero(&filter, sizeof(filter));
+		filter.flags = 0;
+		filter.layerKey = FWPM_LAYER_INBOUND_IPPACKET_V4;
+		filter.weight.type = FWP_UINT64;
+		filter.weight.uint64 = &weight;
+		filter.action.type = FWP_ACTION_PERMIT;
+		filter.displayData.name = L"Test1";
+		ret = api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
+		if (ret)
+		{
+			Debug("FwpmFilterAdd0 for IPv4 Failed: 0x%X\n", ret);
+		}
+		else
+		{
+			Debug("FwpmFilterAdd0 for IPv4 Ok.\n");
+		}
+
+		// Create the Filter (IPv4)
+		Zero(&filter, sizeof(filter));
+		filter.flags = 0;
+		filter.layerKey = FWPM_LAYER_INBOUND_IPPACKET_V4;
+		filter.weight.type = FWP_UINT64;
+		filter.weight.uint64 = &weight;
+		filter.action.type = FWP_ACTION_BLOCK;
+		filter.displayData.name = L"Test1";
+		ret = api->FwpmFilterAdd0(hEngine, &filter, NULL, NULL);
+		if (ret)
+		{
+			Debug("FwpmFilterAdd0 for IPv4 Failed: 0x%X\n", ret);
+		}
+		else
+		{
+			Debug("FwpmFilterAdd0 for IPv4 Ok.\n");
+		}
+	}
+}
+
+// Start applying White List Rules
+void *DuStartApplyWhiteListRules()
+{
+	FWPM_SESSION0 session;
+	UINT ret;
+	HANDLE hEngine;
+
+	if (DuInitWfpApi() == false)
+	{
+		return NULL;
+	}
+
+	// Open the WFP (Dynamic Session)
+	Zero(&session, sizeof(session));
+	session.flags = FWPM_SESSION_FLAG_DYNAMIC;
+	ret = api->FwpmEngineOpen0(NULL, RPC_C_AUTHN_DEFAULT, NULL, &session, &hEngine);
+	if (ret)
+	{
+		Debug("FwpmEngineOpen0 Failed.\n");
+		return NULL;
+	}
+
+	return hEngine;
+}
+
+// Stop applying White List Rules
+void DuStopApplyWhiteListRules(void *handle)
+{
+	if (api	== NULL || handle == NULL)
+	{
+		return;
+	}
+
+	api->FwpmEngineClose0((HANDLE)handle);
 }
 
 #endif	// WIN32
