@@ -175,8 +175,8 @@ UINT DuInspectionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void
 
 bool DuInitWfpApi();
 void DuWfpTest();
-void DuWfpAddIpAcl(HANDLE hEngine, IP *ip, IP *mask, UINT index, bool permit);
-void DuWfpAddPortAcl(HANDLE hEngine, bool ipv6, UCHAR protocol, UINT port, UINT index, bool permit);
+void DuWfpAddIpAcl(HANDLE hEngine, bool is_in, IP *ip, IP *mask, UINT index, bool permit);
+void DuWfpAddPortAcl(HANDLE hEngine, bool is_in, bool ipv6, UCHAR protocol, UINT port, UINT index, bool permit);
 
 void *DuStartApplyWhiteListRules();
 void DuStopApplyWhiteListRules(void *handle);

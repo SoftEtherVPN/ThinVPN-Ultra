@@ -2706,7 +2706,7 @@ bool DuInitWfpApi()
 }
 
 // Add ACL rule with port
-void DuWfpAddPortAcl(HANDLE hEngine, bool ipv6, UCHAR protocol, UINT port, UINT index, bool permit)
+void DuWfpAddPortAcl(HANDLE hEngine, bool is_in, bool ipv6, UCHAR protocol, UINT port, UINT index, bool permit)
 {
 	FWPM_FILTER0 filter;
 	UINT64 weight = ((UINT64)~((UINT64)0)) - (UINT64)index;
@@ -2730,7 +2730,14 @@ void DuWfpAddPortAcl(HANDLE hEngine, bool ipv6, UCHAR protocol, UINT port, UINT 
 
 	Zero(&filter, sizeof(filter));
 	filter.flags = 0;
-	filter.layerKey = isv4 ? FWPM_LAYER_OUTBOUND_TRANSPORT_V4 : FWPM_LAYER_OUTBOUND_TRANSPORT_V6;
+	if (is_in)
+	{
+		filter.layerKey = isv4 ? FWPM_LAYER_INBOUND_TRANSPORT_V4 : FWPM_LAYER_INBOUND_TRANSPORT_V6;
+	}
+	else
+	{
+		filter.layerKey = isv4 ? FWPM_LAYER_OUTBOUND_TRANSPORT_V4 : FWPM_LAYER_OUTBOUND_TRANSPORT_V6;
+	}
 	filter.weight.type = FWP_UINT64;
 	filter.weight.uint64 = &weight;
 	filter.action.type = permit ? FWP_ACTION_PERMIT : FWP_ACTION_BLOCK;
@@ -2747,7 +2754,7 @@ void DuWfpAddPortAcl(HANDLE hEngine, bool ipv6, UCHAR protocol, UINT port, UINT 
 }
 
 // Add ACL rule with IP
-void DuWfpAddIpAcl(HANDLE hEngine, IP *ip, IP *mask, UINT index, bool permit)
+void DuWfpAddIpAcl(HANDLE hEngine, bool is_in, IP *ip, IP *mask, UINT index, bool permit)
 {
 	FWPM_FILTER0 filter;
 	UINT64 weight = ((UINT64)~((UINT64)0)) - (UINT64)index;
@@ -2801,7 +2808,16 @@ void DuWfpAddIpAcl(HANDLE hEngine, IP *ip, IP *mask, UINT index, bool permit)
 
 	Zero(&filter, sizeof(filter));
 	filter.flags = 0;
-	filter.layerKey = isv4 ? FWPM_LAYER_OUTBOUND_TRANSPORT_V4 : FWPM_LAYER_OUTBOUND_TRANSPORT_V6;
+
+	if (is_in)
+	{
+		filter.layerKey = isv4 ? FWPM_LAYER_INBOUND_TRANSPORT_V4 : FWPM_LAYER_INBOUND_TRANSPORT_V6;
+	}
+	else
+	{
+		filter.layerKey = isv4 ? FWPM_LAYER_OUTBOUND_TRANSPORT_V4 : FWPM_LAYER_OUTBOUND_TRANSPORT_V6;
+	}
+
 	filter.weight.type = FWP_UINT64;
 	filter.weight.uint64 = &weight;
 	filter.action.type = permit ? FWP_ACTION_PERMIT : FWP_ACTION_BLOCK;
@@ -2840,19 +2856,6 @@ void DuWfpTest()
 
 	if (true)
 	{
-		IP ip, mask;
-
-		DuWfpAddPortAcl(hEngine, false, IP_PROTO_UDP, 53, 50, true);
-
-		SetIP(&ip, 8, 8, 8, 8);
-		SetIP(&mask, 255, 255, 255, 255);
-
-		DuWfpAddIpAcl(hEngine, &ip, &mask, 200, true);
-
-		SetIP(&ip, 8, 8, 8, 0);
-		SetIP(&mask, 255, 255, 255, 0);
-
-		DuWfpAddIpAcl(hEngine, &ip, &mask, 100, false);
 	}
 	else
 	{
@@ -2951,7 +2954,8 @@ void *DuStartApplyWhiteListRules()
 
 								if (ParseIpAndSubnetMask46(value, &ip, &mask))
 								{
-									DuWfpAddIpAcl(hEngine, &ip, &mask, ++index, true);
+									DuWfpAddIpAcl(hEngine, true, &ip, &mask, ++index, true);
+									DuWfpAddIpAcl(hEngine, false, &ip, &mask, ++index, true);
 								}
 							}
 							else if (StrCmpi(type, "UDP") == 0)
@@ -2959,7 +2963,8 @@ void *DuStartApplyWhiteListRules()
 								UINT port = ToInt(value);
 								if (port >= 1 && port <= 65535)
 								{
-									DuWfpAddPortAcl(hEngine, false, IP_PROTO_UDP, port, ++index, true);
+									DuWfpAddPortAcl(hEngine, true, false, IP_PROTO_UDP, port, ++index, true);
+									DuWfpAddPortAcl(hEngine, false, false, IP_PROTO_UDP, port, ++index, true);
 								}
 							}
 						}
@@ -2982,12 +2987,14 @@ void *DuStartApplyWhiteListRules()
 		// Deny all IPv4
 		ZeroIP4(&ip);
 		ZeroIP4(&mask);
-		DuWfpAddIpAcl(hEngine, &ip, &mask, ++index, false);
+		DuWfpAddIpAcl(hEngine, true, &ip, &mask, ++index, false);
+		DuWfpAddIpAcl(hEngine, false, &ip, &mask, ++index, false);
 
 		// Deny all IPv6
 		ZeroIP6(&ip);
 		ZeroIP6(&mask);
-		DuWfpAddIpAcl(hEngine, &ip, &mask, ++index, false);
+		DuWfpAddIpAcl(hEngine, true, &ip, &mask, ++index, false);
+		DuWfpAddIpAcl(hEngine, false, &ip, &mask, ++index, false);
 	}
 
 	return hEngine;
