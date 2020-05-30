@@ -947,7 +947,9 @@ void test(UINT num, char **arg)
 	if (true)
 	{
 #ifdef  OS_WIN32
-		DuWfpTest();
+		void *h = DuStartApplyWhiteListRules();
+		GetLine(NULL, 0);
+		DuStopApplyWhiteListRules(h);
 #endif
 		return;
 	}

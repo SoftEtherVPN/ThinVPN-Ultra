@@ -2899,7 +2899,8 @@ void *DuStartApplyWhiteListRules()
 {
 	FWPM_SESSION0 session;
 	UINT ret;
-	HANDLE hEngine;
+	HANDLE hEngine = NULL;
+	UINT index = 0;
 
 	if (DuInitWfpApi() == false)
 	{
@@ -2914,6 +2915,79 @@ void *DuStartApplyWhiteListRules()
 	{
 		Debug("FwpmEngineOpen0 Failed.\n");
 		return NULL;
+	}
+
+	if (true)
+	{
+		BUF *body = ReadDump(DU_WHITELIST_FILENAME);
+		if (body != NULL)
+		{
+			while (true)
+			{
+				char *line = CfgReadNextLine(body);
+				if (line == NULL)
+				{
+					break;
+				}
+
+				Trim(line);
+
+				if (StartWith(line, "#") == false && StartWith(line, "//") == false &&
+					StartWith(line, ";") == false)
+				{
+					TOKEN_LIST *t = ParseTokenWithoutNullStr(line, " \t");
+
+					if (t != NULL)
+					{
+						if (t->NumTokens == 2)
+						{
+							char *type = t->Token[0];
+							char *value = t->Token[1];
+
+							if (StrCmpi(type, "IP") == 0)
+							{
+								IP ip;
+								IP mask;
+
+								if (ParseIpAndSubnetMask46(value, &ip, &mask))
+								{
+									DuWfpAddIpAcl(hEngine, &ip, &mask, ++index, true);
+								}
+							}
+							else if (StrCmpi(type, "UDP") == 0)
+							{
+								UINT port = ToInt(value);
+								if (port >= 1 && port <= 65535)
+								{
+									DuWfpAddPortAcl(hEngine, false, IP_PROTO_UDP, port, ++index, true);
+								}
+							}
+						}
+
+						FreeToken(t);
+					}
+				}
+
+				Free(line);
+			}
+
+			FreeBuf(body);
+		}
+	}
+
+	if (true)
+	{
+		IP ip, mask;
+
+		// Deny all IPv4
+		ZeroIP4(&ip);
+		ZeroIP4(&mask);
+		DuWfpAddIpAcl(hEngine, &ip, &mask, ++index, false);
+
+		// Deny all IPv6
+		ZeroIP6(&ip);
+		ZeroIP6(&mask);
+		DuWfpAddIpAcl(hEngine, &ip, &mask, ++index, false);
 	}
 
 	return hEngine;

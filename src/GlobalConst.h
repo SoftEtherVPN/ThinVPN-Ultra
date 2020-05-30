@@ -68,6 +68,8 @@
 
 #define	GC_REG_COMPANY_NAME			"Thin Telework System"
 
+#define DU_WHITELIST_FILENAME		"|WhiteListRules.txt"
+
 
 // Installer 関係
 #define SW_NAME_THINSVR			"thinsvr"
