@@ -377,7 +377,10 @@ bool DuWoLDlgOnOk(HWND hWnd, DU_MAIN *m)
 
 	DuWoLSetControlEnable(hWnd, true);
 
-	MsgBoxEx(hWnd, MB_ICONINFORMATION, _UU("DU_WOL_MSG"), pcid, pcid2);
+	if (ret)
+	{
+		MsgBoxEx(hWnd, MB_ICONINFORMATION, _UU("DU_WOL_MSG"), pcid, pcid2);
+	}
 
 	FocusEx(hWnd, C_PCID);
 

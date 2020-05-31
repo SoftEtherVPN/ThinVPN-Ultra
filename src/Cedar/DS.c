@@ -1073,6 +1073,10 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 		DsSendError(sock, ERR_NO_ERROR);
 		FreePack(p);
+
+		// ダミー通信待機 (これがないと切断されたとみなされてしまう)
+		SockIoSetTimeout(sock, DS_SEND_ERROR_AND_WAIT_SPAN);
+		FreePack(SockIoRecvPack(sock));
 		return;
 	}
 
@@ -1139,6 +1143,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		{
 			// クライアント検疫が設定されているのに対応していないバージョンのクライアント
 			DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+			return;
 		}
 	}
 
