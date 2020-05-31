@@ -2580,6 +2580,8 @@ UINT DtChangePcid(DS *ds, RPC_PCID *t)
 // 設定の設定
 UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 {
+	bool wol_target_old = ds->EnableWoLTarget;
+
 	ds->Active = t->Active;
 	ds->PowerKeep = t->PowerKeep;
 	Copy(ds->HashedPassword, t->HashedPassword, sizeof(ds->HashedPassword));
@@ -2612,9 +2614,23 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 	ds->RdpEnableOptimizer = t->RdpEnableOptimizer;
 	StrCpy(ds->RdpStopServicesList, sizeof(ds->RdpStopServicesList), t->RdpStopServicesList);
 
+	ds->EnableWoLTarget = t->EnableWoLTarget;
+	ds->EnableWoLTrigger = t->EnableWoLTrigger;
+
 	DsNormalizeConfig(ds, true);
 	DsSaveConfig(ds);
 	DsUpdatePowerKeepSetting(ds);
+
+	if (ds->EnableWoLTarget != wol_target_old)
+	{
+		ds->Wide->SendMacList = ds->EnableWoLTarget;
+
+		// WoL ターゲットの設定が変更された場合は再接続をする
+		if (WideServerTryAutoReconnect(ds->Wide))
+		{
+			WideServerReconnect(ds->Wide);
+		}
+	}
 
 	return ERR_NO_ERROR;
 }
@@ -2654,6 +2670,9 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 	UniStrCpy(t->RdpGroupKeepUserName, sizeof(t->RdpGroupKeepUserName), ds->RdpGroupKeepUserName);
 	t->RdpEnableOptimizer = ds->RdpEnableOptimizer;
 	StrCpy(t->RdpStopServicesList, sizeof(t->RdpStopServicesList), ds->RdpStopServicesList);
+
+	t->EnableWoLTarget = ds->EnableWoLTarget;
+	t->EnableWoLTrigger = ds->EnableWoLTrigger;
 
 	return ERR_NO_ERROR;
 }
@@ -3231,6 +3250,9 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 
 	ds->AuthType = CfgGetInt(root, "AuthType");
 
+	ds->EnableWoLTarget = CfgGetBool(root, "EnableWoLTarget");
+	ds->EnableWoLTrigger = CfgGetBool(root, "EnableWoLTrigger");
+
 	switch (ds->AuthType)
 	{
 	case DESK_AUTH_PASSWORD:
@@ -3380,6 +3402,9 @@ FOLDER *DsSaveConfigMain(DS *ds)
 	CfgAddStr(root, "RdpStopServicesList", ds->RdpStopServicesList);
 
 	CfgAddUniStr(root, "AdminUsername", ds->AdminUsername);
+
+	CfgAddBool(root, "EnableWoLTarget", ds->EnableWoLTarget);
+	CfgAddBool(root, "EnableWoLTrigger", ds->EnableWoLTrigger);
 
 	if (ds->SupportBluetooth)
 	{
@@ -3901,10 +3926,13 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 	ds->RpcListener = NewListenerEx2(ds->Cedar, LISTENER_TCP,
 		DS_RPC_PORT, DsRpcListenerThread, ds, true);
 
-	WideServerSetCertAndKey(ds->Wide, cert, key);
-
 	// 設定初期化
 	DsInitConfig(ds);
+
+	ds->Wide->SendMacList = ds->EnableWoLTarget;
+
+	// WIDE 基礎モジュールに対して証明書が設定され、接続が開始される
+	WideServerSetCertAndKey(ds->Wide, cert, key);
 
 	WideServerSuppressAutoReconnect(ds->Wide, false);
 

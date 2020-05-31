@@ -256,6 +256,8 @@
 #define S_STATUS5                       1019
 #define S_COPYRIGHT                     1020
 #define S_SUFFIX                        1020
+#define B_ERASE2                        1020
+#define B_WOL                           1020
 #define E_PASSPHRASE                    1021
 #define S_STATUS7                       1021
 #define S_STATUS8                       1022

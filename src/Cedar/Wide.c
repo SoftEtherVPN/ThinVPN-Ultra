@@ -936,6 +936,39 @@ void WideServerGenerateCertAndKey(X **cert, K **key)
 #endif  // OS_WIN32
 }
 
+// WIDE Controller に 指定したマシンの MAC アドレスの一覧を要求する
+UINT WideClientGetWoLMacList(WIDE *w, char *pcid, UINT ver, UINT build, char *mac_list, UINT mac_list_size)
+{
+	PACK *r = NULL, *p = NULL;
+	UINT ret;
+	// 引数チェック
+	ClearStr(mac_list, mac_list_size);
+	if (w == NULL || pcid == NULL)
+	{
+		return ERR_INTERNAL_ERROR;
+	}
+
+	r = NewPack();
+	PackAddStr(r, "SvcName", w->SvcName);
+	PackAddStr(r, "Pcid", pcid);
+	PackAddInt(r, "Ver", ver);
+	PackAddInt(r, "Build", build);
+	PackAddData(r, "ClientId", w->ClientId, sizeof(w->ClientId));
+	p = WideCall(w, "ClientGetWoLMacList", r, false, true);
+	FreePack(r);
+
+	ret = GetErrorFromPack(p);
+
+	if (ret == ERR_NO_ERROR)
+	{
+		PackGetStr(p, "wol_maclist", mac_list, mac_list_size);
+	}
+
+	FreePack(p);
+
+	return ret;
+}
+
 // クライアント接続
 UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT build)
 {
@@ -1036,6 +1069,18 @@ UINT WideServerConnect(WIDE *w, WT_CONNECT *c)
 	}
 
 	r = NewPack();
+
+	if (w->SendMacList)
+	{
+		UINT mac_list_size = 1024;
+		char *mac_list_str = ZeroMalloc(mac_list_size);
+
+		GetMacAddressListLocalComputer(mac_list_str, mac_list_size);
+
+		PackAddStr(r, "wol_maclist", mac_list_str);
+
+		Free(mac_list_str);
+	}
 
 	PackAddInt64(r, "ServerMask64", w->ServerMask64);
 	p = WideCall(w, "ServerConnect", r, false, true);

@@ -181,4 +181,10 @@ void DuWfpAddPortAcl(HANDLE hEngine, bool is_in, bool ipv6, UCHAR protocol, UINT
 void *DuStartApplyWhiteListRules();
 void DuStopApplyWhiteListRules(void *handle);
 
+bool DuWoLDlg(HWND hWnd, DU_MAIN *m);
+UINT DuWoLDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+void DuWoLDlgInit(HWND hWnd, DU_MAIN *m);
+void DuWoLSetControlEnable(HWND hWnd, bool b);
+
+
 

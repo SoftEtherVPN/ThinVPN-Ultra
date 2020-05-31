@@ -169,6 +169,7 @@ struct WIDE
 	WIDE_RESET_CERT_PROC *ResetCertProc;
 	void *ResetCertProcParam;
 	UINT64 ServerMask64;
+	bool SendMacList;
 	ACCEPT_QUEUE *AcceptQueue;
 
 	bool MsgForServerArrived;			// 新しいメッセージが WideController から届いている
@@ -239,6 +240,7 @@ void WideClientStop(WIDE *w);
 UINT WideClientConnect(WIDE *w, char *pc_id, UINT ver, UINT build, SOCKIO **sockio);
 UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT build);
 void WideClientGenerateClientId(UCHAR *id);
+UINT WideClientGetWoLMacList(WIDE *w, char *pcid, UINT ver, UINT build, char *mac_list, UINT mac_list_size);
 
 // WideServer
 WIDE *WideServerStart(char *svc_name, WT_ACCEPT_PROC *accept_proc, void *accept_param, UINT se_lang);

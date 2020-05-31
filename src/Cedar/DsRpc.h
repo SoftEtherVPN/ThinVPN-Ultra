@@ -74,6 +74,9 @@ struct RPC_DS_CONFIG
 	wchar_t RdpGroupKeepUserName[MAX_PATH];
 	bool RdpEnableOptimizer;
 	char RdpStopServicesList[MAX_PATH];
+
+	bool EnableWoLTarget;
+	bool EnableWoLTrigger;
 };
 
 void InInternetSetting(INTERNET_SETTING *t, PACK *p);

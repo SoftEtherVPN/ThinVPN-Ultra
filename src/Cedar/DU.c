@@ -116,6 +116,103 @@ static HINSTANCE du_wfp_dll = NULL;
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
 
+// WoL ダイアログ初期化
+void DuWoLDlgInit(HWND hWnd, DU_MAIN *m)
+{
+	UINT i;
+	LIST *c;
+	HFONT h;
+	if (hWnd == NULL || m == NULL)
+	{
+		return;
+	}
+
+	SetIcon(hWnd, 0, ICO_NIC_ONLINE);
+
+	DlgFont(hWnd, IDOK, 0, true);
+
+	h = GetFont("Arial", 10, false, false, false, false);
+	SetFont(hWnd, C_PCID, h);
+	SetFont(hWnd, C_PCID2, h);
+
+	// Candidate
+	c = m->Du->Dc->Candidate;
+	for (i = 0;i < LIST_NUM(c);i++)
+	{
+		CANDIDATE *item = LIST_DATA(c, i);
+
+		if (UniIsEmptyStr(item->Str) == false)
+		{
+			CbAddStr(hWnd, C_PCID, item->Str, 0);
+		}
+	}
+	CbSetHeight(hWnd, C_PCID, 20);
+
+	// Candidate WoL
+	c = m->Du->Dc->CandidateWoL;
+	for (i = 0;i < LIST_NUM(c);i++)
+	{
+		CANDIDATE *item = LIST_DATA(c, i);
+
+		if (UniIsEmptyStr(item->Str) == false)
+		{
+			CbAddStr(hWnd, C_PCID2, item->Str, 0);
+		}
+	}
+	CbSetHeight(hWnd, C_PCID2, 20);
+}
+
+// WoL コントロール有効 / 無効変更
+void DuWoLSetControlEnable(HWND hWnd, bool b)
+{
+	SetEnable(hWnd, C_PCID, b);
+	SetEnable(hWnd, C_PCID2, b);
+	SetEnable(hWnd, IDOK, b);
+	SetEnable(hWnd, IDCANCEL, b);
+}
+
+// WoL ダイアログプロシージャ
+UINT DuWoLDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	DU_MAIN *m = (DU_MAIN *)param;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		DuWoLDlgInit(hWnd, m);
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+			break;
+
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		break;
+	}
+
+	return 0;
+}
+
+// WoL ダイアログ
+bool DuWoLDlg(HWND hWnd, DU_MAIN *m)
+{
+	if (m == NULL)
+	{
+		return false;
+	}
+
+	return Dialog(hWnd, D_DU_WOL, DuWoLDlgProc, m);
+}
+
 // コントロール更新
 void DuOtpDlgUpdate(HWND hWnd)
 {
@@ -2364,6 +2461,9 @@ void DuMainDlgSetControlEnabled(HWND hWnd, bool b)
 	SetEnable(hWnd, IDOK, b);
 	SetEnable(hWnd, IDCANCEL, b);
 	SetEnable(hWnd, B_OPTION, b);
+	SetEnable(hWnd, B_SHARE, b);
+	SetEnable(hWnd, B_WOL, b);
+	SetEnable(hWnd, B_ERASE, b);
 
 	if (b)
 	{
@@ -2486,6 +2586,11 @@ UINT DuMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 
 				Focus(hWnd, C_PCID);
 			}
+			break;
+
+		case B_WOL:
+			// Wake on LAN
+			DuWoLDlg(hWnd, t);
 			break;
 		}
 		break;

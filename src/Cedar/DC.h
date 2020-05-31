@@ -140,6 +140,7 @@ struct DC
 	bool MstscUseShareCamera;			// カメラ共有を使用する
 	bool DontShowFullScreenMessage;		// フルスクリーンメッセージを表示しない
 	LIST *Candidate;					// 候補
+	LIST *CandidateWoL;					// 候補 2 (WoL トリガー)
 	wchar_t BluetoothDir[MAX_PATH];		// Bluetooth ディレクトリ
 	bool BluetoothDirInited;			// Bluetooth ディレクトリが初期化された
 	LIST *AdvAuthList;					// 拡張認証データリスト
@@ -156,6 +157,7 @@ UINT DcConnectEx(DC *dc, DC_SESSION *dcs, char *pcid, DC_AUTH_CALLBACK *auth_cal
 				 SOCKIO **sockio, bool first_connection, wchar_t *ret_msg, UINT ret_msg_size, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param,
 				 DC_INSPECT_CALLBACK *ins_callback, DC_SESSION *ins_callback_param);
 UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param, DC_INSPECT_CALLBACK *ins_callback, DC_SESSION *ins_callback_param);
+UINT DcTriggerWoL(DC *dc, char *target_pcid, char *trigger_pcid);
 void DcSetLocalHostAllowFlag(bool allow);
 UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_OTP_CALLBACK *otp_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback, DC_INSPECT_CALLBACK *inspect_callback,
 				  void *param, DC_SESSION **session);
@@ -205,6 +207,7 @@ bool DcSetMstscRdpFileStr(char *key_name, char *value);
 wchar_t *DcReadRdpFile(wchar_t *name, bool *is_empty);
 bool DcWriteRdpFile(wchar_t *name, wchar_t *s);
 void DcEraseCandidate(DC *dc);
+void DcEraseCandidateWoL(DC *dc);
 BUF *DcGetNextFileFromDir(wchar_t *dirname, wchar_t *filename, UINT filename_size, LIST *ignore_list);
 DC_ADVAUTH *DcGetAdvAuth(DC *dc, char *pcid);
 void DcSetAdvAuth(DC *dc, DC_ADVAUTH *advauth);

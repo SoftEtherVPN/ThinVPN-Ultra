@@ -144,6 +144,9 @@ struct DS
 	char RdpStopServicesList[MAX_PATH];
 
 	DS_POLICY_CLIENT *PolicyClient;		// ポリシークライアント
+
+	bool EnableWoLTarget;
+	bool EnableWoLTrigger;
 };
 
 struct DS_INFO

@@ -404,6 +404,20 @@ void DcEraseCandidate(DC *dc)
 	dc->Candidate = NewCandidateList();
 }
 
+// WoL トリガー候補一覧の消去
+void DcEraseCandidateWoL(DC *dc)
+{
+	// 引数チェック
+	if (dc == NULL)
+	{
+		return;
+	}
+
+	FreeCandidateList(dc->CandidateWoL);
+
+	dc->CandidateWoL = NewCandidateList();
+}
+
 // Default.rdp の書き換え (文字列)
 bool DcSetMstscRdpFileStr(char *key_name, char *value)
 {
@@ -1489,6 +1503,7 @@ void DcLoadConfig(DC *dc, FOLDER *root)
 
 	// 候補
 	dc->Candidate = NULL;
+
 	b = CfgGetBuf(root, "Candidate");
 	if (b != NULL)
 	{
@@ -1499,6 +1514,21 @@ void DcLoadConfig(DC *dc, FOLDER *root)
 	if (dc->Candidate == NULL)
 	{
 		dc->Candidate = NewCandidateList();
+	}
+
+	// WoL 候補
+	dc->CandidateWoL = NULL;
+
+	b = CfgGetBuf(root, "CandidateWoL");
+	if (b != NULL)
+	{
+		dc->CandidateWoL = BufToCandidate(b);
+		FreeBuf(b);
+	}
+
+	if (dc->CandidateWoL == NULL)
+	{
+		dc->CandidateWoL = NewCandidateList();
 	}
 
 	// インターネット設定
@@ -1615,9 +1645,17 @@ void DcSaveConfig(DC *dc)
 		CfgAddUniStr(root, "BluetoothDir", dc->BluetoothDir);
 	}
 
+	// Candidate
 	b = CandidateToBuf(dc->Candidate);
 
 	CfgAddBuf(root, "Candidate", b);
+
+	FreeBuf(b);
+
+	// Candidate WoL
+	b = CandidateToBuf(dc->CandidateWoL);
+
+	CfgAddBuf(root, "CandidateWoL", b);
 
 	FreeBuf(b);
 
@@ -1702,6 +1740,7 @@ void DcInitDefaultConfig(DC *dc)
 	DcSetInternetSetting(dc, &setting);
 
 	dc->Candidate = NewCandidateList();
+	dc->CandidateWoL = NewCandidateList();
 	dc->AdvAuthList = NewList(DcCompareAdvAuth);
 
 	WideSetDontCheckCert(dc->Wide, false);
@@ -1802,6 +1841,8 @@ void FreeDc(DC *dc)
 	WideClientStop(dc->Wide);
 
 	FreeCandidateList(dc->Candidate);
+
+	FreeCandidateList(dc->CandidateWoL);
 
 	for (i = 0;i < LIST_NUM(dc->AdvAuthList);i++)
 	{
@@ -3022,6 +3063,32 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 #else   // OS_WIN32
 	return ERR_NOT_SUPPORTED;
 #endif  // OS_WIN32
+}
+
+// WoL パケットの送信命令
+UINT DcTriggerWoL(DC *dc, char *target_pcid, char *trigger_pcid)
+{
+	SOCKIO *sock = NULL;
+	UINT ret = ERR_NO_ERROR;
+	char mac_list[1024] = {0};
+	if (dc == NULL || target_pcid == NULL || trigger_pcid == NULL)
+	{
+		return ERR_INTERNAL_ERROR;
+	}
+
+	ret = WideClientGetWoLMacList(dc->Wide, target_pcid, DESK_VERSION, DESK_BUILD, mac_list, sizeof(mac_list));
+
+	if (ret != ERR_NO_ERROR)
+	{
+		return ret;
+	}
+
+	Print("%s\n", mac_list);
+
+	SockIoDisconnect(sock);
+	ReleaseSockIo(sock);
+
+	return ret;
 }
 
 // 接続
