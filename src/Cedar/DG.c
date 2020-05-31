@@ -117,6 +117,29 @@ UINT DgWoLDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 		case IDCANCEL:
 			Close(hWnd);
 			break;
+
+		case B_DEVMGR:
+			{
+				wchar_t mmc[MAX_PATH];
+				wchar_t devmgmt[MAX_PATH];
+				void *wow;
+				void *handle = NULL;
+
+				CombinePathW(mmc, sizeof(mmc), MsGetSystem32DirW(), L"mmc.exe");
+				CombinePathW(devmgmt, sizeof(devmgmt), MsGetSystem32DirW(), L"devmgmt.msc");
+
+				wow = MsDisableWow64FileSystemRedirection();
+
+				if (MsExecuteEx3W(mmc, devmgmt, &handle, true, false) == false)
+				{
+					MsgBox(hWnd, MB_ICONEXCLAMATION, _UU("DG_DEVMGMT_RUN_ERROR"));
+				}
+
+				MsCloseHandle(handle);
+
+				MsRestoreWow64FileSystemRedirection(wow);
+			}
+			break;
 		}
 		break;
 

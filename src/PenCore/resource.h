@@ -1062,6 +1062,7 @@
 #define E_EMERGENCY                     1519
 #define B_NEW_EMERGENCY                 1520
 #define B_RESET                         1521
+#define B_DEVMGR                        1522
 #define B_ONLINE                        1655
 #define D_NM_CONNECT                    1998
 #define D_NM_MAIN                       1999
@@ -1429,7 +1430,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        251
 #define _APS_NEXT_COMMAND_VALUE         40111
-#define _APS_NEXT_CONTROL_VALUE         1522
+#define _APS_NEXT_CONTROL_VALUE         1523
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
