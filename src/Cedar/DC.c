@@ -1608,6 +1608,7 @@ void DcSaveConfig(DC *dc)
 	CfgAddBool(root, "EnableVersion2", dc->EnableVersion2);
 	CfgAddBool(root, "MstscUseShareAudioRec", dc->MstscUseShareAudioRec);
 	CfgAddBool(root, "MstscUseShareCamera", dc->MstscUseShareCamera);
+	CfgAddBool(root, "DisableMultiDisplay", dc->DisableMultiDisplay);
 
 	if (dc->SupportBluetooth)
 	{
