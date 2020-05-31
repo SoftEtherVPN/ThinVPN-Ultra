@@ -143,6 +143,7 @@ UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 	case WM_INITDIALOG:
 		SetIcon(hWnd, 0, ICO_SHIELD);
 		DlgFont(hWnd, S_BOLD, 11, true);
+		DlgFont(hWnd, S_BOLD2, 0, true);
 		DlgFont(hWnd, IDOK, 10, true);
 		DlgFont(hWnd, IDCANCEL, 10, false);
 		break;
@@ -218,6 +219,7 @@ UINT DuGovFw2DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 	case WM_INITDIALOG:
 		SetIcon(hWnd, 0, ICO_LANG_JAPANESE);
 		DlgFont(hWnd, S_BOLD, 11, true);
+		//DlgFont(hWnd, S_BOLD2, 0, true);
 		DlgFont(hWnd, IDCANCEL, 10, true);
 		break;
 
