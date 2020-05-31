@@ -25,6 +25,7 @@
 
 #define DU_SHOW_THEEND_KEY_NAME			"ShowTheEndDialog_Ver01"		// お疲れ様でした有効化キー
 #define	DU_ENABLE_RELAX_KEY_NAME		"EnableRelaxMode"				// リラックスモード
+#define DU_GOV_FW2_SINGLE_INSTANCE_NAME	"GovFw2"
 
 
 #define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Server\\Config Tool"

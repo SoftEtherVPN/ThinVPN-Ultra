@@ -206,7 +206,8 @@ struct SOCKIO
 	SOCK_EVENT *SentNoticeEvent;		// 送信通知イベント (裏側スレッドが使う)
 	UINT MaxSendBufferSize;				// 最大送信バッファサイズ
 	BUF *SendBuf;						// 送信バッファ
-	UINT UserData1, UserData2, UserData3, UserData4;	// ユーザーデータ
+	UINT UserData1, UserData2, UserData3, UserData4, UserData5;	// ユーザーデータ
+	UINT64 ServerMask64;
 	PACK *InitialPack;					// Initial Pack
 };
 

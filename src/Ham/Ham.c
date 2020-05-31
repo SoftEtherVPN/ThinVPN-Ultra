@@ -944,6 +944,23 @@ void proxy_test(UINT num, char **arg)
 
 void test(UINT num, char **arg)
 {
+	if (num >= 1)
+	{
+		//MsRunAsUserExW(L"C:\\git\\IPA-DNP-DeskVPN\\src\\bin\\Ham.exe", L"", false);
+		//MsRunAsUserExW(L"c:\\windows\\notepad.exe", L"", false);
+		return;
+	}
+
+	if (true)
+	{
+#ifdef OS_WIN32
+		InitWinUi(NULL, NULL, 0);
+		//DuGovFw1Main();
+		FreeWinUi();
+		return;
+#endif
+	}
+
 	if (true)
 	{
 		LIST *o = NewStrList();

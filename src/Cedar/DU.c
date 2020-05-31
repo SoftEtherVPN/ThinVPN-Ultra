@@ -115,6 +115,130 @@ static HINSTANCE du_wfp_dll = NULL;
 
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
+// 完全閉域化ファイアウォール起動選択画面
+void DuGovFw1Main()
+{
+	INSTANCE *inst;
+
+	// すでに起動しているかどうか調べる
+	inst = NewSingleInstance(DU_GOV_FW2_SINGLE_INSTANCE_NAME);
+
+	if (inst == NULL)
+	{
+		// すでに起動しているので何もしない
+		return;
+	}
+
+	FreeSingleInstance(inst);
+
+	// ダイアログを表示する
+	Dialog(NULL, D_DU_GOVFW1, DuGovFw1DlgProc, NULL);
+}
+
+// 完全閉域化ファイアウォール起動選択画面プロシージャ
+UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		SetIcon(hWnd, 0, ICO_SHIELD);
+		DlgFont(hWnd, S_BOLD, 11, true);
+		DlgFont(hWnd, IDOK, 10, true);
+		DlgFont(hWnd, IDCANCEL, 10, false);
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+			{
+				wchar_t *exe = MsGetExeFileNameW();
+				wchar_t *arg = L"/govfw";
+				void *handle = NULL;
+
+				// for debug
+				//exe = L"C:\\git\\IPA-DNP-DeskVPN\\src\\bin\\ThinClient.exe";
+
+				if (MsExecuteEx3W(exe, arg, &handle, true, false))
+				{
+					EndDialog(hWnd, 1);
+				}
+			}
+			break;
+
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		break;
+	}
+
+	return 0;
+}
+
+// 完全閉域化ファイアウォールのメイン処理
+void DuGovFw2Main()
+{
+	void *h = NULL;
+	INSTANCE *inst;
+
+	if (MsIsAdmin() == false)
+	{
+		return;
+	}
+	
+	inst = NewSingleInstance(DU_GOV_FW2_SINGLE_INSTANCE_NAME);
+
+	if (inst == NULL)
+	{
+		return;
+	}
+
+	h = DuStartApplyWhiteListRules();
+
+	Dialog(NULL, D_DU_GOVFW2, DuGovFw2DlgProc, NULL);
+
+	FreeSingleInstance(inst);
+
+	DuStopApplyWhiteListRules(h);
+
+	return;
+}
+
+// 完全閉域化ファイアウォール
+UINT DuGovFw2DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		SetIcon(hWnd, 0, ICO_LANG_JAPANESE);
+		DlgFont(hWnd, S_BOLD, 11, true);
+		DlgFont(hWnd, IDCANCEL, 10, true);
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		break;
+	}
+
+	return 0;
+}
 
 // WoL ダイアログ初期化
 void DuWoLDlgInit(HWND hWnd, DU_MAIN *m)
@@ -1743,6 +1867,13 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 			Show(t->hWnd, 0);
 		}
 
+		if (s->IsLimitedMode && dc->DisableLimitedFw == false)
+		{
+			// 接続先サーバーが「行政システム適合モード」の場合はファイアウォールを
+			// 勧める画面を表示する
+			DuGovFw1Main();
+		}
+
 		if (dialup_ok == false)
 		{
 		}
@@ -2138,6 +2269,8 @@ void DuOptionDlgInit(HWND hWnd, DU_OPTION *t)
 
 	Check(hWnd, C_MULTIDISPLAY, !dc->DisableMultiDisplay);
 
+	Check(hWnd, C_LIMITED_FW, !dc->DisableLimitedFw);
+
 	DuOptionDlgInitProxyStr(hWnd, t);
 
 	DuOptionDlgUpdate(hWnd, t);
@@ -2274,6 +2407,8 @@ void DuOptionDlgOnOk(HWND hWnd, DU_OPTION *t)
 	dc->MstscUsePublicSwitchForVer6 = IsChecked(hWnd, C_PUBLIC);
 
 	dc->DisableMultiDisplay = !IsChecked(hWnd, C_MULTIDISPLAY);
+
+	dc->DisableLimitedFw = !IsChecked(hWnd, C_LIMITED_FW);
 
 	DcSaveConfig(dc);
 
@@ -2799,37 +2934,47 @@ void DUExec()
 
 	s = s2 = GetCommandLineStr();
 
-	// /local オプションで設定ファイルを実行ファイルのディレクトリに保存
-	if (StrCmpi(s,"/local") == 0 || StartWith(s,"/local "))
+	if (InStr(s, "/govfw"))
 	{
-		localconfig = true;
-		s+=6;
+		// 完全閉域化ファイアウォール
+		DuGovFw2Main();
 	}
-
-	if (IsFileExists(DU_LOCALCONFIG_FILENAME))
+	else
 	{
-		localconfig = true;
-	}
+		// /local オプションで設定ファイルを実行ファイルのディレクトリに保存
+		if (StrCmpi(s,"/local") == 0 || StartWith(s,"/local "))
+		{
+			localconfig = true;
+			s+=6;
+		}
 
-	if (IsEmptyStr(s) == false)
-	{
-		Trim(s);
-		StrCpy(du->AutoConnectPcid, sizeof(du->AutoConnectPcid), s);
-	}
+		if (IsFileExists(DU_LOCALCONFIG_FILENAME))
+		{
+			localconfig = true;
+		}
 
-	Free(s2);
+		if (IsEmptyStr(s) == false)
+		{
+			Trim(s);
+			StrCpy(du->AutoConnectPcid, sizeof(du->AutoConnectPcid), s);
+		}
+
 	
-	du->Dc = NewDc(localconfig);
+		du->Dc = NewDc(localconfig);
 
-	// メイン
-	DuMain(du);
+		// メイン
+		DuMain(du);
 
-	FreeDc(du->Dc);
+		FreeDc(du->Dc);
+	}
+
 	ReleaseCedar(du->Cedar);
 
 	FreeWinUi();
 
 	Free(du);
+
+	Free(s2);
 }
 
 

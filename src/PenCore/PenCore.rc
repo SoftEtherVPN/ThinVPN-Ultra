@@ -1330,7 +1330,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 440
         TOPMARGIN, 7
-        BOTTOMMARGIN, 328
+        BOTTOMMARGIN, 360
     END
 
     D_DU_DOWNLOAD, DIALOG
@@ -1538,17 +1538,16 @@ BEGIN
     D_DU_GOVFW1, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 350
+        RIGHTMARGIN, 352
         TOPMARGIN, 5
-        BOTTOMMARGIN, 384
     END
 
     D_DU_GOVFW2, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 351
+        RIGHTMARGIN, 352
         TOPMARGIN, 5
-        BOTTOMMARGIN, 312
+        BOTTOMMARGIN, 322
     END
 
     D_DG_WOL, DIALOG
@@ -5119,7 +5118,7 @@ BEGIN
     CONTROL         2517,S_BANNER2,"Static",SS_BITMAP | SS_NOTIFY | NOT WS_VISIBLE,36,119,267,40
 END
 
-D_DU_OPTION DIALOGEX 0, 0, 447, 335
+D_DU_OPTION DIALOGEX 0, 0, 447, 367
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "@D_DU_OPTION"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
@@ -5132,11 +5131,13 @@ BEGIN
     LTEXT           "@S4",IDC_STATIC,14,75,46,11
     LTEXT           "PROXY_CONFIG",S_PROXY_CONFIG,34,87,164,14
     PUSHBUTTON      "@B_PROXY",B_PROXY,100,107,90,16
-    GROUPBOX        "@S5",IDC_STATIC,7,132,197,141
+    GROUPBOX        "@S5",IDC_STATIC,7,132,197,171
     ICON            ICO_LICENSE,IDC_STATIC,12,145,20,20
     LTEXT           "@S6",IDC_STATIC,36,146,160,51
     CONTROL         "@C_CHECK_CERT",C_CHECK_CERT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,36,201,164,12
     LTEXT           "@S_CHECK_CERT",S_CHECK_CERT,36,220,161,47
+    CONTROL         "接続先のサーバーが「行政情報システム適合モード」の場合、「完全閉域化ファイアウォール」を起動",C_LIMITED_FW,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,36,271,160,26
     GROUPBOX        "@S7",IDC_STATIC,208,36,232,237
     ICON            ICO_DESKSERVER_EXE,IDC_STATIC,216,50,20,20
     LTEXT           "@S8",IDC_STATIC,240,51,193,50
@@ -5152,10 +5153,10 @@ BEGIN
     EDITTEXT        E_PARAM,264,215,163,12,ES_AUTOHSCROLL
     CONTROL         "@C_MULTIDISPLAY",C_MULTIDISPLAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,222,236,208,10
     CONTROL         "@C_PUBLIC",C_PUBLIC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,222,249,211,20
-    GROUPBOX        "@S_UX",IDC_STATIC,7,278,255,50
-    ICON            ICO_DISPLAY,IDC_STATIC,12,291,20,20
-    CONTROL         "@C_ENABLE_RELAX",C_ENABLE_RELAX,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,39,290,216,12
-    CONTROL         "@C_SHOW_THEEND",C_SHOW_THEEND,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,39,306,216,12
+    GROUPBOX        "@S_UX",IDC_STATIC,7,310,255,50
+    ICON            ICO_DISPLAY,IDC_STATIC,12,323,18,18
+    CONTROL         "@C_ENABLE_RELAX",C_ENABLE_RELAX,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,39,322,216,12
+    CONTROL         "@C_SHOW_THEEND",C_SHOW_THEEND,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,39,338,216,12
     GROUPBOX        "S_STATIC1",IDC_STATIC,266,283,174,57,NOT WS_VISIBLE
     LTEXT           "S_STATIC2",IDC_STATIC,267,296,214,20,NOT WS_VISIBLE
     CONTROL         "C_VER2",C_VER2,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | NOT WS_VISIBLE | WS_TABSTOP,279,293,211,13
@@ -5598,33 +5599,37 @@ BEGIN
     LTEXT           "接続先の NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 の設定に基づき、クライアント端末のセキュリティチェックを実行しています。しばらくお待ちください...",S_INFO,31,19,229,27
 END
 
-D_DU_GOVFW1 DIALOGEX 0, 0, 357, 389
+D_DU_GOVFW1 DIALOGEX 0, 0, 359, 362
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOPMOST
 CAPTION "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 "
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         1,IDC_STATIC,"Static",SS_BITMAP,7,5,343,138
-    LTEXT           "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 を一時的に有効にしますか?",S_BOLD,7,150,343,20
-    LTEXT           "「完全閉域化ファイアウォール機能」 を有効にすると、行政情報システムへのシンクライアント通信のための SSL-VPN 接続中は、本 PC とインターネットとの通信 (本 SSL-VPN 接続をのぞく) をすべて遮断できます。Windows のカーネルに最高優先上位のパケットフィルタを挿入することにより、他の通信に対する強力な遮断が実施されることから、他のアプリケーション (Web ブラウザ等を含む) は、これに反して通信をすることはできなくなり、セキュリティ脅威となり得る通信をシャットアウトできます。",S_INFO1,7,176,343,38
-    GROUPBOX        "「完全閉域化ファイアウォール機能」 による自宅と行政機関との間の完全閉域網化について",IDC_STATIC,7,218,343,84
-    LTEXT           "接続先の 「シン・テレワークシステム サーバー」 (職場側 PC) は、「行政情報システム適合モード」で動作しており、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムの固定された 30 個程度の IP アドレスのみと、通信を行なっています。このことを「特定通信」といいます。",S_INFO9,15,232,328,30
-    LTEXT           "行政情報システムへのアクセス時のインターネット分離を実現し、「IP-VPN」 や 「閉域 SIM」 等との同等の閉域性を実現するためには、シンクライアント方式での通信中は、このクライアント端末においても、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムとの間のみ「特定通信」を許可し、他の通信を一時的に遮断することが望ましいと考えられます。",S_INFO10,15,262,328,35
-    DEFPUSHBUTTON   "はい、一時的に完全閉域化をします",IDOK,40,313,158,22
-    PUSHBUTTON      "いいえ",IDCANCEL,209,313,108,22
-    LTEXT           "「はい」をクリックすると、「完全閉域化ファイアウォール機能」 が動作を開始し、このコンピュータからは 「行政情報システム適合モード」 のシンクライアント通信のみが可能となり、インターネットとの通信はすべて遮断されます。なお、「完全閉域化ファイアウォール機能」 を終了すると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作し、Windows のシステム設定を変更することはありません。",IDC_STATIC,7,343,343,41
+    CONTROL         1,IDC_STATIC,"Static",SS_BITMAP,7,0,345,138
+    LTEXT           "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 を有効化しますか?",S_BOLD,30,143,322,20
+    LTEXT           "「完全閉域化ファイアウォール機能」 を有効にすると、行政情報システムへのシンクライアント通信のための SSL-VPN 接続中は、本 PC とインターネットとの通信 (本 SSL-VPN 接続をのぞく) をすべて遮断できます。Windows のカーネルに最高優先上位のパケットフィルタを挿入することにより、他の通信に対する強力な遮断が実施されることから、他のアプリケーション (Web ブラウザ等を含む) は、これに反して通信をすることはできなくなり、セキュリティ脅威となり得る通信をシャットアウトできます。",S_INFO1,7,165,345,38
+    GROUPBOX        "「完全閉域化ファイアウォール機能」 による自宅と行政機関との間の完全閉域網化について",IDC_STATIC,7,207,345,84
+    LTEXT           "接続先の 「シン・テレワークシステム サーバー」 (職場側 PC) は、「行政情報システム適合モード」で動作しており、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムの固定された 30 個程度の IP アドレスのみと、通信を行なっています。このことを「特定通信」といいます。",S_INFO9,15,221,328,30
+    LTEXT           "行政情報システムへのアクセス時のインターネット分離を実現し、「IP-VPN」 や 「閉域 SIM」 等との同等の閉域性を実現するためには、シンクライアント方式での通信中は、このクライアント端末においても、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムとの間のみ「特定通信」を許可し、他の通信を一時的に遮断することが望ましいと考えられます。",S_INFO10,15,251,328,35
+    DEFPUSHBUTTON   "はい、「完全閉域化ファイアウォール」を有効にします。",IDOK,24,294,198,22
+    PUSHBUTTON      "いいえ、有効にしません。",IDCANCEL,235,294,100,22
+    LTEXT           "「はい」をクリックすると、「完全閉域化ファイアウォール機能」 が動作を開始し、このコンピュータからは 「行政情報システム適合モード」 のシンクライアント通信のみが可能となり、インターネットとの通信はすべて遮断されます。なお、「完全閉域化ファイアウォール機能」 を終了すると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作し、Windows のシステム設定を変更することはありません。",IDC_STATIC,7,321,345,41
+    ICON            ICO_SHIELD,IDC_STATIC,7,139,18,18
 END
 
-D_DU_GOVFW2 DIALOGEX 0, 0, 358, 317
+D_DU_GOVFW2 DIALOGEX 0, 0, 359, 327
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 が有効です"
+CAPTION "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 が作動中です"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         1,IDC_STATIC,"Static",SS_BITMAP,7,5,344,138
-    LTEXT           "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 が有効です",S_BOLD,7,150,344,20
-    LTEXT           "このウインドウを閉じるまでの間、「完全閉域化ファイアウォール機能」 が有効となっています。グローバル IPv4 / IPv6 アドレスへの通信は、SSL-VPN 閉域中継システム以外、すべて遮断されています。\r\n\r\n通信遮断が正しく行なわれていることを検証するには、Web ブラウザによる Web サイトのブラウジングができないことを確認してみてください。\r\n\r\nWindows の特殊な改造を行なっている場合や、他社製の特殊なカーネル改造プログラムを動作させている場合、本機能は正しく動作しない場合があります。",S_INFO1,7,176,344,72
-    LTEXT           "このウインドウは裏面に移動して隠すことができます。シンクライアント画面を前面にして作業することができます。このウインドウを閉じると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作しており、Windows のシステム設定を変更することはありません。",IDC_STATIC,35,251,316,29
-    ICON            ICO_INFORMATION,IDC_STATIC,7,250,20,20
-    DEFPUSHBUTTON   "「完全閉域化ファイアウォール機能」 を終了する",IDCANCEL,80,285,196,22
+    LTEXT           "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 が作動中です",S_BOLD,37,156,311,20
+    LTEXT           "このウインドウを閉じるまでの間、「完全閉域化ファイアウォール機能」 が有効となっています。グローバル IPv4 / IPv6 アドレスへの通信は、SSL-VPN 閉域中継システム以外、すべて遮断されています。\r\n\r\n通信遮断が正しく行なわれていることを検証するには、Web ブラウザによる Web サイトのブラウジングができないことを確認してみてください。\r\n\r\nWindows の特殊な改造を行なっている場合や、他社製の特殊なカーネル改造プログラムを動作させている場合、本機能は正しく動作しない場合があります。",S_INFO1,12,182,335,72
+    LTEXT           "このウインドウは裏面に移動して隠すことができます。シンクライアント画面を前面にして作業することができます。このウインドウを閉じると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作しており、Windows のシステム設定を変更することはありません。",IDC_STATIC,36,257,309,28
+    ICON            ICO_INFORMATION,IDC_STATIC,12,256,20,20
+    DEFPUSHBUTTON   "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 を終了する(&X)",IDCANCEL,33,296,290,22
+    ICON            ICO_LANG_JAPANESE,IDC_STATIC,13,153,20,20
+    CONTROL         1,IDC_STATIC,"Static",SS_BITMAP,7,0,345,138
+    GROUPBOX        "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」",IDC_STATIC,7,143,345,145
 END
 
 D_DG_WOL DIALOGEX 0, 0, 383, 349

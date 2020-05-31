@@ -96,6 +96,7 @@ struct DC_SESSION
 	char InspectionTicket[64];			// インスペクション済みチケット
 	UINT64 LifeTime;					// 有効期限
 	wchar_t LifeTimeMsg[MAX_PATH];		// 有効期限満了時のメッセージ
+	bool IsLimitedMode;					// サーバーが行政システム適合モードかどうか
 };
 
 // 拡張認証データ
@@ -146,6 +147,7 @@ struct DC
 	LIST *AdvAuthList;					// 拡張認証データリスト
 	bool EnableVersion2;				// URDP2 を有効にする
 	bool DisableMultiDisplay;			// マルチディスプレイ機能を無効にする
+	bool DisableLimitedFw;				// 完全閉域化ファイアウォールを無効にする
 };
 
 // 関数プロトタイプ宣言

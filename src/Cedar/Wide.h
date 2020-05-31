@@ -92,6 +92,7 @@ struct SESSION_INFO_CACHE
 	char HostNameForProxy[MAX_HOST_NAME_LEN + 1];		// ホスト名 プロキシ用
 	UINT Port;									// ポート番号
 	UCHAR SessionId[WT_SESSION_ID_SIZE];		// 接続先セッション ID
+	UINT64 ServerMask64;						// ServerMask64
 	UINT64 Expires;								// 有効期限
 };
 
@@ -219,7 +220,7 @@ bool WideCompareMachineId(WT_MACHINE_ID *d1, WT_MACHINE_ID *d2);
 void WideSessionInfoCacheDeleteExpires(LIST *o);
 SESSION_INFO_CACHE *WideSessionInfoCacheGet(LIST *o, char *pcid, UINT64 expire_span);
 void WideSessionInfoCacheAdd(LIST *o, char *pcid, char *hostname, char *hostname_for_proxy, UINT port,
-							 UCHAR *session_id, UINT64 expire_span);
+							 UCHAR *session_id, UINT64 expire_span, UINT64 servermask64);
 void WideSessionInfoCacheDel(LIST *o, char *pcid);
 LIST *WideInitSessionInfoCache();
 void WideFreeSessionInfoCache(LIST *o);

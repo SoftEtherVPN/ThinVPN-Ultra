@@ -125,7 +125,7 @@ SESSION_INFO_CACHE *WideSessionInfoCacheGet(LIST *o, char *pcid, UINT64 expire_s
 
 // セッション接続情報キャッシュの追加
 void WideSessionInfoCacheAdd(LIST *o, char *pcid, char *hostname, char *hostname_for_proxy, UINT port,
-							 UCHAR *session_id, UINT64 expire_span)
+							 UCHAR *session_id, UINT64 expire_span, UINT64 servermask64)
 {
 	// 引数チェック
 	if (o == NULL || pcid == NULL || hostname == NULL || session_id == NULL)
@@ -162,6 +162,7 @@ void WideSessionInfoCacheAdd(LIST *o, char *pcid, char *hostname, char *hostname
 		StrCpy(c->HostNameForProxy, sizeof(c->HostNameForProxy), hostname_for_proxy);
 		c->Port = port;
 		Copy(c->SessionId, session_id, sizeof(c->SessionId));
+		c->ServerMask64 = servermask64;
 
 		c->Expires = Tick64() + expire_span;
 	}
@@ -1023,11 +1024,12 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 			PackGetStr(p, "HostnameForProxy", c->HostNameForProxy, sizeof(c->HostNameForProxy));
 			c->Port = PackGetInt(p, "Port");
 			PackGetData2(p, "SessionId", c->SessionId, sizeof(c->SessionId));
+			c->ServerMask64 = PackGetInt64(p, "ServerMask64");
 
 			if (no_cache == false)
 			{
 				WideSessionInfoCacheAdd(w->SessionInfoCache, pcid,
-					c->HostName, c->HostNameForProxy, c->Port, c->SessionId, w->SessionInfoCacheExpires);
+					c->HostName, c->HostNameForProxy, c->Port, c->SessionId, w->SessionInfoCacheExpires, c->ServerMask64);
 			}
 
 			c->CacheUsed = false;
@@ -1040,6 +1042,7 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 			StrCpy(c->HostNameForProxy, sizeof(c->HostNameForProxy), cache->HostNameForProxy);
 			c->Port = cache->Port;
 			Copy(c->SessionId, cache->SessionId, sizeof(c->SessionId));
+			c->ServerMask64 = cache->ServerMask64;
 
 			c->CacheUsed = true;
 

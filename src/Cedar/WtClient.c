@@ -462,6 +462,7 @@ L_PROXY_RETRY_WITH_ALTERNATIVE_FQDN:
 	session = WtcNewSession(wt, s);
 	*sockio = session->ClientTunnel->SockIo;
 	AddRef((*sockio)->Ref);
+	(*sockio)->ServerMask64 = connect->ServerMask64;
 
 	session->GateTcp = WtNewTTcp(s, connect->UseCompress, tunnel_timeout, tunnel_keepalive, tunnel_use_aggressive_timeout);
 

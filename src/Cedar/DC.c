@@ -1486,6 +1486,7 @@ void DcLoadConfig(DC *dc, FOLDER *root)
 	dc->MstscUseShareComPort = CfgGetBool(root, "MstscUseShareComPort");
 	dc->MstscUseShareAudioRec = CfgGetBool(root, "MstscUseShareAudioRec");
 	dc->DisableMultiDisplay = CfgGetBool(root, "DisableMultiDisplay");
+	dc->DisableLimitedFw = CfgGetBool(root, "DisableLimitedFw");
 	if (CfgIsItem(root, "EnableVersion2"))
 	{
 		dc->EnableVersion2 = CfgGetBool(root, "EnableVersion2");
@@ -1639,6 +1640,7 @@ void DcSaveConfig(DC *dc)
 	CfgAddBool(root, "MstscUseShareAudioRec", dc->MstscUseShareAudioRec);
 	CfgAddBool(root, "MstscUseShareCamera", dc->MstscUseShareCamera);
 	CfgAddBool(root, "DisableMultiDisplay", dc->DisableMultiDisplay);
+	CfgAddBool(root, "DisableLimitedFw", dc->DisableLimitedFw);
 
 	if (dc->SupportBluetooth)
 	{
@@ -2293,6 +2295,7 @@ UINT DcSessionConnect(DC_SESSION *s)
 	s->ServiceType = io->UserData1;
 	s->DsCaps = io->UserData4;
 	s->IsShareDisabled = ((io->UserData3 == 0) ? false : true);
+	s->IsLimitedMode = io->UserData5;
 	Debug("DS_CAPS: %u\n", s->DsCaps);
 
 	// この SOCKIO をキューに追加する
@@ -2645,6 +2648,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	UCHAR smart_card_ticket[SHA1_SIZE];
 	UINT64 lifetime = 0;
 	wchar_t lifetime_msg[MAX_PATH];
+	bool is_server_limited_mode = false;
 	// 引数チェック
 	if (dc == NULL || sock == NULL || pcid == NULL || auth_callback == NULL)
 	{
@@ -3053,9 +3057,16 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	dcs->LifeTime = lifetime;
 	UniStrCpy(dcs->LifeTimeMsg, sizeof(dcs->LifeTimeMsg), lifetime_msg);
 
+	// 接続先サーバーが行政情報システム適合モードか?
+	if (sock->ServerMask64 & DS_MASK_IS_LIMITED_MODE)
+	{
+		is_server_limited_mode = true;
+	}
+
 	sock->UserData1 = svc_type;
 	sock->UserData3 = is_share_disabled;
 	sock->UserData4 = ds_caps;
+	sock->UserData5 = is_server_limited_mode;
 
 	SockIoSetTimeout(sock, INFINITE);
 

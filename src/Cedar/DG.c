@@ -134,8 +134,10 @@ UINT DgWoLDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 				{
 					MsgBox(hWnd, MB_ICONEXCLAMATION, _UU("DG_DEVMGMT_RUN_ERROR"));
 				}
-
-				MsCloseHandle(handle);
+				else
+				{
+					MsCloseHandle(handle);
+				}
 
 				MsRestoreWow64FileSystemRedirection(wow);
 			}

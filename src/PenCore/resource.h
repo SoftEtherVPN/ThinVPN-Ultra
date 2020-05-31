@@ -1234,6 +1234,8 @@
 #define C_INSPECTION                    2549
 #define B_ACCEPT                        2550
 #define C_CHECKMAC                      2550
+#define C_CHECK_CERT3                   2550
+#define C_LIMITED_FW                    2550
 #define C_PUBLIC2                       2551
 #define C_VER2                          2552
 #define B_DENY                          2553

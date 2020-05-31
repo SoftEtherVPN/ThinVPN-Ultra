@@ -41,6 +41,7 @@ struct WT_CONNECT
 
 	// Client 用
 	UCHAR SessionId[WT_SESSION_ID_SIZE];		// 接続先セッション ID
+	UINT64 ServerMask64;						// ServerMask64
 	bool CacheUsed;								// キャッシュが使用された
 };
 

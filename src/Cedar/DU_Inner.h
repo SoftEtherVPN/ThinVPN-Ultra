@@ -14,6 +14,7 @@
 #define DU_BANNER_SWITCH_INTERVAL		(30 * 1000)	// バナースイッチ間隔
 #define	DU_LOCALCONFIG_FILENAME			"@uselocalconfig"	// ローカルに設定データを保存する
 
+
 // データ構造宣言
 typedef struct DU
 {
@@ -188,6 +189,11 @@ void DuWoLDlgInit(HWND hWnd, DU_MAIN *m);
 void DuWoLSetControlEnable(HWND hWnd, bool b);
 bool DuWoLDlgOnOk(HWND hWnd, DU_MAIN *m);
 
+UINT DuGovFw2DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+void DuGovFw2Main();
+
+UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+void DuGovFw1Main();
 
 
 
