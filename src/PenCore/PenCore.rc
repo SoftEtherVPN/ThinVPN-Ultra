@@ -5054,12 +5054,16 @@ BEGIN
     EDITTEXT        E_SYSLOG_HOSTNAME,342,149,95,12,ES_AUTOHSCROLL
     RTEXT           "ポート番号(&O):",S_02,275,169,62,8
     EDITTEXT        E_SYSLOG_PORT,342,167,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
-    GROUPBOX        "共有機能の禁止",S_STATIC2,268,198,176,86
-    ICON            ICO_DISCARD,S_ICON1,275,212,20,20
-    LTEXT           "---",S_STATIC1,298,214,139,45
-    CONTROL         "共有機能の使用を禁止する(&D)",C_DISABLESHARE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,263,136,14
-    DEFPUSHBUTTON   "@IDOK",IDOK,311,290,64,17
-    PUSHBUTTON      "@IDCANCEL",IDCANCEL,380,290,64,17
+    GROUPBOX        "Wake on LAN 機能",S_STATIC11,268,195,176,72
+    ICON            ICO_NIC_ONLINE,IDC_STATIC,273,207,18,18
+    LTEXT           "Wake on LAN 機能を使用すると、電源が OFF またはスタンバイモード中の職場の PC の電源を、自宅から ON することができます。",IDC_STATIC,298,210,139,31
+    PUSHBUTTON      "Wake on LAN 機能の設定(&W)...",B_WOL,314,241,123,19
+    GROUPBOX        "共有機能の禁止",S_STATIC2,268,271,176,76
+    ICON            ICO_DISCARD,S_ICON1,275,282,18,18
+    LTEXT           "---",S_STATIC1,298,287,139,40
+    CONTROL         "共有機能の使用を禁止する(&D)",C_DISABLESHARE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,329,136,14
+    DEFPUSHBUTTON   "@IDOK",IDOK,311,350,64,17
+    PUSHBUTTON      "@IDCANCEL",IDCANCEL,380,350,64,17
 END
 
 D_DG_PASSWORD DIALOGEX 0, 0, 287, 243
@@ -5478,7 +5482,7 @@ BEGIN
     DEFPUSHBUTTON   "@IDOK",IDOK,203,68,38,16
     PUSHBUTTON      "@B_RESTORE",B_RESTORE,244,68,48,16
     LTEXT           "@S_PCID_2",S_PCID_2,40,87,228,20
-    ICON            ICO_DISPLAY,S_PCID_3,275,86,18,18
+    ICON            ICO_DISPLAY,S_PCID_3,275,86,20,20
     CONTROL         "",S_PCID_4,"Static",SS_ETCHEDHORZ,14,113,279,1
     RTEXT           "@S2",IDC_STATIC,14,123,51,8
     LTEXT           "PROXY_CONFIG",S_PROXY_CONFIG,69,123,131,15
@@ -5490,28 +5494,28 @@ BEGIN
     CTEXT           "@S_ACCEPT",S_ACCEPT,232,169,58,8
     PUSHBUTTON      "@B_ACCEPT",B_ACCEPT,231,183,62,16
     PUSHBUTTON      "@B_DENY",B_DENY,231,204,62,16
-    ICON            ICO_WARNING,S_WARNING,45,186,18,18
-    ICON            ICO_NETCONN,IDC_STATIC,275,138,18,18
+    ICON            ICO_WARNING,S_WARNING,45,186,20,20
+    ICON            ICO_NETCONN,IDC_STATIC,275,138,20,20
     GROUPBOX        "@S4",IDC_STATIC,7,227,293,99
-    ICON            ICO_LICENSE,IDC_STATIC,14,239,18,18
+    ICON            ICO_LICENSE,IDC_STATIC,14,239,20,20
     LTEXT           "@S5",IDC_STATIC,37,240,111,8
     PUSHBUTTON      "@B_AUTH",B_AUTH,37,252,90,16
     PUSHBUTTON      "@B_ABOUT",B_ABOUT,184,252,62,16
     PUSHBUTTON      "@B_SHOWID",B_SHOWID,250,252,44,16
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDVERT,153,237,1,84
-    ICON            ICO_INFORMATION,IDC_STATIC,161,239,18,18
+    ICON            ICO_INFORMATION,IDC_STATIC,161,239,20,20
     LTEXT           "@S6",IDC_STATIC,184,240,106,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,14,273,278,1
-    ICON            ICO_DESKSERVER_EXE,IDC_STATIC,14,280,18,18
+    ICON            ICO_DESKSERVER_EXE,IDC_STATIC,14,280,20,20
     LTEXT           "@S7",IDC_STATIC,37,280,112,18
     PUSHBUTTON      "@B_OPTION",B_OPTION,37,301,90,16
-    ICON            ICO_KEY,IDC_STATIC,159,279,18,18
+    ICON            ICO_KEY,IDC_STATIC,159,279,20,20
     LTEXT           "@S8",IDC_STATIC,184,280,112,18
-    PUSHBUTTON      "@B_PASSWORD",B_PASSWORD,184,301,90,16
+    PUSHBUTTON      "@B_PASSWORD",B_PASSWORD,184,301,108,16
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,244,335,56,18
     LTEXT           "@S9",IDC_STATIC,7,335,231,18
-    ICON            ICO_NONE,S_DENY,45,185,18,18
-    ICON            ICO_PASS,S_LOCK,45,185,18,18
+    ICON            ICO_NONE,S_DENY,45,185,20,20
+    ICON            ICO_PASS,S_LOCK,45,185,20,20
 END
 
 D_DU_THEEND DIALOGEX 0, 0, 306, 221
@@ -5628,19 +5632,19 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Wake on LAN 機能の設定"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         250,IDC_STATIC,"Static",SS_BITMAP,7,5,366,132
-    GROUPBOX        "この PC を (1) Wake on LAN ターゲット PC として設定",IDC_STATIC,7,141,180,146
-    ICON            ICO_DISPLAY,IDC_STATIC,14,153,20,20
-    LTEXT           "Wake on LAN ターゲット PC として有効化しておくと、リモートから、同じ LAN 内の 1 台の Wake on LAN トリガー PC (常時電源 ON) を経由して、このコンピュータの電源を ON にすることができます。",IDC_STATIC,39,154,143,42
-    ICON            ICO_NIC_ONLINE,IDC_STATIC,14,197,20,20
-    LTEXT           "有線 LAN カードが Wake on LAN に対応しており、Hub に接続されている必要があります。また、「デバイスマネージャ」の LAN カードの設定、および、PC 本体の BIOS の設定画面で、Wake on LAN を有効にする必要がある場合があります。さらに、Wake on LAN 時に「PXE ブート」が使用されないような BIOS 設定にしておく必要があります。",IDC_STATIC,39,197,143,67
-    CONTROL         "Wake on LAN ターゲット PC として設定",C_WOL_TARGET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,38,261,142,19
-    GROUPBOX        "この PC を (2) Wake on LAN トリガー PC として設定",IDC_STATIC,195,141,180,146
-    ICON            ICO_LINK2,IDC_STATIC,202,153,20,20
-    LTEXT           "Wake on LAN トリガー PC は、ターゲット PC (複数設置可) と 同じ LAN (レイヤ 2 イーサネット) 内に少なくとも 1 台必要です。また、原理上、常時電源を ON にする必要があります。",IDC_STATIC,226,154,143,42
-    ICON            ICO_USER,IDC_STATIC,202,199,20,20
-    LTEXT           "ユーザーは、「シン・テレワークシステム クライアント」の Wake on LAN 起動機能で、「トリガー PC」 と 「ターゲット PC」 のコンピュータ ID を入力する必要があります。そのため、トリガー PC のコンピュータ ID は、組織ユーザーに周知してください。",IDC_STATIC,226,197,143,50
-    CONTROL         "Wake on LAN トリガー PC として設定",C_WOL_TARGET2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,226,261,142,19
+    CONTROL         250,IDC_STATIC,"Static",SS_BITMAP,7,0,366,132
+    GROUPBOX        "この PC を (1) Wake on LAN ターゲット PC として設定",IDC_STATIC,7,134,180,151
+    ICON            ICO_DISPLAY,IDC_STATIC,14,146,18,18
+    LTEXT           "Wake on LAN ターゲット PC として有効化しておくと、リモートから、同じ LAN 内の 1 台の Wake on LAN トリガー PC (常時電源 ON) を経由して、このコンピュータの電源を ON にすることができます。",IDC_STATIC,39,147,143,42
+    ICON            ICO_NIC_ONLINE,IDC_STATIC,14,190,18,18
+    LTEXT           "有線 LAN カードが Wake on LAN に対応しており、Hub に接続されている必要があります。また、「デバイスマネージャ」の LAN カードの設定、および、PC 本体の BIOS の設定画面で、Wake on LAN を有効にする必要がある場合があります。さらに、Wake on LAN 時に「PXE ブート」が使用されないような BIOS 設定にしておく必要があります。",IDC_STATIC,39,190,143,67
+    CONTROL         "Wake on LAN ターゲット PC として設定(&T)",C_WOL_TARGET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,254,165,19
+    GROUPBOX        "この PC を (2) Wake on LAN トリガー PC として設定",IDC_STATIC,195,134,180,151
+    ICON            ICO_LINK2,IDC_STATIC,202,146,18,18
+    LTEXT           "Wake on LAN トリガー PC は、ターゲット PC (複数設置可) と 同じ LAN (レイヤ 2 イーサネット) 内に少なくとも 1 台必要です。また、原理上、常時電源を ON にする必要があります。",IDC_STATIC,226,147,143,42
+    ICON            ICO_USER,IDC_STATIC,202,192,18,18
+    LTEXT           "ユーザーは、「シン・テレワークシステム クライアント」の Wake on LAN 起動機能で、「トリガー PC」 と 「ターゲット PC」 のコンピュータ ID を入力する必要があります。そのため、トリガー PC のコンピュータ ID は、組織ユーザーに周知してください。",IDC_STATIC,226,190,143,50
+    CONTROL         "Wake on LAN トリガー PC として設定(&R)",C_WOL_TRIGGER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,204,254,164,19
     DEFPUSHBUTTON   "&OK",IDOK,241,296,64,17
     PUSHBUTTON      "キャンセル(&C)",IDCANCEL,311,296,64,17
     LTEXT           "職場で Wake on LAN 機能を利用する場合は、必ず、第三のクライアント PC を用いて Wake on LAN が正しく動作するかどうか何度か確かめてください。",IDC_STATIC,7,293,230,20

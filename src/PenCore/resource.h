@@ -256,7 +256,6 @@
 #define S_STATUS5                       1019
 #define S_COPYRIGHT                     1020
 #define S_SUFFIX                        1020
-#define B_ERASE2                        1020
 #define B_WOL                           1020
 #define E_PASSPHRASE                    1021
 #define S_STATUS7                       1021
@@ -758,6 +757,7 @@
 #define R_L2TP                          1286
 #define R_LIMITED                       1286
 #define C_WOL_TARGET2                   1286
+#define C_WOL_TRIGGER                   1286
 #define E_LIST                          1287
 #define C_OTHER                         1287
 #define C_LOSS                          1287

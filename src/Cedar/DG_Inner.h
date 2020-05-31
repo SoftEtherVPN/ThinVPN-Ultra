@@ -96,5 +96,8 @@ void DgOptDlgOnOk(HWND hWnd, DG *dg);
 bool DgMacDlg(HWND hWnd, DG *dg);
 UINT DgMacDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 
+bool DgWoLDlg(HWND hWnd, DG *dg);
+UINT DgWoLDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
+
 
 

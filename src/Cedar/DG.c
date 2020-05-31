@@ -50,6 +50,83 @@
 
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
+// WoL 設定ダイアログ
+bool DgWoLDlg(HWND hWnd, DG *dg)
+{
+	return Dialog(hWnd, D_DG_WOL, DgWoLDlgProc, dg);
+}
+
+// WoL 設定ダイアログプロシージャ
+UINT DgWoLDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
+{
+	DG *dg = (DG *)param;
+	RPC_DS_CONFIG t;
+	bool old_target_setting = false;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		SetIcon(hWnd, 0, ICO_NIC_ONLINE);
+
+		Zero(&t, sizeof(t));
+		if (CALL(hWnd, DtcGetConfig(dg->Rpc, &t)) == false)
+		{
+			EndDialog(hWnd, 0);
+			break;
+		}
+
+		Check(hWnd, C_WOL_TARGET, t.EnableWoLTarget);
+		Check(hWnd, C_WOL_TRIGGER, t.EnableWoLTrigger);
+
+		DlgFont(hWnd, C_WOL_TARGET, 10, true);
+		DlgFont(hWnd, C_WOL_TRIGGER, 10, true);
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+			Zero(&t, sizeof(t));
+			if (CALL(hWnd, DtcGetConfig(dg->Rpc, &t)) == false)
+			{
+				break;
+			}
+
+			old_target_setting = t.EnableWoLTarget;
+
+			t.EnableWoLTarget = IsChecked(hWnd, C_WOL_TARGET);
+			t.EnableWoLTrigger = IsChecked(hWnd, C_WOL_TRIGGER);
+
+			if (t.EnableWoLTarget != old_target_setting)
+			{
+				if (MsgBox(hWnd, MB_ICONINFORMATION | MB_OKCANCEL, _UU("DG_CHANGE_WOL_TARGET")) == IDCANCEL)
+				{
+					break;
+				}
+			}
+
+			if (CALL(hWnd, DtcSetConfig(dg->Rpc, &t)) == false)
+			{
+				break;
+			}
+
+			EndDialog(hWnd, 1);
+
+			break;
+
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		break;
+	}
+
+	return 0;
+}
 
 // MAC 登録ダイアログプロシージャ
 UINT DgMacDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
@@ -1131,6 +1208,10 @@ UINT DgOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		case B_CURRENTUSER:
 			SetText(hWnd, E_USERNAME, MsGetUserNameExW());
 			FocusEx(hWnd, E_USERNAME);
+			break;
+
+		case B_WOL:
+			DgWoLDlg(hWnd, dg);
 			break;
 		}
 		break;
