@@ -285,6 +285,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GovFw1.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\Group.ico"
 				>
 			</File>
@@ -754,6 +758,10 @@
 			</File>
 			<File
 				RelativePath=".\WinPC.bmp"
+				>
+			</File>
+			<File
+				RelativePath=".\WoL.bmp"
 				>
 			</File>
 			<File

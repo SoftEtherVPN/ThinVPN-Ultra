@@ -1534,6 +1534,38 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 51
     END
+
+    D_DU_GOVFW1, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 350
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 384
+    END
+
+    D_DU_GOVFW2, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 351
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 312
+    END
+
+    D_DG_WOL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 374
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 301
+    END
+
+    D_DU_WOL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 375
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 281
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -5561,6 +5593,76 @@ BEGIN
     LTEXT           "接続先の NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 の設定に基づき、クライアント端末のセキュリティチェックを実行しています。しばらくお待ちください...",S_INFO,31,19,229,27
 END
 
+D_DU_GOVFW1 DIALOGEX 0, 0, 357, 389
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 "
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    CONTROL         1,IDC_STATIC,"Static",SS_BITMAP,7,5,343,138
+    LTEXT           "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 を一時的に有効にしますか?",S_BOLD,7,150,343,20
+    LTEXT           "「完全閉域化ファイアウォール機能」 を有効にすると、行政情報システムへのシンクライアント通信のための SSL-VPN 接続中は、本 PC とインターネットとの通信 (本 SSL-VPN 接続をのぞく) をすべて遮断できます。Windows のカーネルに最高優先上位のパケットフィルタを挿入することにより、他の通信に対する強力な遮断が実施されることから、他のアプリケーション (Web ブラウザ等を含む) は、これに反して通信をすることはできなくなり、セキュリティ脅威となり得る通信をシャットアウトできます。",S_INFO1,7,176,343,38
+    GROUPBOX        "「完全閉域化ファイアウォール機能」 による自宅と行政機関との間の完全閉域網化について",IDC_STATIC,7,218,343,84
+    LTEXT           "接続先の 「シン・テレワークシステム サーバー」 (職場側 PC) は、「行政情報システム適合モード」で動作しており、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムの固定された 30 個程度の IP アドレスのみと、通信を行なっています。このことを「特定通信」といいます。",S_INFO9,15,232,328,30
+    LTEXT           "行政情報システムへのアクセス時のインターネット分離を実現し、「IP-VPN」 や 「閉域 SIM」 等との同等の閉域性を実現するためには、シンクライアント方式での通信中は、このクライアント端末においても、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムとの間のみ「特定通信」を許可し、他の通信を一時的に遮断することが望ましいと考えられます。",S_INFO10,15,262,328,35
+    DEFPUSHBUTTON   "はい、一時的に完全閉域化をします",IDOK,40,313,158,22
+    PUSHBUTTON      "いいえ",IDCANCEL,209,313,108,22
+    LTEXT           "「はい」をクリックすると、「完全閉域化ファイアウォール機能」 が動作を開始し、このコンピュータからは 「行政情報システム適合モード」 のシンクライアント通信のみが可能となり、インターネットとの通信はすべて遮断されます。なお、「完全閉域化ファイアウォール機能」 を終了すると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作し、Windows のシステム設定を変更することはありません。",IDC_STATIC,7,343,343,41
+END
+
+D_DU_GOVFW2 DIALOGEX 0, 0, 358, 317
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 が有効です"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    CONTROL         1,IDC_STATIC,"Static",SS_BITMAP,7,5,344,138
+    LTEXT           "行政情報システム適合モード用 「完全閉域化ファイアウォール機能」 が有効です",S_BOLD,7,150,344,20
+    LTEXT           "このウインドウを閉じるまでの間、「完全閉域化ファイアウォール機能」 が有効となっています。グローバル IPv4 / IPv6 アドレスへの通信は、SSL-VPN 閉域中継システム以外、すべて遮断されています。\r\n\r\n通信遮断が正しく行なわれていることを検証するには、Web ブラウザによる Web サイトのブラウジングができないことを確認してみてください。\r\n\r\nWindows の特殊な改造を行なっている場合や、他社製の特殊なカーネル改造プログラムを動作させている場合、本機能は正しく動作しない場合があります。",S_INFO1,7,176,344,72
+    LTEXT           "このウインドウは裏面に移動して隠すことができます。シンクライアント画面を前面にして作業することができます。このウインドウを閉じると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作しており、Windows のシステム設定を変更することはありません。",IDC_STATIC,35,251,316,29
+    ICON            ICO_INFORMATION,IDC_STATIC,7,250,20,20
+    DEFPUSHBUTTON   "「完全閉域化ファイアウォール機能」 を終了する",IDCANCEL,80,285,196,22
+END
+
+D_DG_WOL DIALOGEX 0, 0, 381, 306
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Wake on LAN 機能の設定"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    CONTROL         250,IDC_STATIC,"Static",SS_BITMAP,7,5,366,132
+    GROUPBOX        "この PC を Wake on LAN ターゲット PC として設定",IDC_STATIC,7,141,180,136
+    ICON            ICO_DISPLAY,IDC_STATIC,14,153,20,20
+    LTEXT           "Wake on LAN ターゲット PC として有効化しておくと、リモートから、同じ LAN 内の 1 台の Wake on LAN トリガー PC (常時電源 ON) を経由して、このコンピュータの電源を ON にすることができます。",IDC_STATIC,39,154,143,42
+    ICON            ICO_NIC_ONLINE,IDC_STATIC,14,197,18,18
+    LTEXT           "有線 LAN カードが Wake on LAN に対応しており、Hub に接続されている必要があります。また、「デバイスマネージャ」の LAN カードの設定、および、PC 本体の BIOS の設定画面で、Wake on LAN を有効にする必要がある場合があります。",IDC_STATIC,39,197,143,50
+    CONTROL         "Wake on LAN ターゲット PC として設定",C_WOL_TARGET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,250,166,19
+    GROUPBOX        "この PC を Wake on LAN トリガー PC として設定",IDC_STATIC,194,141,180,136
+    ICON            ICO_LINK2,IDC_STATIC,202,153,18,18
+    LTEXT           "Wake on LAN トリガー PC は、ターゲット PC (複数設置可) と 同じ LAN (レイヤ 2 イーサネット) 内に少なくとも 1 台必要です。また、原理上、常時電源を ON にする必要があります。",IDC_STATIC,226,154,143,42
+    ICON            ICO_USER,IDC_STATIC,202,199,18,18
+    LTEXT           "ユーザーは、「シン・テレワークシステム クライアント」の Wake on LAN 起動機能で、「トリガー PC」 と 「ターゲット PC」 のコンピュータ ID を入力する必要があります。そのため、トリガー PC のコンピュータ ID は、組織ユーザーに周知してください。",IDC_STATIC,226,197,143,50
+    CONTROL         "Wake on LAN トリガー PC として設定",C_WOL_TARGET2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,250,166,19
+    DEFPUSHBUTTON   "&OK",IDOK,241,284,64,17
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,310,284,64,17
+    LTEXT           "職場で Wake on LAN 機能を利用する場合は、必ず、第三のクライアント PC を用いて Wake on LAN が正しく動作するかどうか何度か確かめてください。",IDC_STATIC,7,281,230,20
+END
+
+D_DU_WOL DIALOGEX 0, 0, 382, 286
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Wake on LAN 機能"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    CONTROL         250,IDC_STATIC,"Static",SS_BITMAP,7,5,366,132
+    ICON            ICO_DISPLAY,IDC_STATIC,18,158,18,18
+    LTEXT           "(1) Wake on LAN ターゲット PC のコンピュータ ID:",S_PCID,47,164,147,13
+    COMBOBOX        C_PCID,198,161,154,159,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    ICON            ICO_LINK2,IDC_STATIC,18,197,18,18
+    LTEXT           "(2) Wake on LAN トリガー PC のコンピュータ ID:",S_PCID2,47,200,145,13
+    COMBOBOX        C_PCID2,198,197,154,159,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    ICON            ICO_INFORMATION,IDC_STATIC,7,229,18,18
+    LTEXT           "「シン・テレワークシステム サーバー」 側の設定で、予め Wake on LAN 機能が有効になっている必要があります。",IDC_STATIC,37,230,338,21
+    DEFPUSHBUTTON   "&Wake on LAN の実行",IDOK,199,264,106,17
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,311,264,64,17
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -5686,6 +5788,8 @@ BMP_THANKS_EN           BITMAP                  "Thanks_en.bmp"
 BMP_THEEND              BITMAP                  "TheEnd.bmp"
 BMP_CREDIT              BITMAP                  "CREDIT.bmp"
 BMP_OTP                 BITMAP                  "Otp.bmp"
+BMP_GOVFW1              BITMAP                  "GovFw1.bmp"
+BMP_WOL                 BITMAP                  "WoL.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

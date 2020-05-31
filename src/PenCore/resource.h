@@ -2,6 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by PenCore.rc
 //
+#define BMP_GOVFW1                      1
 #define IDOK3                           2
 #define B_POLICY                        3
 #define B_SAVE                          3
@@ -229,6 +230,7 @@
 #define IDB_BITMAP3                     247
 #define BMP_OTP                         247
 #define ICO_SHIELD                      248
+#define BMP_WOL                         250
 #define S_TITLE                         1007
 #define S_INSERT_SECURE                 1008
 #define S_TITLE2                        1008
@@ -746,12 +748,14 @@
 #define C_NOMORE                        1285
 #define C_MULTIDISPLAY                  1285
 #define B_OTP_ENABLE                    1285
+#define C_WOL_TARGET                    1285
 #define R_DOUBLE                        1286
 #define C_SITE                          1286
 #define C_JITTER                        1286
 #define R_REDIRECT                      1286
 #define R_L2TP                          1286
 #define R_LIMITED                       1286
+#define C_WOL_TARGET2                   1286
 #define E_LIST                          1287
 #define C_OTHER                         1287
 #define C_LOSS                          1287
@@ -1021,6 +1025,7 @@
 #define S_PRODUCT                       1487
 #define S_INFO9                         1487
 #define S_PRODUCT_STR                   1488
+#define S_INFO10                        1488
 #define S_CURRENT_STR                   1490
 #define S_LATEST                        1491
 #define S_LATEST_STR                    1492
@@ -1239,6 +1244,7 @@
 #define S_CHECK_CERT                    2560
 #define C_PCID                          2561
 #define S_PROXY_CONFIG                  2562
+#define C_PCID2                         2562
 #define C_DIRECT                        2563
 #define S_ADDRESS                       2564
 #define C_HTTP                          2565
@@ -1250,6 +1256,7 @@
 #define B_URDP                          2570
 #define S_PCID                          2571
 #define S_PCID_2                        2572
+#define S_PCID2                         2572
 #define S_PCID_3                        2573
 #define S_PCID_4                        2574
 #define C_SYSTEM32                      2575
@@ -1344,6 +1351,10 @@
 #define D_DG_MAC                        2650
 #define D_DU_CONNECT1                   2651
 #define D_DU_INSPECT                    2651
+#define D_DU_GOVFW1                     2652
+#define D_DU_GOVFW2                     2653
+#define D_DG_WOL                        2654
+#define D_DU_WOL                        2655
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021
@@ -1414,7 +1425,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        249
+#define _APS_NEXT_RESOURCE_VALUE        251
 #define _APS_NEXT_COMMAND_VALUE         40111
 #define _APS_NEXT_CONTROL_VALUE         1522
 #define _APS_NEXT_SYMED_VALUE           102
