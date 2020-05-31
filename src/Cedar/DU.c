@@ -214,6 +214,13 @@ bool DuWoLDlgOnOk(HWND hWnd, DU_MAIN *m)
 		return false;
 	}
 
+	if (StrCmpi(pcid, pcid2) == 0)
+	{
+		MsgBox(hWnd, MB_ICONEXCLAMATION, _UU("DU_WOL_TARGET_IS_TRIGGER"));
+		Focus(hWnd, C_PCID);
+		return false;
+	}
+
 	// Target
 	StrToUni(tmp, sizeof(tmp), pcid);
 	AddCandidate(m->Du->Dc->Candidate, tmp, DU_CANDIDATE_MAX);
@@ -243,6 +250,8 @@ bool DuWoLDlgOnOk(HWND hWnd, DU_MAIN *m)
 	}
 
 	DuWoLSetControlEnable(hWnd, true);
+
+	MsgBoxEx(hWnd, MB_ICONINFORMATION, _UU("DU_WOL_MSG"), pcid, pcid2);
 
 	FocusEx(hWnd, C_PCID);
 
