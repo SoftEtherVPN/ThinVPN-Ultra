@@ -1713,6 +1713,7 @@ UINT64 GetDynValueOrDefaultSafe(char *name, UINT64 default_value);
 void GetMacAddressListLocalComputer(char *dst, UINT size);
 
 void WoLSendPacket(LIST *mac_address_str_list);
+void WoLSendPacketToMacAddressListStr(char *mac_list_str);
 LIST *GetLocalComputerBroadcastAddressList();
 
 UINT GetNetworkAddress(UINT addr, UINT mask);

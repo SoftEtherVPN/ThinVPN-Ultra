@@ -5661,7 +5661,7 @@ BEGIN
     ICON            ICO_INFORMATION,IDC_STATIC,45,206,18,18
     LTEXT           "「シン・テレワークシステム サーバー」 側の設定で、あらかじめ Wake on LAN 機能が有効になっている必要があります。",IDC_STATIC,70,209,298,18
     DEFPUSHBUTTON   "&Wake on LAN の実行",IDOK,199,240,106,17
-    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,312,240,64,17
+    PUSHBUTTON      "閉じる(&C)",IDCANCEL,312,240,64,17
     GROUPBOX        "Wake on LAN 機能を用いてターゲット PC の電源を ON にする",IDC_STATIC,7,133,369,99
 END
 

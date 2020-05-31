@@ -3092,6 +3092,7 @@ UINT DcTriggerWoL(DC *dc, char *target_pcid, char *trigger_pcid)
 	{
 		// 指定されたトリガー PC の PCID に接続
 		ret = WideClientConnect(dc->Wide, trigger_pcid, DESK_VERSION, DESK_BUILD, &sock, WT_CLIENT_OPTIONS_WOL, true);
+
 		if (ret == ERR_NO_ERROR)
 		{
 			PACK *p = NULL;

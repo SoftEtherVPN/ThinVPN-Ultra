@@ -298,6 +298,15 @@ bool IsMacBroadcast(UCHAR *mac)
 	return true;
 }
 
+void WoLSendPacketToMacAddressListStr(char *mac_list_str)
+{
+	LIST *o = GetStrListFromLines(mac_list_str);
+
+	WoLSendPacket(o);
+
+	FreeStrList(o);
+}
+
 void WoLSendPacket(LIST *mac_address_str_list)
 {
 	UINT i, j, k;
@@ -311,6 +320,8 @@ void WoLSendPacket(LIST *mac_address_str_list)
 	}
 
 	num_mac_address = MIN(num_mac_address, 64);
+
+	Debug("WoLSendPacket to %u addresses.\n", num_mac_address);
 
 	ff[0] = ff[1] = ff[2] = ff[3] = ff[4] = ff[5] = 0xFF;
 

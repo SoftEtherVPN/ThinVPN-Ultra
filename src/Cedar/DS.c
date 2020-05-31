@@ -1048,14 +1048,35 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	Zero(bluetooth_mode_client_id, sizeof(bluetooth_mode_client_id));
 	PackGetData2(p, "bluetooth_mode_client_id", bluetooth_mode_client_id, sizeof(bluetooth_mode_client_id));
 
-	FreePack(p);
-
 	if (wol_mode)
 	{
+		UINT mac_str_size = 4096;
+		char *mac_str = NULL;
+
 		// WoL モード
+		if (ds->EnableWoLTrigger == false)
+		{
+			// WoL Trigger 機能が無効である
+			DsSendError(sock, ERR_WOL_TRIGGER_NOT_ENABLED);
+			FreePack(p);
+			return;
+		}
+
+		mac_str = ZeroMalloc(mac_str_size);
+
+		PackGetStr(p, "mac_list", mac_str, mac_str_size);
+
+		// WoL 送信の実行
+		WoLSendPacketToMacAddressListStr(mac_str);
+
+		Free(mac_str);
+
 		DsSendError(sock, ERR_NO_ERROR);
+		FreePack(p);
 		return;
 	}
+
+	FreePack(p);
 
 	if (pingmode)
 	{
@@ -3716,6 +3737,8 @@ UINT64 DsCalcMask(DS *ds)
 	{
 		return 0;
 	}
+
+	ret |= DS_MASK_SUPPORT_WOL_TRIGGER;
 
 	if (ds->IsUserMode)
 	{

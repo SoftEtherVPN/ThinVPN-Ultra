@@ -108,7 +108,7 @@
 #define DS_MASK_SERVICE_MODE			16		// サービスモード
 #define DS_MASK_POLICY_ENFORCED			32		// ポリシー強制
 #define	DS_MASK_OTP_ENABLED				64		// OTP が有効
-
+#define DS_MASK_SUPPORT_WOL_TRIGGER		128		// WOL トリガーをサポート
 
 
 
