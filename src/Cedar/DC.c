@@ -125,7 +125,7 @@ void DcBlueConnectIfNotConnected(DC_BLUE *b)
 			UINT ret;
 
 			Debug("Bluetooth: Connecting Socket...\n");
-			ret = WideClientConnect(b->Wide, b->Session->Pcid, DESK_VERSION, DESK_BUILD, &b->sockio);
+			ret = WideClientConnect(b->Wide, b->Session->Pcid, DESK_VERSION, DESK_BUILD, &b->sockio, 0, false);
 
 			if (ret == ERR_NO_ERROR)
 			{
@@ -3083,7 +3083,49 @@ UINT DcTriggerWoL(DC *dc, char *target_pcid, char *trigger_pcid)
 		return ret;
 	}
 
-	Print("%s\n", mac_list);
+	if (IsEmptyStr(mac_list))
+	{
+		// ターゲットで WoL 機能が有効化されていない
+		ret = ERR_WOL_TARGET_NOT_ENABLED;
+	}
+	else
+	{
+		// 指定されたトリガー PC の PCID に接続
+		ret = WideClientConnect(dc->Wide, trigger_pcid, DESK_VERSION, DESK_BUILD, &sock, WT_CLIENT_OPTIONS_WOL, true);
+		if (ret == ERR_NO_ERROR)
+		{
+			PACK *p = NULL;
+			bool b = false;
+
+			SockIoSetTimeout(sock, DS_PROTOCOL_CONNECTING_TIMEOUT);
+
+			// バージョンを送信
+			p = NewPack();
+			PackAddInt(p, "ClientVer", DESK_VERSION);
+			PackAddInt(p, "ClientBuild", DESK_BUILD);
+			PackAddBool(p, "WoLMode", true);
+			PackAddStr(p, "mac_list", mac_list);
+			b = SockIoSendPack(sock, p);
+			FreePack(p);
+			if (b == false)
+			{
+				ret = ERR_DISCONNECTED;
+			}
+			else
+			{
+				p = SockIoRecvPack(sock);
+				if (p == NULL)
+				{
+					ret = ERR_DISCONNECTED;
+				}
+				else
+				{
+					ret = GetErrorFromPack(p);
+					FreePack(p);
+				}
+			}
+		}
+	}
 
 	SockIoDisconnect(sock);
 	ReleaseSockIo(sock);
@@ -3107,7 +3149,7 @@ UINT DcConnectEx(DC *dc, DC_SESSION *dcs, char *pcid, DC_AUTH_CALLBACK *auth_cal
 	StrCpy(ret_url, ret_url_size, "");
 
 	// 指定された PCID に接続
-	ret = WideClientConnect(dc->Wide, pcid, DESK_VERSION, DESK_BUILD, &sock);
+	ret = WideClientConnect(dc->Wide, pcid, DESK_VERSION, DESK_BUILD, &sock, 0, false);
 	if (ret != ERR_NO_ERROR)
 	{
 		if (ret == ERR_RECV_URL)

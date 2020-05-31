@@ -347,7 +347,7 @@ UINT WideGetErrorLevel(UINT code)
 }
 
 // WideClient 接続
-UINT WideClientConnect(WIDE *w, char *pc_id, UINT ver, UINT build, SOCKIO **sockio)
+UINT WideClientConnect(WIDE *w, char *pc_id, UINT ver, UINT build, SOCKIO **sockio, UINT client_options, bool no_cache)
 {
 	WT *wt;
 	UINT ret;
@@ -367,7 +367,7 @@ UINT WideClientConnect(WIDE *w, char *pc_id, UINT ver, UINT build, SOCKIO **sock
 	// WideControl に接続
 LABEL_RETRY:
 	Debug("Connecting to WideControl...\n");
-	ret = WideClientConnectInner(w, &c, pcid, ver, build);
+	ret = WideClientConnectInner(w, &c, pcid, ver, build, client_options, no_cache);
 	if (ret == ERR_NO_ERROR)
 	{
 		Debug("Redirect Host: %s (for proxy: %s):%u\n", c.HostName, c.HostNameForProxy, c.Port);
@@ -970,7 +970,7 @@ UINT WideClientGetWoLMacList(WIDE *w, char *pcid, UINT ver, UINT build, char *ma
 }
 
 // クライアント接続
-UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT build)
+UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT build, UINT client_options, bool no_cache)
 {
 	PACK *r = NULL, *p = NULL;
 	UINT ret;
@@ -981,7 +981,10 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 		return ERR_INTERNAL_ERROR;
 	}
 
-	cache = WideSessionInfoCacheGet(w->SessionInfoCache, pcid, w->SessionInfoCacheExpires);
+	if (no_cache == false)
+	{
+		cache = WideSessionInfoCacheGet(w->SessionInfoCache, pcid, w->SessionInfoCacheExpires);
+	}
 
 	if (cache == NULL)
 	{
@@ -990,6 +993,7 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 		PackAddStr(r, "Pcid", pcid);
 		PackAddInt(r, "Ver", ver);
 		PackAddInt(r, "Build", build);
+		PackAddInt(r, "ClientOptions", client_options);
 		PackAddData(r, "ClientId", w->ClientId, sizeof(w->ClientId));
 		p = WideCall(w, "ClientConnect", r, false, true);
 		FreePack(r);
@@ -1020,8 +1024,11 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 			c->Port = PackGetInt(p, "Port");
 			PackGetData2(p, "SessionId", c->SessionId, sizeof(c->SessionId));
 
-			WideSessionInfoCacheAdd(w->SessionInfoCache, pcid,
-				c->HostName, c->HostNameForProxy, c->Port, c->SessionId, w->SessionInfoCacheExpires);
+			if (no_cache == false)
+			{
+				WideSessionInfoCacheAdd(w->SessionInfoCache, pcid,
+					c->HostName, c->HostNameForProxy, c->Port, c->SessionId, w->SessionInfoCacheExpires);
+			}
 
 			c->CacheUsed = false;
 

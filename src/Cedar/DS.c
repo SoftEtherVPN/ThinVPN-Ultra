@@ -956,6 +956,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bool check_port;
 	char c;
 	bool pingmode;
+	bool wol_mode;
 	bool downloadmode;
 	UINT download_size;
 	bool bluetooth_mode;
@@ -1025,6 +1026,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	client_build = PackGetInt(p, "ClientBuild");
 	check_port = PackGetBool(p, "CheckPort");
 	pingmode = PackGetBool(p, "PingMode");
+	wol_mode = PackGetBool(p, "WoLMode");
 	downloadmode = PackGetBool(p, "downloadmode");
 	download_size = PackGetInt(p, "download_size");
 	bluetooth_mode = false;//PackGetBool(p, "bluetooth_mode");
@@ -1047,6 +1049,13 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	PackGetData2(p, "bluetooth_mode_client_id", bluetooth_mode_client_id, sizeof(bluetooth_mode_client_id));
 
 	FreePack(p);
+
+	if (wol_mode)
+	{
+		// WoL モード
+		DsSendError(sock, ERR_NO_ERROR);
+		return;
+	}
 
 	if (pingmode)
 	{

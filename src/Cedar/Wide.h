@@ -237,8 +237,8 @@ bool WideTryUpdateNewEntryPointModestStandard(WT *wt, bool *cancel);
 WIDE *WideClientStart(char *svc_name, UINT se_lang);
 WIDE *WideClientStartEx(char *svc_name, UINT se_lang, X *master_cert, char *fixed_entrance_url);
 void WideClientStop(WIDE *w);
-UINT WideClientConnect(WIDE *w, char *pc_id, UINT ver, UINT build, SOCKIO **sockio);
-UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT build);
+UINT WideClientConnect(WIDE *w, char *pc_id, UINT ver, UINT build, SOCKIO **sockio, UINT client_options, bool no_cache);
+UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT build, UINT client_options, bool no_cache);
 void WideClientGenerateClientId(UCHAR *id);
 UINT WideClientGetWoLMacList(WIDE *w, char *pcid, UINT ver, UINT build, char *mac_list, UINT mac_list_size);
 

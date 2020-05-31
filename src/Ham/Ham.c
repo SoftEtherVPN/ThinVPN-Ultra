@@ -1199,7 +1199,7 @@ void cc(UINT num, char **arg)
 		pcid = arg[0];
 	}
 
-	ret = WideClientConnect(w, pcid, 0, 0, &s);
+	ret = WideClientConnect(w, pcid, 0, 0, &s, 0, false);
 
 	if (ret == ERR_NO_ERROR)
 	{
@@ -1433,7 +1433,7 @@ void download_test(UINT num, char **arg)
 
 	wide = WideClientStart("DESK", _GETLANG());
 
-	ret = WideClientConnect(wide, pcid, 0, 0, &sockio);
+	ret = WideClientConnect(wide, pcid, 0, 0, &sockio, 0, false);
 
 	if (ret != ERR_NO_ERROR)
 	{
@@ -1515,7 +1515,7 @@ void ping_test(UINT num, char **arg)
 
 	wide = WideClientStart("DESK", _GETLANG());
 
-	ret = WideClientConnect(wide, pcid, 0, 0, &sockio);
+	ret = WideClientConnect(wide, pcid, 0, 0, &sockio, 0, false);
 
 	if (ret != ERR_NO_ERROR)
 	{

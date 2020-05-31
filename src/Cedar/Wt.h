@@ -48,6 +48,9 @@
 #define ERR_RETRY_AFTER_8_HOURS				242	// 8 時間後に再試行してください
 #define ERR_RETRY_AFTER_24_HOURS			243	// 24 時間後に再試行してください
 #define ERR_RECV_MSG						251	// メッセージを受信
+#define ERR_WOL_TARGET_NOT_ENABLED			252	// WoL ターゲット機能無効
+#define ERR_WOL_TRIGGER_NOT_ENABLED			253	// WoL トリガー機能無効
+#define ERR_WOL_TRIGGER_NOT_SUPPORTED		254	// WoL トリガー機能がサポートされていない
 
 
 
@@ -110,6 +113,11 @@
 
 // セッション接続情報キャッシュの有効期限のデフォルト値
 #define WT_SESSION_INFO_CACHE_EXPIRES_DEFAULT		(60 * 1000)
+
+
+// クライアントフラグ
+#define WT_CLIENT_OPTIONS_WOL		1
+
 
 
 

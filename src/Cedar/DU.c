@@ -169,6 +169,82 @@ void DuWoLSetControlEnable(HWND hWnd, bool b)
 	SetEnable(hWnd, C_PCID2, b);
 	SetEnable(hWnd, IDOK, b);
 	SetEnable(hWnd, IDCANCEL, b);
+
+	if (b)
+	{
+		EnableClose(hWnd);
+	}
+	else
+	{
+		DisableClose(hWnd);
+	}
+
+	DoEvents(hWnd);
+}
+
+// WoL 実行
+bool DuWoLDlgOnOk(HWND hWnd, DU_MAIN *m)
+{
+	char pcid[MAX_PATH];
+	char pcid2[MAX_PATH];
+	wchar_t tmp[MAX_PATH];
+	bool ret = false;
+	UINT err = ERR_NO_ERROR;
+	if (hWnd == NULL || m == NULL)
+	{
+		return false;
+	}
+
+	GetTxtA(hWnd, C_PCID, pcid, sizeof(pcid));
+	Trim(pcid);
+	GetTxtA(hWnd, C_PCID2, pcid2, sizeof(pcid2));
+	Trim(pcid2);
+
+	if (IsEmptyStr(pcid))
+	{
+		MsgBox(hWnd, MB_ICONEXCLAMATION, _UU("DU_WOL_TARGET_EMPTY"));
+		Focus(hWnd, C_PCID);
+		return false;
+	}
+
+	if (IsEmptyStr(pcid2))
+	{
+		MsgBox(hWnd, MB_ICONEXCLAMATION, _UU("DU_WOL_TRIGGER_EMPTY"));
+		Focus(hWnd, C_PCID2);
+		return false;
+	}
+
+	// Target
+	StrToUni(tmp, sizeof(tmp), pcid);
+	AddCandidate(m->Du->Dc->Candidate, tmp, DU_CANDIDATE_MAX);
+
+	// Trigger
+	StrToUni(tmp, sizeof(tmp), pcid2);
+	AddCandidate(m->Du->Dc->CandidateWoL, tmp, DU_CANDIDATE_MAX);
+
+	DcSaveConfig(m->Du->Dc);
+
+	DuWoLSetControlEnable(hWnd, false);
+
+	// メイン
+	err = DcTriggerWoL(m->Du->Dc, pcid, pcid2);
+
+	if (err != ERR_NO_ERROR)
+	{
+		// エラー発生
+		MsgBox(hWnd, MB_ICONWARNING, _E(err));
+	}
+	else
+	{
+		// OK
+		ret = true;
+	}
+
+	DuWoLSetControlEnable(hWnd, true);
+
+	FocusEx(hWnd, C_PCID);
+
+	return ret;
 }
 
 // WoL ダイアログプロシージャ
@@ -186,6 +262,7 @@ UINT DuWoLDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 		switch (wParam)
 		{
 		case IDOK:
+			DuWoLDlgOnOk(hWnd, m);
 			break;
 
 		case IDCANCEL:
@@ -2300,11 +2377,32 @@ void DuOptionDlg(HWND hWnd, DU_MAIN *t)
 	Dialog(hWnd, D_DU_OPTION, DuOptionDlgProc, &o);
 }
 
-// 初期化
-void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
+// PCID 一覧の設定
+void DuMainDlgInitPcidCandidate(HWND hWnd, DU_MAIN *t)
 {
 	UINT i;
 	LIST *c;
+
+	c = t->Du->Dc->Candidate;
+
+	CbReset(hWnd, C_PCID);
+
+	for (i = 0;i < LIST_NUM(c);i++)
+	{
+		CANDIDATE *item = LIST_DATA(c, i);
+
+		if (UniIsEmptyStr(item->Str) == false)
+		{
+			CbAddStr(hWnd, C_PCID, item->Str, 0);
+		}
+	}
+
+	CbSetHeight(hWnd, C_PCID, 20);
+}
+
+// 初期化
+void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
+{
 	HFONT h;
 	HMENU hMenu;
 	// 引数チェック
@@ -2312,8 +2410,6 @@ void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 	{
 		return;
 	}
-
-	c = t->Du->Dc->Candidate;
 
 	t->hWnd = hWnd;
 
@@ -2353,17 +2449,7 @@ void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 	h = GetFont("Arial", 10, false, false, false, false);
 	SetFont(hWnd, C_PCID, h);
 
-	for (i = 0;i < LIST_NUM(c);i++)
-	{
-		CANDIDATE *item = LIST_DATA(c, i);
-
-		if (UniIsEmptyStr(item->Str) == false)
-		{
-			CbAddStr(hWnd, C_PCID, item->Str, 0);
-		}
-	}
-
-	CbSetHeight(hWnd, C_PCID, 20);
+	DuMainDlgInitPcidCandidate(hWnd, t);
 
 	DuMainDlgUpdate(hWnd, t, false);
 
@@ -2591,6 +2677,8 @@ UINT DuMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 		case B_WOL:
 			// Wake on LAN
 			DuWoLDlg(hWnd, t);
+
+			DuMainDlgInitPcidCandidate(hWnd, t);
 			break;
 		}
 		break;

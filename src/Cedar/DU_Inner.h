@@ -104,6 +104,7 @@ typedef struct DU_ABOUT
 void DuMain(DU *du);
 UINT DuMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 void DuMainDlgInit(HWND hWnd, DU_MAIN *t);
+void DuMainDlgInitPcidCandidate(HWND hWnd, DU_MAIN *t);
 void DuMainBanner(HWND hWnd, DU_MAIN *t);
 void DuMainDlgUpdate(HWND hWnd, DU_MAIN *t, bool forceEnable);
 void DuMainDlgOnOk(HWND hWnd, DU_MAIN *t);
@@ -185,6 +186,8 @@ bool DuWoLDlg(HWND hWnd, DU_MAIN *m);
 UINT DuWoLDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 void DuWoLDlgInit(HWND hWnd, DU_MAIN *m);
 void DuWoLSetControlEnable(HWND hWnd, bool b);
+bool DuWoLDlgOnOk(HWND hWnd, DU_MAIN *m);
+
 
 
 
