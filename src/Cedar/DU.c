@@ -217,10 +217,12 @@ bool DuWoLDlgOnOk(HWND hWnd, DU_MAIN *m)
 	// Target
 	StrToUni(tmp, sizeof(tmp), pcid);
 	AddCandidate(m->Du->Dc->Candidate, tmp, DU_CANDIDATE_MAX);
+	Sort(m->Du->Dc->Candidate);
 
 	// Trigger
 	StrToUni(tmp, sizeof(tmp), pcid2);
 	AddCandidate(m->Du->Dc->CandidateWoL, tmp, DU_CANDIDATE_MAX);
+	Sort(m->Du->Dc->CandidateWoL);
 
 	DcSaveConfig(m->Du->Dc);
 
@@ -2385,7 +2387,7 @@ void DuMainDlgInitPcidCandidate(HWND hWnd, DU_MAIN *t)
 
 	c = t->Du->Dc->Candidate;
 
-	CbReset(hWnd, C_PCID);
+	SendMsg(hWnd, C_PCID, CB_RESETCONTENT, 0, 0);
 
 	for (i = 0;i < LIST_NUM(c);i++)
 	{
@@ -2510,6 +2512,7 @@ void DuMainDlgOnOk(HWND hWnd, DU_MAIN *t)
 	StrToUni(tmp, sizeof(tmp), pcid);
 
 	AddCandidate(t->Du->Dc->Candidate, tmp, DU_CANDIDATE_MAX);
+	Sort(t->Du->Dc->Candidate);
 
 	DcSaveConfig(t->Du->Dc);
 
