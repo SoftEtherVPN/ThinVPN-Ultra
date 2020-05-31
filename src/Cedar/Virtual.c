@@ -7151,40 +7151,6 @@ void VirtualUdpReceived(VH *v, UINT src_ip, UINT dest_ip, void *data, UINT size,
 	}
 }
 
-// Determine the network address of the subnet to which the specified IP address belongs
-UINT GetNetworkAddress(UINT addr, UINT mask)
-{
-	return (addr & mask);
-}
-
-// Determine the broadcast address of the subnet to which the specified IP address belongs
-UINT GetBroadcastAddress(UINT addr, UINT mask)
-{
-	return ((addr & mask) | (~mask));
-}
-void GetBroadcastAddress4(IP *dst, IP *addr, IP *mask)
-{
-	// Validate arguments
-	if (dst == NULL || IsIP4(addr) == false || IsIP4(mask) == false)
-	{
-		Zero(dst, sizeof(IP));
-		return;
-	}
-
-	UINTToIP(dst, GetBroadcastAddress(IPToUINT(addr), IPToUINT(mask)));
-}
-
-// Determine whether the specified IP address belongs to the sub-network that is
-// represented by a another specified network address and a subnet mask
-bool IsInNetwork(UINT uni_addr, UINT network_addr, UINT mask)
-{
-	if (GetNetworkAddress(uni_addr, mask) == GetNetworkAddress(network_addr, mask))
-	{
-		return true;
-	}
-	return false;
-}
-
 // Send an UDP packet
 void SendUdp(VH *v, UINT dest_ip, UINT dest_port, UINT src_ip, UINT src_port, void *data, UINT size)
 {
@@ -8318,46 +8284,6 @@ void FreeArpWaitTable(VH *v)
 	}
 
 	ReleaseList(v->ArpWaitTable);
-}
-
-// Check whether the MAC address is valid
-bool IsMacInvalid(UCHAR *mac)
-{
-	UINT i;
-	// Validate arguments
-	if (mac == NULL)
-	{
-		return false;
-	}
-
-	for (i = 0;i < 6;i++)
-	{
-		if (mac[i] != 0x00)
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-// Check whether the MAC address is a broadcast address
-bool IsMacBroadcast(UCHAR *mac)
-{
-	UINT i;
-	// Validate arguments
-	if (mac == NULL)
-	{
-		return false;
-	}
-
-	for (i = 0;i < 6;i++)
-	{
-		if (mac[i] != 0xff)
-		{
-			return false;
-		}
-	}
-	return true;
 }
 
 // Insert an entry in the ARP table

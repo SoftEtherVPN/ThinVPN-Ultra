@@ -946,13 +946,25 @@ void test(UINT num, char **arg)
 {
 	if (true)
 	{
-#ifdef  OS_WIN32
-		void *h = DuStartApplyWhiteListRules();
-		GetLine(NULL, 0);
-		DuStopApplyWhiteListRules(h);
-#endif
+		LIST *o = NewStrList();
+
+		AddStrToStrListDistinct(o, "50-7B-9D-CE-32-7B");
+
+		WoLSendPacket(o);
+
+		FreeStrList(o);
 		return;
 	}
+//
+//	if (true)
+//	{
+//#ifdef  OS_WIN32
+//		void *h = DuStartApplyWhiteListRules();
+//		GetLine(NULL, 0);
+//		DuStopApplyWhiteListRules(h);
+//#endif
+//		return;
+//	}
 
 	if (true)
 	{

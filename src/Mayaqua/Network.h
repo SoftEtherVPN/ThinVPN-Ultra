@@ -1712,5 +1712,16 @@ UINT64 GetDynValueOrDefaultSafe(char *name, UINT64 default_value);
 
 void GetMacAddressListLocalComputer(char *dst, UINT size);
 
+void WoLSendPacket(LIST *mac_address_str_list);
+LIST *GetLocalComputerBroadcastAddressList();
+
+UINT GetNetworkAddress(UINT addr, UINT mask);
+UINT GetBroadcastAddress(UINT addr, UINT mask);
+void GetBroadcastAddress4(IP *dst, IP *addr, IP *mask);
+bool IsInNetwork(UINT uni_addr, UINT network_addr, UINT mask);
+bool IsMacBroadcast(UCHAR *mac);
+bool IsMacInvalid(UCHAR *mac);
+
+
 #endif	// NETWORK_H
 

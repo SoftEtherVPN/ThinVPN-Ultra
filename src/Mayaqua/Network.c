@@ -258,6 +258,195 @@ static LIST *g_dyn_value_list = NULL;
 //#define	RUDP_DETAIL_LOG
 
 
+// Check whether the MAC address is valid
+bool IsMacInvalid(UCHAR *mac)
+{
+	UINT i;
+	// Validate arguments
+	if (mac == NULL)
+	{
+		return false;
+	}
+
+	for (i = 0;i < 6;i++)
+	{
+		if (mac[i] != 0x00)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+// Check whether the MAC address is a broadcast address
+bool IsMacBroadcast(UCHAR *mac)
+{
+	UINT i;
+	// Validate arguments
+	if (mac == NULL)
+	{
+		return false;
+	}
+
+	for (i = 0;i < 6;i++)
+	{
+		if (mac[i] != 0xff)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void WoLSendPacket(LIST *mac_address_str_list)
+{
+	UINT i, j, k;
+	LIST *bcast_list = NULL;
+	UINT num = 5;
+	UCHAR ff[6];
+	UINT num_mac_address = LIST_NUM(mac_address_str_list);
+	if (mac_address_str_list == NULL)
+	{
+		return;
+	}
+
+	num_mac_address = MIN(num_mac_address, 64);
+
+	ff[0] = ff[1] = ff[2] = ff[3] = ff[4] = ff[5] = 0xFF;
+
+	bcast_list = GetLocalComputerBroadcastAddressList();
+
+	for (k = 0;k < num;k++)
+	{
+		SOCK *udp = NewUDP4(0, NULL);
+
+		for (i = 0;i < LIST_NUM(bcast_list);i++)
+		{
+			IP dest_ip;
+			char *dest = LIST_DATA(bcast_list, i);
+
+			if (StrToIP(&dest_ip, dest))
+			{
+				for (j = 0;j < num_mac_address;j++)
+				{
+					char *macstr = LIST_DATA(mac_address_str_list, j);
+					UCHAR mac_address[6];
+
+					if (StrToMac(mac_address, macstr))
+					{
+						if (IsZero(mac_address, 6) == false && IsMacBroadcast(mac_address) == false)
+						{
+							UINT c;
+							BUF *b = NewBuf();
+
+							WriteBuf(b, ff, 6);
+
+							for (c = 0;c < 16;c++)
+							{
+								WriteBuf(b, mac_address, 6);
+							}
+
+							SendTo(udp, &dest_ip, 9, b->Buf, b->Size);
+
+							FreeBuf(b);
+						}
+					}
+				}
+			}
+		}
+
+		Disconnect(udp);
+		ReleaseSock(udp);
+	}
+
+	FreeStrList(bcast_list);
+}
+
+LIST *GetLocalComputerBroadcastAddressList()
+{
+#ifdef	OS_WIN32
+	MS_ADAPTER_LIST *o;
+#endif	// OS_WIN32
+	LIST *ret = NewStrList();
+
+#ifdef	OS_WIN32
+	o = MsCreateAdapterList();
+
+	if (o != NULL)
+	{
+		UINT i;
+
+		for (i = 0;i < o->Num;i++)
+		{
+			UINT j;
+			MS_ADAPTER *a = o->Adapters[i];
+
+			for (j = 0;j < a->NumIpAddress;j++)
+			{
+				IP *ip = &a->IpAddresses[j];
+				IP *mask = &a->SubnetMasks[j];
+
+				if (IsIP4(ip) && IsIP4(mask) && IsSubnetMask4(mask) && IsZeroIP(ip) == false && IsZeroIP(mask) == false)
+				{
+					IP bcast = {0};
+
+					GetBroadcastAddress4(&bcast, ip, mask);
+
+					if (IsZeroIP(&bcast) == false)
+					{
+						char tmp[64];
+
+						IPToStr(tmp, sizeof(tmp), &bcast);
+
+						AddStrToStrListDistinct(ret, tmp);
+					}
+				}
+			}
+		}
+
+		MsFreeAdapterList(o);
+	}
+#endif	// OS_WIN32
+
+	AddStrToStrListDistinct(ret, "255.255.255.255");
+
+	return ret;
+}
+
+// Determine the network address of the subnet to which the specified IP address belongs
+UINT GetNetworkAddress(UINT addr, UINT mask)
+{
+	return (addr & mask);
+}
+
+// Determine the broadcast address of the subnet to which the specified IP address belongs
+UINT GetBroadcastAddress(UINT addr, UINT mask)
+{
+	return ((addr & mask) | (~mask));
+}
+void GetBroadcastAddress4(IP *dst, IP *addr, IP *mask)
+{
+	// Validate arguments
+	if (dst == NULL || IsIP4(addr) == false || IsIP4(mask) == false)
+	{
+		Zero(dst, sizeof(IP));
+		return;
+	}
+
+	UINTToIP(dst, GetBroadcastAddress(IPToUINT(addr), IPToUINT(mask)));
+}
+
+
+// Determine whether the specified IP address belongs to the sub-network that is
+// represented by a another specified network address and a subnet mask
+bool IsInNetwork(UINT uni_addr, UINT network_addr, UINT mask)
+{
+	if (GetNetworkAddress(uni_addr, mask) == GetNetworkAddress(network_addr, mask))
+	{
+		return true;
+	}
+	return false;
+}
 
 void GetMacAddressListLocalComputer(char *dst, UINT size)
 {
