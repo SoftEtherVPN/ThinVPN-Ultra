@@ -40,6 +40,10 @@ For Each item in colHistory
 				end if
 			next
 
+			if InStr(item.Title, "KB890830") then
+				is_for_windows = false
+			end if
+
 			if (is_for_windows) then
 				'Wscript.Echo "" & item.Date & " " & item.Title
 				dt = item.Date
