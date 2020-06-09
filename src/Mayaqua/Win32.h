@@ -177,6 +177,7 @@ char* Win32GetProductId();
 void Win32SetHighPriority();
 void Win32RestorePriority();
 void *Win32NewSingleInstance(char *instance_name);
+bool Win32IsSingleInstanceExists(char *instance_name);
 void Win32FreeSingleInstance(void *data);
 void Win32GetMemInfo(MEMINFO *info);
 void Win32Yield();

@@ -110,34 +110,41 @@ typedef struct DU_WFP_FUNCTIONS
 
 } DU_WFP_FUNCTIONS;
 
+typedef struct DU_GOV_FW1_DATA
+{
+	bool Mandate;
+	bool ClickOnce;
+} DU_GOV_FW1_DATA;
+
 static DU_WFP_FUNCTIONS *du_wfp_api = NULL;
 static HINSTANCE du_wfp_dll = NULL;
 
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
 // 完全閉域化ファイアウォール起動選択画面
-void DuGovFw1Main()
+bool DuGovFw1Main(bool mandate)
 {
-	INSTANCE *inst;
+	DU_GOV_FW1_DATA t;
+
+	Zero(&t, sizeof(t));
+	t.Mandate = mandate;
 
 	// すでに起動しているかどうか調べる
-	inst = NewSingleInstance(DU_GOV_FW2_SINGLE_INSTANCE_NAME);
-
-	if (inst == NULL)
+	if (IsSingleInstanceExists(DU_GOV_FW2_SINGLE_INSTANCE_NAME, false))
 	{
 		// すでに起動しているので何もしない
-		return;
+		return true;
 	}
 
-	FreeSingleInstance(inst);
-
 	// ダイアログを表示する
-	Dialog(NULL, D_DU_GOVFW1, DuGovFw1DlgProc, NULL);
+	return Dialog(NULL, D_DU_GOVFW1, DuGovFw1DlgProc, &t);
 }
 
 // 完全閉域化ファイアウォール起動選択画面プロシージャ
 UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
 {
+	DU_GOV_FW1_DATA *t = (DU_GOV_FW1_DATA *)param;
+
 	switch (msg)
 	{
 	case WM_INITDIALOG:
@@ -146,6 +153,11 @@ UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		DlgFont(hWnd, S_BOLD2, 0, true);
 		DlgFont(hWnd, IDOK, 10, true);
 		DlgFont(hWnd, IDCANCEL, 10, false);
+
+		if (t->Mandate)
+		{
+			SetText(hWnd, IDCANCEL, _UU("DU_GOV_FW_MANDATE_CLOSE_BUTTON"));
+		}
 		break;
 
 	case WM_COMMAND:
@@ -157,12 +169,46 @@ UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 				wchar_t *arg = L"/govfw";
 				void *handle = NULL;
 
+				if (t->ClickOnce)
+				{
+					break;
+				}
+
 				// for debug
 				//exe = L"C:\\git\\IPA-DNP-DeskVPN\\src\\bin\\ThinClient.exe";
 
 				if (MsExecuteEx3W(exe, arg, &handle, true, false))
 				{
-					EndDialog(hWnd, 1);
+					// Single instance が生成されるかプロセスが終了するまで待機する
+					UINT64 now = Tick64();
+					UINT64 giveup = now + 30000ULL;
+					bool ok = false;
+
+					t->ClickOnce = true;
+
+					while (true)
+					{
+						now = Tick64();
+						if (now >= giveup)
+						{
+							break;
+						}
+
+						if (IsSingleInstanceExists(DU_GOV_FW2_SINGLE_INSTANCE_NAME, false))
+						{
+							ok = true;
+							break;
+						}
+
+						if (MsWaitProcessExitWithTimeoutEx(handle, 100, true))
+						{
+							break;
+						}
+					}
+
+					MsCloseHandle(handle);
+
+					EndDialog(hWnd, ok);
 				}
 			}
 			break;
@@ -175,6 +221,14 @@ UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		break;
 
 	case WM_CLOSE:
+		if (t->Mandate)
+		{
+			if (MsgBox(hWnd, MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION, _UU("DU_GOV_FW_MANDATE_MSG")) == IDNO)
+			{
+				break;
+			}
+		}
+
 		EndDialog(hWnd, 0);
 		break;
 	}
@@ -202,11 +256,14 @@ void DuGovFw2Main()
 
 	h = DuStartApplyWhiteListRules();
 
-	Dialog(NULL, D_DU_GOVFW2, DuGovFw2DlgProc, NULL);
+	if (h != NULL)
+	{
+		Dialog(NULL, D_DU_GOVFW2, DuGovFw2DlgProc, NULL);
+
+		DuStopApplyWhiteListRules(h);
+	}
 
 	FreeSingleInstance(inst);
-
-	DuStopApplyWhiteListRules(h);
 
 	return;
 }
@@ -1195,24 +1252,28 @@ UINT DuInspectionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void
 		switch (wParam)
 		{
 		case 1:
+			KillTimer(hWnd, 1);
+
+			DoEvents(hWnd);
+			ins->AntiVirusOk = MsCheckAntiVirus();
+
+			DoEvents(hWnd);
+			ins->WindowsUpdateOk = MsCheckWindowsUpdate();
+
+			if (DcGetDebugFlag())
 			{
-				KillTimer(hWnd, 1);
-
-				DoEvents(hWnd);
-				ins->AntiVirusOk = MsCheckAntiVirus();
-
-				DoEvents(hWnd);
-				ins->WindowsUpdateOk = MsCheckWindowsUpdate();
-
-				DoEvents(hWnd);
-				GetMacAddressListLocalComputer(ins->MacAddressList, sizeof(ins->MacAddressList));
-
-				DoEvents(hWnd);
-
-				EndDialog(hWnd, 1);
-
-				break;
+				ins->AntiVirusOk = true;
+				ins->WindowsUpdateOk = true;
 			}
+
+			DoEvents(hWnd);
+			GetMacAddressListLocalComputer(ins->MacAddressList, sizeof(ins->MacAddressList));
+
+			DoEvents(hWnd);
+
+			EndDialog(hWnd, 1);
+
+			break;
 		}
 
 		break;
@@ -1862,6 +1923,8 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 		UINT process_id = 0;
 		bool rdp_file_write_failed = false;
 		UINT urdp_version = 0;
+		bool gov_fw_ok = true;
+		bool need_to_watch_gov_fw = false;
 
 		if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_ENABLE_RELAX_KEY_NAME))
 		{
@@ -1876,11 +1939,22 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 		{
 			// 接続先サーバーが「行政システム適合モード」の場合はファイアウォールを
 			// 勧める画面を表示する
-			DuGovFw1Main();
+			if (MsIsVista())
+			{
+				gov_fw_ok = DuGovFw1Main(s->IsEnspectionEnabled);
+
+				need_to_watch_gov_fw = s->IsEnspectionEnabled;
+			}
+			else
+			{
+				// Windows XP またはそれ以前ではファイアウォール機能が利用できない
+				gov_fw_ok = false;
+			}
 		}
 
-		if (dialup_ok == false)
+		if (dialup_ok == false || gov_fw_ok == false)
 		{
+			// キャンセルされた
 		}
 		else
 		{
@@ -1982,7 +2056,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 					}
 
 					// プロセスが終了 or タイムアウト するまで待つ
-					timeouted = !DcWaitForProcessExit(process, timeout);
+					timeouted = !DcWaitForProcessExit(process, timeout, need_to_watch_gov_fw);
 
 					if (msg != NULL)
 					{

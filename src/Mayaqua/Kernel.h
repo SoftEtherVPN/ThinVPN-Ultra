@@ -249,6 +249,7 @@ void HashInstanceName(char *name, UINT size, char *instance_name);
 void HashInstanceNameLocal(char *name, UINT size, char *instance_name);
 INSTANCE *NewSingleInstance(char *instance_name);
 INSTANCE *NewSingleInstanceEx(char *instance_name, bool user_local);
+bool IsSingleInstanceExists(char *instance_name, bool user_local);
 void FreeSingleInstance(INSTANCE *inst);
 void GetSpanStr(char *str, UINT size, UINT64 sec64);
 void GetSpanStrEx(wchar_t *str, UINT size, UINT64 sec64, LOCALE *locale);

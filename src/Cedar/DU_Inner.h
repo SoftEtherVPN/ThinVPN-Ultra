@@ -193,7 +193,7 @@ UINT DuGovFw2DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 void DuGovFw2Main();
 
 UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
-void DuGovFw1Main();
+bool DuGovFw1Main(bool mandate);
 
 
 

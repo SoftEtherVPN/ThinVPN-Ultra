@@ -820,6 +820,29 @@ void Win32GetMemInfo(MEMINFO *info)
 	}
 }
 
+bool Win32IsSingleInstanceExists(char *instance_name)
+{
+	char tmp[MAX_SIZE];
+	HANDLE hMutex;
+	// Validate arguments
+	if (instance_name == NULL)
+	{
+		char exe_path[MAX_PATH];
+		GetModuleFileName(NULL, exe_path, sizeof(exe_path));
+		HashInstanceName(tmp, sizeof(tmp), exe_path);
+		instance_name = tmp;
+	}
+
+	hMutex = OpenMutex(SYNCHRONIZE, FALSE, instance_name);
+	if (hMutex != NULL)
+	{
+		CloseHandle(hMutex);
+		return true;
+	}
+
+	return false;
+}
+
 // Creating a single instance
 void *Win32NewSingleInstance(char *instance_name)
 {

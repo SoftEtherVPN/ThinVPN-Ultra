@@ -32,12 +32,9 @@ kKbBPozVgrH05nnFd5rZsleAUhCSjT7HgXX9ITBi+eFVpa0YYlmpmKA28Dsy64lm
 IsrNWH7VSYQKD5mNri0FEaUHAU65oRFMKHHX/4xf+NOJ
 -----END CERTIFICATE-----
 
-# ご注意: この EntryPoint.dat のファイルの内容は、動的に生成され、
-#         頻繁に自動更新されます。新たな EntryPoint.dat のファイル
-#         は、「シン・テレワークシステム」のサーバーおよびクライアント
-#         の動作時に自動的にダウンロードされます。
-#         また、以下のドメイン名または IP アドレスの多くは、
-#         ダイナミックに変化します。
+
+# 行政情報システム適合モード用 EntryPoint Config
+# Ver 2020/05/13
 
 
 # 中継システムのロードバランサの「プライマリ URL」です。
@@ -45,50 +42,12 @@ IsrNWH7VSYQKD5mNri0FEaUHAU65oRFMKHHX/4xf+NOJ
 # 中継システムへのアクセスの際に、まずこのロードバランサへのアクセス
 # を試みます。
 
-https://c__TIME__.controller.dynamic-ip.thin.cyber.ipa.go.jp/widecontrol/
+https://load-balancer.thin-secure.cyber.ipa.go.jp/widecontrol/?flag=limited
 
 
-# この EntryPoint.dat のファイルの最新版を取得するための GitHub の
-# URL です。EntryPoint.dat のファイル内容は、動的に更新される可能性
-# があります。古くなったことが検出されれば、直ちに GitHub から最新
-# のファイルをダウンロードします。ファイルは RSA 電子証明書で署名
-# されており、ダウンロード時に署名の確認がなされます。万一 GitHub の
-# コンテンツが第三者によって改ざんされた場合でも、虚偽のファイル
-# をダウンロードするおそれはありません。
+# 行政システム用セカンダリサーバー一覧
+# DNS がおかしい場合を考慮
 
-Update:https://raw.githubusercontent.com/ThinTelework/THIN-ThinTeleworkUpdateFiles/master/Files/
-
-
-
-# 何らかの理由で「プライマリ URL」のサーバーとの通信に失敗した場合は、
-# 「セカンダリ URL」との通信を試みます。
-# 「セカンダリ URL」のサーバーは、できるだけ異なるドメイン名および
-# AS 番号 (インターネット BGP 上の独立したネットワーク、すなわち ISP)
-# に分散するようにして配置されています。
-# その理由は、
-# ① 特定のドメインネームシステム (DNS) に不具合が発生した場合でも、
-#    問題なく通信が継続できるようにするため。一般に、DNS の不具合は
-#    特定のドメイン単位で発生します。以下のセカンダリ URL の一覧
-#    は、できるだけ広範囲なドメイン名にまたがるように配置されており、
-#    すべてがダウンしない限り通信が維持されます。
-# ② ユーザーの端末と、インターネット上の中継システムとの間の通信の
-#    障害は、特定の IP サブネットまたは AS 番号単位で発生すること
-#    が多いため、できるだけ異なる IP サブネットおよび AS 番号に分散
-#    することが重要です。
-
-
-# 以下のドメイン名または IP アドレスの多くは、通信障害を避けるため、
-# ダイナミックに変化します。
-# 「シン・テレワークシステム」のサーバーおよびクライアントは、動作時に、
-# GitHub から最新の SECONDARY リストをダウンロードして使用します。
-
-SECONDARY:[https://219.100.94.1/widecontrol/]
-SECONDARY:[https://140.227.26.102/widecontrol/]
-SECONDARY:[https://h128-22-151-69.ablenetvps.ne.jp/widecontrol/]
-SECONDARY:[https://v118-27-25-70.4l0s.static.cnode.io/widecontrol/]
-SECONDARY:[https://ik1-424-44228.vs.sakura.ne.jp/widecontrol/]
-SECONDARY:[https://ec2-52-194-229-250.ap-northeast-1.compute.amazonaws.com/widecontrol/]
-SECONDARY:[https://ec2-54-190-62-125.us-west-2.compute.amazonaws.com/widecontrol/]
-
-ADDITIONAL_SECONDARY
+SECONDARY:[https://219.100.94.11/widecontrol/?flag=limited]
+SECONDARY:[https://219.100.94.1/widecontrol/?flag=limited]
 

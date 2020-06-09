@@ -1092,6 +1092,7 @@ bool MsExecuteEx3W(wchar_t *exe, wchar_t *arg, void **process_handle, bool runas
 void MsCloseHandle(void *handle);
 UINT MsWaitProcessExit(void *process_handle);
 bool MsWaitProcessExitWithTimeout(void *process_handle, UINT timeout);
+bool MsWaitProcessExitWithTimeoutEx(void *process_handle, UINT timeout, bool no_close_handle);
 bool MsIsFileLocked(char *name);
 bool MsIsFileLockedW(wchar_t *name);
 bool MsIsLocalDrive(char *name);

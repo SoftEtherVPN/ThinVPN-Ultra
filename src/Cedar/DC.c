@@ -702,7 +702,7 @@ wchar_t *DcReadRdpFile(wchar_t *name, bool *is_empty)
 }
 
 // プロセスの終了まで待機する
-bool DcWaitForProcessExit(void *h, UINT timeout)
+bool DcWaitForProcessExit(void *h, UINT timeout, bool watch_gov_fw_exit)
 {
 	bool ret = false;
 #ifdef	OS_WIN32
@@ -712,15 +712,61 @@ bool DcWaitForProcessExit(void *h, UINT timeout)
 		return true;
 	}
 
-	if (Win32WaitProcess(h, timeout) == false)
+	if (watch_gov_fw_exit == false)
 	{
-		// タイムアウトした場合はプロセスを Kill する
-		Win32TerminateProcess(h);
-		ret = false;
+		// 通常モード
+		if (Win32WaitProcess(h, timeout) == false)
+		{
+			// タイムアウトした場合はプロセスを Kill する
+			Win32TerminateProcess(h);
+			ret = false;
+		}
+		else
+		{
+			ret = true;
+		}
 	}
 	else
 	{
-		ret = true;
+		// gov fw が停止したらタイムアウトしたものとみなすモード
+		UINT64 now = Tick64();
+		UINT64 giveup = now + (UINT64)timeout;
+		if (timeout == INFINITE)
+		{
+			giveup = 0xFFFFFFFFFFFFFFFFULL;
+		}
+
+		while (true)
+		{
+			now = Tick64();
+
+			if (now >= giveup)
+			{
+				// タイムアウトした
+				ret = false;
+				break;
+			}
+
+			if (Win32WaitProcess(h, 1000))
+			{
+				// プロセスが終了した
+				ret = true;
+				break;
+			}
+
+			if (IsSingleInstanceExists(DU_GOV_FW2_SINGLE_INSTANCE_NAME, false) == false)
+			{
+				// gov fw が終了された
+				ret = false;
+				break;
+			}
+		}
+
+		if (ret == false)
+		{
+			// タイムアウトまたは gov fw 終了時はプロセスを kill する
+			Win32TerminateProcess(h);
+		}
 	}
 
 	Win32CloseProcess(h);
@@ -2296,6 +2342,7 @@ UINT DcSessionConnect(DC_SESSION *s)
 	s->DsCaps = io->UserData4;
 	s->IsShareDisabled = ((io->UserData3 == 0) ? false : true);
 	s->IsLimitedMode = io->UserData5;
+	s->IsEnspectionEnabled = io->UserData6;
 	Debug("DS_CAPS: %u\n", s->DsCaps);
 
 	// この SOCKIO をキューに追加する
@@ -2624,9 +2671,14 @@ SOCK *DcListen()
 
 // localhost 接続許可フラグ (デバッグ用)
 static bool dc_allow_localhost = false;
-void DcSetLocalHostAllowFlag(bool allow)
+void DcSetDebugFlag(bool allow)
 {
 	dc_allow_localhost = allow;
+}
+
+bool DcGetDebugFlag()
+{
+	return dc_allow_localhost;
 }
 
 // 接続メイン
@@ -2810,7 +2862,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 		{
 			return ERR_DISCONNECTED;
 		}
-		// OTP 結果受信
+		// 検疫結果受信
 		p = SockIoRecvPack(sock);
 		if (p == NULL)
 		{
@@ -3067,6 +3119,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	sock->UserData3 = is_share_disabled;
 	sock->UserData4 = ds_caps;
 	sock->UserData5 = is_server_limited_mode;
+	sock->UserData6 = run_inspect;
 
 	SockIoSetTimeout(sock, INFINITE);
 

@@ -2302,6 +2302,10 @@ UINT MsWaitProcessExit(void *process_handle)
 }
 bool MsWaitProcessExitWithTimeout(void *process_handle, UINT timeout)
 {
+	return MsWaitProcessExitWithTimeoutEx(process_handle, timeout, false);
+}
+bool MsWaitProcessExitWithTimeoutEx(void *process_handle, UINT timeout, bool no_close_handle)
+{
 	HANDLE h = (HANDLE)process_handle;
 	bool ret = false;
 
@@ -2312,7 +2316,10 @@ bool MsWaitProcessExitWithTimeout(void *process_handle, UINT timeout)
 
 	ret = (WaitForSingleObject(h, timeout) != WAIT_TIMEOUT);
 
-	CloseHandle(h);
+	if (no_close_handle == false)
+	{
+		CloseHandle(h);
+	}
 
 	return ret;
 }

@@ -97,6 +97,7 @@ struct DC_SESSION
 	UINT64 LifeTime;					// 有効期限
 	wchar_t LifeTimeMsg[MAX_PATH];		// 有効期限満了時のメッセージ
 	bool IsLimitedMode;					// サーバーが行政システム適合モードかどうか
+	bool IsEnspectionEnabled;			// 検疫有効
 };
 
 // 拡張認証データ
@@ -160,7 +161,8 @@ UINT DcConnectEx(DC *dc, DC_SESSION *dcs, char *pcid, DC_AUTH_CALLBACK *auth_cal
 				 DC_INSPECT_CALLBACK *ins_callback, DC_SESSION *ins_callback_param);
 UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CALLBACK *auth_callback, void *callback_param, bool check_port, bool first_connection, DC_OTP_CALLBACK *otp_callback, DC_SESSION *otp_callback_param, DC_INSPECT_CALLBACK *ins_callback, DC_SESSION *ins_callback_param);
 UINT DcTriggerWoL(DC *dc, char *target_pcid, char *trigger_pcid);
-void DcSetLocalHostAllowFlag(bool allow);
+void DcSetDebugFlag(bool allow);
+bool DcGetDebugFlag();
 UINT NewDcSession(DC *dc, char *pcid, DC_PASSWORD_CALLBACK *password_callback, DC_OTP_CALLBACK *otp_callback, DC_ADVAUTH_CALLBACK *advauth_callback, DC_EVENT_CALLBACK *event_callback, DC_INSPECT_CALLBACK *inspect_callback,
 				  void *param, DC_SESSION **session);
 UINT DcSessionConnect(DC_SESSION *s);
@@ -202,7 +204,7 @@ UINT DcGetMstscArguments(DC_SESSION *s, wchar_t *mstsc_exe, char *arg, UINT arg_
 UINT DcGetUrdpClientArguments(DC_SESSION *s, char *arg, UINT arg_size, bool disable_share, UINT version);
 void *DcRunMstsc(DC *dc, wchar_t *mstsc_exe, char *arg, char *target, bool disable_share, UINT *process_id, bool *rdp_file_write_failed);
 void *DcRunUrdpClient(char *arg, UINT *process_id, UINT version);
-bool DcWaitForProcessExit(void *h, UINT timeout);
+bool DcWaitForProcessExit(void *h, UINT timeout, bool watch_gov_fw_exit);
 void DcInitMstscRdpFile();
 bool DcSetMstscRdpFileInt(char *key_name, UINT value);
 bool DcSetMstscRdpFileStr(char *key_name, char *value);

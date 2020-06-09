@@ -688,6 +688,36 @@ void GetMemInfo(MEMINFO *info)
 	OSGetMemInfo(info);
 }
 
+bool IsSingleInstanceExists(char *instance_name, bool user_local)
+{
+#ifdef	OS_WIN32
+	char name[MAX_SIZE];
+	bool ret = false;
+
+	if (instance_name != NULL)
+	{
+		if (user_local == false)
+		{
+			HashInstanceName(name, sizeof(name), instance_name);
+		}
+		else
+		{
+			HashInstanceNameLocal(name, sizeof(name), instance_name);
+		}
+
+		ret = Win32IsSingleInstanceExists(name);
+	}
+	else
+	{
+		ret = Win32IsSingleInstanceExists(NULL);
+	}
+
+	return ret;
+#else	// OS_WIN32
+	return false;
+#endif	// OS_WIN32
+}
+
 // Start the single-instance
 INSTANCE *NewSingleInstance(char *instance_name)
 {
