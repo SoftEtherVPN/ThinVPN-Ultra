@@ -200,44 +200,9 @@ void WideFreeSessionInfoCache(LIST *o)
 // 2 つのマシン ID を比較し、同一のマシンであると判断したら true を返す
 bool WideCompareMachineId(WT_MACHINE_ID *d1, WT_MACHINE_ID *d2)
 {
-	UINT n = 0;
-	// 引数チェック
-	if (d1 == NULL || d2 == NULL)
-	{
-		return false;
-	}
-
-	if (Cmp(d1->ProductIdHash, d2->ProductIdHash, SHA1_SIZE) == 0)
-	{
-		n++;
-	}
-
-	if (Cmp(d1->MachineNameHash, d2->MachineNameHash, SHA1_SIZE) == 0)
-	{
-		n++;
-	}
-
-	if (Cmp(d1->IpAddressHash, d2->IpAddressHash, SHA1_SIZE) == 0)
-	{
-		n++;
-	}
-
-	if (Cmp(d1->MacAddressHash, d2->MacAddressHash, SHA1_SIZE) == 0)
-	{
-		n++;
-	}
-
-	if (Cmp(d1->RamSizeHash, d2->RamSizeHash, SHA1_SIZE) == 0)
-	{
-		n++;
-	}
-
-	if (n >= 2)
-	{
-		return true;
-	}
-
-	return false;
+	// 2020.6.9 Windows 10 2004 アップデートでおかしくなるので
+	// 常に true を返すようにする
+	return true;
 }
 
 // 現在のマシン ID を取得
