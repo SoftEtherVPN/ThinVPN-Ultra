@@ -1950,6 +1950,12 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 				// Windows XP またはそれ以前ではファイアウォール機能が利用できない
 				gov_fw_ok = false;
 			}
+
+			if (s->IsEnspectionEnabled == false)
+			{
+				// 検疫有効でない場合は、いかなる場合でも gov fw は成功したとみなす
+				gov_fw_ok = true;
+			}
 		}
 
 		if (dialup_ok == false || gov_fw_ok == false)
