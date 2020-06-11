@@ -15336,6 +15336,16 @@ bool MsCheckIsAdmin()
 	return true;
 }
 
+void *MsGetCurrentInstanceHandle()
+{
+	if (ms != NULL && ms->hInst != NULL)
+	{
+		return ms->hInst;
+	}
+
+	return GetModuleHandle(NULL);
+}
+
 // Library initialization
 void MsInit()
 {

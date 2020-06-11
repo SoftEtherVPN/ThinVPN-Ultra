@@ -488,6 +488,31 @@ typedef struct BAD_PROCESS
 	char *Title;
 } BAD_PROCESS;
 
+typedef struct DESKTOP_WATERMARK_SETTING
+{
+	char WindowTitle[MAX_PATH];
+	char FontName1[MAX_PATH];
+	char FontName2[MAX_PATH];
+	UINT FontSize1;
+	UINT FontSize2;
+	wchar_t Text1[MAX_SIZE];
+	wchar_t Text2[MAX_SIZE * 2];
+	UINT TextColor1;
+	UINT TextColor2;
+	UINT Alpha;
+} DESKTOP_WATERMARK_SETTING;
+
+// Watermark
+typedef struct DESKTOP_WATERMARK
+{
+	THREAD *Thread;
+	HWND hWnd;
+	DESKTOP_WATERMARK_SETTING Setting;
+	HFONT Font1, Font2;
+} DESKTOP_WATERMARK;
+
+#define DESKTOP_WATERMARK_COLORKEY	RGB(12,34,56)
+
 #ifdef	WINUI_C
 
 // Process name list of incompatible anti-virus software
@@ -931,6 +956,11 @@ void ShowTextFile(HWND hWnd, char *filename, wchar_t *caption, UINT icon);
 void StopAsyncOnceMsg(ONCEMSG_DLG *d);
 ONCEMSG_DLG *StartAsyncOnceMsg(wchar_t *title, wchar_t *message, bool show_checkbox, UINT icon, bool topmost);
 void AsyncOnceMsgThread(THREAD *thread, void *param);
+
+DESKTOP_WATERMARK *StartDesktopWatermark(DESKTOP_WATERMARK_SETTING *setting);
+void StopDesktopWatermark(DESKTOP_WATERMARK *d);
+void DesktopWatermarkThread(THREAD *thread, void *param);
+
 
 #endif	// OS_WIN32
 

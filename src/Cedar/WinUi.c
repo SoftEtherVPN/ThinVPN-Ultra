@@ -165,6 +165,273 @@ typedef struct _WINUI_SHSTOCKICONINFO
 	WCHAR szPath[MAX_PATH];
 } WINUI_SHSTOCKICONINFO;
 
+HFONT CreateDrawTextFont(char *name, UINT size, bool bold, bool italic, bool underline, bool strikeout)
+{
+	HFONT hFont;
+	HDC hDC;
+	DWORD font_quality = NONANTIALIASED_QUALITY;
+	UINT dpi;
+
+	hDC = CreateCompatibleDC(NULL);
+
+	if (MsIsVista())
+	{
+		dpi = GetDeviceCaps(hDC, LOGPIXELSY);
+	}
+	else
+	{
+		dpi = 96;
+	}
+
+	hFont = CreateFontA(-MulDiv(size, dpi, 72),
+		0, 0, 0, (bold == false ? 500 : FW_BOLD),
+		italic, underline, strikeout, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+		CLIP_DEFAULT_PRECIS, font_quality, DEFAULT_PITCH, name);
+
+	hDC = CreateCompatibleDC(NULL);
+
+	DeleteDC(hDC);
+
+	return hFont;
+}
+
+void DrawTextFont(HDC hDC, UINT x, UINT y, HFONT hFont, wchar_t *text, UINT format)
+{
+	RECT r;
+	HFONT hOld;
+	if (UniStrLen(text) == 0)
+	{
+		text = L" ";
+	}
+
+	format |= DT_WORDBREAK | DT_NOPREFIX;
+
+	Zero(&r, sizeof(r));
+	SetRect(&r, x, y, 65536, 65536);
+
+	hOld = SelectObject(hDC, hFont);
+
+	DrawTextW(hDC, text, -1, &r, format);
+
+	SelectObject(hDC, hOld);
+}
+
+bool GetDrawTextFont(RECT *rect, HFONT hFont, wchar_t *text, UINT format)
+{
+	RECT r;
+	bool ret = false;
+	Zero(rect, sizeof(RECT));
+
+	if (UniStrLen(text) == 0)
+	{
+		text = L" ";
+	}
+
+	format |= DT_CALCRECT | DT_WORDBREAK | DT_NOPREFIX;
+
+	Lock(lock_common_dc);
+	{
+		HFONT hOld = SelectObject(hCommonDC, hFont);
+		UINT i;
+
+		Zero(&r, sizeof(r));
+		r.left = r.top = 0;
+		r.right = 65536;
+		r.bottom = 65536;
+
+		i = DrawTextW(hCommonDC, text, -1, &r, format);
+
+		if (i != 0)
+		{
+			ret = true;
+
+			rect->right = GET_ABS(r.right - r.left);
+			rect->bottom = GET_ABS(r.bottom - r.top);
+		}
+
+		SelectObject(hCommonDC, hOld);
+	}
+	Unlock(lock_common_dc);
+
+	return ret;
+}
+
+// Start desktop watermark
+DESKTOP_WATERMARK *StartDesktopWatermark(DESKTOP_WATERMARK_SETTING *setting)
+{
+	DESKTOP_WATERMARK *d = ZeroMalloc(sizeof(DESKTOP_WATERMARK));
+
+	Copy(&d->Setting, setting, sizeof(DESKTOP_WATERMARK_SETTING));
+
+	d->Font1 = CreateDrawTextFont(setting->FontName1, setting->FontSize1, true, false, false, false);
+	d->Font2 = CreateDrawTextFont(setting->FontName2, setting->FontSize2, true, false, false, false);
+
+	d->Thread = NewThread(DesktopWatermarkThread, d);
+
+	WaitThreadInit(d->Thread);
+
+	return d;
+}
+
+// Stop desktop watermark
+void StopDesktopWatermark(DESKTOP_WATERMARK *d)
+{
+	if (d == NULL)
+	{
+		return;
+	}
+
+	WaitThread(d->Thread, INFINITE);
+
+	ReleaseThread(d->Thread);
+
+	DeleteObject(d->Font1);
+	DeleteObject(d->Font2);
+
+	Free(d);
+}
+
+void DesktopWatermarkPaint(HDC hDC, DESKTOP_WATERMARK *d)
+{
+	DESKTOP_WATERMARK_SETTING *s;
+	if (hDC == NULL || d == NULL)
+	{
+		return;
+	}
+
+	s = &d->Setting;
+
+	SetBkColor(hDC, DESKTOP_WATERMARK_COLORKEY);
+	SetTextColor(hDC, s->TextColor1);
+
+	DrawTextFont(hDC, 10, 10, d->Font1, s->Text1, 0);
+}
+
+// Desktop watermark window proc
+LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	DESKTOP_WATERMARK *d;
+	CREATESTRUCT *cs;
+	if (hWnd == NULL)
+	{
+		return 0;
+	}
+
+	d = (DESKTOP_WATERMARK *)GetWindowLongPtrA(hWnd, GWLP_USERDATA);
+	if (d == NULL && msg != WM_CREATE)
+	{
+		goto LABEL_END;
+	}
+
+	switch (msg)
+	{
+	case WM_CREATE:
+		cs = (CREATESTRUCT *)lParam;
+		d = (DESKTOP_WATERMARK *)cs->lpCreateParams;
+		SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)d);
+
+		ShowWindow(hWnd, SW_SHOWNORMAL);
+
+		break;
+
+	case WM_WTSSESSION_CHANGE:
+		{
+			switch (wParam)
+			{
+			case WTS_SESSION_LOCK:
+			case WTS_SESSION_UNLOCK:
+				break;
+			}
+		}
+
+		break;
+
+	case WM_PAINT:
+		{
+			PAINTSTRUCT ps = {0};
+			HDC hDC;
+
+			hDC = BeginPaint(hWnd, &ps);
+			if (hDC != NULL)
+			{
+				DesktopWatermarkPaint(hDC, d);
+			}
+
+			EndPaint(hWnd, &ps);
+		}
+		break;
+
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+	}
+
+LABEL_END:
+	return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+// Desktop watermark thread
+void DesktopWatermarkThread(THREAD *thread, void *param)
+{
+	char wndclass_name[MAX_PATH];
+	DESKTOP_WATERMARK *d;
+	WNDCLASS wc;
+	HWND hWnd;
+	MSG msg;
+	if (thread == NULL || param == NULL)
+	{
+		return;
+	}
+	d = (DESKTOP_WATERMARK *)param;
+
+	Format(wndclass_name, sizeof(wndclass_name), "WNDCLASS_%I64u", Rand64());
+
+	Zero(&wc, sizeof(wc));
+	wc.hbrBackground = CreateSolidBrush(DESKTOP_WATERMARK_COLORKEY);
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hIcon = NULL;
+	wc.hInstance = MsGetCurrentInstanceHandle();
+	wc.lpfnWndProc = DesktopWatermarkWindowProc;
+	wc.lpszClassName = wndclass_name;
+	if (RegisterClassA(&wc) == 0)
+	{
+		DeleteObject(wc.hbrBackground);
+		NoticeThreadInit(thread);
+		return;
+	}
+
+	hWnd = CreateWindowExA(
+		WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST,
+		wndclass_name, d->Setting.WindowTitle,
+		WS_POPUP,
+		240, 240, 1024, 768,
+		NULL, NULL, MsGetCurrentInstanceHandle(), d);
+
+	SetLayeredWindowAttributes(hWnd, DESKTOP_WATERMARK_COLORKEY, d->Setting.Alpha, LWA_COLORKEY | LWA_ALPHA);
+
+	d->hWnd = hWnd;
+
+	NoticeThreadInit(thread);
+
+	if (hWnd == NULL)
+	{
+		UnregisterClassA(wndclass_name, MsGetCurrentInstanceHandle());
+		return;
+	}
+
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	DestroyWindow(hWnd);
+
+	UnregisterClassA(wndclass_name, MsGetCurrentInstanceHandle());
+
+	DeleteObject(wc.hbrBackground);
+}
+
 // Get whether the current process is foreground
 bool IsThisProcessForeground()
 {

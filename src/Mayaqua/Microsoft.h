@@ -1181,6 +1181,8 @@ bool MsCheckWindowsUpdate();
 UINT64 MsGetKernelTimestamp();
 LIST *MsGetMacAddressList();
 
+void *MsGetCurrentInstanceHandle();
+
 // Inner functions
 #ifdef	MICROSOFT_C
 
