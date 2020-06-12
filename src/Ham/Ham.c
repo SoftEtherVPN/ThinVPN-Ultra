@@ -958,15 +958,20 @@ void test(UINT num, char **arg)
 				UniStrCpy(s.Text1, 0, L"Hello World !");
 				UniStrCpy(s.Text2, 0, L"a:1\r\nb:2\r\nc:3");
 
+				s.RandSeed = Rand32();
+
 				StrCpy(s.FontName1, 0, "Meiryo UI");
 				s.FontSize1 = 32;
 
 				StrCpy(s.FontName2, 0, "Meiryo UI");
-				s.FontSize2 = 32;
+				s.FontSize2 = 16;
 
 				s.TextColor1 = RGB(2, 200, 81);
-				s.TextColor2 = RGB(255, 255, 255);
-				s.Alpha = 9;
+				s.TextColor2 = RGB(2, 200, 81);
+				s.Alpha = 128;//9;
+
+				s.Num = 100;
+				s.Margin = 20;
 				
 				w = StartDesktopWatermark(&s);
 

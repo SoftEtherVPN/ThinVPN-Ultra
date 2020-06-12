@@ -367,6 +367,13 @@ struct MD
 	UINT Size;
 };
 
+// Seed based rand
+struct SEEDRAND
+{
+	UCHAR InitialSeed[SHA1_SIZE];
+	UINT64 CurrentCounter;
+};
+
 
 // Lock of the OpenSSL
 extern LOCK **ssl_lock_obj;
@@ -390,6 +397,14 @@ USHORT Rand16();
 UCHAR Rand8();
 bool Rand1();
 UINT HashPtrToUINT(void *p);
+
+SEEDRAND *NewSeedRand(void *seed, UINT seed_size);
+void FreeSeedRand(SEEDRAND *r);
+UCHAR SeedRand8(SEEDRAND *r);
+void SeedRand(SEEDRAND *r, void *buf, UINT size);
+USHORT SeedRand16(SEEDRAND *r);
+UINT SeedRand32(SEEDRAND *r);
+UINT64 SeedRand64(SEEDRAND *r);
 
 void CertTest();
 BIO *BufToBio(BUF *b);

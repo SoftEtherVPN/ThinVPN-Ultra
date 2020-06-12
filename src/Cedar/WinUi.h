@@ -500,6 +500,9 @@ typedef struct DESKTOP_WATERMARK_SETTING
 	UINT TextColor1;
 	UINT TextColor2;
 	UINT Alpha;
+	UINT Num;
+	UINT Margin;
+	UINT RandSeed;
 } DESKTOP_WATERMARK_SETTING;
 
 // Watermark

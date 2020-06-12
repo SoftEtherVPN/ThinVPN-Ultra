@@ -4210,6 +4210,84 @@ BIO *BufToBio(BUF *b)
 	return bio;
 }
 
+// New seed rand
+SEEDRAND *NewSeedRand(void *seed, UINT seed_size)
+{
+	SEEDRAND *r = ZeroMalloc(sizeof(SEEDRAND));
+
+	if (seed == NULL || seed_size == 0)
+	{
+		HashSha1(r->InitialSeed, NULL, 0);
+	}
+	else
+	{
+		HashSha1(r->InitialSeed, seed, seed_size);
+	}
+
+	return r;
+}
+
+// Free seed rand
+void FreeSeedRand(SEEDRAND *r)
+{
+	if (r == NULL)
+	{
+		return;
+	}
+
+	Free(r);
+}
+
+// Get seed rand next byte
+UCHAR SeedRand8(SEEDRAND *r)
+{
+	UCHAR tmp[SHA1_SIZE + sizeof(UINT64)];
+	UCHAR hash[SHA1_SIZE];
+	if (r == NULL)
+	{
+		return 0;
+	}
+
+	Copy(tmp, r->InitialSeed, SHA1_SIZE);
+	WRITE_UINT64(tmp + SHA1_SIZE, r->CurrentCounter);
+
+	HashSha1(hash, tmp, sizeof(tmp));
+
+	r->CurrentCounter++;
+
+	return hash[0];
+}
+void SeedRand(SEEDRAND *r, void *buf, UINT size)
+{
+	UINT i;
+	if (buf == NULL || size == 0)
+	{
+		return;
+	}
+	for (i = 0;i < size;i++)
+	{
+		((UCHAR *)buf)[i] = SeedRand8(r);
+	}
+}
+USHORT SeedRand16(SEEDRAND *r)
+{
+	USHORT i;
+	SeedRand(r, &i, sizeof(i));
+	return i;
+}
+UINT SeedRand32(SEEDRAND *r)
+{
+	UINT i;
+	SeedRand(r, &i, sizeof(i));
+	return i;
+}
+UINT64 SeedRand64(SEEDRAND *r)
+{
+	UINT64 i;
+	SeedRand(r, &i, sizeof(i));
+	return i;
+}
+
 // 128-bit random number generation
 void Rand128(void *buf)
 {

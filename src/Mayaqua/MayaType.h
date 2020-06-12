@@ -442,6 +442,7 @@ typedef struct DH_CTX DH_CTX;
 typedef struct AES_KEY_VALUE AES_KEY_VALUE;
 typedef struct CIPHER CIPHER;
 typedef struct MD MD;
+typedef struct SEEDRAND SEEDRAND;
 
 // Secure.h
 typedef struct SECURE_DEVICE SECURE_DEVICE;

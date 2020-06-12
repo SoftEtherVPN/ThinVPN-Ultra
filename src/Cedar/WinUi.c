@@ -216,7 +216,7 @@ void DrawTextFont(HDC hDC, UINT x, UINT y, HFONT hFont, wchar_t *text, UINT form
 	SelectObject(hDC, hOld);
 }
 
-bool GetDrawTextFont(RECT *rect, HFONT hFont, wchar_t *text, UINT format)
+bool CalcDrawTextFontRect(RECT *rect, HFONT hFont, wchar_t *text, UINT format)
 {
 	RECT r;
 	bool ret = false;
@@ -291,20 +291,192 @@ void StopDesktopWatermark(DESKTOP_WATERMARK *d)
 	Free(d);
 }
 
-void DesktopWatermarkPaint(HDC hDC, DESKTOP_WATERMARK *d)
+bool DetermineIfWatermarkRectOverlapsExisting(LIST *o, UINT text_x, UINT text_y, UINT text_width, UINT text_height)
+{
+	UINT i;
+
+	for (i = 0;i < LIST_NUM(o);i++)
+	{
+		POINT *p = LIST_DATA(o, i);
+		RECT r1, r2, t;
+
+		SetRect(&r1, p->x, p->y, p->x + text_width, p->y + text_height);
+
+		SetRect(&r2, text_x, text_y, text_x + text_width, text_y + text_height);
+
+		if (IntersectRect(&t, &r1, &r2))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+LIST *GenerateRandomWatermarkPlacePointList(UINT width, UINT height, UINT num, DESKTOP_WATERMARK *d)
+{
+	DESKTOP_WATERMARK_SETTING *s = &d->Setting;
+	LIST *o = NewList(NULL);
+	RECT r1, r2;
+	UINT text_width, text_height;
+	SEEDRAND *seed;
+	BUF *seed_buf = NewBuf();
+	UINT i;
+
+	WriteBufStr(seed_buf, "HelloNekosan");
+	WriteBufInt(seed_buf, width);
+	WriteBufInt(seed_buf, height);
+	WriteBufInt(seed_buf, s->RandSeed);
+
+	seed = NewSeedRand(seed_buf->Buf, seed_buf->Size);
+
+	CalcDrawTextFontRect(&r1, d->Font1, s->Text1, 0);
+	CalcDrawTextFontRect(&r2, d->Font2, s->Text2, 0);
+
+	text_width = MAX(r1.right, r2.right);
+	text_height = r1.bottom + r2.bottom;
+
+	if (width > text_width && height > text_height)
+	{
+		for (i = 0;i < num;i++)
+		{
+			bool fail = true;
+			UINT num_retry = 30;
+
+			UINT k;
+
+			for (k = 0;k < num_retry;k++)
+			{
+				UINT x = SeedRand32(seed) % (width - text_width);
+				UINT y = SeedRand32(seed) % (height - text_height);
+
+				if (DetermineIfWatermarkRectOverlapsExisting(o, x, y, text_width + s->Margin, text_height + s->Margin) == false)
+				{
+					POINT *p = ZeroMalloc(sizeof(POINT));
+
+					p->x = x;
+					p->y = y;
+
+					Add(o, p);
+
+					fail = false;
+
+					break;
+				}
+			}
+
+			if (fail)
+			{
+				break;
+			}
+		}
+	}
+
+	FreeSeedRand(seed);
+
+	FreeBuf(seed_buf);
+
+	return o;
+}
+
+void DesktopWatermarkPaint(HDC hTarget, DESKTOP_WATERMARK *d)
 {
 	DESKTOP_WATERMARK_SETTING *s;
-	if (hDC == NULL || d == NULL)
+	HDC hDC;
+	HBITMAP hBM;
+	HWND hWnd;
+	RECT client_rect;
+	UINT width, height;
+	if (hTarget == NULL || d == NULL)
 	{
 		return;
 	}
 
 	s = &d->Setting;
 
-	SetBkColor(hDC, DESKTOP_WATERMARK_COLORKEY);
-	SetTextColor(hDC, s->TextColor1);
+	hWnd = WindowFromDC(hTarget);
 
-	DrawTextFont(hDC, 10, 10, d->Font1, s->Text1, 0);
+	if (GetClientRect(hWnd, &client_rect) == false)
+	{
+		return;
+	}
+
+	width = GET_ABS(client_rect.right - client_rect.left);
+	height = GET_ABS(client_rect.bottom - client_rect.top);
+
+	hDC = CreateCompatibleDC(hTarget);
+	if (hDC != NULL)
+	{
+		RECT rect;
+		HBRUSH hBrush;
+		UINT i;
+		UINT num = s->Num;
+		LIST *o;
+
+		RECT r1;
+
+		hBM = CreateCompatibleBitmap(hTarget, 1920, 1200);
+
+		hBrush = CreateSolidBrush(DESKTOP_WATERMARK_COLORKEY);
+
+		Zero(&rect, sizeof(rect));
+		SetRect(&rect, 0, 0, 1920, 1200);
+
+		SelectObject(hDC, hBM);
+
+		FillRect(hDC, &rect, hBrush);
+
+		SetBkColor(hDC, DESKTOP_WATERMARK_COLORKEY);
+		SetBkMode(hDC, TRANSPARENT);
+
+		SetTextColor(hDC, s->TextColor1);
+
+		CalcDrawTextFontRect(&r1, d->Font1, s->Text1, 0);
+
+		o = GenerateRandomWatermarkPlacePointList(1920, 1200, num, d);
+		if (o != NULL)
+		{
+			for (i = 0;i < LIST_NUM(o);i++)
+			{
+				POINT *p = LIST_DATA(o, i);
+
+				DrawTextFont(hDC, p->x, p->y, d->Font1, s->Text1, 0);
+				DrawTextFont(hDC, p->x, p->y + r1.bottom, d->Font2, s->Text2, 0);
+			}
+
+			ReleaseIntList(o);
+		}
+
+		BitBlt(hTarget, 0, 0, 1920, 1200, hDC, 0, 0, SRCCOPY);
+
+		GdiFlush();
+
+		DeleteDC(hDC);
+		DeleteObject(hBM);
+		DeleteObject(hBrush);
+	}
+}
+
+bool DesktopWatermarkUpdateScreenSize(HWND hWnd, DESKTOP_WATERMARK *d)
+{
+	RECT rect;
+	HWND hDeskWnd = GetDesktopWindow();
+	if (hWnd == NULL || d == NULL)
+	{
+		return false;
+	}
+	if (hDeskWnd == NULL)
+	{
+		return false;
+	}
+	if (GetWindowRect(hDeskWnd, &rect) == false)
+	{
+		return false;
+	}
+
+	Print("%u %u %u %u\n", rect.left, rect.top, rect.right, rect.bottom);
+
+	return true;
 }
 
 // Desktop watermark window proc
@@ -329,6 +501,8 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 		cs = (CREATESTRUCT *)lParam;
 		d = (DESKTOP_WATERMARK *)cs->lpCreateParams;
 		SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)d);
+
+		DesktopWatermarkUpdateScreenSize(hWnd, d);
 
 		ShowWindow(hWnd, SW_SHOWNORMAL);
 
@@ -404,7 +578,7 @@ void DesktopWatermarkThread(THREAD *thread, void *param)
 		WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST,
 		wndclass_name, d->Setting.WindowTitle,
 		WS_POPUP,
-		240, 240, 1024, 768,
+		0, 0, 1920, 1200,
 		NULL, NULL, MsGetCurrentInstanceHandle(), d);
 
 	SetLayeredWindowAttributes(hWnd, DESKTOP_WATERMARK_COLORKEY, d->Setting.Alpha, LWA_COLORKEY | LWA_ALPHA);
