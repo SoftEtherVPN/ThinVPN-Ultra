@@ -210,6 +210,7 @@ struct SOCKIO
 	UINT64 ServerMask64;
 	PACK *InitialPack;					// Initial Pack
 	IP ClientLocalIP;					// クライアント側で見たローカル IP
+	IP ServerLocalIP;					// サーバー側で見たローカル IP
 };
 
 // 以前使用されたトンネル ID の一覧

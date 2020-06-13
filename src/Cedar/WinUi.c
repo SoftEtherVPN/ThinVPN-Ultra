@@ -365,7 +365,7 @@ LIST *GenerateRandomWatermarkPlacePointList(UINT width, UINT height, DESKTOP_WAT
 		for (i = 0;;i++)
 		{
 			bool fail = true;
-			UINT num_retry = 100;
+			UINT num_retry = 300;
 
 			UINT k;
 

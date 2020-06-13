@@ -384,6 +384,8 @@ void WtsNewTunnelThread(THREAD *thread, void *param)
 
 	SockIoRecvAll(p->SockIo, &zero, sizeof(UINT));
 
+	CopyIP(&p->SockIo->ServerLocalIP, &p->Session->ServerLocalIP);
+
 	p->Session->AcceptProc(thread, p->SockIo, p->Session->AcceptProcParam);
 
 	SockIoDisconnect(p->SockIo);
@@ -622,6 +624,8 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 	session->GateTcp->MultiplexMode = true;
 
 	SetTimeout(s, TIMEOUT_INFINITE);
+
+	CopyIP(&session->ServerLocalIP, &s->LocalIP);
 
 	Debug("Connected.\n");
 

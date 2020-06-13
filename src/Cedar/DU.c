@@ -2070,16 +2070,16 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 						set.RandSeed = Rand32();
 
 						StrCpy(set.FontName1, 0, "Meiryo UI");
-						set.FontSize1 = 20;
+						set.FontSize1 = 14;
 
 						StrCpy(set.FontName2, 0, "Meiryo UI");
-						set.FontSize2 = 12;
+						set.FontSize2 = 9;
 
 						set.TextColor1 = RGB(2, 200, 81);
 						set.TextColor2 = RGB(2, 200, 81);
-						set.Alpha = 128;//128;//9;
+						set.Alpha = 24;//192;//128;//9;
 
-						set.Margin = 20;
+						set.Margin = 15;
 
 						water = StartDesktopWatermark(&set);
 					}

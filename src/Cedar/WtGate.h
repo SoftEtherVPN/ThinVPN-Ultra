@@ -109,6 +109,7 @@ struct TSESSION
 	// Client / Server 共通
 	TTCP *GateTcp;						// Gate 側 TCP コネクション
 	SOCK *Sock;							// ソケット
+	IP ServerLocalIP;					// サーバー側で見たローカル IP
 };
 
 // HTTP プロキシ
