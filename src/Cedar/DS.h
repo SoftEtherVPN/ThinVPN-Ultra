@@ -143,6 +143,9 @@ struct DS
 	bool RdpEnableOptimizer;
 	char RdpStopServicesList[MAX_PATH];
 
+	bool ShowWatermark;
+	wchar_t WatermarkStr[MAX_PATH];
+
 	DS_POLICY_CLIENT *PolicyClient;		// ポリシークライアント
 
 	bool EnableWoLTarget;

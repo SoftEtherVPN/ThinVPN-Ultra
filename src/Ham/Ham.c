@@ -964,13 +964,12 @@ void test(UINT num, char **arg)
 				s.FontSize1 = 32;
 
 				StrCpy(s.FontName2, 0, "Meiryo UI");
-				s.FontSize2 = 16;
+				s.FontSize2 = 20;
 
 				s.TextColor1 = RGB(2, 200, 81);
 				s.TextColor2 = RGB(2, 200, 81);
-				s.Alpha = 128;//9;
+				s.Alpha = 128;//128;//9;
 
-				s.Num = 100;
 				s.Margin = 20;
 				
 				w = StartDesktopWatermark(&s);

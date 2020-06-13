@@ -75,6 +75,9 @@ struct RPC_DS_CONFIG
 	bool RdpEnableOptimizer;
 	char RdpStopServicesList[MAX_PATH];
 
+	bool ShowWatermark;
+	wchar_t WatermarkStr[MAX_PATH];
+
 	bool EnableWoLTarget;
 	bool EnableWoLTrigger;
 };

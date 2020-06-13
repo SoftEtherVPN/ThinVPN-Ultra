@@ -209,6 +209,7 @@ struct SOCKIO
 	UINT UserData1, UserData2, UserData3, UserData4, UserData5, UserData6;	// ユーザーデータ
 	UINT64 ServerMask64;
 	PACK *InitialPack;					// Initial Pack
+	IP ClientLocalIP;					// クライアント側で見たローカル IP
 };
 
 // 以前使用されたトンネル ID の一覧

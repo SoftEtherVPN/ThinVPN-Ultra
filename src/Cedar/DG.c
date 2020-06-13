@@ -906,6 +906,9 @@ void DgOptionDlgOnOk(HWND hWnd, DG *dg)
 	c.RdpEnableOptimizer = IsChecked(hWnd, B_RDP_OPTIMIZE);
 	GetTxtA(hWnd, E_STOPSVC, c.RdpStopServicesList, sizeof(c.RdpStopServicesList));
 
+	c.ShowWatermark = IsChecked(hWnd, C_SHOW_WATERMARK);
+	GetTxt(hWnd, E_WATERMARK_STR, c.WatermarkStr, sizeof(c.WatermarkStr));
+
 	if (CALL(hWnd, DtcSetConfig(dg->Rpc, &c)) == false)
 	{
 		return;
@@ -1017,6 +1020,10 @@ void DgOptionDlgInit(HWND hWnd, DG *dg)
 	}
 
 	SetEnable(hWnd, C_EVENTLOG, s.SupportEventLog);
+
+	// 透かし
+	Check(hWnd, C_SHOW_WATERMARK, c.ShowWatermark);
+	SetText(hWnd, E_WATERMARK_STR, c.WatermarkStr);
 
 #ifdef	DESK_DISABLE_NEW_FEATURE
 	Hide(hWnd, C_EVENTLOG);
@@ -1153,6 +1160,16 @@ void DgOptionDlgUpdate(HWND hWnd, DG *dg)
 	SetEnable(hWnd, E_SYSLOG_PORT, b2);
 
 	SetEnable(hWnd, IDOK, b);
+
+	// 透かし
+	if (IsChecked(hWnd, C_SHOW_WATERMARK))
+	{
+		SetEnable(hWnd, E_WATERMARK_STR, true);
+	}
+	else
+	{
+		SetEnable(hWnd, E_WATERMARK_STR, false);
+	}
 }
 
 // オプションダイアログプロシージャ
@@ -1189,6 +1206,14 @@ UINT DgOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 
 		case IDCANCEL:
 			Close(hWnd);
+			break;
+
+		case C_SHOW_WATERMARK:
+			DgOptionDlgUpdate(hWnd, dg);
+			if (IsChecked(hWnd, C_SHOW_WATERMARK))
+			{
+				FocusEx(hWnd, E_WATERMARK_STR);
+			}
 			break;
 
 		case B_RDP:

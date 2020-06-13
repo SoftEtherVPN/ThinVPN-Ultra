@@ -969,10 +969,14 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bool support_otp_enforcement = false;
 	bool is_smartcard_auth = false;
 	bool support_inspect = false;
+	bool support_watermark = false;
 	UINT ds_caps = 0;
 	UINT urdp_version = 0;
 	DS_POLICY_BODY pol = {0};
 	bool run_inspect = false;
+	wchar_t computer_name[MAX_PATH];
+	wchar_t user_name[MAX_PATH];
+	IP client_local_ip = {0};
 	// 引数チェック
 	if (ds == NULL || sock == NULL)
 	{
@@ -1035,6 +1039,11 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	support_otp = PackGetBool(p, "SupportOtp");
 	support_otp_enforcement = PackGetBool(p, "SupportOtpEnforcement");
 	support_inspect = PackGetBool(p, "SupportInspect");
+
+	support_watermark = PackGetBool(p, "SupportWatermark");
+	PackGetUniStr(p, "ComputerName", computer_name, sizeof(computer_name));
+	PackGetUniStr(p, "UserName", user_name, sizeof(user_name));
+	PackGetIp(p, "ClientLocalIP", &client_local_ip);
 
 	if (MsIsWinXPOrWinVista() == false)
 	{
@@ -1115,6 +1124,13 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	if (ds->EnableOtp && support_otp == false)
 	{
 		// OTP が有効なのにクライアントが OTP 非サポート
+		DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+		return;
+	}
+
+	if (ds->ShowWatermark && support_watermark == false)
+	{
+		// 透かしが有効なのにクライアントが透かし非サポート
 		DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
 		return;
 	}
@@ -1280,6 +1296,31 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	if (MsIsRemoteDesktopAvailable() && MsIsRemoteDesktopEnabled())
 	{
 		ds_caps |= DS_CAPS_WIN_RDP_ENABLED;
+	}
+
+	if (ds->ShowWatermark)
+	{
+		wchar_t tmp[MAX_SIZE];
+		wchar_t dtstr[MAX_PATH];
+		wchar_t this_machine_name[MAX_PATH];
+		IP this_machine_ip;
+
+		SetIP(&this_machine_ip, 1,2,3,4);
+
+		MsGetComputerNameFullEx(this_machine_name, sizeof(this_machine_name), true);
+
+		GetDateTimeStrEx64(dtstr, sizeof(dtstr), LocalTime64(), NULL);
+
+		// 透かし文字列を生成
+		PackAddUniStr(p, "WatermarkStr1", ds->WatermarkStr);
+
+		UniFormat(tmp, sizeof(tmp), _UU("DU_FELONY_STR2"),
+			dtstr, this_machine_name, &this_machine_ip,
+			computer_name, client_host,
+			&client_ip, &client_local_ip,
+			user_name);
+
+		PackAddUniStr(p, "WatermarkStr2", tmp);
 	}
 
 	PackAddInt(p, "DsCaps", ds_caps);
@@ -2649,6 +2690,9 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 	ds->RdpEnableOptimizer = t->RdpEnableOptimizer;
 	StrCpy(ds->RdpStopServicesList, sizeof(ds->RdpStopServicesList), t->RdpStopServicesList);
 
+	ds->ShowWatermark = t->ShowWatermark;
+	UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), t->WatermarkStr);
+
 	ds->EnableWoLTarget = t->EnableWoLTarget;
 	ds->EnableWoLTrigger = t->EnableWoLTrigger;
 
@@ -2705,6 +2749,9 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 	UniStrCpy(t->RdpGroupKeepUserName, sizeof(t->RdpGroupKeepUserName), ds->RdpGroupKeepUserName);
 	t->RdpEnableOptimizer = ds->RdpEnableOptimizer;
 	StrCpy(t->RdpStopServicesList, sizeof(t->RdpStopServicesList), ds->RdpStopServicesList);
+
+	t->ShowWatermark = ds->ShowWatermark;
+	UniStrCpy(t->WatermarkStr, sizeof(t->WatermarkStr), ds->WatermarkStr);
 
 	t->EnableWoLTarget = ds->EnableWoLTarget;
 	t->EnableWoLTrigger = ds->EnableWoLTrigger;
@@ -3144,6 +3191,8 @@ void DsInitDefaultConfig(DS *ds)
 	ds->RdpEnableGroupKeeper = true;
 	ds->RdpEnableOptimizer = true;
 
+	UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), _UU("DU_FELONY_STR1"));
+
 	WideSetDontCheckCert(ds->Wide, false);
 
 	DsNormalizeConfig(ds, true);
@@ -3207,6 +3256,11 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 	if (StrLen(ds->EmergencyOtp) < DS_EMERGENCY_OTP_LENGTH)
 	{
 		DsGenerateNewOtp(ds->EmergencyOtp, sizeof(ds->EmergencyOtp), DS_EMERGENCY_OTP_LENGTH);
+	}
+
+	if (UniIsEmptyStr(ds->WatermarkStr))
+	{
+		UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), _UU("DU_FELONY_STR1"));
 	}
 
 #endif  // OS_WIN32
@@ -3279,6 +3333,13 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 	CfgGetUniStr(root, "RdpGroupKeepUserName", ds->RdpGroupKeepUserName, sizeof(ds->RdpGroupKeepUserName));
 	ds->RdpEnableOptimizer = CfgGetBoolEx(root, "RdpEnableOptimizer", true);
 	CfgGetStr(root, "RdpStopServicesList", ds->RdpStopServicesList, sizeof(ds->RdpStopServicesList));
+
+	ds->ShowWatermark = CfgGetBool(root, "ShowWatermark");
+	CfgGetUniStr(root, "WatermarkStr", ds->WatermarkStr, sizeof(ds->WatermarkStr));
+	if (UniIsEmptyStr(ds->WatermarkStr))
+	{
+		UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), _UU("DU_FELONY_STR1"));
+	}
 
 	Zero(ds->HashedPassword, SHA1_SIZE);
 	CfgGetByte(root, "HashedPassword", ds->HashedPassword, SHA1_SIZE);
@@ -3435,6 +3496,9 @@ FOLDER *DsSaveConfigMain(DS *ds)
 	CfgAddUniStr(root, "RdpGroupKeepUserName", ds->RdpGroupKeepUserName);
 	CfgAddBool(root, "RdpEnableOptimizer", ds->RdpEnableOptimizer);
 	CfgAddStr(root, "RdpStopServicesList", ds->RdpStopServicesList);
+
+	CfgAddBool(root, "ShowWatermark", ds->ShowWatermark);
+	CfgAddUniStr(root, "WatermarkStr", ds->WatermarkStr);
 
 	CfgAddUniStr(root, "AdminUsername", ds->AdminUsername);
 

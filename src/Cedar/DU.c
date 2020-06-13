@@ -1865,6 +1865,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 	DC *dc;
 	UINT ret;
 	wchar_t lifetime_msg[MAX_PATH] = {0};
+	DESKTOP_WATERMARK *water = NULL;
 	// 引数チェック
 	if (hWnd == NULL || t == NULL || pcid == NULL)
 	{
@@ -2055,6 +2056,34 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 					Hide(hWnd, 0);
 					Hide(t->hWnd, 0);
 
+					if (UniIsEmptyStr(s->WatermarkStr1) == false)
+					{
+						// 透かしを描画
+						DESKTOP_WATERMARK_SETTING set;
+
+						Zero(&set, sizeof(set));
+						StrCpy(set.WindowTitle, sizeof(set.WindowTitle), "Thin Telework Watermark");
+
+						UniStrCpy(set.Text1, 0, s->WatermarkStr1);
+						UniStrCpy(set.Text2, 0, s->WatermarkStr2);
+
+						set.RandSeed = Rand32();
+
+						StrCpy(set.FontName1, 0, "Meiryo UI");
+						set.FontSize1 = 20;
+
+						StrCpy(set.FontName2, 0, "Meiryo UI");
+						set.FontSize2 = 12;
+
+						set.TextColor1 = RGB(2, 200, 81);
+						set.TextColor2 = RGB(2, 200, 81);
+						set.Alpha = 128;//128;//9;
+
+						set.Margin = 20;
+
+						water = StartDesktopWatermark(&set);
+					}
+
 					if (s->LifeTime != 0 && s->LifeTime < INFINITE)
 					{
 						// 有効期限あり
@@ -2063,6 +2092,11 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 					// プロセスが終了 or タイムアウト するまで待つ
 					timeouted = !DcWaitForProcessExit(process, timeout, need_to_watch_gov_fw);
+
+					if (water != NULL)
+					{
+						StopDesktopWatermark(water);
+					}
 
 					if (msg != NULL)
 					{

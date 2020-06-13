@@ -500,7 +500,6 @@ typedef struct DESKTOP_WATERMARK_SETTING
 	UINT TextColor1;
 	UINT TextColor2;
 	UINT Alpha;
-	UINT Num;
 	UINT Margin;
 	UINT RandSeed;
 } DESKTOP_WATERMARK_SETTING;
@@ -512,6 +511,7 @@ typedef struct DESKTOP_WATERMARK
 	HWND hWnd;
 	DESKTOP_WATERMARK_SETTING Setting;
 	HFONT Font1, Font2;
+	volatile bool Halt;
 } DESKTOP_WATERMARK;
 
 #define DESKTOP_WATERMARK_COLORKEY	RGB(12,34,56)

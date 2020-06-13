@@ -2701,11 +2701,14 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	UINT64 lifetime = 0;
 	wchar_t lifetime_msg[MAX_PATH];
 	bool is_server_limited_mode = false;
+	wchar_t computer_name[MAX_PATH];
 	// 引数チェック
 	if (dc == NULL || sock == NULL || pcid == NULL || auth_callback == NULL)
 	{
 		return ERR_INTERNAL_ERROR;
 	}
+
+	MsGetComputerNameFullEx(computer_name, sizeof(computer_name), true);
 
 	SockIoSetTimeout(sock, DS_PROTOCOL_CONNECTING_TIMEOUT);
 
@@ -2722,6 +2725,10 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	PackAddBool(p, "SupportOtp", true);
 	PackAddBool(p, "SupportOtpEnforcement", true);
 	PackAddBool(p, "SupportInspect", true);
+	PackAddIp(p, "ClientLocalIP", &sock->ClientLocalIP);
+	PackAddUniStr(p, "UserName", MsGetUserNameExW());
+	PackAddUniStr(p, "ComputerName", computer_name);
+	PackAddBool(p, "SupportWatermark", true);
 	b = SockIoSendPack(sock, p);
 	FreePack(p);
 
@@ -2751,6 +2758,12 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 
 	lifetime = PackGetInt64(p, "Lifetime");
 	PackGetUniStr(p, "LifeTimeMsg", lifetime_msg, sizeof(lifetime_msg));
+
+	if (first_connection)
+	{
+		PackGetUniStr(p, "WatermarkStr1", dcs->WatermarkStr1, sizeof(dcs->WatermarkStr1));
+		PackGetUniStr(p, "WatermarkStr2", dcs->WatermarkStr2, sizeof(dcs->WatermarkStr2));
+	}
 
 	FreePack(p);
 	if (ret != ERR_NO_ERROR)

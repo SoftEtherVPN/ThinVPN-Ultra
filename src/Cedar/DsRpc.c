@@ -49,6 +49,9 @@ void InRpcDsConfig(RPC_DS_CONFIG *t, PACK *p)
 	t->RdpEnableOptimizer = PackGetBool(p, "RdpEnableOptimizer");
 	PackGetStr(p, "RdpStopServicesList", t->RdpStopServicesList, sizeof(t->RdpStopServicesList));
 
+	t->ShowWatermark = PackGetBool(p, "ShowWatermark");
+	PackGetUniStr(p, "WatermarkStr", t->WatermarkStr, sizeof(t->WatermarkStr));
+
 	t->EnableWoLTarget = PackGetBool(p, "EnableWoLTarget");
 	t->EnableWoLTrigger = PackGetBool(p, "EnableWoLTrigger");
 }
@@ -84,6 +87,9 @@ void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 	PackAddUniStr(p, "RdpGroupKeepUserName", t->RdpGroupKeepUserName);
 	PackAddBool(p, "RdpEnableOptimizer", t->RdpEnableOptimizer);
 	PackAddStr(p, "RdpStopServicesList", t->RdpStopServicesList);
+
+	PackAddBool(p, "ShowWatermark", t->ShowWatermark);
+	PackAddUniStr(p, "WatermarkStr", t->WatermarkStr);
 
 	PackAddBool(p, "EnableWoLTarget", t->EnableWoLTarget);
 	PackAddBool(p, "EnableWoLTrigger", t->EnableWoLTrigger);

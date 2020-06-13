@@ -892,6 +892,7 @@
 #define S_16                            1382
 #define E_URL                           1382
 #define E_ABUSE                         1382
+#define E_WATERMARK_STR                 1382
 #define S_17                            1383
 #define E_MSG                           1383
 #define S_24                            1384
@@ -918,6 +919,7 @@
 #define S_STATIC11                      1403
 #define S_STATIC1                       1404
 #define S_STATIC6                       1405
+#define S_STATIC16                      1405
 #define S_STATIC8                       1406
 #define S_STATIC9                       1407
 #define S_STATIC10                      1408
@@ -1298,6 +1300,8 @@
 #define C_SHARE_CAMERA2                 2603
 #define C_SHARE_AUDIOREC                2603
 #define S_S3                            2604
+#define C_WATERMARK                     2604
+#define C_SHOW_WATERMARK                2604
 #define S_S2                            2605
 #define S_S10                           2606
 #define S_S11                           2607
