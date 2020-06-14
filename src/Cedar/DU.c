@@ -285,7 +285,10 @@ UINT DuGovFw2DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		{
 		case IDOK:
 		case IDCANCEL:
-			Close(hWnd);
+			if (MsgBox(hWnd, MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION, _UU("DU_GOV_FW_CLOSE_MSG")) == IDYES)
+			{
+				Close(hWnd);
+			}
 			break;
 		}
 

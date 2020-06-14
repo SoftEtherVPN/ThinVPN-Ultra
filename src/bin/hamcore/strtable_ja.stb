@@ -420,6 +420,7 @@ DU_WOL_MSG				ターゲットコンピュータ ID '%S' の MAC アドレスに�
 
 DU_GOV_FW_MANDATE_MSG	接続先のシン・テレワークシステム サーバーでは、完全閉域化ファイアウォール機能を利用しない場合、通信が許可されません。接続を中断しますか?
 DU_GOV_FW_MANDATE_CLOSE_BUTTON	いいえ (接続を中断)
+DU_GOV_FW_CLOSE_MSG		完全閉域化ファイアウォールを終了しますか?
 
 DU_FELONY_STR1			画面撮影・情報持出等のフェロニー行為禁止！
 DU_FELONY_STR2			シン・テレワーク作業中 ログイン日時: %s\r\n%S\r\nサーバー端末: %s (IP: %r)\r\nクライアント端末: %s (%S)\r\nクライアント IP: %r/%r\r\nユーザー名: %s\r\n%S
