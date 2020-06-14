@@ -1941,7 +1941,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 		if (s->IsLimitedMode && dc->DisableLimitedFw == false)
 		{
-			// 接続先サーバーが「行政システム適合モード」の場合はファイアウォールを
+			// 接続先サーバーが「行政システム適応モード」の場合はファイアウォールを
 			// 勧める画面を表示する
 			if (MsIsVista())
 			{

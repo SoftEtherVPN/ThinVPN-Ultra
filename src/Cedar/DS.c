@@ -1001,7 +1001,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 	if (pol.EnforceOtp && IsEmptyStr(pol.EnforceOtpEndWith) == false)
 	{
-		// OTP 強制かつ末尾強制の場合は、適合しないメールアドレスが設定
+		// OTP 強制かつ末尾強制の場合は、適応しないメールアドレスが設定
 		// されている場合は削除する
 		if (EndWith(ds->OtpEmail, pol.EnforceOtpEndWith) == false)
 		{

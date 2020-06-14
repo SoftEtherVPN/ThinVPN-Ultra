@@ -109,7 +109,7 @@
 #define DS_MASK_POLICY_ENFORCED			32		// ポリシー強制
 #define	DS_MASK_OTP_ENABLED				64		// OTP が有効
 #define DS_MASK_SUPPORT_WOL_TRIGGER		128		// WOL トリガーをサポート
-#define DS_MASK_IS_LIMITED_MODE			256		// 行政情報システム適合モード (Wide Controller が勝手に付ける)
+#define DS_MASK_IS_LIMITED_MODE			256		// 行政情報システム適応モード (Wide Controller が勝手に付ける)
 
 
 

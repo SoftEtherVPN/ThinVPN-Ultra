@@ -3122,7 +3122,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	dcs->LifeTime = lifetime;
 	UniStrCpy(dcs->LifeTimeMsg, sizeof(dcs->LifeTimeMsg), lifetime_msg);
 
-	// 接続先サーバーが行政情報システム適合モードか?
+	// 接続先サーバーが行政情報システム適応モードか?
 	if (sock->ServerMask64 & DS_MASK_IS_LIMITED_MODE)
 	{
 		is_server_limited_mode = true;
