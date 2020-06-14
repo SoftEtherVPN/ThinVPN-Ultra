@@ -422,7 +422,10 @@ DU_GOV_FW_MANDATE_MSG	接続先のシン・テレワークシステム サーバ
 DU_GOV_FW_MANDATE_CLOSE_BUTTON	いいえ (接続を中断)
 
 DU_FELONY_STR1			画面撮影・情報持出等のフェロニー行為禁止！
-DU_FELONY_STR2			テレワーク作業中 ログイン日時: %s\r\nサーバー端末: %s (IP: %r)\r\nクライアント端末: %s (%S)\r\nクライアント IP: %r/%r\r\nユーザー名: %s
+DU_FELONY_STR2			シン・テレワーク作業中 ログイン日時: %s\r\n%S\r\nサーバー端末: %s (IP: %r)\r\nクライアント端末: %s (%S)\r\nクライアント IP: %r/%r\r\nユーザー名: %s\r\n%S
+DU_FELONY_FONT_XP		MS UI Gothic
+DU_FELONY_FONT_7		Meiryo UI
+
 
 
 # シン・テレワークシステム サーバー管理ツール関係

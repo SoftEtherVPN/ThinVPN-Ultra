@@ -189,6 +189,8 @@ struct DS_POLICY_BODY
 	bool EnforceInspection;
 	bool EnforceMacCheck;
 	char EnforceOtpEndWith[64];
+	bool EnforceWatermark;
+	wchar_t WatermarkMessage[MAX_SIZE];
 	char SyslogHostname[MAX_PATH];
 	UINT SyslogPort;
 };

@@ -2060,6 +2060,12 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 					{
 						// 透かしを描画
 						DESKTOP_WATERMARK_SETTING set;
+						char *font_name = _SS("DU_FELONY_FONT_XP");
+
+						if (MsIsWindows7())
+						{
+							font_name = _SS("DU_FELONY_FONT_7");
+						}
 
 						Zero(&set, sizeof(set));
 						StrCpy(set.WindowTitle, sizeof(set.WindowTitle), "Thin Telework Watermark");
@@ -2069,10 +2075,10 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 						set.RandSeed = Rand32();
 
-						StrCpy(set.FontName1, 0, "Meiryo UI");
 						set.FontSize1 = 14;
 
-						StrCpy(set.FontName2, 0, "Meiryo UI");
+						StrCpy(set.FontName1, 0, font_name);
+						StrCpy(set.FontName2, 0, font_name);
 						set.FontSize2 = 9;
 
 						set.TextColor1 = RGB(2, 200, 81);

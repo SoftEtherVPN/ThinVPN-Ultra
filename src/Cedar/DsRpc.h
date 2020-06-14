@@ -39,6 +39,7 @@ struct RPC_DS_STATUS
 	char OtpEndWith[64];
 	bool EnforceInspection;
 	bool EnforceMacCheck;
+	bool EnforceWatermark;
 	bool IsAdminOrSystem;
 };
 

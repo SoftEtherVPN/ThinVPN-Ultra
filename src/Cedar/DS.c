@@ -114,6 +114,17 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 		}
 	}
 
+	b->EnforceWatermark = IniIntValue(o, "ENFORCE_WATERMARK");
+	if (b->EnforceWatermark)
+	{
+		ws = IniUniStrValue(o, "WATERMARK_MESSAGE");
+		if (UniIsEmptyStr(ws) == false)
+		{
+			UniStrCpy(b->WatermarkMessage, sizeof(b->WatermarkMessage), ws);
+			b->WatermarkMessage[40] = 0;
+		}
+	}
+
 	s = IniStrValue(o, "ENFORCE_OTP_ENDWITH");
 	s_hash = IniStrValue(o, "ENFORCE_OTP_ENDWITH_SECURITY");
 	if (IsEmptyStr(s) == false && IsEmptyStr(s_hash) == false)
@@ -1304,6 +1315,14 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		wchar_t dtstr[MAX_PATH];
 		wchar_t this_machine_name[MAX_PATH];
 		IP this_machine_ip;
+		char hash[128];
+		UCHAR hash2[SHA1_SIZE];
+		char hash_str[128];
+
+		WideServerGetHash(ds->Wide, hash, sizeof(hash));
+		HashSha1(hash2, hash, StrLen(hash));
+
+		BinToStr(hash_str, sizeof(hash_str), hash2, sizeof(hash2));
 
 		CopyIP(&this_machine_ip, &sock->ServerLocalIP);
 
@@ -1326,10 +1345,10 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		}
 
 		UniFormat(tmp, sizeof(tmp), _UU("DU_FELONY_STR2"),
-			dtstr, this_machine_name, &this_machine_ip,
+			dtstr, hash_str, this_machine_name, &this_machine_ip,
 			computer_name, client_host,
 			&client_ip, &client_local_ip,
-			user_name);
+			user_name, hash_str);
 
 		PackAddUniStr(p, "WatermarkStr2", tmp);
 	}
@@ -2557,6 +2576,8 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 
 		t->EnforceInspection = pol.EnforceInspection;
 		t->EnforceMacCheck = pol.EnforceMacCheck;
+
+		t->EnforceWatermark = pol.EnforceWatermark;
 	}
 	else
 	{
@@ -3261,6 +3282,16 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 		if (pol.EnforceMacCheck)
 		{
 			ds->EnableMacCheck = true;
+		}
+
+		if (pol.EnforceWatermark)
+		{
+			ds->ShowWatermark = true;
+
+			if (UniIsEmptyStr(pol.WatermarkMessage) == false)
+			{
+				UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), pol.WatermarkMessage);
+			}
 		}
 	}
 

@@ -1041,6 +1041,8 @@ void DgOptionDlgInit(HWND hWnd, DG *dg)
 
 	dg->IsAdminOrSystem_Cache = s.IsAdminOrSystem;
 
+	SetEnable(hWnd, C_SHOW_WATERMARK, !s.EnforceWatermark);
+
 	DgOptionDlgUpdate(hWnd, dg);
 }
 

@@ -171,6 +171,7 @@ void InRpcDsStatus(RPC_DS_STATUS *t, PACK *p)
 
 	t->EnforceInspection = PackGetBool(p, "EnforceInspection");
 	t->EnforceMacCheck = PackGetBool(p, "EnforceMacCheck");
+	t->EnforceWatermark = PackGetBool(p, "EnforceWatermark");
 
 	t->IsAdminOrSystem = PackGetBool(p, "IsAdminOrSystem");
 }
@@ -214,6 +215,7 @@ void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 
 	PackAddBool(p, "EnforceInspection", t->EnforceInspection);
 	PackAddBool(p, "EnforceMacCheck", t->EnforceMacCheck);
+	PackAddBool(p, "EnforceWatermark", t->EnforceWatermark);
 
 	PackAddBool(p, "IsAdminOrSystem", t->IsAdminOrSystem);
 }
