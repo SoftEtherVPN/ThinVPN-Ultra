@@ -37,7 +37,7 @@ UINT WpcCommCheck(WT *wt)
 // Entrance URL を取得 (キャッシュ付き)
 UINT WpcGetEntranceUrlEx(WT *wt, char *entrance, UINT entrance_size, UINT cache_expires, LIST *secondary_str_list)
 {
-	WideLoadEntryPoint(NULL, entrance, entrance_size, secondary_str_list);
+	WideLoadEntryPoint(NULL, entrance, entrance_size, secondary_str_list, NULL, 0);
 
 	return ERR_NO_ERROR;
 }

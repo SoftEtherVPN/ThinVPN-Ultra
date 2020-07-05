@@ -50,6 +50,13 @@
 // ポリシークライアント最大ファイルサイズ
 #define DS_POLICY_CLIENT_MAX_FILESIZE		4096
 
+// SERVER_ALLOWED_MAC_LIST_URL への接続タイムアウト
+#define DS_POLICY_SERVER_ALLOWED_MAC_LIST_URL_TIMEOUT	1000
+
+// SERVER_ALLOWED_MAC_LIST_URL のファイルサイズ最大
+#define DS_POLICY_SERVER_ALLOWED_MAC_LIST_URL_MAX_SIZE	(100 * 1024)
+
+
 // ポリシーサーバー関係定数
 #define DS_POLICY_INDOMAIN_SERVER_NAME	"thin-telework-policy-server"
 #define DS_POLICY_IP_SERVER_NAME		"10.255.255.127"
@@ -193,6 +200,7 @@ struct DS_POLICY_BODY
 	wchar_t WatermarkMessage[MAX_SIZE];
 	char SyslogHostname[MAX_PATH];
 	UINT SyslogPort;
+	char ServerAllowedMacListUrl[MAX_PATH];
 };
 
 struct DS_POLICY_CLIENT

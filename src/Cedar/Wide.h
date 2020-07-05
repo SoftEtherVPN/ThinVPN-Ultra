@@ -225,7 +225,7 @@ void WideSessionInfoCacheDel(LIST *o, char *pcid);
 LIST *WideInitSessionInfoCache();
 void WideFreeSessionInfoCache(LIST *o);
 
-void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_list);
+void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_list, char *mode, UINT mode_size);
 
 bool WideVerifyNewEntryPointAndSignature(X *master_x, BUF *ep, BUF *sign);
 BUF *WideTryDownloadAndVerifyNewEntryPoint(X *master_x, INTERNET_SETTING *setting, char *base_url, bool *cancel, WT *wt);

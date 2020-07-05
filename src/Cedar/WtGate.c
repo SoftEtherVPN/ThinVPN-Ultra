@@ -872,7 +872,7 @@ void WtgAccept(WT *wt, SOCK *s)
 
 	if (IsEmptyStr(wt->EntranceUrlForProxy))
 	{
-		WideLoadEntryPoint(NULL, wt->EntranceUrlForProxy, sizeof(wt->EntranceUrlForProxy), NULL);
+		WideLoadEntryPoint(NULL, wt->EntranceUrlForProxy, sizeof(wt->EntranceUrlForProxy), NULL, NULL, 0);
 	}
 
 	IPToStr(ip_str, sizeof(ip_str), &s->RemoteIP);

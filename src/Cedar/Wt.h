@@ -164,6 +164,7 @@ struct WT
 	WIDE *Wide;						// Wide へのポインタ
 	bool EnableUpdateEntryPoint;
 	UINT64 LastTryUpdateNewEntryPoint;	// 最後に GitHub から Entry Point 更新を試行した時刻
+	char EntranceMode[MAX_PATH];
 
 	// Gate 用
 	LISTENER *Listener;				// リスナー

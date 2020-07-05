@@ -3323,7 +3323,7 @@ bool WideServerLoadLocalKeyFromBuffer(BUF *buf, K **k, X **x)
 }
 
 // ローカルディレクトリの EnterPoint.txt を読み込む (2020 年改造の新方式)
-void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_list)
+void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_list, char *mode, UINT mode_size)
 {
 	char url_tmp[MAX_SIZE];
 	X *cert_tmp;
@@ -3334,6 +3334,8 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 	UINT64 secs = now / (UINT64)ENTRANCE_URL_TIME_UPDATE_MSECS;
 
 	BUF *buf = ReadDump(LOCAL_ENTRY_POINT_FILENAME);
+
+	StrCpy(mode, mode_size, "Normal");
 
 	Zero(url_tmp, sizeof(url_tmp));
 
@@ -3358,6 +3360,7 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 	while (true)
 	{
 		char *secondary_tag = "SECONDARY:[";
+		char *mode_tag = "MODE:";
 		char *line = CfgReadNextLine(buf);
 		if (line == NULL)
 		{
@@ -3391,6 +3394,14 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 				{
 					additional_secondary = true;
 				}
+			}
+
+			if (StartWith(line, mode_tag))
+			{
+				char tmp[MAX_PATH];
+				StrCpy(tmp, sizeof(tmp), line + StrLen(mode_tag));
+				Trim(tmp);
+				StrCpy(mode, mode_size, tmp);
 			}
 		}
 

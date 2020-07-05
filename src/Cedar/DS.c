@@ -102,6 +102,12 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 	b->EnforceMacCheck = IniIntValue(o, "ENFORCE_MACCHECK");
 	b->DisableShare = IniIntValue(o, "DISABLE_SHARE");
 
+	s = IniStrValue(o, "SERVER_ALLOWED_MAC_LIST_URL");
+	if (IsEmptyStr(s) == false)
+	{
+		StrCpy(b->ServerAllowedMacListUrl, sizeof(b->ServerAllowedMacListUrl), s);
+	}
+
 	s = IniStrValue(o, "SYSLOG_HOSTNAME");
 	if (IsEmptyStr(s) == false)
 	{
@@ -988,6 +994,8 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	wchar_t computer_name[MAX_PATH];
 	wchar_t user_name[MAX_PATH];
 	IP client_local_ip = {0};
+	bool server_allowed_mac_list_check_ok = true;
+	bool support_server_allowed_mac_list_err = false;
 	// 引数チェック
 	if (ds == NULL || sock == NULL)
 	{
@@ -998,6 +1006,44 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	DsNormalizeConfig(ds, false);
 
 	DsGetPolicy(ds, &pol);
+
+	if (IsEmptyStr(pol.ServerAllowedMacListUrl) == false)
+	{
+		// SERVER_ALLOWED_MAC_LIST_URL は行政情報システム適応モードのみ対応
+		if (InStr(ds->Wide->wt->EntranceMode, "limited"))
+		{
+			// SERVER_ALLOWED_MAC_LIST_URL が指定されているのでダウンロードを試みる
+			URL_DATA data;
+			if (ParseUrl(&data, pol.ServerAllowedMacListUrl, false, NULL))
+			{
+				UINT err = 0;
+				BUF *buf = HttpRequestEx5(&data, NULL,
+					DS_POLICY_SERVER_ALLOWED_MAC_LIST_URL_TIMEOUT,
+					DS_POLICY_SERVER_ALLOWED_MAC_LIST_URL_TIMEOUT,
+					&err, false, NULL, NULL, NULL, NULL, 0, NULL,
+					DS_POLICY_SERVER_ALLOWED_MAC_LIST_URL_MAX_SIZE,
+					NULL, NULL, NULL, false, true);
+
+				if (buf != NULL)
+				{
+					char local_mac_list[1024] = {0};
+
+					GetMacAddressListLocalComputer(local_mac_list, sizeof(local_mac_list));
+
+					SeekBufToEnd(buf);
+					WriteBufChar(buf, 0);
+
+					if (CheckStrListIncludedInOtherStrMac(buf->Buf, local_mac_list) == false)
+					{
+						// リストに ないですな
+						server_allowed_mac_list_check_ok = false;
+					}
+
+					FreeBuf(buf);
+				}
+			}
+		}
+	}
 
 	if (pol.EnforceOtp && IsEmptyStr(pol.EnforceOtpEndWith) == false)
 	{
@@ -1050,6 +1096,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	support_otp = PackGetBool(p, "SupportOtp");
 	support_otp_enforcement = PackGetBool(p, "SupportOtpEnforcement");
 	support_inspect = PackGetBool(p, "SupportInspect");
+	support_server_allowed_mac_list_err = PackGetBool(p, "SupportServerAllowedMacListErr");
 
 	support_watermark = PackGetBool(p, "SupportWatermark");
 	PackGetUniStr(p, "ComputerName", computer_name, sizeof(computer_name));
@@ -1067,6 +1114,14 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	}
 	Zero(bluetooth_mode_client_id, sizeof(bluetooth_mode_client_id));
 	PackGetData2(p, "bluetooth_mode_client_id", bluetooth_mode_client_id, sizeof(bluetooth_mode_client_id));
+
+	if (server_allowed_mac_list_check_ok == false)
+	{
+		// サーバー側 MAC アドレスチェック失敗
+		DsSendError(sock, support_server_allowed_mac_list_err ? ERR_DESK_SERVER_ALLOWED_MAC_LIST : ERR_DESK_UNKNOWN_AUTH_TYPE);
+		FreePack(p);
+		return;
+	}
 
 	if (wol_mode)
 	{

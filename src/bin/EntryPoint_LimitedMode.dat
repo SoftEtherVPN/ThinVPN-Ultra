@@ -34,7 +34,7 @@ IsrNWH7VSYQKD5mNri0FEaUHAU65oRFMKHHX/4xf+NOJ
 
 
 # 行政情報システム適応モード用 EntryPoint Config
-# Ver 2020/05/13
+# Ver 2020/07/05
 
 
 # 中継システムのロードバランサの「プライマリ URL」です。
@@ -50,4 +50,6 @@ https://load-balancer.thin-secure.cyber.ipa.go.jp/widecontrol/?flag=limited
 
 SECONDARY:[https://219.100.94.11/widecontrol/?flag=limited]
 SECONDARY:[https://219.100.94.1/widecontrol/?flag=limited]
+
+MODE:Limited
 
