@@ -2086,7 +2086,9 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 						set.TextColor1 = RGB(2, 200, 81);
 						set.TextColor2 = RGB(2, 200, 81);
-						set.Alpha = 24;//192;//128;//9;
+						set.Alpha = 20;//192;//128;//9;
+
+						//set.Alpha = 70;
 
 						set.Margin = 15;
 
