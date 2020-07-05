@@ -217,6 +217,17 @@ LIST *GetStrListFromLines(char *str)
 
 		if (IsEmptyStr(line) == false)
 		{
+			UINT comment_index = SearchStrEx(line, "#", 0, false);
+			if (comment_index != INFINITE)
+			{
+				line[comment_index] = 0;
+			}
+			comment_index = SearchStrEx(line, "//", 0, false);
+			if (comment_index != INFINITE)
+			{
+				line[comment_index] = 0;
+			}
+
 			Trim(line);
 
 			AddStrToStrListDistinct(o, line);
@@ -254,11 +265,25 @@ bool NormalizeMacAddressListStr(char *dst, UINT size, char *src)
 	{
 		char *line = CfgReadNextLine(buf);
 		UCHAR address[6];
+		UINT comment_index;
 
 		if (line == NULL)
 		{
 			break;
 		}
+
+		comment_index = SearchStrEx(line, "#", 0, false);
+		if (comment_index != INFINITE)
+		{
+			line[comment_index] = 0;
+		}
+		comment_index = SearchStrEx(line, "//", 0, false);
+		if (comment_index != INFINITE)
+		{
+			line[comment_index] = 0;
+		}
+
+		Trim(line);
 
 		if (StrToMac(address, line))
 		{
