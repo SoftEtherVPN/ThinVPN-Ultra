@@ -1524,7 +1524,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 268
         TOPMARGIN, 5
-        BOTTOMMARGIN, 293
+        BOTTOMMARGIN, 337
     END
 
     D_DU_INSPECT, DIALOG
@@ -5578,7 +5578,7 @@ BEGIN
     CONTROL         247,IDC_STATIC,"Static",SS_BITMAP,9,0,234,88
 END
 
-D_DG_MAC DIALOGEX 0, 0, 275, 298
+D_DG_MAC DIALOGEX 0, 0, 275, 342
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "クライアント MAC アドレス認証"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
@@ -5589,8 +5589,9 @@ BEGIN
     GROUPBOX        "MAC アドレスについて",IDC_STATIC,7,185,261,84
     ICON            ICO_INFORMATION,IDC_STATIC,14,197,20,20
     LTEXT           "「MAC アドレス」とは、端末に内蔵されているハードウェア固有のアドレスです。予めクライアントコンピュータの画面で確認しておいたものを、正確に入力する必要があります。1 文字でも異なっていると、接続が許可されません。\r\n\r\nクライアント端末の Windows の「コマンド プロンプト」を開き、\r\n> ipconfig /all\r\nと入力することで、MAC アドレスを確認できます。",S_INFO,39,198,222,64
-    DEFPUSHBUTTON   "&OK",IDOK,131,276,64,17
-    PUSHBUTTON      "キャンセル",IDCANCEL,203,276,64,17
+    DEFPUSHBUTTON   "&OK",IDOK,131,320,64,17
+    PUSHBUTTON      "キャンセル",IDCANCEL,203,320,64,17
+    LTEXT           "【システム管理者の方へ】\r\n「エンタープライズ環境用ポリシー規制サーバー」を社内 LAN 上に設置している場合は、当該ポリシーサーバーで MAC アドレスの一覧を定義し一元管理することもできます。詳しくは、シン・テレワークシステムの Web サイトをご参照ください。",S_MSG_3,7,275,261,38,WS_TABSTOP
 END
 
 D_DU_INSPECT DIALOGEX 0, 0, 267, 58
