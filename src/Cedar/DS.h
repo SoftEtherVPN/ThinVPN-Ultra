@@ -201,6 +201,7 @@ struct DS_POLICY_BODY
 	char SyslogHostname[MAX_PATH];
 	UINT SyslogPort;
 	char ServerAllowedMacListUrl[MAX_PATH];
+	char ClientAllowedMacListUrl[MAX_PATH];
 };
 
 struct DS_POLICY_CLIENT

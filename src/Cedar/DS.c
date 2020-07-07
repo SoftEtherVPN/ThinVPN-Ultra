@@ -108,6 +108,12 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 		StrCpy(b->ServerAllowedMacListUrl, sizeof(b->ServerAllowedMacListUrl), s);
 	}
 
+	s = IniStrValue(o, "CLIENT_ALLOWED_MAC_LIST_URL");
+	if (IsEmptyStr(s) == false)
+	{
+		StrCpy(b->ClientAllowedMacListUrl, sizeof(b->ClientAllowedMacListUrl), s);
+	}
+
 	s = IniStrValue(o, "SYSLOG_HOSTNAME");
 	if (IsEmptyStr(s) == false)
 	{
@@ -1548,12 +1554,48 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 					return;
 				}
 			}
+
 			if (ds->EnableMacCheck)
 			{
 				if (CheckStrListIncludedInOtherStrMac(ds->MacAddressList, ins.MacAddressList) == false)
 				{
-					DsSendError(sock, ERR_DESK_INSPECTION_MAC_ERROR);
-					return;
+					bool policy_server_based_mac_ok = false;
+
+					if (IsEmptyStr(pol.ClientAllowedMacListUrl) == false)
+					{
+						// SERVER_ALLOWED_MAC_LIST_URL が指定されているのでダウンロードを試みる
+						URL_DATA data;
+						if (ParseUrl(&data, pol.ClientAllowedMacListUrl, false, NULL))
+						{
+							UINT err = 0;
+							BUF *buf = HttpRequestEx5(&data, NULL,
+								DS_POLICY_SERVER_ALLOWED_MAC_LIST_URL_TIMEOUT,
+								DS_POLICY_SERVER_ALLOWED_MAC_LIST_URL_TIMEOUT,
+								&err, false, NULL, NULL, NULL, NULL, 0, NULL,
+								DS_POLICY_SERVER_ALLOWED_MAC_LIST_URL_MAX_SIZE,
+								NULL, NULL, NULL, false, true);
+
+							if (buf != NULL)
+							{
+								SeekBufToEnd(buf);
+								WriteBufChar(buf, 0);
+
+								if (CheckStrListIncludedInOtherStrMac(buf->Buf, ins.MacAddressList))
+								{
+									// リストに ありますな
+									policy_server_based_mac_ok = true;
+								}
+
+								FreeBuf(buf);
+							}
+						}
+					}
+
+					if (policy_server_based_mac_ok == false)
+					{
+						DsSendError(sock, ERR_DESK_INSPECTION_MAC_ERROR);
+						return;
+					}
 				}
 			}
 		}
