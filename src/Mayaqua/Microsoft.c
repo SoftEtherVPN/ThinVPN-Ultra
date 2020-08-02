@@ -3980,6 +3980,24 @@ bool MsIs64BitWindows()
 				return false;
 			}
 
+			if (ms->nt->IsWow64Process2 != NULL)
+			{
+				// Windows 10 or above
+				USHORT v1 = IMAGE_FILE_MACHINE_UNKNOWN, v2 = IMAGE_FILE_MACHINE_UNKNOWN;
+				if (ms->nt->IsWow64Process2(GetCurrentProcess(), &v1, &v2))
+				{
+					if (v1 == IMAGE_FILE_MACHINE_UNKNOWN)
+					{
+						return false;
+					}
+					else
+					{
+						return true;
+					}
+				}
+			}
+
+			// Windows 8 or below
 			if (ms->nt->IsWow64Process == NULL)
 			{
 				return false;
@@ -13293,6 +13311,10 @@ NT_API *MsLoadNtApiFunctions()
 	nt->IsWow64Process =
 		(BOOL (__stdcall *)(HANDLE,BOOL *))
 		GetProcAddress(nt->hKernel32, "IsWow64Process");
+
+	nt->IsWow64Process2 =
+		(BOOL (__stdcall *)(HANDLE,USHORT *,USHORT *))
+		GetProcAddress(nt->hKernel32, "IsWow64Process2");
 
 	nt->GetFileInformationByHandle =
 		(BOOL (__stdcall *)(HANDLE,LPBY_HANDLE_FILE_INFORMATION))

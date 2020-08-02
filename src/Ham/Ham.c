@@ -946,6 +946,14 @@ void test(UINT num, char **arg)
 {
 	if (true)
 	{
+#ifdef	OS_WIN32
+		Debug("%u\n", MsIs64BitWindows());
+#endif
+		return;
+	}
+
+	if (true)
+	{
 #ifdef OS_WIN32
 		InitWinUi(NULL, NULL, 0);
 		{
