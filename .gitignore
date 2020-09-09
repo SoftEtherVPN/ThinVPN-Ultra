@@ -95,3 +95,4 @@ mayaqua.key
 /src/bin/*.cer
 /src/bin/*.key
 /src/bin/hamcore/ThinSetup_nosign.exe
+/src/.vs/
