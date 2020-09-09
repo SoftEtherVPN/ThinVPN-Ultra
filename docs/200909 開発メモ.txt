@@ -82,8 +82,7 @@ C/C++
                 WIN32;NDEBUG;_CONSOLE;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)
     コード生成
         文字列プール: いいえ
-        最小リビルドを有効にする:
-            Debug の場合のみ: はい
+        最小リビルドを有効にする: いいえ
         C++ の例外を有効にする: いいえ
         基本ランタイムチェック:
             Debug の場合: /RTC1
@@ -102,10 +101,10 @@ C/C++
         指定の警告を無効にする: 4996
         完全パスの使用: いいえ
 ライブラリアン
-    追加のライブラリディレクトリ: $(ProjectDir)BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\
+    追加のライブラリディレクトリ: $(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\
     すべての既定ライブラリの無視: いいえ
     (Mayaqua の場合)
-        追加の依存ファイル: libeay32.lib ssleay32.lib zlib.lib libintelaes.lib
+        追加の依存ファイル: libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib
 リンカー
     全般
         出力ファイル
