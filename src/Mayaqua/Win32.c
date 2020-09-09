@@ -2728,7 +2728,7 @@ CALLSTACK_DATA *Win32GetCallStack()
 	DWORD current_eip32 = 0, current_esp32 = 0, current_ebp32 = 0;
 	UINT64 current_eip = 0, current_esp = 0, current_ebp = 0;
 	STACKFRAME64 sf;
-	CALLSTACK_DATA *cs = NULL, *s;
+	CALLSTACK_DATA *cs = NULL, *s = NULL;
 
 #ifdef	CPU_64
 	CONTEXT context;
