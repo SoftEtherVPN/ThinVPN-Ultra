@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 16.0.30413.136
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildUtil", "BuildUtil\BuildUtil.csproj", "{9279DA54-8BBB-473F-A1FA-54B714CF33D8}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ham", "Ham\Ham.vcxproj", "{9B8781AE-F515-49D8-8064-3052BB7ABCC7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cedar", "Cedar\Cedar.vcxproj", "{D11C227F-AE0E-4B8B-8D99-F9EA28FF3BE8}"
@@ -19,6 +21,10 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9279DA54-8BBB-473F-A1FA-54B714CF33D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9279DA54-8BBB-473F-A1FA-54B714CF33D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9279DA54-8BBB-473F-A1FA-54B714CF33D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9279DA54-8BBB-473F-A1FA-54B714CF33D8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B8781AE-F515-49D8-8064-3052BB7ABCC7}.Debug|x64.ActiveCfg = Debug|x64
 		{9B8781AE-F515-49D8-8064-3052BB7ABCC7}.Debug|x64.Build.0 = Debug|x64
 		{9B8781AE-F515-49D8-8064-3052BB7ABCC7}.Debug|x86.ActiveCfg = Debug|Win32
