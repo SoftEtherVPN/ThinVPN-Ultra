@@ -1594,7 +1594,7 @@ void *CreateWizardPageInstance(WIZARD *w, WIZARD_PAGE *p)
 
 	t.lParam = (LPARAM)p->DialogParam;
 
-	return CreatePropertySheetPageW(&t);
+	return CreatePropertySheetPageW((LPCPROPSHEETPAGEW)&t);
 }
 
 // Create a new wizard
@@ -3740,7 +3740,7 @@ void InitDialogInternational(HWND hWnd, void *pparam)
 	UINT i;
 	bool is_managed_dialog = false;
 	char caption[MAX_PATH];
-	char *dialog_name;
+	char* dialog_name = NULL;
 	DIALOG_PARAM *param = (DIALOG_PARAM *)pparam;
 	HDC hDC;
 	bool need_resize = false;

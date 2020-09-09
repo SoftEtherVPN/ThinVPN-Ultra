@@ -13549,11 +13549,11 @@ NT_API *MsLoadNtApiFunctions()
 	if (nt->hSecur32 != NULL)
 	{
 		nt->GetUserNameExA =
-			(BOOL (__stdcall *)(EXTENDED_NAME_FORMAT,LPSTR,PULONG))
+			(BOOL (__stdcall *)(UINT,LPSTR,PULONG))
 			GetProcAddress(nt->hSecur32, "GetUserNameExA");
 
 		nt->GetUserNameExW =
-			(BOOL (__stdcall *)(EXTENDED_NAME_FORMAT,LPWSTR,PULONG))
+			(BOOL (__stdcall *)(UINT,LPWSTR,PULONG))
 			GetProcAddress(nt->hSecur32, "GetUserNameExW");
 
 		nt->LsaConnectUntrusted =

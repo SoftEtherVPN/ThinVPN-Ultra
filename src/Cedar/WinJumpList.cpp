@@ -209,7 +209,7 @@ extern "C"
 	JL_HRESULT JL_CreateCustomDestinationList(JL_PCustomDestinationList* poc, wchar_t* appID)
 	{
 		ICustomDestinationList *pcdl;
-
+		
 		//CLSID_DestinationList = 6332DEBF-87B5-4670-90C0-5E57-B408-A49E
 
 		GUID destList;
