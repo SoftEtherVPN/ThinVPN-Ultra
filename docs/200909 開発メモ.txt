@@ -151,5 +151,10 @@ C/C++
             ※ PenCore DLL の場合は不要
 
 
+■ プロジェクト内サブフォルダ
+
+Source Files
+Header Files
+Resource Files
 
 
