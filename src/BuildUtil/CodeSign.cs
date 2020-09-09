@@ -122,7 +122,7 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using CoreUtil;
-using BuildUtil.HvSignService;
+//using BuildUtil.HvSignService;
 
 namespace BuildUtil
 {
@@ -179,9 +179,6 @@ namespace BuildUtil
 
 		public const int NumRetriesForCopy = 50;
 		public const int RetryIntervalsForCopy = 10;
-		
-		const string in_dir = @"\\hvsigncode\SIGN\IN";
-		const string out_dir = @"\\hvsigncode\SIGN\OUT";
 
 #if !BU_SOFTETHER
 		public static int UsingCertId = 1;
