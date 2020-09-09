@@ -1,4 +1,155 @@
 ﻿こんにちは！
 
+■ プロジェクト依存関係
+    BuildUtil <-- Mayaqua, Cedar, PenCore, Ham
+    
+        Mayaqua <-- Cedar
+    
+        PenCore <-- Cedar
+    
+            Cedar <-- Ham
+
+
+
+■ VC++ 構成プロパティ 共通的設定メモ
+全般
+    文字セット: マルチバイト文字セットを使用する
+    プログラム全体の最適化: なし
+    Windows SDK バージョン: 7.0
+    出力ディレクトリ:
+        ライブラリの場合:
+            $(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\
+        EXE または DLL の場合:
+            $(SolutionDir)bin\
+    中間ディレクトリ: $(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\
+    ターゲット名: $(ProjectName)
+    プラットフォーム ツールセット: Visual Studio 2017 - Windpws XP (v141_xp)
+
+C/C++
+    追加のインクルードディレクトリ: $(ProjectDir)\..\
+    デバッグ情報: プログラムデータベース
+    [マイコードのみ] のサポート: いいえ
+    複数プロセッサによるコンパイル: はい
+    最適化
+        Debug の場合:
+            最適化: 無効
+            インライン関数の展開: 無効
+        Release の場合:
+            最適化: 最適化 (速度を優先) (/Ox)
+            インライン関数の展開: 拡張可能な関数すべて
+        共通設定:
+            組み込み関数: いいえ
+            速度またはサイズを優先: なし
+            フレームポインタなし: いいえ
+            ファイバー保護の最適化: いいえ
+            プログラム全体の最適化: いいえ
+            最適化: 無効
+            インライン関数の展開: 既定
+            組み込み関数: いいえ
+            速度またはサイズを優先: なし
+            フレームポインタなし: いいえ
+            ファイバー保護の最適化: いいえ
+            プログラム全体の最適化: いいえ
+    プリプロセッサ
+        (ライブラリの場合)
+            Debug - Win32
+                WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)
+            Debug - x64
+                WIN32;_DEBUG;_LIB;CPU_64;%(PreprocessorDefinitions)
+            Release - Win32
+                WIN32;NDEBUG;_LIB;VPN_SPEED;%(PreprocessorDefinitions)
+            Release - x64
+                WIN32;NDEBUG;_LIB;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)
+        (DLL または EXE の場合)
+            Debug - Win32
+                WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)
+            Debug - x64
+                WIN32;_DEBUG;_WINDOWS;CPU_64;%(PreprocessorDefinitions)
+            Release - Win32
+                WIN32;NDEBUG;_WINDOWS;VPN_SPEED;%(PreprocessorDefinitions)
+            Release - x64
+                WIN32;NDEBUG;_WINDOWS;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)
+        (EXE かつコンソールアプリの場合)
+            Debug - Win32
+                WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)
+            Debug - x64
+                WIN32;_DEBUG;_CONSOLE;CPU_64;%(PreprocessorDefinitions)
+            Release - Win32
+                WIN32;NDEBUG;_CONSOLE;VPN_SPEED;%(PreprocessorDefinitions)
+            Release - x64
+                WIN32;NDEBUG;_CONSOLE;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)
+    コード生成
+        文字列プール: いいえ
+        最小リビルドを有効にする:
+            Debug の場合のみ: はい
+        C++ の例外を有効にする: いいえ
+        基本ランタイムチェック:
+            Debug の場合: /RTC1
+            Release の場合: 既定
+        ランタイムライブラリ:
+            Debug の場合: /MTd
+            Release の場合: /MT
+        構造体メンバーのアライメント: 8
+        セキュリティ チェック: 有効
+        制御フローガード: いいえ
+        関数レベルでリンクする: いいえ
+    プリコンパイル済みヘッダー
+        (Cedar の場合のみ) 使用する
+    詳細設定
+        コンパイル言語: C
+        指定の警告を無効にする: 4996
+        完全パスの使用: いいえ
+ライブラリアン
+    追加のライブラリディレクトリ: $(ProjectDir)BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\
+    すべての既定ライブラリの無視: いいえ
+    (Mayaqua の場合)
+        追加の依存ファイル: libeay32.lib ssleay32.lib zlib.lib libintelaes.lib
+リンカー
+    全般
+        出力ファイル
+            (PenCore の場合): $(OutDir)\hamcore\PenCore.dll
+            (一般の EXE の場合) $(OutDir)\なんとかかんとか.exe
+        インクリメンタルリンクを有効にする: Debug -> はい、Release -> いいえ
+    入力
+        追加の依存ファイル: $(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res
+        すべての既定ライブラリの無視: いいえ
+        DLL の遅延読み込み: setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll
+    マニフェストファイル
+        マニフェストの生成: いいえ
+        追加のマニフェスト依存関係:
+          PenCore DLL の場合: 空欄のまま
+          それ以外の一般的な EXE の場合:
+            (Win32 の場合)
+                type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86'  publicKeyToken='6595b64144ccf1df' language='*'
+            (x64 の場合)
+                type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64'  publicKeyToken='6595b64144ccf1df' language='*'
+    デバッグ
+        デバッグ情報の生成: /DEBUG
+        プログラムデータベースファイルの生成: $(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(ConfigurationName)\$(ProjectName).pdb
+        マップファイルの作成: /MAP
+        マップファイル名: $(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map
+    システム
+        サブシステム: コンソール or Windows
+        スタックのサイズの設定: 100000
+    最適化
+        参照: いいえ (/OPT:NOREF)
+        COMDAT の圧縮: いいえ (/OPT:NOICF)
+    マニフェストツール:
+        入出力:
+            埋め込みマニフェスト: いいえ
+
+ビルドイベント (EXE または DLL の場合のみ):
+    リンク前のイベント:
+        $(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"
+        ※ /POSTFIX:"(ShareEnabled)" 等も付けることができますよ
+    リンク後のイベント (2 行)
+        (Win32 の場合)
+            $(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x86_user.manifest
+        (x64 の場合)
+            (普通の EXE の場合)
+                $(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x64_user.manifest
+            ※ PenCore DLL の場合は不要
+
+
 
 
