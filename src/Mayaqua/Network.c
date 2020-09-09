@@ -113,8 +113,9 @@
 
 #ifdef	WIN32
 // Include windows.h for Socket API
-#define	_WIN32_WINNT		0x0600
-#define	WINVER				0x0600
+#define	_WIN32_IE			0x0600
+#define	_WIN32_WINNT		0x0502
+#define	WINVER				0x0502
 #include <Ws2tcpip.h>
 #include <Wspiapi.h>
 #include <winsock2.h>

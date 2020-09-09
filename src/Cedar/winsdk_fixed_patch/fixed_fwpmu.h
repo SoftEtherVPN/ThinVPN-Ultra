@@ -6,7 +6,7 @@
      Declares the management portion of the FWP API.
 */
 
-#if (NTDDI_VERSION >= NTDDI_WIN6)
+//#if (NTDDI_VERSION >= NTDDI_WIN6)
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -3880,5 +3880,5 @@ FwpmSystemPortsUnsubscribe0(
 #endif
 #endif // FWPMX_H
 #endif // GUID_DEFS_ONLY
-#endif // (NTDDI_VERSION >= NTDDI_WIN6)
+//#endif // (NTDDI_VERSION >= NTDDI_WIN6)
 

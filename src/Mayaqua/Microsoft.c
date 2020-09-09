@@ -126,8 +126,8 @@ typedef enum    _PNP_VETO_TYPE {
 }   PNP_VETO_TYPE, *PPNP_VETO_TYPE;
 
 #define	_WIN32_IE			0x0600
-#define	_WIN32_WINNT		0x0600
-#define	WINVER				0x0600
+#define	_WIN32_WINNT		0x0502
+#define	WINVER				0x0502
 #define   SECURITY_WIN32
 #include <Ws2tcpip.h>
 #include <Wspiapi.h>
