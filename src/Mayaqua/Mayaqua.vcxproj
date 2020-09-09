@@ -75,23 +75,23 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -121,7 +121,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Lib>
   </ItemDefinitionGroup>
@@ -154,7 +154,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Lib>
   </ItemDefinitionGroup>
@@ -187,7 +187,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Lib>
   </ItemDefinitionGroup>
@@ -221,7 +221,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Lib>
   </ItemDefinitionGroup>

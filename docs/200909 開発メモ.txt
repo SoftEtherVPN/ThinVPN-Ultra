@@ -18,17 +18,18 @@
     Windows SDK バージョン: 7.0
     出力ディレクトリ:
         ライブラリの場合:
-            $(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\
+            $(SolutionDir)tmp\windows\lib\$(PlatformName)_$(Configuration)\
         EXE または DLL の場合:
             $(SolutionDir)bin\
         PenCore.dll の場合:
             $(SolutionDir)bin\hamcore\
-    中間ディレクトリ: $(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\
+    中間ディレクトリ: $(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\
     ターゲット名: $(ProjectName)
     プラットフォーム ツールセット: Visual Studio 2017 - Windpws XP (v141_xp)
 
 C/C++
     追加のインクルードディレクトリ: $(ProjectDir);$(ProjectDir)..\
+        Cedar の場合さらに ;WinPcap を追加
     デバッグ情報: プログラムデータベース
     [マイコードのみ] のサポート: いいえ
     複数プロセッサによるコンパイル: はい
@@ -101,7 +102,7 @@ C/C++
         指定の警告を無効にする: 4996;4091
         完全パスの使用: いいえ
 ライブラリアン
-    追加のライブラリディレクトリ: $(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\
+    追加のライブラリディレクトリ: $(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\
     すべての既定ライブラリの無視: いいえ
     (Mayaqua の場合)
         追加の依存ファイル: libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib
@@ -126,9 +127,9 @@ C/C++
                 type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64'  publicKeyToken='6595b64144ccf1df' language='*'
     デバッグ
         デバッグ情報の生成: /DEBUG
-        プログラムデータベースファイルの生成: $(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(ConfigurationName)\$(ProjectName).pdb
+        プログラムデータベースファイルの生成: $(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb
         マップファイルの作成: /MAP
-        マップファイル名: $(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map
+        マップファイル名: $(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map
     システム
         サブシステム: コンソール or Windows
         スタックのサイズの設定: 100000

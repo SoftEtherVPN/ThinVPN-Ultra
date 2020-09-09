@@ -113,8 +113,8 @@
 
 #ifdef	WIN32
 // Include windows.h for Socket API
-#define	_WIN32_WINNT		0x0502
-#define	WINVER				0x0502
+#define	_WIN32_WINNT		0x0600
+#define	WINVER				0x0600
 #include <Ws2tcpip.h>
 #include <Wspiapi.h>
 #include <winsock2.h>
@@ -11025,7 +11025,7 @@ void Win32InitSocketLibrary()
 			GetProcAddress(w32net->hIpHlpApi32, "GetNetworkParams");
 
 		w32net->GetAdaptersAddresses =
-			(ULONG (__stdcall *)(ULONG,ULONG,PVOID,PIP_ADAPTER_ADDRESSES,PULONG))
+			(ULONG (__stdcall *)(ULONG,ULONG,PVOID, IP_ADAPTER_ADDRESSES_XP *,PULONG))
 			GetProcAddress(w32net->hIpHlpApi32, "GetAdaptersAddresses");
 
 		w32net->IpRenewAddress =

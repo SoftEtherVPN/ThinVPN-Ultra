@@ -76,28 +76,28 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
@@ -107,7 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>false</SupportJustMyCode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -131,9 +131,9 @@
       <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
-      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(ConfigurationName)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map</MapFileName>
+      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
@@ -154,7 +154,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;VPN_SPEED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -177,9 +177,9 @@
       <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
-      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(ConfigurationName)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map</MapFileName>
+      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <AdditionalOptions>/IGNORE:4199 %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -196,7 +196,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;CPU_64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>false</SupportJustMyCode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -221,9 +221,9 @@
       <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
-      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(ConfigurationName)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map</MapFileName>
+      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
@@ -244,7 +244,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -268,9 +268,9 @@
       <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
-      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(ConfigurationName)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map</MapFileName>
+      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <AdditionalOptions>/IGNORE:4199 %(AdditionalOptions)</AdditionalOptions>
     </Link>

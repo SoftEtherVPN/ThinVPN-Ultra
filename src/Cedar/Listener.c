@@ -531,7 +531,7 @@ int CompareDos(void *p1, void *p2)
 // UDP listener main loop
 void ListenerUDPMainLoop(LISTENER *r)
 {
-	UCHAR *data;
+	UCHAR *data = NULL;
 	// Validate arguments
 	if (r == NULL)
 	{

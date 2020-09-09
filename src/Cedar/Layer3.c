@@ -1542,6 +1542,8 @@ void L3SwThread(THREAD *t, void *param)
 
 SHUTDOWN:
 
+			o = NULL;
+
 			Lock(s->lock);
 			{
 				for (i = 0;i < LIST_NUM(s->IfList);i++)

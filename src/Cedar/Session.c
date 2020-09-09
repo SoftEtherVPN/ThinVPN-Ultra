@@ -111,7 +111,7 @@ void SessionMain(SESSION *s)
 	POLICY *policy;
 	UINT64 now;
 	UINT i = 0;
-	PACKET_ADAPTER *pa;
+	PACKET_ADAPTER *pa = NULL;
 	bool pa_inited = false;
 	UINT packet_size;
 	void *packet;

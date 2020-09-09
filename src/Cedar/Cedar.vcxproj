@@ -75,23 +75,23 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
+    <OutDir>$(SolutionDir)tmp\windows\lib\$(PlatformName)_$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -99,7 +99,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\;WinPcap</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>false</SupportJustMyCode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -115,13 +115,14 @@
       <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CedarPch.h</PrecompiledHeaderFile>
+      <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
     </Lib>
     <Lib>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -135,7 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VPN_SPEED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\;WinPcap</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -148,6 +149,7 @@
       <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CedarPch.h</PrecompiledHeaderFile>
+      <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,7 +158,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
     </Lib>
     <Lib>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -168,7 +170,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;CPU_64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\;WinPcap</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>false</SupportJustMyCode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -185,13 +187,14 @@
       <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CedarPch.h</PrecompiledHeaderFile>
+      <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
     </Lib>
     <Lib>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -205,7 +208,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\;$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\;WinPcap</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -218,6 +221,7 @@
       <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>CedarPch.h</PrecompiledHeaderFile>
+      <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -226,14 +230,321 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
     </Lib>
     <Lib>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="_Empty.c" />
+    <ClCompile Include="Account.c" />
+    <ClCompile Include="Admin.c" />
+    <ClCompile Include="AzureClient.c" />
+    <ClCompile Include="AzureServer.c" />
+    <ClCompile Include="Bridge.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="BridgeUnix.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="BridgeWin32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Cedar.c" />
+    <ClCompile Include="CedarPch.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Client.c" />
+    <ClCompile Include="CM.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Command.c" />
+    <ClCompile Include="Connection.c" />
+    <ClCompile Include="Console.c" />
+    <ClCompile Include="Database.c" />
+    <ClCompile Include="DC.c" />
+    <ClCompile Include="DDNS.c" />
+    <ClCompile Include="Desk.c" />
+    <ClCompile Include="DG.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="DI.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="DS.c" />
+    <ClCompile Include="DsRpc.c" />
+    <ClCompile Include="DU.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EM.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="EtherLog.c" />
+    <ClCompile Include="Hub.c" />
+    <ClCompile Include="Interop_OpenVPN.c" />
+    <ClCompile Include="Interop_SSTP.c" />
+    <ClCompile Include="IPsec.c" />
+    <ClCompile Include="IPsec_EtherIP.c" />
+    <ClCompile Include="IPsec_IKE.c" />
+    <ClCompile Include="IPsec_IkePacket.c" />
+    <ClCompile Include="IPsec_IPC.c" />
+    <ClCompile Include="IPsec_L2TP.c" />
+    <ClCompile Include="IPsec_PPP.c" />
+    <ClCompile Include="IPsec_Win7.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Layer3.c" />
+    <ClCompile Include="Link.c" />
+    <ClCompile Include="Listener.c" />
+    <ClCompile Include="Logging.c" />
+    <ClCompile Include="Nat.c" />
+    <ClCompile Include="NativeStack.c" />
+    <ClCompile Include="NM.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="NullLan.c" />
+    <ClCompile Include="Protocol.c" />
+    <ClCompile Include="Radius.c" />
+    <ClCompile Include="Remote.c" />
+    <ClCompile Include="Sam.c" />
+    <ClCompile Include="SecureInfo.c" />
+    <ClCompile Include="SecureNAT.c" />
+    <ClCompile Include="SeLowUser.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Server.c" />
+    <ClCompile Include="Session.c" />
+    <ClCompile Include="SM.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="SW.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="UdpAccel.c" />
+    <ClCompile Include="UT.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="VG.c" />
+    <ClCompile Include="Virtual.c" />
+    <ClCompile Include="VLan.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="VLanUnix.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="VLanWin32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WaterMark.c" />
+    <ClCompile Include="WebUI.c" />
+    <ClCompile Include="Wide.c" />
+    <ClCompile Include="Win32Com.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="WinJumpList.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="WinUi.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Wpc.c" />
+    <ClCompile Include="Wt.c" />
+    <ClCompile Include="WtClient.c" />
+    <ClCompile Include="WtGate.c" />
+    <ClCompile Include="WtServer.c" />
+    <ClCompile Include="WtWpc.c" />
+    <ClCompile Include="_Empty.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Account.h" />
+    <ClInclude Include="Admin.h" />
+    <ClInclude Include="AzureClient.h" />
+    <ClInclude Include="AzureServer.h" />
+    <ClInclude Include="Bridge.h" />
+    <ClInclude Include="BridgeUnix.h" />
+    <ClInclude Include="BridgeWin32.h" />
+    <ClInclude Include="Cedar.h" />
+    <ClInclude Include="CedarPch.h" />
+    <ClInclude Include="CedarType.h" />
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="CM.h" />
+    <ClInclude Include="CMInner.h" />
+    <ClInclude Include="Command.h" />
+    <ClInclude Include="Connection.h" />
+    <ClInclude Include="Console.h" />
+    <ClInclude Include="Database.h" />
+    <ClInclude Include="DC.h" />
+    <ClInclude Include="DDNS.h" />
+    <ClInclude Include="Desk.h" />
+    <ClInclude Include="DeskType.h" />
+    <ClInclude Include="DG.h" />
+    <ClInclude Include="DG_Inner.h" />
+    <ClInclude Include="DI.h" />
+    <ClInclude Include="DI_Inner.h" />
+    <ClInclude Include="DS.h" />
+    <ClInclude Include="DsRpc.h" />
+    <ClInclude Include="DU.h" />
+    <ClInclude Include="DU_Inner.h" />
+    <ClInclude Include="EM.h" />
+    <ClInclude Include="EMInner.h" />
+    <ClInclude Include="EtherLog.h" />
+    <ClInclude Include="Hub.h" />
+    <ClInclude Include="Interop_OpenVPN.h" />
+    <ClInclude Include="Interop_SSTP.h" />
+    <ClInclude Include="IPsec.h" />
+    <ClInclude Include="IPsec_EtherIP.h" />
+    <ClInclude Include="IPsec_IKE.h" />
+    <ClInclude Include="IPsec_IkePacket.h" />
+    <ClInclude Include="IPsec_IPC.h" />
+    <ClInclude Include="IPsec_L2TP.h" />
+    <ClInclude Include="IPsec_PPP.h" />
+    <ClInclude Include="IPsec_Win7.h" />
+    <ClInclude Include="IPsec_Win7Inner.h" />
+    <ClInclude Include="Layer3.h" />
+    <ClInclude Include="Link.h" />
+    <ClInclude Include="Listener.h" />
+    <ClInclude Include="Logging.h" />
+    <ClInclude Include="Nat.h" />
+    <ClInclude Include="NativeStack.h" />
+    <ClInclude Include="Neo.h" />
+    <ClInclude Include="netcfgn.h" />
+    <ClInclude Include="netcfgx.h" />
+    <ClInclude Include="NM.h" />
+    <ClInclude Include="NMInner.h" />
+    <ClInclude Include="NullLan.h" />
+    <ClInclude Include="Protocol.h" />
+    <ClInclude Include="Radius.h" />
+    <ClInclude Include="Remote.h" />
+    <ClInclude Include="Sam.h" />
+    <ClInclude Include="SecureInfo.h" />
+    <ClInclude Include="SecureNAT.h" />
+    <ClInclude Include="SeLowCommon.h" />
+    <ClInclude Include="SeLowUser.h" />
+    <ClInclude Include="Server.h" />
+    <ClInclude Include="Session.h" />
+    <ClInclude Include="SM.h" />
+    <ClInclude Include="SMInner.h" />
+    <ClInclude Include="SW.h" />
+    <ClInclude Include="SWInner.h" />
+    <ClInclude Include="UdpAccel.h" />
+    <ClInclude Include="UT.h" />
+    <ClInclude Include="VG.h" />
+    <ClInclude Include="Virtual.h" />
+    <ClInclude Include="VLan.h" />
+    <ClInclude Include="VLanUnix.h" />
+    <ClInclude Include="VLanWin32.h" />
+    <ClInclude Include="WaterMark.h" />
+    <ClInclude Include="WebUI.h" />
+    <ClInclude Include="Wfp.h" />
+    <ClInclude Include="Wide.h" />
+    <ClInclude Include="Win32Com.h" />
+    <ClInclude Include="winpcap\bittypes.h" />
+    <ClInclude Include="winpcap\bucket_lookup.h" />
+    <ClInclude Include="winpcap\count_packets.h" />
+    <ClInclude Include="winpcap\Devioctl.h" />
+    <ClInclude Include="winpcap\Gnuc.h" />
+    <ClInclude Include="winpcap\ip6_misc.h" />
+    <ClInclude Include="winpcap\memory_t.h" />
+    <ClInclude Include="winpcap\normal_lookup.h" />
+    <ClInclude Include="winpcap\Ntddndis.h" />
+    <ClInclude Include="winpcap\Ntddpack.h" />
+    <ClInclude Include="winpcap\Packet32.h" />
+    <ClInclude Include="winpcap\pcap-bpf.h" />
+    <ClInclude Include="winpcap\pcap-int.h" />
+    <ClInclude Include="winpcap\pcap-stdinc.h" />
+    <ClInclude Include="winpcap\pcap.h" />
+    <ClInclude Include="winpcap\pthread.h" />
+    <ClInclude Include="winpcap\remote-ext.h" />
+    <ClInclude Include="winpcap\sched.h" />
+    <ClInclude Include="winpcap\semaphore.h" />
+    <ClInclude Include="winpcap\tcp_session.h" />
+    <ClInclude Include="winpcap\time_calls.h" />
+    <ClInclude Include="winpcap\tme.h" />
+    <ClInclude Include="winpcap\Win32-Extensions.h" />
+    <ClInclude Include="WinUi.h" />
+    <ClInclude Include="Wpc.h" />
+    <ClInclude Include="Wt.h" />
+    <ClInclude Include="WtClient.h" />
+    <ClInclude Include="WtGate.h" />
+    <ClInclude Include="WtServer.h" />
+    <ClInclude Include="WtType.h" />
+    <ClInclude Include="WtWpc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -344,7 +344,7 @@ void WtgRecvFromServer(TSESSION *s)
 	{
 		UINT tunnel_id = block->TunnelId;
 		TUNNEL *t = WtgSearchTunnelById(s->TunnelList, tunnel_id);
-		QUEUE *dest_queue;
+		QUEUE *dest_queue = NULL;
 		DATABLOCK *send_block;
 		bool use_compress = false;
 

@@ -1330,7 +1330,7 @@ void SendInformationalExchangePacketEx(IKE_SERVER *ike, IKE_CLIENT *c, IKE_PACKE
 	IKE_PACKET *ps;
 	LIST *payload_list;
 	UCHAR dummy_hash_data[IKE_MAX_HASH_SIZE];
-	IKE_PACKET_PAYLOAD *hash_payload;
+	IKE_PACKET_PAYLOAD *hash_payload = NULL;
 	BUF *ps_buf;
 	UINT after_hash_offset, after_hash_size;
 	BUF *ps_buf_after_hash;
