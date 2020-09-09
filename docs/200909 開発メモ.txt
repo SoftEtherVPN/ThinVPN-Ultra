@@ -21,6 +21,8 @@
             $(SolutionDir)tmp\windows\lib\$(PlatformName)_$(ConfigurationName)\
         EXE または DLL の場合:
             $(SolutionDir)bin\
+        PenCore.dll の場合:
+            $(SolutionDir)bin\hamcore\
     中間ディレクトリ: $(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\
     ターゲット名: $(ProjectName)
     プラットフォーム ツールセット: Visual Studio 2017 - Windpws XP (v141_xp)
@@ -107,7 +109,7 @@ C/C++
 リンカー
     全般
         出力ファイル
-            (PenCore の場合): $(OutDir)\hamcore\PenCore.dll
+            (PenCore の場合): $(OutDir)\PenCore.dll
             (一般の EXE の場合) $(OutDir)\なんとかかんとか.exe
         インクリメンタルリンクを有効にする: Debug -> はい、Release -> いいえ
     入力
@@ -134,9 +136,12 @@ C/C++
     最適化
         参照: いいえ (/OPT:NOREF)
         COMDAT の圧縮: いいえ (/OPT:NOICF)
-    マニフェストツール:
-        入出力:
-            埋め込みマニフェスト: いいえ
+    コマンドライン
+        /IGNORE:4199
+
+マニフェストツール:
+    入出力:
+        埋め込みマニフェスト: いいえ
 
 ビルドイベント (EXE または DLL の場合のみ):
     リンク前のイベント:
@@ -150,6 +155,16 @@ C/C++
                 $(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x64_user.manifest
             ※ PenCore DLL の場合は不要
 
+
+■ vcxproj ファイルの編集
+<PropertyGroup Label="UserMacros" />
+の真下に
+---------
+  <PropertyGroup>
+    <XPDeprecationWarning>false</XPDeprecationWarning>
+  </PropertyGroup>
+---------
+を追加する。
 
 ■ プロジェクト内サブフォルダ
 

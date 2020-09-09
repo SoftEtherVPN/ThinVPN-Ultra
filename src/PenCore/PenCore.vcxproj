@@ -30,9 +30,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <XPDeprecationWarning>false</XPDeprecationWarning>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\</OutDir>
+    <OutDir>$(SolutionDir)bin\hamcore\</OutDir>
     <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(ConfigurationName)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
@@ -63,7 +66,7 @@
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>false</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>$(OutDir)\hamcore\PenCore.dll</OutputFile>
+      <OutputFile>$(OutDir)\PenCore.dll</OutputFile>
       <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
@@ -71,6 +74,7 @@
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(ConfigurationName)\$(ProjectName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
+      <AdditionalOptions>/IGNORE:4199 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreLinkEvent>
       <Command>$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>
