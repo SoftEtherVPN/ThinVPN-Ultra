@@ -29,7 +29,7 @@
 
 C/C++
     追加のインクルードディレクトリ: $(ProjectDir);$(ProjectDir)..\
-        Cedar の場合さらに ;WinPcap を追加
+        Cedar の場合さらに ;WinPcap;winsdk_fixed_patch を追加
     デバッグ情報: プログラムデータベース
     [マイコードのみ] のサポート: いいえ
     複数プロセッサによるコンパイル: はい

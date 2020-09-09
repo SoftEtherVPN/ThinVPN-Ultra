@@ -117,8 +117,8 @@
 #include <shlobj.h>
 #include <commctrl.h>
 #include <Dbghelp.h>
-#include <Fwpmu.h>
-#include <Fwpmtypes.h>
+#include <fixed_Fwpmu.h>
+#include <fixed_Fwpmtypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
