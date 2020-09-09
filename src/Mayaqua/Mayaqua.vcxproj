@@ -99,7 +99,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>false</SupportJustMyCode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -112,7 +112,7 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <CompileAs>CompileAsC</CompileAs>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
@@ -133,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VPN_SPEED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -143,7 +143,7 @@
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <CompileAs>CompileAsC</CompileAs>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
@@ -164,7 +164,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;CPU_64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <SupportJustMyCode>false</SupportJustMyCode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -178,7 +178,7 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <CompileAs>CompileAsC</CompileAs>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
@@ -199,7 +199,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -210,7 +210,7 @@
       <StructMemberAlignment>8Bytes</StructMemberAlignment>
       <ControlFlowGuard>false</ControlFlowGuard>
       <CompileAs>CompileAsC</CompileAs>
-      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
@@ -226,7 +226,165 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Cfg.c" />
+    <ClCompile Include="Encrypt.c" />
+    <ClCompile Include="FileIO.c" />
+    <ClCompile Include="Internat.c" />
+    <ClCompile Include="Kernel.c" />
+    <ClCompile Include="Mayaqua.c" />
+    <ClCompile Include="Memory.c" />
+    <ClCompile Include="Microsoft.c" />
+    <ClCompile Include="Network.c" />
+    <ClCompile Include="Object.c" />
+    <ClCompile Include="OS.c" />
+    <ClCompile Include="Pack.c" />
+    <ClCompile Include="Secure.c" />
+    <ClCompile Include="Str.c" />
+    <ClCompile Include="Table.c" />
+    <ClCompile Include="TcpIp.c" />
+    <ClCompile Include="Tick64.c" />
+    <ClCompile Include="Tracking.c" />
+    <ClCompile Include="Unix.c" />
+    <ClCompile Include="Win32.c" />
     <ClCompile Include="_Empty.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Cfg.h" />
+    <ClInclude Include="cryptoki.h" />
+    <ClInclude Include="Encrypt.h" />
+    <ClInclude Include="FileIO.h" />
+    <ClInclude Include="intelaes\iaesni.h" />
+    <ClInclude Include="Internat.h" />
+    <ClInclude Include="Kernel.h" />
+    <ClInclude Include="Mayaqua.h" />
+    <ClInclude Include="MayaType.h" />
+    <ClInclude Include="Memory.h" />
+    <ClInclude Include="Microsoft.h" />
+    <ClInclude Include="Network.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="openssl\aes.h" />
+    <ClInclude Include="openssl\asn1.h" />
+    <ClInclude Include="openssl\asn1err.h" />
+    <ClInclude Include="openssl\asn1t.h" />
+    <ClInclude Include="openssl\asn1_mac.h" />
+    <ClInclude Include="openssl\async.h" />
+    <ClInclude Include="openssl\asyncerr.h" />
+    <ClInclude Include="openssl\bio.h" />
+    <ClInclude Include="openssl\bioerr.h" />
+    <ClInclude Include="openssl\blowfish.h" />
+    <ClInclude Include="openssl\bn.h" />
+    <ClInclude Include="openssl\bnerr.h" />
+    <ClInclude Include="openssl\buffer.h" />
+    <ClInclude Include="openssl\buffererr.h" />
+    <ClInclude Include="openssl\camellia.h" />
+    <ClInclude Include="openssl\cast.h" />
+    <ClInclude Include="openssl\cmac.h" />
+    <ClInclude Include="openssl\cms.h" />
+    <ClInclude Include="openssl\cmserr.h" />
+    <ClInclude Include="openssl\comp.h" />
+    <ClInclude Include="openssl\comperr.h" />
+    <ClInclude Include="openssl\conf.h" />
+    <ClInclude Include="openssl\conferr.h" />
+    <ClInclude Include="openssl\conf_api.h" />
+    <ClInclude Include="openssl\crypto.h" />
+    <ClInclude Include="openssl\cryptoerr.h" />
+    <ClInclude Include="openssl\ct.h" />
+    <ClInclude Include="openssl\cterr.h" />
+    <ClInclude Include="openssl\des.h" />
+    <ClInclude Include="openssl\dh.h" />
+    <ClInclude Include="openssl\dherr.h" />
+    <ClInclude Include="openssl\dsa.h" />
+    <ClInclude Include="openssl\dsaerr.h" />
+    <ClInclude Include="openssl\dtls1.h" />
+    <ClInclude Include="openssl\ebcdic.h" />
+    <ClInclude Include="openssl\ec.h" />
+    <ClInclude Include="openssl\ecdh.h" />
+    <ClInclude Include="openssl\ecdsa.h" />
+    <ClInclude Include="openssl\ecerr.h" />
+    <ClInclude Include="openssl\engine.h" />
+    <ClInclude Include="openssl\engineerr.h" />
+    <ClInclude Include="openssl\err.h" />
+    <ClInclude Include="openssl\evp.h" />
+    <ClInclude Include="openssl\evperr.h" />
+    <ClInclude Include="openssl\e_os2.h" />
+    <ClInclude Include="openssl\hmac.h" />
+    <ClInclude Include="openssl\idea.h" />
+    <ClInclude Include="openssl\kdf.h" />
+    <ClInclude Include="openssl\kdferr.h" />
+    <ClInclude Include="openssl\lhash.h" />
+    <ClInclude Include="openssl\md2.h" />
+    <ClInclude Include="openssl\md4.h" />
+    <ClInclude Include="openssl\md5.h" />
+    <ClInclude Include="openssl\mdc2.h" />
+    <ClInclude Include="openssl\modes.h" />
+    <ClInclude Include="openssl\objects.h" />
+    <ClInclude Include="openssl\objectserr.h" />
+    <ClInclude Include="openssl\obj_mac.h" />
+    <ClInclude Include="openssl\ocsp.h" />
+    <ClInclude Include="openssl\ocsperr.h" />
+    <ClInclude Include="openssl\opensslconf.h" />
+    <ClInclude Include="openssl\opensslv.h" />
+    <ClInclude Include="openssl\ossl_typ.h" />
+    <ClInclude Include="openssl\pem.h" />
+    <ClInclude Include="openssl\pem2.h" />
+    <ClInclude Include="openssl\pemerr.h" />
+    <ClInclude Include="openssl\pkcs12.h" />
+    <ClInclude Include="openssl\pkcs12err.h" />
+    <ClInclude Include="openssl\pkcs7.h" />
+    <ClInclude Include="openssl\pkcs7err.h" />
+    <ClInclude Include="openssl\rand.h" />
+    <ClInclude Include="openssl\randerr.h" />
+    <ClInclude Include="openssl\rand_drbg.h" />
+    <ClInclude Include="openssl\rc2.h" />
+    <ClInclude Include="openssl\rc4.h" />
+    <ClInclude Include="openssl\rc5.h" />
+    <ClInclude Include="openssl\ripemd.h" />
+    <ClInclude Include="openssl\rsa.h" />
+    <ClInclude Include="openssl\rsaerr.h" />
+    <ClInclude Include="openssl\safestack.h" />
+    <ClInclude Include="openssl\seed.h" />
+    <ClInclude Include="openssl\sha.h" />
+    <ClInclude Include="openssl\srp.h" />
+    <ClInclude Include="openssl\srtp.h" />
+    <ClInclude Include="openssl\ssl.h" />
+    <ClInclude Include="openssl\ssl2.h" />
+    <ClInclude Include="openssl\ssl3.h" />
+    <ClInclude Include="openssl\sslerr.h" />
+    <ClInclude Include="openssl\stack.h" />
+    <ClInclude Include="openssl\store.h" />
+    <ClInclude Include="openssl\storeerr.h" />
+    <ClInclude Include="openssl\symhacks.h" />
+    <ClInclude Include="openssl\tls1.h" />
+    <ClInclude Include="openssl\ts.h" />
+    <ClInclude Include="openssl\tserr.h" />
+    <ClInclude Include="openssl\txt_db.h" />
+    <ClInclude Include="openssl\ui.h" />
+    <ClInclude Include="openssl\uierr.h" />
+    <ClInclude Include="openssl\whrlpool.h" />
+    <ClInclude Include="openssl\x509.h" />
+    <ClInclude Include="openssl\x509err.h" />
+    <ClInclude Include="openssl\x509v3.h" />
+    <ClInclude Include="openssl\x509v3err.h" />
+    <ClInclude Include="openssl\x509_vfy.h" />
+    <ClInclude Include="OS.h" />
+    <ClInclude Include="Pack.h" />
+    <ClInclude Include="pkcs11.h" />
+    <ClInclude Include="pkcs11f.h" />
+    <ClInclude Include="pkcs11t.h" />
+    <ClInclude Include="Secure.h" />
+    <ClInclude Include="Str.h" />
+    <ClInclude Include="Table.h" />
+    <ClInclude Include="TcpIp.h" />
+    <ClInclude Include="Tick64.h" />
+    <ClInclude Include="Tracking.h" />
+    <ClInclude Include="TunTap.h" />
+    <ClInclude Include="Unix.h" />
+    <ClInclude Include="Win32.h" />
+    <ClInclude Include="zlib\zconf.h" />
+    <ClInclude Include="zlib\zlib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="openssl\opensslconf.h.in" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -28,7 +28,7 @@
     プラットフォーム ツールセット: Visual Studio 2017 - Windpws XP (v141_xp)
 
 C/C++
-    追加のインクルードディレクトリ: $(ProjectDir)\..\
+    追加のインクルードディレクトリ: $(ProjectDir);$(ProjectDir)..\
     デバッグ情報: プログラムデータベース
     [マイコードのみ] のサポート: いいえ
     複数プロセッサによるコンパイル: はい
@@ -98,7 +98,7 @@ C/C++
         (Cedar の場合のみ) 使用する
     詳細設定
         コンパイル言語: C
-        指定の警告を無効にする: 4996
+        指定の警告を無効にする: 4996;4091
         完全パスの使用: いいえ
 ライブラリアン
     追加のライブラリディレクトリ: $(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(ConfigurationName)\

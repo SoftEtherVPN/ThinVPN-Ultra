@@ -1648,7 +1648,7 @@ void *Win32RunEx3W(wchar_t *filename, wchar_t *arg, bool hide, UINT *process_id,
 	PROCESS_INFORMATION ret;
 	wchar_t cmdline[MAX_SIZE];
 	wchar_t name[MAX_PATH];
-	void *p;
+	void *p = NULL;
 	// Validate arguments
 	if (filename == NULL)
 	{

@@ -531,7 +531,7 @@ void TrackDeleteObj(UINT64 addr)
 
 			if (IsDebug())
 			{
-				printf("TrackDeleteObj: 0x%x is not Object!!\n", (void *)addr);
+				printf("TrackDeleteObj: 0x%x is not Object!!\n", (UINT)addr);
 			}
 			return;
 		}
