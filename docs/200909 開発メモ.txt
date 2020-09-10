@@ -113,9 +113,9 @@ C/C++
         出力ファイル
             (PenCore の場合): $(OutDir)\PenCore.dll
             (一般の EXE の場合) $(OutDir)\なんとかかんとか.exe
-        インクリメンタルリンクを有効にする: Debug -> はい、Release -> いいえ
+        インクリメンタルリンクを有効にする: いいえ
     入力
-        追加の依存ファイル: $(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res
+        追加の依存ファイル: $(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib
         すべての既定ライブラリの無視: いいえ
         DLL の遅延読み込み: setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll
     マニフェストファイル
@@ -138,6 +138,8 @@ C/C++
     最適化
         参照: いいえ (/OPT:NOREF)
         COMDAT の圧縮: いいえ (/OPT:NOICF)
+    詳細設定
+        安全な例外ハンドラを含むイメージ: いいえ
     コマンドライン
         /IGNORE:4199,4221
 

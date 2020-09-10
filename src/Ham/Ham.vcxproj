@@ -74,7 +74,7 @@
     <XPDeprecationWarning>false</XPDeprecationWarning>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
@@ -88,7 +88,7 @@
     <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
     <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
@@ -128,7 +128,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)\Ham.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
       <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
@@ -138,6 +138,7 @@
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
       <Command>$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>
@@ -174,7 +175,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)\Ham.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
       <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
@@ -182,6 +183,7 @@
       <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
       <Command>$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>
@@ -218,7 +220,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)\Ham_x64.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
       <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
@@ -228,6 +230,7 @@
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
       <Command>$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>
@@ -265,7 +268,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)\Ham_x64.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
       <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
@@ -273,6 +276,7 @@
       <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
       <Command>$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>

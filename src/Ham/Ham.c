@@ -221,7 +221,7 @@ void test(UINT num, char **arg)
 			X *master_x = FileToX("S:\\NTTVPN\\Certs\\200418_Certs\\00_Master.cer");
 			BUF *data = ReadDump("C:\\git\\THIN-ThinTeleworkUpdateFiles\\Files\\EntryPoint.dat");
 			BUF *sign = ReadDump("C:\\git\\THIN-ThinTeleworkUpdateFiles\\Files\\EntryPointSign.dat");
-
+			
 			Print("VERIFY: %u\n", WideVerifyNewEntryPointAndSignature(master_x, data, sign));
 
 			FreeX(master_x);
