@@ -282,7 +282,18 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Ham.c" />
     <ClCompile Include="_Empty.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Ham.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Ham.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="NIC.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
