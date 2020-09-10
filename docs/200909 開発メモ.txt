@@ -139,7 +139,7 @@ C/C++
         参照: いいえ (/OPT:NOREF)
         COMDAT の圧縮: いいえ (/OPT:NOICF)
     コマンドライン
-        /IGNORE:4199
+        /IGNORE:4199,4221
 
 マニフェストツール:
     入出力:

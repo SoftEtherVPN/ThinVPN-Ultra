@@ -123,6 +123,7 @@
       <AdditionalDependencies>libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -156,6 +157,7 @@
       <AdditionalDependencies>libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -189,6 +191,7 @@
       <AdditionalDependencies>libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -223,6 +226,7 @@
       <AdditionalDependencies>libeay32.lib;ssleay32.lib;zlib.lib;libintelaes.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)..\BuildFiles\WindowsLibrary\$(PlatformName)_$(Configuration)\</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
