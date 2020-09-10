@@ -295,6 +295,11 @@
   <ItemGroup>
     <Image Include="NIC.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cedar\Cedar.vcxproj">
+      <Project>{d11c227f-ae0e-4b8b-8d99-f9ea28ff3be8}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

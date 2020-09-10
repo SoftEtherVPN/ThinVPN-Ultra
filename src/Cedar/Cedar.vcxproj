@@ -554,6 +554,11 @@
     <ClInclude Include="WtType.h" />
     <ClInclude Include="WtWpc.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mayaqua\Mayaqua.vcxproj">
+      <Project>{f95d574f-0bbd-464d-8211-2d02d85eacd0}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
