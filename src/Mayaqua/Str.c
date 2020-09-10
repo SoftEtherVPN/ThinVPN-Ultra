@@ -3669,7 +3669,7 @@ UINT StrCpy(char *dst, UINT size, char *src)
 
 	// Check the length
 	len = StrLen(src);
-	if (len <= (size - 1))
+	if ((len <= (size - 1)) || (size == 0x7fffffff))
 	{
 		Copy(dst, src, len + 1);
 	}
