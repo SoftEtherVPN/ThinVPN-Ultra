@@ -155,6 +155,11 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 #define	OS_UNIX			// UNIX
 #endif	// WIN32
 
+// Detemining CPU
+#if defined(__LP64__) || defined(_LP64) || defined(_WIN64) || defined(__x86_64__) || defined(__powerpc64__) || defined(__aarch64__) || defined(_____LP64_____) ||  (UINTPTR_MAX == 0xffffffffffffffff)
+#define	CPU_64
+#endif // defined(__LP64__) || defined(_LP64) || defined(_WIN64) || defined(__x86_64__) || defined(__powerpc64__) || defined(__aarch64__) || defined(_____LP64_____) ||  (UINTPTR_MAX == 0xffffffffffffffff)
+
 // Directory separator
 #ifdef	OS_WIN32
 #define	PATH_BACKSLASH	// Backslash (\)
