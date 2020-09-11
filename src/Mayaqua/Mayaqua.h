@@ -170,6 +170,15 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 #define	CPU_64
 #endif // defined(__LP64__) || defined(_LP64) || defined(_WIN64) || defined(__x86_64__) || defined(__powerpc64__) || defined(__aarch64__) || defined(_____LP64_____) ||  (UINTPTR_MAX == 0xffffffffffffffff)
 
+// pointer to UINT cast type
+#ifdef CPU_64
+// 64 bit
+#define PTR32		UINT)(UINT64
+#else	// CPU_64
+// 32 bit
+#define PTR32		UINT
+#endif	// CPU_64
+
 // Directory separator
 #ifdef	OS_WIN32
 #define	PATH_BACKSLASH	// Backslash (\)
