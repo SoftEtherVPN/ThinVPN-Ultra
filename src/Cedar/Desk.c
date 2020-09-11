@@ -102,7 +102,7 @@ void DeskRelay(SOCKIO *io, SOCK *s)
 
 	SetTimeout(s, INFINITE);
 	SockIoSetTimeout(io, INFINITE);
-	SetSocketSendRecvBufferSize((int)s, WT_SOCKET_WINDOW_SIZE);
+	SetSocketSendRecvBufferSize(s->socket, WT_SOCKET_WINDOW_SIZE);
 
 	buf_size = WT_SOCKET_WINDOW_SIZE;
 	buf = Malloc(buf_size);

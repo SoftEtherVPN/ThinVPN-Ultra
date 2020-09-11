@@ -534,7 +534,7 @@ void server_accept_test(THREAD* thread, SOCKIO* sock, void* param)
 	{
 		// rdp
 		SOCK* s = Connect("localhost", 3389);
-		SetSocketSendRecvBufferSize((int)s, WT_SOCKET_WINDOW_SIZE);
+		SetSocketSendRecvBufferSize(s->socket, WT_SOCKET_WINDOW_SIZE);
 
 		if (s != NULL)
 		{
