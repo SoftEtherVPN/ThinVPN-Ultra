@@ -250,7 +250,6 @@
     <ClCompile Include="Tracking.c" />
     <ClCompile Include="Unix.c" />
     <ClCompile Include="Win32.c" />
-    <ClCompile Include="_Empty.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cfg.h" />

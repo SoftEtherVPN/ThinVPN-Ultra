@@ -285,7 +285,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Ham.c" />
-    <ClCompile Include="_Empty.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ham.h" />
