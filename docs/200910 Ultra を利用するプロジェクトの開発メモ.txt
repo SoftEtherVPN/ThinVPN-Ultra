@@ -1,0 +1,3 @@
+インクルードディレクトリ
+
+$(ProjectDir);$(ProjectDir)..\;$(SolutionDir)..\submodules\IPA-DN-Ultra\src\

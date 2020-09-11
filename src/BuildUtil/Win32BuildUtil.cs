@@ -150,13 +150,13 @@ namespace BuildUtil
 				IO.MakeDir(cabTmpDir);
 				IO.DeleteFilesAndSubDirsInDir(cabTmpDir);
 
-				File.Copy(Path.Combine(Paths.BinDirName, ocxFileName), Path.Combine(cabTmpDir, "vpnweb.ocx"));
+				File.Copy(Path.Combine(Paths.SolutionBinDirName, ocxFileName), Path.Combine(cabTmpDir, "vpnweb.ocx"));
 
-				string infText = File.ReadAllText(Path.Combine(Path.Combine(Paths.BaseDirName, @"BuildFiles\OcxCabInf"), "vpnweb.inf"));
+				string infText = File.ReadAllText(Path.Combine(Path.Combine(Paths.SolutionBaseDirName, @"BuildFiles\OcxCabInf"), "vpnweb.inf"));
 				infText = Str.ReplaceStr(infText, "$CAB_VERSION$", cabVer);
 				File.WriteAllText(Path.Combine(cabTmpDir, "vpnweb.inf"), infText);
 
-				Win32BuildUtil.ExecCommand(Path.Combine(Paths.BaseDirName, @"BuildFiles\Utility\cabarc.exe"),
+				Win32BuildUtil.ExecCommand(Path.Combine(Paths.SolutionBaseDirName, @"BuildFiles\Utility\cabarc.exe"),
 					string.Format(@"-s 6144 n {0}\vpnweb.cab {0}\vpnweb.ocx {0}\vpnweb.inf", cabTmpDir));
 
 				File.Copy(Path.Combine(cabTmpDir, "vpnweb.cab"), cabFileName, true);
@@ -184,7 +184,7 @@ namespace BuildUtil
 				rc_name = "ver.rc";
 			}
 
-			string templateFileName = Path.Combine(Paths.BaseDirName, @"BuildFiles\VerScript\" + rc_name);
+			string templateFileName = Path.Combine(Paths.UltraBuildFilesDirName, @"VerScript\" + rc_name);
 			string body = Str.ReadTextFile(templateFileName);
 
 			string exeFileName = Path.GetFileName(targetExeName);
@@ -281,7 +281,7 @@ namespace BuildUtil
 		// Write the build number and the version number in the text file
 		public static void WriteBuildInfoToTextFile(int build, int version, string name, DateTime date)
 		{
-			string filename = Path.Combine(Paths.BaseDirName, "CurrentBuild.txt");
+			string filename = Path.Combine(Paths.SolutionBaseDirName, "CurrentBuild.txt");
 
 			WriteBuildInfoToTextFile(build, version, name, date, filename);
 		}
@@ -302,7 +302,7 @@ namespace BuildUtil
 		// Read the build number and the version number from a text file
 		public static void ReadBuildInfoFromTextFile(out int build, out int version, out string name, out DateTime date)
 		{
-			string filename = Path.Combine(Paths.BaseDirName, "CurrentBuild.txt");
+			string filename = Path.Combine(Paths.SolutionBaseDirName, "CurrentBuild.txt");
 
 			ReadBuildInfoFromTextFile(out build, out version, out name, out date, filename);
 		}
@@ -391,13 +391,13 @@ namespace BuildUtil
 			pcName = pcName.ToLower();
 
 			string[] files = Util.CombineArray<string>(
-				Directory.GetFiles(Paths.BaseDirName, "*.h", SearchOption.AllDirectories));
+				Directory.GetFiles(Paths.SolutionBaseDirName, "*.h", SearchOption.AllDirectories));
 
 			foreach (string file in files)
 			{
 				string dir = Path.GetDirectoryName(file);
 				if (Str.InStr(dir, @"\.svn\") == false &&
-					Str.InStr(IO.GetRelativeFileName(file, Paths.BaseDirName), @"tmp\") == false)
+					Str.InStr(IO.GetRelativeFileName(file, Paths.SolutionBaseDirName), @"tmp\") == false)
 				{
 					byte[] srcData = File.ReadAllBytes(file);
 
@@ -541,7 +541,7 @@ namespace BuildUtil
 		}
 		public static void CopyDebugSnapshot(string snapDir, params string[] exclude_exts)
 		{
-			IO.CopyDir(Paths.BaseDirName, Path.Combine(snapDir, "Main"),
+			IO.CopyDir(Paths.SolutionBaseDirName, Path.Combine(snapDir, "Main"),
 				delegate(FileInfo fi)
 				{
 					string srcPath = fi.FullName;
@@ -630,15 +630,15 @@ namespace BuildUtil
 				bat.WriteLine("call \"{0}\"", Paths.VisualStudioVCBatchFileName);
 				bat.WriteLine("echo on");
 				bat.WriteLine("\"{0}\" /toolsversion:3.5 /verbosity:detailed /target:Clean /property:Configuration=Release /property:Platform=Win32 \"{1}\"",
-					Paths.MSBuildFileName, Paths.VPN4SolutionFileName);
+					Paths.MSBuildFileName, Paths.VisualStudioSolutionFileName);
 				bat.WriteLine("IF ERRORLEVEL 1 GOTO LABEL_ERROR");
 
 				bat.WriteLine("\"{0}\" /toolsversion:3.5 /verbosity:detailed /target:Clean /property:Configuration=Release /property:Platform=x64 \"{1}\"",
-					Paths.MSBuildFileName, Paths.VPN4SolutionFileName);
+					Paths.MSBuildFileName, Paths.VisualStudioSolutionFileName);
 				bat.WriteLine("IF ERRORLEVEL 1 GOTO LABEL_ERROR");
 
 				bat.WriteLine("\"{0}\" /toolsversion:3.5 /verbosity:detailed /target:Rebuild /property:Configuration=Release /property:Platform=Win32 \"{1}\"",
-					Paths.MSBuildFileName, Paths.VPN4SolutionFileName);
+					Paths.MSBuildFileName, Paths.VisualStudioSolutionFileName);
 				bat.WriteLine("IF ERRORLEVEL 1 GOTO LABEL_ERROR");
 
 				//bat.WriteLine("\"{0}\" /toolsversion:3.5 /verbosity:detailed /target:Rebuild /property:Configuration=Release /property:Platform=x64 \"{1}\"",
@@ -668,7 +668,7 @@ namespace BuildUtil
 			int maxLen = 0;
 
 			// Read the map file
-			string[] lines = File.ReadAllLines(Path.Combine(Paths.BaseDirName, @"DebugFiles\map\Win32_Release\vpnserver.map"));
+			string[] lines = File.ReadAllLines(Path.Combine(Paths.SolutionBaseDirName, @"DebugFiles\map\Win32_Release\vpnserver.map"));
 			char[] sps = { ' ', '\t', };
 
 			foreach (string line in lines)
@@ -721,7 +721,7 @@ namespace BuildUtil
 			o.Sort();
 
 			// Generate the Replace.h
-			string filename = Path.Combine(Paths.BaseDirName, @"DebugFiles\Replace.h");
+			string filename = Path.Combine(Paths.SolutionBaseDirName, @"DebugFiles\Replace.h");
 			StreamWriter w = new StreamWriter(filename);
 
 			w.WriteLine("// PacketiX VPN Function Name Replacement Header File");
@@ -860,7 +860,7 @@ namespace BuildUtil
 
 			ReadBuildInfoFromTextFile(out build, out version, out name, out date);
 
-			string hamcore = Path.Combine(Paths.BinDirName, "hamcore");
+			string hamcore = Path.Combine(Paths.SolutionBinDirName, "hamcore");
 			string sys_src = Path.Combine(hamcore, "SeLow_" + cpu + ".sys");
 			string inf_src = Path.Combine(hamcore, "SeLow_" + cpu + ".inf");
 
@@ -887,7 +887,7 @@ namespace BuildUtil
 			DateTime date;
 			ReadBuildInfoFromTextFile(out build, out version, out name, out date);
 
-			string hamcore = Path.Combine(Paths.BinDirName, "hamcore");
+			string hamcore = Path.Combine(Paths.SolutionBinDirName, "hamcore");
 			string inf_src_x86 = Path.Combine(hamcore, "vpn_driver.inf");
 			string inf_src_x64 = Path.Combine(hamcore, "vpn_driver_x64.inf");
 			string sys_src_x86 = Path.Combine(hamcore, "vpn_driver.sys");
@@ -936,7 +936,7 @@ namespace BuildUtil
 			IO.DeleteFilesAndSubDirsInDir(dstDir);
 			IO.MakeDirIfNotExists(dstDir);
 
-			string utility_dirname = Path.Combine(Paths.BaseDirName, @"BuildFiles\Utility");
+			string utility_dirname = Path.Combine(Paths.SolutionBaseDirName, @"BuildFiles\Utility");
 			string makecat1 = Path.Combine(dstDir, "makecat.exe");
 			string makecat2 = Path.Combine(dstDir, "makecat.exe.manifest");
 			string makecat3 = Path.Combine(dstDir, "Microsoft.Windows.Build.Signing.wintrust.dll.manifest");
@@ -1102,7 +1102,7 @@ namespace BuildUtil
 
 		static void make_cat_file(string dir, string[] filename_list, string catname, bool win8, bool no_sign)
 		{
-			string utility_dirname = Path.Combine(Paths.BaseDirName, @"BuildFiles\Utility");
+			string utility_dirname = Path.Combine(Paths.SolutionBaseDirName, @"BuildFiles\Utility");
 			string makecat1 = Path.Combine(dir, "makecat.exe");
 			string makecat2 = Path.Combine(dir, "makecat.exe.manifest");
 			string makecat3 = Path.Combine(dir, "Microsoft.Windows.Build.Signing.wintrust.dll.manifest");
@@ -1165,8 +1165,8 @@ namespace BuildUtil
 
 			date = date.AddDays(-1);
 
-			string dst_dir = Path.Combine(Paths.BaseDirName, @"tmp\MakeDriverPackage");
-			string src_dir = Path.Combine(Paths.BaseDirName, @"BuiltDriverPackages");
+			string dst_dir = Path.Combine(Paths.SolutionBaseDirName, @"tmp\MakeDriverPackage");
+			string src_dir = Path.Combine(Paths.SolutionBaseDirName, @"BuiltDriverPackages");
 			IO.DeleteFilesAndSubDirsInDir(dst_dir);
 			IO.MakeDirIfNotExists(dst_dir);
 
@@ -1381,7 +1381,7 @@ namespace BuildUtil
 		// Sign for all binary files (series mode)
 		public static void SignAllBinaryFilesSerial()
 		{
-			string[] files = Directory.GetFiles(Paths.BinDirName, "*", SearchOption.AllDirectories);
+			string[] files = Directory.GetFiles(Paths.SolutionBinDirName, "*", SearchOption.AllDirectories);
 
 			foreach (string file in files)
 			{
@@ -1415,7 +1415,7 @@ namespace BuildUtil
 			//SignAllBinaryFilesSerial();
 			//return;
 
-			string[] files = Directory.GetFiles(Paths.BinDirName, "*", SearchOption.AllDirectories);
+			string[] files = Directory.GetFiles(Paths.SolutionBinDirName, "*", SearchOption.AllDirectories);
 
 			List<string> filename_list = new List<string>();
 

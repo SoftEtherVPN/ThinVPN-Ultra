@@ -145,7 +145,7 @@ namespace BuildUtil
 		};
 
 		public readonly string CrossLibName;
-		public readonly string CrossLibBaseDir = Path.Combine(Paths.BaseDirName, @"BuildFiles\CrossLib");
+		public readonly string CrossLibBaseDir = Path.Combine(Paths.SolutionBaseDirName, @"BuildFiles\CrossLib");
 		public readonly bool UseGccBitsOption;
 		public readonly string CrossCompilerName;
 		public readonly bool NoPThreadOption;
@@ -262,7 +262,7 @@ namespace BuildUtil
 
 			if (true)
 			{
-				string srcData = File.ReadAllText(Path.Combine(Paths.BinDirName, @"hamcore\eula.txt"),
+				string srcData = File.ReadAllText(Path.Combine(Paths.SolutionBinDirName, @"hamcore\eula.txt"),
 					enc);
 
 				byte[] destData = enc.GetBytes(srcData);
@@ -272,7 +272,7 @@ namespace BuildUtil
 
 			if (true)
 			{
-				string srcData = File.ReadAllText(Path.Combine(Paths.BinDirName, @"hamcore\authors.txt"),
+				string srcData = File.ReadAllText(Path.Combine(Paths.SolutionBinDirName, @"hamcore\authors.txt"),
 					enc);
 
 				byte[] destData = enc.GetBytes(srcData);
@@ -282,7 +282,7 @@ namespace BuildUtil
 
 			if (true)
 			{
-				string srcData = File.ReadAllText(Path.Combine(Paths.BinDirName, @"hamcore\warning_ja.txt"),
+				string srcData = File.ReadAllText(Path.Combine(Paths.SolutionBinDirName, @"hamcore\warning_ja.txt"),
 					enc);
 
 				byte[] destData = enc.GetBytes(srcData);
@@ -292,7 +292,7 @@ namespace BuildUtil
 
 			if (true)
 			{
-				string srcData = File.ReadAllText(Path.Combine(Paths.BinDirName, @"hamcore\warning_en.txt"),
+				string srcData = File.ReadAllText(Path.Combine(Paths.SolutionBinDirName, @"hamcore\warning_en.txt"),
 					enc);
 
 				byte[] destData = enc.GetBytes(srcData);
@@ -302,7 +302,7 @@ namespace BuildUtil
 
 			if (true)
 			{
-				string srcData = File.ReadAllText(Path.Combine(Paths.BinDirName, @"hamcore\warning_cn.txt"),
+				string srcData = File.ReadAllText(Path.Combine(Paths.SolutionBinDirName, @"hamcore\warning_cn.txt"),
 					enc);
 
 				byte[] destData = enc.GetBytes(srcData);
@@ -349,7 +349,7 @@ namespace BuildUtil
 			tar.AddFileSimple(targetName + @"\lib\License.txt", lsFileData, 0, lsFileData.Length, DateTime.Now);
 
 			// HamCore
-			byte[] hcData = File.ReadAllBytes(Path.Combine(Paths.BaseDirName, string.Format(@"bin\BuiltHamcoreFiles\hamcore_unix\hamcore.se2")));
+			byte[] hcData = File.ReadAllBytes(Path.Combine(Paths.SolutionBaseDirName, string.Format(@"bin\BuiltHamcoreFiles\hamcore_unix\hamcore.se2")));
 			tar.AddFileSimple(targetName + @"\hamcore.se2", hcData, 0, hcData.Length, DateTime.Now);
 
 			// Generate a tar
@@ -458,12 +458,12 @@ namespace BuildUtil
 			// Copy the source code
 			foreach (string srcDirName in SrcDirNameList)
 			{
-				string srcFullPath = Path.Combine(Paths.BaseDirName, srcDirName);
+				string srcFullPath = Path.Combine(Paths.SolutionBaseDirName, srcDirName);
 				string destFullPath = Path.Combine(outSrcDir, srcDirName);
 
 				IO.CopyDir(srcFullPath, destFullPath, new IO.CopyDirPreCopyDelegate(CopySrcFilesDelegate), false, true, true, true, true);
 			}
-			IO.FileCopy(Path.Combine(Paths.BaseDirName, "CurrentBuild.txt"), Path.Combine(outSrcDir, "CurrentBuild.txt"), true, false);
+			IO.FileCopy(Path.Combine(Paths.SolutionBaseDirName, "CurrentBuild.txt"), Path.Combine(outSrcDir, "CurrentBuild.txt"), true, false);
 		}
 
 		// Build SrcKit
@@ -510,7 +510,7 @@ namespace BuildUtil
 			// Copy the source code
 			foreach (string srcDirName in SrcDirNameList)
 			{
-				string srcFullPath = Path.Combine(Paths.BaseDirName, srcDirName);
+				string srcFullPath = Path.Combine(Paths.SolutionBaseDirName, srcDirName);
 				string destFullPath = Path.Combine(outSrcDir, srcDirName);
 				bool delete_bom = true;
 
@@ -521,10 +521,10 @@ namespace BuildUtil
 
 				IO.CopyDir(srcFullPath, destFullPath, new IO.CopyDirPreCopyDelegate(CopySrcFilesDelegate), false, true, true, delete_bom);
 			}
-			IO.FileCopy(Path.Combine(Paths.BaseDirName, "CurrentBuild.txt"), Path.Combine(outSrcDir, "CurrentBuild.txt"), true, false);
-			IO.FileCopy(Path.Combine(Paths.BaseDirName, "GlobalConst.h"), Path.Combine(outSrcDir, "GlobalConst.h"), true, false);
-			IO.FileCopy(Path.Combine(Paths.BaseDirName, @"DebugFiles\Replace.h"), Path.Combine(outSrcDir, "Replace.h"), true, false);
-			IO.FileCopy(Path.Combine(Paths.BaseDirName, @"bin\BuiltHamcoreFiles\hamcore_unix\hamcore.se2"),
+			IO.FileCopy(Path.Combine(Paths.SolutionBaseDirName, "CurrentBuild.txt"), Path.Combine(outSrcDir, "CurrentBuild.txt"), true, false);
+			IO.FileCopy(Path.Combine(Paths.SolutionBaseDirName, "GlobalConst.h"), Path.Combine(outSrcDir, "GlobalConst.h"), true, false);
+			IO.FileCopy(Path.Combine(Paths.SolutionBaseDirName, @"DebugFiles\Replace.h"), Path.Combine(outSrcDir, "Replace.h"), true, false);
+			IO.FileCopy(Path.Combine(Paths.SolutionBaseDirName, @"bin\BuiltHamcoreFiles\hamcore_unix\hamcore.se2"),
 				Path.Combine(outSrcDir, @"bin\hamcore.se2"), true, false);
 
 			// Copy Crosslibs

@@ -122,6 +122,7 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using CoreUtil;
+using System.Linq;
 
 namespace BuildUtil
 {
@@ -142,7 +143,7 @@ namespace BuildUtil
 		// loads the language list text file
 		public static Language[] GetLanguageList()
 		{
-			return GetLanguageList(Path.Combine(Paths.BinDirName, @"hamcore\languages.txt"));
+			return GetLanguageList(Path.Combine(Paths.SolutionBinDirName, @"hamcore\languages.txt"));
 		}
 		public static Language[] GetLanguageList(string filename)
 		{
@@ -281,35 +282,22 @@ namespace BuildUtil
 	{
 		public static readonly string ExeFileName = Env.ExeFileName;
 		public static readonly string ExeDirName = Env.ExeFileDir;
-		public static readonly string BinDirName = ExeDirName;
-		public static readonly string BaseDirName = IO.NormalizePath(Path.Combine(BinDirName, @"..\"));
-		public static readonly string UtilityDirName = IO.NormalizePath(Path.Combine(BinDirName, @"..\BuildFiles\Utility"));
+		public static readonly string SolutionBinDirName = ExeDirName;
+		public static readonly string SolutionBaseDirName = IO.NormalizePath(Path.Combine(SolutionBinDirName, @"..\"));
+		public static readonly string UtilityDirName = IO.NormalizePath(Path.Combine(SolutionBinDirName, @"..\BuildFiles\Utility"));
 
-#if !BU_SOFTETHER
-		// PacketiX VPN (build by SoftEther)
-		public static readonly string VPN4SolutionFileName = Path.Combine(BaseDirName, "VPN4.sln");
-		public static readonly string DebugSnapshotBaseDir = @"S:\SE4\DebugFilesSnapshot";
-		public static readonly string ReleaseDestDir = @"s:\SE4\Releases";
-		public const string Prefix = "";
-#else
-#if !BU_OSS
-		// SoftEther VPN (build by SoftEther)
-		public static readonly string VPN4SolutionFileName = Path.Combine(BaseDirName, "SEVPN.sln");
-		public static readonly string DebugSnapshotBaseDir = @"S:\SE4\DebugFilesSnapshot_SEVPN";
-		public static readonly string ReleaseDestDir = @"s:\SE4\Releases_SEVPN";
-		public const string Prefix = "softether-";
-#else
-		// SoftEther VPN (build by Open Source Developers)
-		public static readonly string VPN4SolutionFileName = Path.Combine(BaseDirName, "DeskVPN.sln");
+		public static readonly string UltraBaseDirName = IO.NormalizePath(Path.Combine(SolutionBinDirName, @"..\..\submodules\IPA-DN-Ultra\src"));
+		public static readonly string UltraBinDirName = IO.NormalizePath(Path.Combine(UltraBaseDirName, "bin"));
+		public static readonly string UltraBuildFilesDirName = IO.NormalizePath(Path.Combine(UltraBaseDirName, "BuildFiles"));
+
+		public static readonly string VisualStudioSolutionFileName;
 		public static readonly string DebugSnapshotBaseDir = @"S:\NTTVPN\DebugFilesSnapshot";
 		public static readonly string ReleaseDestDir = @"s:\NTTVPN\Releases";
 		public const string Prefix = "";
-#endif
-#endif
 
 		public static readonly string ReleaseDestDir_SEVPN = @"s:\NTTVPN\Releases_SEVPN";
 
-		public static readonly string BuildHamcoreFilesDirName = Path.Combine(BinDirName, "BuiltHamcoreFiles");
+		public static readonly string BuildHamcoreFilesDirName = Path.Combine(SolutionBinDirName, "BuiltHamcoreFiles");
 		public static readonly string VisualStudioVCDir;
 		public static readonly string VisualStudioVCBatchFileName;
 		public static readonly string DotNetFramework35Dir;
@@ -318,15 +306,15 @@ namespace BuildUtil
 		public static readonly DateTime StartDateTime = DateTime.Now;
 		public static readonly string StartDateTimeStr;
 		public static readonly string CmdFileName;
-		public static readonly string ManifestsDir = Path.Combine(BaseDirName, @"BuildFiles\Manifests");
+		public static readonly string ManifestsDir = Path.Combine(UltraBuildFilesDirName, "Manifests");
 		public static readonly string XCopyExeFileName = Path.Combine(Env.SystemDir, "xcopy.exe");
-		public static readonly string ReleaseDir = Path.Combine(BaseDirName, @"tmp\Release");
-		public static readonly string ReleaseSrckitDir = Path.Combine(BaseDirName, @"tmp\ReleaseSrcKit");
-		public static readonly string StringsDir = Path.Combine(BaseDirName, @"BuildFiles\Strings");
+		public static readonly string ReleaseDir = Path.Combine(SolutionBaseDirName, @"tmp\Release");
+		public static readonly string ReleaseSrckitDir = Path.Combine(SolutionBaseDirName, @"tmp\ReleaseSrcKit");
+		public static readonly string StringsDir = Path.Combine(SolutionBaseDirName, @"BuildFiles\Strings");
 		public static readonly string CrossCompilerBaseDir = @"S:\CommomDev\xc";
-		public static readonly string UnixInstallScript = Path.Combine(BaseDirName, @"BuildFiles\UnixFiles\InstallScript.txt");
+		public static readonly string UnixInstallScript = Path.Combine(SolutionBaseDirName, @"BuildFiles\UnixFiles\InstallScript.txt");
 		public static readonly string OssCommentsFile = Path.Combine(StringsDir, "OssComments.txt");
-		public static readonly string AutorunSrcDir = IO.NormalizePath(Path.Combine(BaseDirName, @"..\Autorun"));
+		public static readonly string AutorunSrcDir = IO.NormalizePath(Path.Combine(SolutionBaseDirName, @"..\Autorun"));
 		public static readonly string MicrosoftSDKDir;
 		public static readonly string MakeCatFilename;
 		public static readonly string RcFilename;
@@ -340,13 +328,19 @@ namespace BuildUtil
 			Paths.StartDateTimeStr = Str.DateTimeToStrShort(Paths.StartDateTime);
 
 			// Check whether the execution path is the bin directory in the VPN directory
-			if (Paths.BinDirName.EndsWith(@"\bin", StringComparison.InvariantCultureIgnoreCase) == false)
+			if (Paths.SolutionBinDirName.EndsWith(@"\bin", StringComparison.InvariantCultureIgnoreCase) == false)
 			{
-				throw new ApplicationException(string.Format("'{0}' is not a VPN bin directory.", Paths.BinDirName));
+				throw new ApplicationException(string.Format("'{0}' is not a VPN bin directory.", Paths.SolutionBinDirName));
 			}
-			if (File.Exists(Paths.VPN4SolutionFileName) == false)
+
+			// Determine the Visual Studio solution file
+			string slnFileName = Directory.EnumerateFiles(SolutionBaseDirName).Where(x => x.EndsWith(".sln")).Single();
+
+			Paths.VisualStudioSolutionFileName = Path.Combine(SolutionBaseDirName, slnFileName);
+
+			if (File.Exists(Paths.VisualStudioSolutionFileName) == false)
 			{
-				throw new ApplicationException(string.Format("'{0}' is not a VPN base directory.", Paths.BaseDirName));
+				throw new ApplicationException(string.Format("'{0}' is not a VPN base directory.", Paths.SolutionBaseDirName));
 			}
 
 			// Get the VC++ directory
@@ -411,7 +405,7 @@ namespace BuildUtil
 			}
 
 			// Get the TMP directory
-			Paths.TmpDirName = Path.Combine(Paths.BaseDirName, "tmp");
+			Paths.TmpDirName = Path.Combine(Paths.SolutionBaseDirName, "tmp");
 			if (Directory.Exists(Paths.TmpDirName) == false)
 			{
 				Directory.CreateDirectory(Paths.TmpDirName);
@@ -557,7 +551,7 @@ namespace BuildUtil
 		// Build Hamcore file
 		public static void BuildHamcore()
 		{
-			string srcDirNameBasic = Path.Combine(Paths.BinDirName, "hamcore");
+			string srcDirNameBasic = Path.Combine(Paths.SolutionBinDirName, "hamcore");
 			// Create the destination directory
 			string win32DestDir = Path.Combine(Paths.BuildHamcoreFilesDirName, "hamcore_win32");
 			string win32DestFileName = Path.Combine(win32DestDir, "hamcore.se2");
@@ -572,7 +566,7 @@ namespace BuildUtil
 			// Copy to bin\hamcore.se2
 			try
 			{
-				string binHamcoreFileName = Path.Combine(Paths.BinDirName, "hamcore.se2");
+				string binHamcoreFileName = Path.Combine(Paths.SolutionBinDirName, "hamcore.se2");
 
 				try
 				{

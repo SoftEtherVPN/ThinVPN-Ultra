@@ -494,7 +494,7 @@ namespace BuildUtil
 //            txt.WriteLine("*");
 //            txt.WriteLine();
 
-			string src_bindir = Path.Combine(Paths.BaseDirName, "bin");
+			string src_bindir = Path.Combine(Paths.SolutionBaseDirName, "bin");
 			string vpnsmgr_zip_filename_relative = "";// @"Windows\Admin_Tools\VPN_Server_Manager_and_Command-line_Utility_Package\";
 			vpnsmgr_zip_filename_relative += 
 //#if BU_SOFTETHER
@@ -1185,7 +1185,7 @@ namespace BuildUtil
 			string dir = vl.DefaultParam.StrValue;
 			if (Str.IsEmptyStr(dir))
 			{
-				dir = Paths.BaseDirName;
+				dir = Paths.SolutionBaseDirName;
 			}
 
 			string[] files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
