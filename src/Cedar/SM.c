@@ -3980,7 +3980,7 @@ void SmLicenseDlgRefresh(HWND hWnd, SM_SERVER *s)
 
 		LvInsertAdd(b,
 			e->Status == LICENSE_STATUS_OK ? ICO_PASS : ICO_DISCARD,
-			(void *)e->Id, 9,
+			(void *)UINT32_TO_POINTER(e->Id), 9,
 			tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8, tmp9);
 	}
 
@@ -4209,7 +4209,7 @@ UINT SmLicenseDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 		case B_DEL:
 			if (IsEnable(hWnd, B_DEL))
 			{
-				UINT id = (UINT)LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST));
+				UINT id = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST)));
 
 				if (id != 0)
 				{
@@ -4303,7 +4303,7 @@ UINT SmSaveLogProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 					}
 					else
 					{
-						if (((UINT)ShellExecute(hWnd, "open", fullpath, NULL, NULL, SW_SHOWNORMAL)) > 32)
+						if (((UINT64)ShellExecute(hWnd, "open", fullpath, NULL, NULL, SW_SHOWNORMAL)) > 32)
 						{
 							EndDialog(hWnd, true);
 						}
@@ -4527,7 +4527,7 @@ void SmLogFileDlgRefresh(HWND hWnd, SM_SERVER *p)
 
 		StrToUni(tmp4, sizeof(tmp4), e->ServerName);
 
-		LvInsertAdd(v, ICO_LOG2, (void *)e->FileSize, 4, tmp1, tmp2, tmp3, tmp4);
+		LvInsertAdd(v, ICO_LOG2, (void *)UINT32_TO_POINTER(e->FileSize), 4, tmp1, tmp2, tmp3, tmp4);
 	}
 
 	LvInsertEndEx(v, hWnd, L_LIST, true);
@@ -4580,7 +4580,7 @@ UINT SmLogFileDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *p
 				UINT i = LvGetSelected(hWnd, L_LIST);
 				if (i != INFINITE)
 				{
-					UINT size = (UINT)LvGetParam(hWnd, L_LIST, i);
+					UINT size = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, i));
 					char *server_name;
 					char *filepath;
 
@@ -5020,7 +5020,7 @@ void SmHubAcDlgRefresh(HWND hWnd, SM_EDIT_AC_LIST *p)
 		UniToStru(tmp4, ac->Priority);
 
 		LvInsertAdd(v, ac->Deny ? ICO_INTERNET_X : ICO_INTERNET,
-			(void *)ac->Id, 4, tmp1, tmp4, tmp2, tmp3);
+			(void *)UINT32_TO_POINTER(ac->Id), 4, tmp1, tmp4, tmp2, tmp3);
 	}
 
 	LvInsertEnd(v, hWnd, L_LIST);
@@ -5057,7 +5057,7 @@ UINT SmHubAcDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *par
 				Zero(&s, sizeof(s));
 
 				s.e = p;
-				s.id = (UINT)LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST));
+				s.id = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST)));
 
 				if (Dialog(hWnd, D_SM_AC, SmHubEditAcDlgProc, &s))
 				{
@@ -5084,7 +5084,7 @@ UINT SmHubAcDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *par
 		case B_DELETE:
 			if (IsEnable(hWnd, B_DELETE))
 			{
-				UINT id = (UINT)LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST));
+				UINT id = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST)));
 
 				if (DelAc(p->AcList, id))
 				{
@@ -5784,7 +5784,7 @@ void SmCrlDlgRefresh(HWND hWnd, SM_HUB *s)
 	for (i = 0;i < t.NumItem;i++)
 	{
 		RPC_ENUM_CRL_ITEM *e = &t.Items[i];
-		LvInsertAdd(v, ICO_CERT_X, (void *)e->Key, 1, e->CrlInfo);
+		LvInsertAdd(v, ICO_CERT_X, (void *)UINT32_TO_POINTER(e->Key), 1, e->CrlInfo);
 	}
 
 	LvInsertEndEx(v, hWnd, L_LIST, true);
@@ -5840,7 +5840,7 @@ UINT SmCrlDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 
 					Zero(&t, sizeof(t));
 					StrCpy(t.HubName, sizeof(t.HubName), s->HubName);
-					t.Key = (UINT)LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST));
+					t.Key = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST)));
 
 					if (CALL(hWnd, ScDelCrl(s->Rpc, &t)))
 					{
@@ -5860,7 +5860,7 @@ UINT SmCrlDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 				Zero(&c, sizeof(c));
 				c.NewCrl = false;
 				c.s = s;
-				c.Key = (UINT)LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST));
+				c.Key = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST)));
 
 				if (Dialog(hWnd, D_SM_EDIT_CRL, SmEditCrlDlgProc, &c))
 				{
@@ -9010,7 +9010,7 @@ void SmIpTableDlgRefresh(HWND hWnd, SM_TABLE *s)
 	i = LvGetSelected(hWnd, L_TABLE);
 	if (i != INFINITE)
 	{
-		old_selected = (UINT)LvGetParam(hWnd, L_TABLE, i);
+		old_selected = POINTER_TO_UINT32(LvGetParam(hWnd, L_TABLE, i));
 	}
 
 	LvReset(hWnd, L_TABLE);
@@ -9053,7 +9053,7 @@ void SmIpTableDlgRefresh(HWND hWnd, SM_TABLE *s)
 				UniFormat(tmp5, sizeof(tmp5), _UU("SM_MACIP_SERVER"), e->RemoteHostname);
 			}
 
-			LvInsert(hWnd, L_TABLE, e->DhcpAllocated ? ICO_PROTOCOL_DHCP : ICO_PROTOCOL, (void *)e->Key, 5,
+			LvInsert(hWnd, L_TABLE, e->DhcpAllocated ? ICO_PROTOCOL_DHCP : ICO_PROTOCOL, (void *)UINT32_TO_POINTER(e->Key), 5,
 				tmp1, tmp2, tmp3, tmp4, tmp5);
 		}
 	}
@@ -9062,7 +9062,7 @@ void SmIpTableDlgRefresh(HWND hWnd, SM_TABLE *s)
 
 	if (old_selected != 0)
 	{
-		LvSelect(hWnd, L_TABLE, LvSearchParam(hWnd, L_TABLE, (void *)old_selected));
+		LvSelect(hWnd, L_TABLE, LvSearchParam(hWnd, L_TABLE, (void *)UINT32_TO_POINTER(old_selected)));
 	}
 
 	SmIpTableDlgUpdate(hWnd, s);
@@ -9096,7 +9096,7 @@ UINT SmIpTableDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *p
 			if (i != INFINITE)
 			{
 				RPC_DELETE_TABLE t;
-				UINT key = (UINT)LvGetParam(hWnd, L_TABLE, i);
+				UINT key = POINTER_TO_UINT32(LvGetParam(hWnd, L_TABLE, i));
 
 				Zero(&t, sizeof(t));
 				StrCpy(t.HubName, sizeof(t.HubName), s->Hub->HubName);
@@ -9244,7 +9244,7 @@ void SmMacTableDlgRefresh(HWND hWnd, SM_TABLE *s)
 	i = LvGetSelected(hWnd, L_TABLE);
 	if (i != INFINITE)
 	{
-		old_selected = (UINT)LvGetParam(hWnd, L_TABLE, i);
+		old_selected = POINTER_TO_UINT32(LvGetParam(hWnd, L_TABLE, i));
 	}
 
 	LvReset(hWnd, L_TABLE);
@@ -9288,12 +9288,12 @@ void SmMacTableDlgRefresh(HWND hWnd, SM_TABLE *s)
 
 			if (GetCapsBool(s->Hub->p->CapsList, "b_support_vlan"))
 			{
-				LvInsert(hWnd, L_TABLE, ICO_NIC_ONLINE, (void *)e->Key, 6,
+				LvInsert(hWnd, L_TABLE, ICO_NIC_ONLINE, (void *)UINT32_TO_POINTER(e->Key), 6,
 					tmp1, tmp6, tmp2, tmp3, tmp4, tmp5);
 			}
 			else
 			{
-				LvInsert(hWnd, L_TABLE, ICO_NIC_ONLINE, (void *)e->Key, 5,
+				LvInsert(hWnd, L_TABLE, ICO_NIC_ONLINE, (void *)UINT32_TO_POINTER(e->Key), 5,
 					tmp1, tmp2, tmp3, tmp4, tmp5);
 			}
 		}
@@ -9303,7 +9303,7 @@ void SmMacTableDlgRefresh(HWND hWnd, SM_TABLE *s)
 
 	if (old_selected != 0)
 	{
-		LvSelect(hWnd, L_TABLE, LvSearchParam(hWnd, L_TABLE, (void *)old_selected));
+		LvSelect(hWnd, L_TABLE, LvSearchParam(hWnd, L_TABLE, (void *)UINT32_TO_POINTER(old_selected)));
 	}
 
 	SmMacTableDlgUpdate(hWnd, s);
@@ -9337,7 +9337,7 @@ UINT SmMacTableDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *
 			if (i != INFINITE)
 			{
 				RPC_DELETE_TABLE t;
-				UINT key = (UINT)LvGetParam(hWnd, L_TABLE, i);
+				UINT key = POINTER_TO_UINT32(LvGetParam(hWnd, L_TABLE, i));
 
 				Zero(&t, sizeof(t));
 				StrCpy(t.HubName, sizeof(t.HubName), s->Hub->HubName);
@@ -9459,7 +9459,7 @@ void SmSessionDlgUpdate(HWND hWnd, SM_HUB *s)
 		if (i != INFINITE)
 		{
 			void *p = LvGetParam(hWnd, L_LIST, i);
-			if (((bool)p) != false)
+			if (((bool)POINTER_TO_UINT32(p)) != false)
 			{
 				if (GetCapsBool(s->p->CapsList, "b_support_cluster_admin") == false)
 				{
@@ -9642,7 +9642,7 @@ void SmSessionDlgRefresh(HWND hWnd, SM_HUB *s)
 			icon = ICO_TRAY0;
 		}
 
-		LvInsertAdd(b, icon, (void *)(e->RemoteSession), 8, tmp1, tmp8, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7);
+		LvInsertAdd(b, icon, (void *)UINT32_TO_POINTER(e->RemoteSession), 8, tmp1, tmp8, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7);
 
 		if (free_tmp2)
 		{
@@ -9957,7 +9957,7 @@ void SmCaDlgRefresh(HWND hWnd, SM_HUB *s)
 
 		GetDateStrEx64(tmp, sizeof(tmp), SystemToLocal64(e->Expires), NULL);
 
-		LvInsertAdd(b, ICO_SERVER_CERT, (void *)e->Key, 3,
+		LvInsertAdd(b, ICO_SERVER_CERT, (void *)UINT32_TO_POINTER(e->Key), 3,
 			e->SubjectName, e->IssuerName, tmp);
 	}
 
@@ -10079,7 +10079,7 @@ UINT SmCaDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
 			i = LvGetSelected(hWnd, L_CERT);
 			if (i != INFINITE)
 			{
-				key = (UINT)LvGetParam(hWnd, L_CERT, i);
+				key = POINTER_TO_UINT32(LvGetParam(hWnd, L_CERT, i));
 				if (key != 0)
 				{
 					if (MsgBox(hWnd, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2,
@@ -10104,7 +10104,7 @@ UINT SmCaDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
 			i = LvGetSelected(hWnd, L_CERT);
 			if (i != INFINITE)
 			{
-				key = (UINT)LvGetParam(hWnd, L_CERT, i);
+				key = POINTER_TO_UINT32(LvGetParam(hWnd, L_CERT, i));
 				if (key != 0)
 				{
 					RPC_HUB_GET_CA t;
@@ -10550,7 +10550,7 @@ void SmLinkDlgUpdate(HWND hWnd, SM_HUB *s)
 	}
 	else
 	{
-		online = (bool)LvGetParam(hWnd, L_LINK, LvGetSelected(hWnd, L_LINK));
+		online = (bool)POINTER_TO_UINT32(LvGetParam(hWnd, L_LINK, LvGetSelected(hWnd, L_LINK)));
 	}
 
 	SetEnable(hWnd, B_EDIT, ok);
@@ -10636,7 +10636,7 @@ void SmLinkDlgRefresh(HWND hWnd, SM_HUB *s)
 		}
 
 		LvInsertAdd(b,
-			icon, (void *)e->Online, 5,
+			icon, (void *)UINT32_TO_POINTER(e->Online), 5,
 			e->AccountName, tmp4, tmp1, tmp2, tmp3);
 	}
 
@@ -13472,7 +13472,7 @@ void SmPolicyDlgUpdate(HWND hWnd, SM_POLICY *s)
 	i = LvGetSelected(hWnd, L_POLICY);
 	if (i != INFINITE)
 	{
-		i = (UINT)LvGetParam(hWnd, L_POLICY, i);
+		i = POINTER_TO_UINT32(LvGetParam(hWnd, L_POLICY, i));
 	}
 	if (i == INFINITE || i >= NUM_POLICY_ITEM)
 	{
@@ -13861,7 +13861,7 @@ void SmEditUserDlgInit(HWND hWnd, SM_EDIT_USER *s)
 
 	for (i = 0;i < 6;i++)
 	{
-		LvInsert(hWnd, L_AUTH, icons[i], (void *)i, 1, SmGetAuthTypeStr(i));
+		LvInsert(hWnd, L_AUTH, icons[i], (void *)UINT32_TO_POINTER(i), 1, SmGetAuthTypeStr(i));
 	}
 
 	// User name, etc.
@@ -15511,7 +15511,7 @@ void SmFarmMemberDlgRefresh(HWND hWnd, SM_SERVER *p)
 		UniToStru(tmp7, e->AssignedClientLicense);
 		UniToStru(tmp8, e->AssignedBridgeLicense);
 
-		LvInsert(hWnd, L_FARM_MEMBER, e->Controller ? ICO_FARM : ICO_TOWER, (void *)e->Id, 9,
+		LvInsert(hWnd, L_FARM_MEMBER, e->Controller ? ICO_FARM : ICO_TOWER, (void *)UINT32_TO_POINTER(e->Id), 9,
 			e->Controller ? _UU("SM_FM_CONTROLLER") : _UU("SM_FM_MEMBER"),
 			tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8);
 	}
@@ -15559,7 +15559,7 @@ void SmFarmMemberCert(HWND hWnd, SM_SERVER *p, UINT id)
 bool SmRefreshFarmMemberInfo(HWND hWnd, SM_SERVER *p, void *param)
 {
 	RPC_FARM_INFO t;
-	UINT id = (UINT)param;
+	UINT id = POINTER_TO_UINT32(param);
 	LVB *b;
 	UINT i;
 	wchar_t tmp[MAX_SIZE];
@@ -15673,7 +15673,7 @@ UINT SmFarmMemberDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void
 			i = LvGetSelected(hWnd, L_FARM_MEMBER);
 			if (i != INFINITE)
 			{
-				SmFarmMemberCert(hWnd, p, (UINT)LvGetParam(hWnd, L_FARM_MEMBER, i));
+				SmFarmMemberCert(hWnd, p, POINTER_TO_UINT32(LvGetParam(hWnd, L_FARM_MEMBER, i)));
 			}
 			break;
 
@@ -15967,7 +15967,7 @@ void SmFarmDlgOnOk(HWND hWnd, SM_SERVER *p)
 					t.Ports = ZeroMalloc(sizeof(UINT) * t.NumPort);
 					for (i = 0;i < t.NumPort;i++)
 					{
-						t.Ports[i] = (UINT)LIST_DATA(o, i);
+						t.Ports[i] = POINTER_TO_UINT32(LIST_DATA(o, i));
 					}
 					ReleaseList(o);
 				}
@@ -18577,7 +18577,7 @@ void SmServerDlgRefresh(HWND hWnd, SM_SERVER *p)
 					icon = ICO_PROTOCOL_OFFLINE;
 				}
 
-				LvInsertAdd(b, icon, (void *)t.Ports[i], 2, tmp, status);
+				LvInsertAdd(b, icon, (void *)UINT32_TO_POINTER(t.Ports[i]), 2, tmp, status);
 			}
 			LvInsertEnd(b, hWnd, L_LISTENER);
 			FreeRpcListenerList(&t);
@@ -18804,7 +18804,7 @@ UINT SmServerDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 			i = LvGetSelected(hWnd, L_LISTENER);
 			if (i != INFINITE)
 			{
-				UINT port = (UINT)LvGetParam(hWnd, L_LISTENER, i);
+				UINT port = POINTER_TO_UINT32(LvGetParam(hWnd, L_LISTENER, i));
 				if (MsgBoxEx(hWnd, MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2, _UU("CM_DELETE_LISTENER_MSG"), port) == IDYES)
 				{
 					RPC_LISTENER t;
@@ -18825,7 +18825,7 @@ UINT SmServerDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 			i = LvGetSelected(hWnd, L_LISTENER);
 			if (i != INFINITE)
 			{
-				UINT port = (UINT)LvGetParam(hWnd, L_LISTENER, i);
+				UINT port = POINTER_TO_UINT32(LvGetParam(hWnd, L_LISTENER, i));
 				RPC_LISTENER t;
 				Zero(&t, sizeof(t));
 				t.Enable = true;
@@ -18843,7 +18843,7 @@ UINT SmServerDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 			i = LvGetSelected(hWnd, L_LISTENER);
 			if (i != INFINITE)
 			{
-				UINT port = (UINT)LvGetParam(hWnd, L_LISTENER, i);
+				UINT port = POINTER_TO_UINT32(LvGetParam(hWnd, L_LISTENER, i));
 				if (MsgBoxEx(hWnd, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2, _UU("CM_STOP_LISTENER_MSG"), port) == IDYES)
 				{
 					RPC_LISTENER t;

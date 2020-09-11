@@ -1276,7 +1276,7 @@ void SwLang1Init(HWND hWnd, SW *sw)
 		UniFormat(tmp, sizeof(tmp), L"(%s)", t->TitleLocal);
 		UniFormat(tmp2, sizeof(tmp2), L" %s", t->TitleEnglish);
 
-		LvInsertAdd(b, SwGetLangIcon(t->Name), (void *)(t->Id + 1), 2, tmp2, tmp);
+		LvInsertAdd(b, SwGetLangIcon(t->Name), (void *)UINT32_TO_POINTER(t->Id + 1), 2, tmp2, tmp);
 
 		if (t->Id == current_lang)
 		{
@@ -1342,7 +1342,7 @@ void SwLang1Update(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
 		return;
 	}
 
-	id = (UINT)LvGetSelectedParam(hWnd, L_LIST);
+	id = POINTER_TO_UINT32(LvGetSelectedParam(hWnd, L_LIST));
 
 	if (id == 0)
 	{
@@ -1417,7 +1417,7 @@ UINT SwLang1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, 
 		}
 
 		// Get the current selection
-		id = (UINT)LvGetSelectedParam(hWnd, L_LIST);
+		id = POINTER_TO_UINT32(LvGetSelectedParam(hWnd, L_LIST));
 		if (id != 0)
 		{
 			id--;

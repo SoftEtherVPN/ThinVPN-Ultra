@@ -1162,7 +1162,7 @@ bool DuEventCallback(DC_SESSION *s, UINT event_type, void *event_param)
 		// URL を受信
 		url = (char *)event_param;
 		ret = ShellExecuteA(t->hWnd, "open", url, NULL, NULL, SW_SHOW);
-		if ((DWORD)ret <= 32)
+		if ((UINT64)ret <= 32)
 		{
 			// 失敗したのでメッセージを表示する
 			MsgBoxEx(t->hWndConnect, MB_ICONINFORMATION, _UU("DU_URL_ERROR"),

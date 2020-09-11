@@ -2275,7 +2275,7 @@ UINT CmPkcsEulaDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		id = (UINT)param;
+		id = POINTER_TO_UINT32(param);
 		dev = GetSecureDevice(id);
 		if (dev == NULL)
 		{
@@ -2315,7 +2315,7 @@ UINT CmPkcsEulaDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 // Confirmation screen of whether the user accepts the EULA of the PKCS DLL
 bool CmCheckPkcsEula(HWND hWnd, UINT id)
 {
-	return (Dialog(hWnd, D_CM_PKCSEULA, CmPkcsEulaDlg, (void *)id) == 0) ? false : true;
+	return (Dialog(hWnd, D_CM_PKCSEULA, CmPkcsEulaDlg, (void *)UINT32_TO_POINTER(id)) == 0) ? false : true;
 }
 
 // Update controls
@@ -2357,7 +2357,7 @@ void CmSecurePinDlgUpdate(HWND hWnd)
 // PIN code changing dialog
 UINT CmSecurePinDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
 {
-	UINT id = (UINT)param;
+	UINT id = POINTER_TO_UINT32(param);
 	char *src, *dst;
 	SECURE *s;
 	// Validate arguments
@@ -2481,7 +2481,7 @@ void CmSecurePin(HWND hWnd, UINT id)
 		return;
 	}
 
-	Dialog(hWnd, D_CM_SECURE_PIN, CmSecurePinDlg, (void *)id);
+	Dialog(hWnd, D_CM_SECURE_PIN, CmSecurePinDlg, (void *)UINT32_TO_POINTER(id));
 }
 
 // Object type selection dialog
@@ -2593,7 +2593,7 @@ void CmSecureManagerDlgUpdate(HWND hWnd, UINT id)
 		b = false;
 	}
 
-	SetEnable(hWnd, B_EXPORT, b && ((UINT)LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST)) != SEC_K));
+	SetEnable(hWnd, B_EXPORT, b && (POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST))) != SEC_K));
 	SetEnable(hWnd, B_DELETE, b && (read_only == false));
 	SetEnable(hWnd, B_PIN, (read_only == false));
 	SetEnable(hWnd, B_IMPORT, (read_only == false));
@@ -2674,7 +2674,7 @@ void CmSecureManagerDlgPrintListEx(HWND hWnd, UINT id, LIST *o, UINT type)
 				icon = ICO_KEY;
 			}
 
-			LvInsertAdd(v, icon, (void *)obj->Type, 2, tmp1, tmp2);
+			LvInsertAdd(v, icon, (void *)UINT32_TO_POINTER(obj->Type), 2, tmp1, tmp2);
 		}
 	}
 
@@ -2987,7 +2987,7 @@ void CmSecureManagerDlgExport(HWND hWnd, UINT id)
 	StrCpy(name, sizeof(name), tmp);
 	Free(tmp);
 
-	type = (UINT)LvGetParam(hWnd, L_LIST, i);
+	type = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, i));
 
 	switch (type)
 	{
@@ -3072,7 +3072,7 @@ void CmSecureManagerDlgDelete(HWND hWnd, UINT id)
 	StrCpy(name, sizeof(name), tmp);
 	Free(tmp);
 
-	type = (UINT)LvGetParam(hWnd, L_LIST, i);
+	type = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, i));
 
 	switch (type)
 	{
@@ -3109,7 +3109,7 @@ static bool cm_secure_manager_no_new_cert = false;
 UINT CmSecureManagerDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
 {
 	NMHDR *n;
-	UINT id = (UINT)param;
+	UINT id = POINTER_TO_UINT32(param);
 	// Validate arguments
 	if (hWnd == NULL)
 	{
@@ -3229,7 +3229,7 @@ void CmSecureManagerEx(HWND hWnd, UINT id, bool no_new_cert)
 		cm_secure_manager_no_new_cert = false;
 	}
 
-	Dialog(hWnd, D_CM_SECURE_MANAGER, CmSecureManagerDlg, (void *)id);
+	Dialog(hWnd, D_CM_SECURE_MANAGER, CmSecureManagerDlg, (void *)UINT32_TO_POINTER(id));
 }
 
 // Smart Card Manager for Client
@@ -3288,14 +3288,14 @@ void CmSelectSecureDlgInit(HWND hWnd, UINT default_id)
 		StrToUni(tmp3, sizeof(tmp3), dev->Manufacturer);
 		StrToUni(tmp4, sizeof(tmp4), dev->ModuleName);
 
-		LvInsertAdd(v, ICO_SECURE, (void *)dev->Id, 4, tmp1, tmp2, tmp3, tmp4);
+		LvInsertAdd(v, ICO_SECURE, (void *)UINT32_TO_POINTER(dev->Id), 4, tmp1, tmp2, tmp3, tmp4);
 	}
 
 	LvInsertEnd(v, hWnd, L_LIST);
 
 	if (default_id != 0)
 	{
-		LvSelect(hWnd, L_LIST, LvSearchParam(hWnd, L_LIST, (void *)default_id));
+		LvSelect(hWnd, L_LIST, LvSearchParam(hWnd, L_LIST, (void *)UINT32_TO_POINTER(default_id)));
 	}
 
 	ReleaseList(o);
@@ -3313,7 +3313,7 @@ void CmSelectSecureDlgUpdate(HWND hWnd)
 // Smart card selection dialog
 UINT CmSelectSecureDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
 {
-	UINT default_id = (UINT)param;
+	UINT default_id = POINTER_TO_UINT32(param);
 	NMHDR *n = NULL;
 	static UINT old_id;
 	// Validate arguments
@@ -3356,7 +3356,7 @@ UINT CmSelectSecureDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *
 				UINT i = LvGetSelected(hWnd, L_LIST);
 				if (i != INFINITE)
 				{
-					UINT id = (UINT)LvGetParam(hWnd, L_LIST, i);
+					UINT id = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, i));
 
 					if (old_id != id)
 					{
@@ -3405,7 +3405,7 @@ UINT CmSelectSecureDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *
 // Select the smart card device to be used
 UINT CmSelectSecure(HWND hWnd, UINT current_id)
 {
-	return Dialog(hWnd, D_CM_SELECT_SECURE, CmSelectSecureDlg, (void *)current_id);
+	return Dialog(hWnd, D_CM_SELECT_SECURE, CmSelectSecureDlg, (void *)UINT32_TO_POINTER(current_id));
 }
 
 // Select the smart card device to be used (client)
@@ -4079,7 +4079,7 @@ void CmTrustDlgRefresh(HWND hWnd)
 			wchar_t tmp[MAX_SIZE];
 
 			GetDateStrEx64(tmp, sizeof(tmp), SystemToLocal64(cert->Expires), NULL);
-			LvInsertAdd(b, ICO_CERT, (void *)cert->Key, 3,
+			LvInsertAdd(b, ICO_CERT, (void *)UINT32_TO_POINTER(cert->Key), 3,
 				cert->SubjectName, cert->IssuerName, tmp);
 		}
 		LvInsertEnd(b, hWnd, L_CERT);
@@ -4119,7 +4119,7 @@ void CmTrustExport(HWND hWnd)
 		return;
 	}
 
-	key = (UINT)LvGetParam(hWnd, L_CERT, LvGetSelected(hWnd, L_CERT));
+	key = POINTER_TO_UINT32(LvGetParam(hWnd, L_CERT, LvGetSelected(hWnd, L_CERT)));
 	if (key != INFINITE)
 	{
 		RPC_GET_CA a;
@@ -4163,7 +4163,7 @@ void CmTrustView(HWND hWnd)
 		return;
 	}
 
-	key = (UINT)LvGetParam(hWnd, L_CERT, LvGetSelected(hWnd, L_CERT));
+	key = POINTER_TO_UINT32(LvGetParam(hWnd, L_CERT, LvGetSelected(hWnd, L_CERT)));
 	if (key != INFINITE)
 	{
 		RPC_GET_CA a;
@@ -4217,7 +4217,7 @@ UINT CmTrustDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *par
 			index = LvGetSelected(hWnd, L_CERT);
 			if (index != INFINITE)
 			{
-				UINT key = (UINT)LvGetParam(hWnd, L_CERT, index);
+				UINT key = POINTER_TO_UINT32(LvGetParam(hWnd, L_CERT, index));
 				if (key != INFINITE)
 				{
 					if (MsgBox(hWnd, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2, _UU("CM_CERT_DELETE_MSG")) == IDYES)
@@ -9129,7 +9129,7 @@ void CmPolicyDlgPrintEx2(HWND hWnd, CM_POLICY *p, bool cascade_mode, UINT ver)
 				}
 			}
 
-			LvInsertAdd(b, ICO_MACHINE, (void *)i, 2, GetPolicyTitle(i), tmp);
+			LvInsertAdd(b, ICO_MACHINE, (void *)UINT32_TO_POINTER(i), 2, GetPolicyTitle(i), tmp);
 		}
 	}
 
@@ -9196,7 +9196,7 @@ UINT CmPolicyDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 				else
 				{
 					UINT index = LvGetSelected(hWnd, L_POLICY);
-					UINT id = (UINT)LvGetParam(hWnd, L_POLICY, index);
+					UINT id = POINTER_TO_UINT32(LvGetParam(hWnd, L_POLICY, index));
 					if (id < NUM_POLICY_ITEM)
 					{
 						SetText(hWnd, S_DESCRIPTION, GetPolicyDescription(id));
@@ -10086,7 +10086,7 @@ bool CmIsEnabled(HWND hWnd, UINT id)
 		{
 			// Determine whether the selected account is a startup account
 			UINT i = LvGetSelected(hWnd, L_ACCOUNT);
-			bool is_startup = (bool)LvGetParam(hWnd, L_ACCOUNT, i);
+			bool is_startup = (bool)POINTER_TO_UINT32(LvGetParam(hWnd, L_ACCOUNT, i));
 			if (id == CMD_STARTUP)
 			{
 				return !is_startup;
@@ -10584,7 +10584,7 @@ void CmRefreshAccountListEx2(HWND hWnd, bool easy, bool style_changed)
 
 			if (easy == false)
 			{
-				LvInsertAdd(b, icon, (void *)t->StartupAccount, 5, t->AccountName,
+				LvInsertAdd(b, icon, (void *)UINT32_TO_POINTER(t->StartupAccount), 5, t->AccountName,
 					t->Active == false ? _UU("CM_ACCOUNT_OFFLINE") :
 					(t->Connected ? _UU("CM_ACCOUNT_ONLINE") : _UU("CM_ACCOUNT_CONNECTING")),
 					tmp2, tmp4,
@@ -10592,7 +10592,7 @@ void CmRefreshAccountListEx2(HWND hWnd, bool easy, bool style_changed)
 			}
 			else
 			{
-				LvInsertAdd(b, icon, (void *)t->StartupAccount, 5, t->AccountName,
+				LvInsertAdd(b, icon, (void *)UINT32_TO_POINTER(t->StartupAccount), 5, t->AccountName,
 					t->Active == false ? _UU("CM_ACCOUNT_OFFLINE") :
 					(t->Connected ? _UU("CM_ACCOUNT_ONLINE") : _UU("CM_ACCOUNT_CONNECTING")),
 					tmp2, tmp4,
@@ -11502,13 +11502,13 @@ void CmRedrawStatusBar(HWND hWnd)
 	SendMsg(h, 0, SB_SETPARTS, 3, (LPARAM)xx);
 
 	// Set an icon
-	icon = (HICON)SendMsg(h, 0, SB_GETICON, 1, 0);
+	icon = (HICON)UINT32_TO_POINTER(SendMsg(h, 0, SB_GETICON, 1, 0));
 	if (icon != cm->Icon2)
 	{
 		SendMsg(h, 0, SB_SETICON, 1, (LPARAM)cm->Icon2);
 	}
 
-	icon = (HICON)SendMsg(h, 0, SB_GETICON, 2, 0);
+	icon = (HICON)UINT32_TO_POINTER(SendMsg(h, 0, SB_GETICON, 2, 0));
 	if (icon != cm->Icon3)
 	{
 		SendMsg(h, 0, SB_SETICON, 2, (LPARAM)cm->Icon3);

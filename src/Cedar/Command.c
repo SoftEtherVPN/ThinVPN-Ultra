@@ -399,7 +399,7 @@ void CheckThread1(THREAD *thread, void *param)
 	{
 		Lock(ct1->lock);
 		check_thread_global_1 = ct1->num;
-		InputToNull((void *)check_thread_global_1);
+		InputToNull((void *)UINT32_TO_POINTER(check_thread_global_1));
 		check_thread_global_1 = check_thread_global_1 + 1 + RetZero();
 		ct1->num = check_thread_global_1;
 		Unlock(ct1->lock);
@@ -686,7 +686,7 @@ bool CheckMemory()
 		pp[i] = ReAlloc(pp[i], size);
 		for (j = old_size;j < size;j++)
 		{
-			InputToNull((void *)(UINT)(((UCHAR *)pp[i])[j] = j % 256));
+			InputToNull(UINT32_TO_POINTER((UINT)(((UCHAR *)pp[i])[j] = j % 256)));
 		}
 	}
 	for (i = 0;i < num;i++)
@@ -7477,13 +7477,13 @@ LIST *StrToPortList(char *str)
 			FreeToken(t);
 			return NULL;
 		}
-		if (IsInList(o, (void *)n))
+		if (IsInList(o, (void *)UINT32_TO_POINTER(n)))
 		{
 			ReleaseList(o);
 			FreeToken(t);
 			return NULL;
 		}
-		Add(o, (void *)n);
+		Add(o, (void *)UINT32_TO_POINTER(n));
 	}
 
 	FreeToken(t);
@@ -7560,7 +7560,7 @@ UINT PsClusterSettingMember(CONSOLE *c, char *cmd_name, wchar_t *str, void *para
 
 		for (i = 0;i < t.NumPort;i++)
 		{
-			t.Ports[i] = (UINT)LIST_DATA(ports, i);
+			t.Ports[i] = POINTER_TO_UINT32(LIST_DATA(ports, i));
 		}
 
 		t.Weight = weight;
@@ -7632,7 +7632,7 @@ bool CmdEvalHostAndPort(CONSOLE *c, wchar_t *str, void *param)
 
 	tmp = CopyUniToStr(str);
 
-	ret = ParseHostPort(tmp, NULL, NULL, (UINT)param);
+	ret = ParseHostPort(tmp, NULL, NULL, POINTER_TO_UINT32(param));
 
 	if (ret == false)
 	{

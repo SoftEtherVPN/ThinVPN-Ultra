@@ -2423,14 +2423,14 @@ bool MsExecute(char *exe, char *arg)
 }
 bool MsExecute2(char *exe, char *arg, bool runas)
 {
-	DWORD d;
+	UINT64 d;
 	// Validate arguments
 	if (exe == NULL)
 	{
 		return false;
 	}
 
-	d = (DWORD)ShellExecuteA(NULL, (runas ? "runas" : "open"), exe, arg, MsGetExeDirName(), SW_SHOWNORMAL);
+	d = (UINT64)ShellExecuteA(NULL, (runas ? "runas" : "open"), exe, arg, MsGetExeDirName(), SW_SHOWNORMAL);
 
 	if (d > 32)
 	{
@@ -2445,7 +2445,7 @@ bool MsExecuteW(wchar_t *exe, wchar_t *arg)
 }
 bool MsExecute2W(wchar_t *exe, wchar_t *arg, bool runas)
 {
-	DWORD d;
+	UINT64 d;
 	// Validate arguments
 	if (exe == NULL)
 	{
@@ -2463,7 +2463,7 @@ bool MsExecute2W(wchar_t *exe, wchar_t *arg, bool runas)
 		return MsExecute(exe_a, arg_a);
 	}
 
-	d = (DWORD)ShellExecuteW(NULL, (runas ? L"runas" : L"open"), exe, arg, MsGetExeDirNameW(), SW_SHOWNORMAL);
+	d = (UINT64)ShellExecuteW(NULL, (runas ? L"runas" : L"open"), exe, arg, MsGetExeDirNameW(), SW_SHOWNORMAL);
 
 	if (d > 32)
 	{

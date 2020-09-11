@@ -419,7 +419,7 @@ void EmLicenseDlgRefresh(HWND hWnd, RPC *s)
 
 		LvInsertAdd(b,
 			e->Status == LICENSE_STATUS_OK ? ICO_PASS : ICO_DISCARD,
-			(void *)e->Id, 9,
+			(void *)UINT32_TO_POINTER(e->Id), 9,
 			tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7, tmp8, tmp9);
 	}
 
@@ -553,7 +553,7 @@ UINT EmLicenseDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 		case B_DEL:
 			if (IsEnable(hWnd, B_DEL))
 			{
-				UINT id = (UINT)LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST));
+				UINT id = POINTER_TO_UINT32(LvGetParam(hWnd, L_LIST, LvGetSelected(hWnd, L_LIST)));
 
 				if (id != 0)
 				{

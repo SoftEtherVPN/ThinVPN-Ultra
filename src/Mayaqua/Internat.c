@@ -2058,6 +2058,7 @@ UINT Utf8ToUni(wchar_t *s, UINT size, BYTE *u, UINT u_size)
 
 		if (IsBigEndian())
 		{
+#ifndef OS_WIN32
 			if (sizeof(wchar_t) == 2)
 			{
 				((BYTE *)&c)[0] = c1;
@@ -2068,6 +2069,11 @@ UINT Utf8ToUni(wchar_t *s, UINT size, BYTE *u, UINT u_size)
 				((BYTE *)&c)[2] = c1;
 				((BYTE *)&c)[3] = c2;
 			}
+#else // OS_WIN32
+			// VC++ (supposed never come here)
+			((BYTE*)&c)[0] = c1;
+			((BYTE*)&c)[1] = c2;
+#endif // OS_WIN32
 		}
 		else
 		{

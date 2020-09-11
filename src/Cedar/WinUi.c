@@ -1162,7 +1162,7 @@ UINT CALLBACK WizardPageDefDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	case WM_CTLCOLORMSGBOX:
 	case WM_CTLCOLORSCROLLBAR:
 	case WM_CTLCOLORSTATIC:
-		return (UINT)GetStockObject(WHITE_BRUSH);
+		return POINTER_TO_UINT32(GetStockObject(WHITE_BRUSH));
 		break;
 
 	case WM_NOTIFY:
@@ -1376,7 +1376,7 @@ LRESULT CALLBACK WizardCustomizedWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 		case WM_CTLCOLORMSGBOX:
 		case WM_CTLCOLORSCROLLBAR:
 		case WM_CTLCOLORSTATIC:
-			return (UINT)GetStockObject(WHITE_BRUSH);
+			return POINTER_TO_UINT32(GetStockObject(WHITE_BRUSH));
 			break;
 		}
 
@@ -3547,7 +3547,7 @@ void GetWindowAndControlSizeResizeScale(HWND hWnd, bool *need_resize, double *fa
 	*need_resize = true;
 
 	// Get the font of the current window
-	hDlgFont = (HFONT)SendMsg(hWnd, 0, WM_GETFONT, 0, 0);
+	hDlgFont = (HFONT)UINT32_TO_POINTER(SendMsg(hWnd, 0, WM_GETFONT, 0, 0));
 
 	// Get the width and height of the font of the current window
 	CalcFontSize(hDlgFont, &dlgfont_x, &dlgfont_y);
@@ -3584,7 +3584,7 @@ void AdjustWindowAndControlSize(HWND hWnd, bool *need_resize, double *factor_x, 
 	*need_resize = true;
 
 	// Get the font of the current window
-	hDlgFont = (HFONT)SendMsg(hWnd, 0, WM_GETFONT, 0, 0);
+	hDlgFont = (HFONT)UINT32_TO_POINTER(SendMsg(hWnd, 0, WM_GETFONT, 0, 0));
 
 	// Get the width and height of the font of the current window
 	CalcFontSize(hDlgFont, &dlgfont_x, &dlgfont_y);
@@ -5656,7 +5656,7 @@ BOOL CALLBACK EnumResNameProc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName
 {
 	if (IS_INTRESOURCE(lpszName))
 	{
-		UINT icon_id = (UINT)lpszName;
+		UINT icon_id = POINTER_TO_UINT32(lpszName);
 		IMAGELIST_ICON *img = LoadIconForImageList(icon_id);
 
 		Add(icon_list, img);
@@ -10789,7 +10789,7 @@ UINT DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, bool white_color
 	case WM_CTLCOLORSTATIC:
 		if (white_color)
 		{
-			return (UINT)GetStockObject(WHITE_BRUSH);
+			return POINTER_TO_UINT32(GetStockObject(WHITE_BRUSH));
 		}
 		break;
 	}

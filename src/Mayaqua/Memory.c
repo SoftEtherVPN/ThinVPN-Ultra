@@ -630,7 +630,7 @@ void CrashNow()
 	while (true)
 	{
 		UINT r = Rand32();
-		UCHAR *c = (UCHAR *)r;
+		UCHAR *c = (UCHAR *)UINT32_TO_POINTER(r);
 
 		*c = Rand8();
 	}

@@ -1160,7 +1160,7 @@ void SetThreadName(UINT thread_id, char *name, void *param)
 		}
 		else
 		{
-			sprintf(tmp, "%s (0x%x)", name, (UINT)param);
+			sprintf(tmp, "%s (0x%x)", name, POINTER_TO_UINT32(param));
 		}
 
 		Win32SetThreadName(thread_id, tmp);

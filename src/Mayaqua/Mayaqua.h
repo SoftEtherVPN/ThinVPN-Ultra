@@ -173,10 +173,32 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 // pointer to UINT cast type
 #ifdef CPU_64
 // 64 bit
-#define PTR32		UINT)(UINT64
+// Convert the pointer to UINT
+#define	POINTER_TO_KEY(p)		(HashPtrToUINT(p))
+// Compare the pointer and UINT
+#define	COMPARE_POINTER_AND_KEY(p, i)	(POINTER_TO_KEY(p) == (i))
+// Convert the pointer to UINT64
+#define	POINTER_TO_UINT64(p)	((UINT64)(p))
+// Convert the pointer to UINT
+#define	POINTER_TO_UINT32(p)	((UINT32)((UINT64)(p)))
+// Convert a UINT64 to pointer
+#define	UINT64_TO_POINTER(i)	((void *)(i))
+// Convert a UINT32 to pointer
+#define	UINT32_TO_POINTER(i)	((void *)((UINT64)i))
 #else	// CPU_64
 // 32 bit
-#define PTR32		UINT
+// Convert the pointer to UINT
+#define	POINTER_TO_KEY(p)		((UINT)(p))
+// Compare the pointer and UINT
+#define	COMPARE_POINTER_AND_KEY(p, i)	(POINTER_TO_KEY(p) == (i))
+// Convert the pointer to UINT64
+#define	POINTER_TO_UINT64(p)	((UINT64)((UINT)(p)))
+// Convert the pointer to UINT
+#define	POINTER_TO_UINT32(p)	((UINT)(p))
+// Convert a UINT64 to pointer
+#define	UINT64_TO_POINTER(i)	((void *)((UINT)(i)))
+// Convert a UINT32 to pointer
+#define	UINT32_TO_POINTER(i)	((void *)((UINT)(i)))
 #endif	// CPU_64
 
 // Directory separator
