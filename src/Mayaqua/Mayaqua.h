@@ -129,7 +129,7 @@ void InitProcessCallOnce();
 
 #ifdef	VPN_EXE
 // To build the executable file
-#ifdef	WIN32
+#ifdef	_WIN32
 #include <windows.h>
 #include "../PenCore/resource.h"
 int main(int argc, char *argv[]);
@@ -139,7 +139,7 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 	InitProcessCallOnceEx(1);
 	return main(1, argv);
 }
-#endif	// WIN32
+#endif	// _WIN32
 #endif	// VPN_EXE
 
 // Constant
@@ -151,6 +151,9 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 // Determining the OS
 #ifdef	_WIN32
 #define	OS_WIN32		// Microsoft Windows
+#ifndef	WIN32
+#define	WIN32
+#endif
 #else
 #define	OS_UNIX			// UNIX
 #define	UNIX			// UNIX
@@ -170,16 +173,16 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 // Directory separator
 #ifdef	OS_WIN32
 #define	PATH_BACKSLASH	// Backslash (\)
-#else	// WIN32
+#else	// _WIN32
 #define	PATH_SLASH		// Slash (/)
-#endif	// WIN32
+#endif	// _WIN32
 
 // Character code
 #ifdef	OS_WIN32
 #define	CODE_SHIFTJIS	// Shift_JIS code
-#else	// WIN32
+#else	// _WIN32
 #define	CODE_EUC		// euc-jp code
-#endif	// WIN32
+#endif	// _WIN32
 
 // Endian
 #define	IsBigEndian()		(g_little_endian ? false : true)
@@ -233,11 +236,11 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 #endif
 
 // Macro that displays the current time
-#ifdef	WIN32
+#ifdef	_WIN32
 #define	WHEN			if (IsDebug()){WHERE; MsPrintTick();}
-#else	// WIN32
+#else	// _WIN32
 #define	WHEN
-#endif	// WIN32
+#endif	// _WIN32
 
 #ifdef	OS_UNIX
 #ifndef	UNIX_SOLARIS
@@ -337,11 +340,11 @@ int iconv_close (iconv_t __cd);
 #endif	// OS_UNIX
 
 // IPv6 support flag
-#ifndef	WIN32
+#ifndef	_WIN32
 #ifndef	AF_INET6
 #define	NO_IPV6
 #endif	// AF_INET6
-#endif	// WIN32
+#endif	// _WIN32
 
 // Basic type declaration
 #include <Mayaqua/MayaType.h>

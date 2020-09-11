@@ -13,7 +13,7 @@
 
 #include <GlobalConst.h>
 
-#ifdef	WIN32
+#ifdef	_WIN32
 
 #define	SM_C
 #define	CM_C
@@ -3016,6 +3016,6 @@ void DIExec(bool helper)
 	Free(di);
 }
 
-#endif	// WIN32
+#endif	// _WIN32
 
 

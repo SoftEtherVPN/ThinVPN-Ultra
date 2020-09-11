@@ -107,9 +107,9 @@
 #define	SECURE_C
 #define	ENCRYPT_C
 
-#ifdef	WIN32
+#ifdef	_WIN32
 #include <windows.h>
-#endif	// WIN32
+#endif	// _WIN32
 
 #include <stdio.h>
 #include <stdlib.h>

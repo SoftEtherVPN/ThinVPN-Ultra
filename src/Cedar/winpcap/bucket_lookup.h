@@ -32,7 +32,7 @@
 
 #ifndef __bucket_lookup
 #define __bucket_lookup
-#ifdef WIN32
+#ifdef _WIN32
 #include "tme.h"
 #endif
 

@@ -111,7 +111,7 @@
 
 #define	__WINCRYPT_H__
 
-#ifdef	WIN32
+#ifdef	_WIN32
 // Include windows.h for Socket API
 #define	_WIN32_IE			0x0600
 #define	_WIN32_WINNT		0x0502
@@ -124,7 +124,7 @@
 #include <ws2ipdef.h>
 #include <netioapi.h>
 #include <Icmpapi.h>
-#endif	// WIN32
+#endif	// _WIN32
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -33,7 +33,7 @@
 #ifndef __count_packets
 #define __count_packets
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "tme.h"
 #endif
 

@@ -57,32 +57,21 @@ C/C++
             プログラム全体の最適化: いいえ
     プリプロセッサ
         (ライブラリの場合)
-            Debug - Win32
-                WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)
-            Debug - x64
-                WIN32;_DEBUG;_LIB;CPU_64;%(PreprocessorDefinitions)
-            Release - Win32
-                WIN32;NDEBUG;_LIB;VPN_SPEED;%(PreprocessorDefinitions)
-            Release - x64
-                WIN32;NDEBUG;_LIB;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)
+            Debug
+                _DEBUG;_LIB;%(PreprocessorDefinitions)
+            Release
+                NDEBUG;_LIB;VPN_SPEED;%(PreprocessorDefinitions)
         (DLL または EXE の場合)
-            Debug - Win32
-                WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)
-            Debug - x64
-                WIN32;_DEBUG;_WINDOWS;CPU_64;%(PreprocessorDefinitions)
-            Release - Win32
-                WIN32;NDEBUG;_WINDOWS;VPN_SPEED;%(PreprocessorDefinitions)
-            Release - x64
-                WIN32;NDEBUG;_WINDOWS;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)
+            Debug
+                _DEBUG;_WINDOWS;%(PreprocessorDefinitions)
+            Release
+                NDEBUG;_WINDOWS;VPN_SPEED;%(PreprocessorDefinitions)
+)
         (EXE かつコンソールアプリの場合)
-            Debug - Win32
-                WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)
-            Debug - x64
-                WIN32;_DEBUG;_CONSOLE;CPU_64;%(PreprocessorDefinitions)
-            Release - Win32
-                WIN32;NDEBUG;_CONSOLE;VPN_SPEED;%(PreprocessorDefinitions)
-            Release - x64
-                WIN32;NDEBUG;_CONSOLE;VPN_SPEED;CPU_64;%(PreprocessorDefinitions)
+            Debug
+                _DEBUG;_CONSOLE;%(PreprocessorDefinitions)
+            Release
+                NDEBUG;_CONSOLE;VPN_SPEED;%(PreprocessorDefinitions)
     コード生成
         文字列プール: いいえ
         最小リビルドを有効にする: いいえ

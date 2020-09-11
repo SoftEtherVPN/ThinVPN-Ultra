@@ -37,7 +37,7 @@
 #ifndef lib_pcap_h
 #define lib_pcap_h
 
-#if defined(WIN32)
+#if defined(_WIN32)
   #include <pcap-stdinc.h>
 #elif defined(MSDOS)
   #include <sys/types.h>
@@ -58,7 +58,7 @@
 	// This is to avoid the distribution of the 'sockutils.h' file around
 	// (for example in the WinPcap developer's pack)
 	#ifndef SOCKET
-		#ifdef WIN32
+		#ifdef _WIN32
 			#define SOCKET unsigned int
 		#else
 			#define SOCKET int
@@ -286,7 +286,7 @@ int	bpf_validate(struct bpf_insn *f, int len);
 char	*bpf_image(struct bpf_insn *, int);
 void	bpf_dump(struct bpf_program *, int);
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 /*
  * Win32 definitions

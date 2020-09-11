@@ -33,7 +33,7 @@
 #ifndef __normal_lookup
 #define __normal_lookup
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "tme.h"
 #endif
 

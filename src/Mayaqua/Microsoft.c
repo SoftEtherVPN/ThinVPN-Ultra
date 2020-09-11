@@ -105,7 +105,7 @@
 
 #include <GlobalConst.h>
 
-#ifdef	WIN32
+#ifdef	_WIN32
 
 #define	MICROSOFT_C
 
@@ -16143,5 +16143,5 @@ UINT64 MsGetCurrentFileTime()
 }
 
 
-#endif	// WIN32
+#endif	// _WIN32
 

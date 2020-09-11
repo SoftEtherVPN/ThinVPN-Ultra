@@ -104,7 +104,7 @@
 
 #include <GlobalConst.h>
 
-#ifdef	WIN32
+#ifdef	_WIN32
 
 //#define NTDDI_WIN7                          0x06010000
 //#define	_WIN32_WINNT	_WIN32_WINNT_VISTA

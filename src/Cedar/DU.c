@@ -13,7 +13,7 @@
 
 #include <GlobalConst.h>
 
-#ifdef	WIN32
+#ifdef	_WIN32
 
 #define	SM_C
 #define	CM_C
@@ -3492,4 +3492,4 @@ void DuStopApplyWhiteListRules(void *handle)
 	du_wfp_api->FwpmEngineClose0((HANDLE)handle);
 }
 
-#endif	// WIN32
+#endif	// _WIN32

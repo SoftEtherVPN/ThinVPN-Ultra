@@ -58,7 +58,7 @@ struct in6_addr
 #endif /* __MINGW32__ */
 
 
-#if (defined WIN32) || (defined __MINGW32__)
+#if (defined _WIN32) || (defined __MINGW32__)
 typedef unsigned short	sa_family_t;
 #endif
 

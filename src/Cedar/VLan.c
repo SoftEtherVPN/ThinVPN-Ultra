@@ -106,7 +106,7 @@
 
 #define	VLAN_C
 
-#ifdef	WIN32
+#ifdef	_WIN32
 #define	OS_WIN32
 #endif
 

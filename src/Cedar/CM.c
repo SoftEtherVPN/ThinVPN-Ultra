@@ -106,7 +106,7 @@
 
 #include <GlobalConst.h>
 
-#ifdef	WIN32
+#ifdef	_WIN32
 
 #define	CM_C
 #define	SM_C
@@ -12566,6 +12566,6 @@ void *CmUpdateJumpList(UINT start_id)
 
 
 
-#endif	// WIN32
+#endif	// _WIN32
 
 

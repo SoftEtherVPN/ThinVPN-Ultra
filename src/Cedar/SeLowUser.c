@@ -104,7 +104,7 @@
 
 #include <GlobalConst.h>
 
-#ifdef	WIN32
+#ifdef	_WIN32
 
 #include <windows.h>
 #include <stdio.h>
@@ -1072,5 +1072,5 @@ void SuFree(SU *u)
 	Free(u);
 }
 
-#endif	// WIN32
+#endif	// _WIN32
 

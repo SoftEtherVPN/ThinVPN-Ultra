@@ -42,9 +42,9 @@ extern "C" {
 
 #include <pcap.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <packet32.h>
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #ifdef MSDOS
 #include <fcntl.h>
@@ -148,7 +148,7 @@ struct pcap_md {
 #endif
 
 struct pcap {
-#ifdef WIN32
+#ifdef _WIN32
 	ADAPTER *adapter;
 	LPPACKET Packet;
 	int timeout;
@@ -157,7 +157,7 @@ struct pcap {
 	int fd;
 	int selectable_fd;
 	int send_fd;
-#endif /* WIN32 */
+#endif /* _WIN32 */
 	int snapshot;
 	int linktype;
 	int tzoff;		/* timezone offset */
@@ -218,7 +218,7 @@ struct pcap {
 	struct pcap_pkthdr pcap_header;	/* This is needed for the pcap_next_ex() to work */
 
 #ifdef HAVE_REMOTE
-#ifndef WIN32	// Win32 already defines 'timeout'
+#ifndef _WIN32	// Win32 already defines 'timeout'
 	int timeout;				//!< timeout to be used in the pcap_open()
 #endif
 	/*! \brief '1' if we're the network client; needed by several functions (like pcap_setfilter() ) to know if 
@@ -328,7 +328,7 @@ extern int vsnprintf (char *, size_t, const char *, va_list ap);
 /*
  * Routines that most pcap implementations can use for non-blocking mode.
  */
-#if !defined(WIN32) && !defined(MSDOS)
+#if !defined(_WIN32) && !defined(MSDOS)
 int	pcap_getnonblock_fd(pcap_t *, char *);
 int	pcap_setnonblock_fd(pcap_t *p, int, char *);
 #endif
@@ -353,7 +353,7 @@ struct sockaddr *dup_sockaddr(struct sockaddr *, size_t);
 int	add_or_find_if(pcap_if_t **, pcap_if_t **, const char *, u_int,
 	    const char *, char *);
 
-#ifdef WIN32
+#ifdef _WIN32
 char	*pcap_win32strerror(void);
 #endif
 

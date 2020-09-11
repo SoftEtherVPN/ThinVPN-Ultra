@@ -104,7 +104,7 @@
 
 #include <GlobalConst.h>
 
-#ifdef	WIN32
+#ifdef	_WIN32
 
 #define	WINUI_C
 
@@ -12111,4 +12111,4 @@ void FreeWinUi()
 	lock_common_dc = NULL;
 }
 
-#endif	// WIN32
+#endif	// _WIN32

@@ -33,7 +33,7 @@
 #ifndef __tcp_session
 #define __tcp_session
 
-#ifdef WIN32
+#ifdef _WIN32
 #include "tme.h"
 #endif
 

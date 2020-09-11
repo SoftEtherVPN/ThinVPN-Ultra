@@ -154,7 +154,7 @@
 #ifdef	NEO_DEVICE_DRIVER
 
 // OS determination
-#ifdef	WIN32
+#ifdef	_WIN32
 #define	OS_WIN32	// Microsoft Windows
 #else
 #define	OS_UNIX		// UNIX / Linux

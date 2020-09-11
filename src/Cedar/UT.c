@@ -104,7 +104,7 @@
 
 #include <GlobalConst.h>
 
-#ifdef	WIN32
+#ifdef	_WIN32
 
 #define	UT_C
 
@@ -407,5 +407,5 @@ void UtSpeedMeterEx(void *hWnd)
 	Dialog((HWND)hWnd, D_SPEEDMETER, UtSpeedMeterDlgProc, NULL);
 }
 
-#endif // WIN32
+#endif // _WIN32
 
