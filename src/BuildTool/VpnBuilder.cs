@@ -245,7 +245,7 @@ namespace BuildTool
         public static string GetVsDevCmdFilePath()
         {
             string vsWhere = Path.Combine(Paths.UltraBuildFilesDirName, @"Utility\vswhere.exe");
-            string args = @"-latest -version 1.2 -requires Microsoft.Component.MSBuild -find Common7\Tools\VsDevCmd.bat";
+            string args = @"-version [16.0,17.0) -sort -requires Microsoft.Component.MSBuild -find Common7\Tools\VsDevCmd.bat";
 
             using (Process p = new Process())
             {
