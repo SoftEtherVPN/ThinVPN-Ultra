@@ -2,13 +2,12 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("PacketiX VPN / SoftEther VPN Build Utility")]
+[assembly: AssemblyTitle("IPA Ultra Build Tool")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("SoftEther Corporation")]
-[assembly: AssemblyProduct("PacketiX VPN / SoftEther VPN Build Utility")]
-[assembly: AssemblyCopyright("Copyright (c) SoftEther Corporation. All Rights Reserved.")]
-[assembly: AssemblyTrademark("PacketiX(R) and SoftEther(R) is a registered trademark of SoftEther Corporation.")]
+[assembly: AssemblyCompany("IPA CyberLab")]
+[assembly: AssemblyProduct("IPA Ultra Build Tool")]
+[assembly: AssemblyCopyright("Copyright (c) IPA CyberLab. All Rights Reserved.")]
 [assembly: AssemblyCulture("")]
 
 [assembly: ComVisible(false)]
