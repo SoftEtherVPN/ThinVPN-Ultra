@@ -198,10 +198,10 @@ namespace BuildTool
 				// Create a batch file
 				string batFileName = Path.Combine(Paths.TmpDirName, "exec_mt.cmd");
 				StreamWriter bat = new StreamWriter(batFileName, false, Str.ShiftJisEncoding);
-				bat.WriteLine("call \"{0}\"", Paths.VisualStudioVCBatchFileName);
+				//bat.WriteLine("call \"{0}\"", Paths.GetVsDevCmdFilePath());
 				bat.WriteLine("echo on");
-				bat.WriteLine("mt.exe -manifest \"{0}\" -outputresource:\"{1}\";1", filename, exeTmp);
-				bat.WriteLine("EXIT /B %ERRORLEVEL%");
+                bat.WriteLine("\"{2}\" -manifest \"{0}\" -outputresource:\"{1}\";1", filename, exeTmp, Path.Combine(Paths.MicrosoftSDKBinDir, "mt.exe"));
+                bat.WriteLine("EXIT /B %ERRORLEVEL%");
 				bat.Close();
 
 				Exception ex = null;

@@ -147,10 +147,10 @@ namespace BuildTool
 		public static readonly string ReleaseDestDir_SEVPN = @"s:\NTTVPN\Releases_SEVPN";
 
 		public static readonly string BuildHamcoreFilesDirName = Path.Combine(SolutionBinDirName, "BuiltHamcoreFiles");
-		public static readonly string VisualStudioVCDir;
-		public static readonly string VisualStudioVCBatchFileName;
-		public static readonly string DotNetFramework35Dir;
-		public static readonly string MSBuildFileName;
+		//public static readonly string VisualStudioVCDir;
+		//public static readonly string VisualStudioVCBatchFileName;
+		//public static readonly string DotNetFramework35Dir;
+		//public static readonly string MSBuildFileName;
 		public static readonly string TmpDirName;
 		public static readonly DateTime StartDateTime = DateTime.Now;
 		public static readonly string StartDateTimeStr;
@@ -165,6 +165,7 @@ namespace BuildTool
 		public static readonly string OssCommentsFile = Path.Combine(StringsDir, "OssComments.txt");
 		public static readonly string AutorunSrcDir = IO.NormalizePath(Path.Combine(SolutionBaseDirName, @"..\Autorun"));
 		public static readonly string MicrosoftSDKDir;
+		public static readonly string MicrosoftSDKBinDir;
 		public static readonly string MakeCatFilename;
 		public static readonly string RcFilename;
 		public static readonly string SoftEtherBuildDir = Env.SystemDir.Substring(0, 2) + @"\tmp\softether_build_dir";
@@ -192,66 +193,45 @@ namespace BuildTool
 				throw new ApplicationException(string.Format("'{0}' is not a VPN base directory.", Paths.SolutionBaseDirName));
 			}
 
-			// Get the VC++ directory
-			// Visual Studio 2008
-			if (IntPtr.Size == 4)
+			// Get Microsoft SDK directory
+			if (IntPtr.Size == 8)
 			{
-				Paths.VisualStudioVCDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Microsoft\VisualStudio\9.0\Setup\VC", "ProductDir"));
+				Paths.MicrosoftSDKDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v10.0", "InstallationFolder"));
 			}
 			else
 			{
-				Paths.VisualStudioVCDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\9.0\Setup\VC", "ProductDir"));
-			}
-			if (Str.IsEmptyStr(Paths.VisualStudioVCDir))
-			{
-				throw new ApplicationException("Visual C++ directory not found.\n");
-			}
-			if (Directory.Exists(Paths.VisualStudioVCDir) == false)
-			{
-				throw new ApplicationException(string.Format("Directory '{0}' not found.", Paths.VisualStudioVCDir));
+				Paths.MicrosoftSDKDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Microsoft\Microsoft SDKs\Windows\v10.0", "InstallationFolder"));
 			}
 
-			// Get the VC++ batch file name
-			Paths.VisualStudioVCBatchFileName = Path.Combine(Paths.VisualStudioVCDir, "vcvarsall.bat");
-			if (File.Exists(Paths.VisualStudioVCBatchFileName) == false)
-			{
-				throw new ApplicationException(string.Format("File '{0}' not found.", Paths.VisualStudioVCBatchFileName));
-			}
+            if (Str.IsEmptyStr(Paths.MicrosoftSDKDir))
+            {
+                throw new ApplicationException("Microsoft SDK not found.");
+            }
 
-			bool x86_dir = false;
+			Paths.MicrosoftSDKBinDir = Path.Combine(Paths.MicrosoftSDKDir, @"bin\x86");
 
-			// Get Microsoft SDK 6.0a directory
-			if (IntPtr.Size == 4)
-			{
-				Paths.MicrosoftSDKDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v6.0A", "InstallationFolder"));
-			}
-			else
-			{
-				Paths.MicrosoftSDKDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Microsoft\Microsoft SDKs\Windows\v6.0A", "InstallationFolder"));
-			}
-
-			// Get makecat.exe file name
-			Paths.MakeCatFilename = Path.Combine(Paths.MicrosoftSDKDir, @"bin\" + (x86_dir ? @"x86\" : "") + "makecat.exe");
+            // Get makecat.exe file name
+            Paths.MakeCatFilename = Path.Combine(Paths.MicrosoftSDKBinDir, "makecat.exe");
 
 			// Get the rc.exe file name
-			Paths.RcFilename = Path.Combine(Paths.MicrosoftSDKDir, @"bin\" + (x86_dir ? @"x86\" : "") + "rc.exe");
+			Paths.RcFilename = Path.Combine(Paths.MicrosoftSDKBinDir, "rc.exe");
 
-			// Get the cmd.exe file name
-			Paths.CmdFileName = Path.Combine(Env.SystemDir, "cmd.exe");
+            // Get the cmd.exe file name
+            Paths.CmdFileName = Path.Combine(Env.SystemDir, "cmd.exe");
 			if (File.Exists(Paths.CmdFileName) == false)
 			{
 				throw new ApplicationException(string.Format("File '{0}' not found.", Paths.CmdFileName));
 			}
 
-			// Get .NET Framework 3.5 directory
-			Paths.DotNetFramework35Dir = Path.Combine(Env.WindowsDir, @"Microsoft.NET\Framework\v3.5");
+			//// Get .NET Framework 3.5 directory
+			//Paths.DotNetFramework35Dir = Path.Combine(Env.WindowsDir, @"Microsoft.NET\Framework\v3.5");
 
-			// Get msbuild.exe directory
-			Paths.MSBuildFileName = Path.Combine(Paths.DotNetFramework35Dir, "MSBuild.exe");
-			if (File.Exists(Paths.MSBuildFileName) == false)
-			{
-				throw new ApplicationException(string.Format("File '{0}' not found.", Paths.MSBuildFileName));
-			}
+			//// Get msbuild.exe directory
+			//Paths.MSBuildFileName = Path.Combine(Paths.DotNetFramework35Dir, "MSBuild.exe");
+			//if (File.Exists(Paths.MSBuildFileName) == false)
+			//{
+			//	throw new ApplicationException(string.Format("File '{0}' not found.", Paths.MSBuildFileName));
+			//}
 
 			// Get the TMP directory
 			Paths.TmpDirName = Path.Combine(Paths.SolutionBaseDirName, "tmp");
@@ -260,7 +240,41 @@ namespace BuildTool
 				Directory.CreateDirectory(Paths.TmpDirName);
 			}
 		}
-	}
+
+        // Visual Studio 2019 の「VsDevCmd.bat」ファイルのパスを取得する
+        public static string GetVsDevCmdFilePath()
+        {
+            string vsWhere = Path.Combine(Paths.UltraBuildFilesDirName, @"Utility\vswhere.exe");
+            string args = @"-latest -version 1.2 -requires Microsoft.Component.MSBuild -find Common7\Tools\VsDevCmd.bat";
+
+            using (Process p = new Process())
+            {
+                var info = p.StartInfo;
+
+                info.FileName = vsWhere;
+                info.UseShellExecute = false;
+                info.CreateNoWindow = true;
+                info.Arguments = args;
+
+                info.RedirectStandardOutput = true;
+
+                if (p.Start() == false)
+                {
+                    throw new Exception($"Starting '{vsWhere}' failed.");
+                }
+
+                var r = p.StandardOutput;
+
+                string line = r.ReadLine();
+                if (string.IsNullOrEmpty(line))
+                {
+                    throw new Exception($"'{vsWhere}' returned error. Perhaps no Visual C++ 2019 installed directory found.");
+                }
+
+                return line.Trim();
+            }
+        }
+    }
 }
 
 
