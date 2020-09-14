@@ -129,11 +129,17 @@ namespace BuildTool
 	public static class Win32BuildTool
 	{
 		// Generate a version information resource
-		public static void GenerateVersionInfoResource(string targetExeName, string outName, string rc_name, string product_name, string postfix)
+		public static void GenerateVersionInfoResource(string targetExeName, string outName, string rc_name, string product_name, string postfix, string commitId)
 		{
 			int build, version;
 			string name;
 			DateTime date;
+
+			if (Str.IsEmptyStr(commitId))
+			{
+				commitId = "unknown";
+			}
+
 			ReadBuildInfoFromTextFile(out build, out version, out name, out date);
 
 			if (Str.IsEmptyStr(rc_name))
@@ -152,14 +158,15 @@ namespace BuildTool
 				internalName += " " + postfix;
 			}
 
-			if (Str.IsEmptyStr(product_name) == false)
+			internalName += " (Ultra: " + commitId + ")";
+
+			if (Str.IsEmptyStr(product_name))
 			{
-				body = Str.ReplaceStr(body, "$PRODUCTNAME$", product_name);
+				product_name = "Unknown Product";
 			}
-			else
-			{
-				body = Str.ReplaceStr(body, "$PRODUCTNAME$", "Thin Telework System by NTT-EAST and IPA");
-			}
+
+			body = Str.ReplaceStr(body, "$PRODUCTNAME$", product_name);
+
 			body = Str.ReplaceStr(body, "$INTERNALNAME$", internalName);
 			body = Str.ReplaceStr(body, "$YEAR$", date.Year.ToString());
 			body = Str.ReplaceStr(body, "$FILENAME$", exeFileName);

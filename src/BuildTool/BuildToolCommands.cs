@@ -212,7 +212,7 @@ namespace BuildTool
 			string product_name = vl["PRODUCT"].StrValue;
 			string postfix = vl["POSTFIX"].StrValue;
 
-			Win32BuildTool.GenerateVersionInfoResource(targetFilename, outFilename, vl["RC"].StrValue, product_name, postfix);
+			Win32BuildTool.GenerateVersionInfoResource(targetFilename, outFilename, vl["RC"].StrValue, product_name, postfix, Paths.GetUltraSubmoduleCommitId());
 
 			return 0;
 		}

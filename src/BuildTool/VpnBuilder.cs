@@ -126,91 +126,91 @@ using System.Linq;
 
 namespace BuildTool
 {
-	// Basic path information
-	public static class Paths
-	{
-		public static readonly string ExeFileName = Env.ExeFileName;
-		public static readonly string ExeDirName = Env.ExeFileDir;
-		public static readonly string SolutionBinDirName = ExeDirName;
-		public static readonly string SolutionBaseDirName = IO.NormalizePath(Path.Combine(SolutionBinDirName, @"..\"));
-		public static readonly string UtilityDirName = IO.NormalizePath(Path.Combine(SolutionBinDirName, @"..\BuildFiles\Utility"));
+    // Basic path information
+    public static class Paths
+    {
+        public static readonly string ExeFileName = Env.ExeFileName;
+        public static readonly string ExeDirName = Env.ExeFileDir;
+        public static readonly string SolutionBinDirName = ExeDirName;
+        public static readonly string SolutionBaseDirName = IO.NormalizePath(Path.Combine(SolutionBinDirName, @"..\"));
+        public static readonly string UtilityDirName = IO.NormalizePath(Path.Combine(SolutionBinDirName, @"..\BuildFiles\Utility"));
 
-		public static readonly string UltraBaseDirName = IO.NormalizePath(Directory.Exists(Path.Combine(SolutionBinDirName, @"..\..\submodules\")) ? Path.Combine(SolutionBinDirName, @"..\..\submodules\IPA-DN-Ultra\src") : Path.Combine(SolutionBinDirName, @"..\"));
-		public static readonly string UltraBinDirName = IO.NormalizePath(Path.Combine(UltraBaseDirName, "bin"));
-		public static readonly string UltraBuildFilesDirName = IO.NormalizePath(Path.Combine(UltraBaseDirName, "BuildFiles"));
+        public static readonly string UltraBaseDirName = IO.NormalizePath(Directory.Exists(Path.Combine(SolutionBinDirName, @"..\..\submodules\")) ? Path.Combine(SolutionBinDirName, @"..\..\submodules\IPA-DN-Ultra\src") : Path.Combine(SolutionBinDirName, @"..\"));
+        public static readonly string UltraBinDirName = IO.NormalizePath(Path.Combine(UltraBaseDirName, "bin"));
+        public static readonly string UltraBuildFilesDirName = IO.NormalizePath(Path.Combine(UltraBaseDirName, "BuildFiles"));
 
-		public static readonly string VisualStudioSolutionFileName;
+        public static readonly string VisualStudioSolutionFileName;
 
-		public static readonly string TmpDirName;
-		public static readonly DateTime StartDateTime = DateTime.Now;
-		public static readonly string StartDateTimeStr;
-		public static readonly string CmdFileName;
-		public static readonly string ManifestsDir = Path.Combine(UltraBuildFilesDirName, "Manifests");
-		public static readonly string XCopyExeFileName = Path.Combine(Env.SystemDir, "xcopy.exe");
-		public static readonly string MicrosoftSDKDir;
-		public static readonly string MicrosoftSDKBinDir;
-		public static readonly string MakeCatFilename;
-		public static readonly string RcFilename;
+        public static readonly string TmpDirName;
+        public static readonly DateTime StartDateTime = DateTime.Now;
+        public static readonly string StartDateTimeStr;
+        public static readonly string CmdFileName;
+        public static readonly string ManifestsDir = Path.Combine(UltraBuildFilesDirName, "Manifests");
+        public static readonly string XCopyExeFileName = Path.Combine(Env.SystemDir, "xcopy.exe");
+        public static readonly string MicrosoftSDKDir;
+        public static readonly string MicrosoftSDKBinDir;
+        public static readonly string MakeCatFilename;
+        public static readonly string RcFilename;
 
-		// Initialize
-		static Paths()
-		{
-			// Starting date and time string
-			Paths.StartDateTimeStr = Str.DateTimeToStrShort(Paths.StartDateTime);
+        // Initialize
+        static Paths()
+        {
+            // Starting date and time string
+            Paths.StartDateTimeStr = Str.DateTimeToStrShort(Paths.StartDateTime);
 
-			// Check whether the execution path is the bin directory in the VPN directory
-			if (Paths.SolutionBinDirName.EndsWith(@"\bin", StringComparison.InvariantCultureIgnoreCase) == false)
-			{
-				throw new ApplicationException(string.Format("'{0}' is not a VPN bin directory.", Paths.SolutionBinDirName));
-			}
+            // Check whether the execution path is the bin directory in the VPN directory
+            if (Paths.SolutionBinDirName.EndsWith(@"\bin", StringComparison.InvariantCultureIgnoreCase) == false)
+            {
+                throw new ApplicationException(string.Format("'{0}' is not a VPN bin directory.", Paths.SolutionBinDirName));
+            }
 
-			// Determine the Visual Studio solution file
-			string slnFileName = Directory.EnumerateFiles(SolutionBaseDirName).Where(x => x.EndsWith(".sln")).Single();
+            // Determine the Visual Studio solution file
+            string slnFileName = Directory.EnumerateFiles(SolutionBaseDirName).Where(x => x.EndsWith(".sln")).Single();
 
-			Paths.VisualStudioSolutionFileName = Path.Combine(SolutionBaseDirName, slnFileName);
+            Paths.VisualStudioSolutionFileName = Path.Combine(SolutionBaseDirName, slnFileName);
 
-			if (File.Exists(Paths.VisualStudioSolutionFileName) == false)
-			{
-				throw new ApplicationException(string.Format("'{0}' is not a VPN base directory.", Paths.SolutionBaseDirName));
-			}
+            if (File.Exists(Paths.VisualStudioSolutionFileName) == false)
+            {
+                throw new ApplicationException(string.Format("'{0}' is not a VPN base directory.", Paths.SolutionBaseDirName));
+            }
 
-			// Get Microsoft SDK directory
-			if (IntPtr.Size == 8)
-			{
-				Paths.MicrosoftSDKDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v10.0", "InstallationFolder"));
-			}
-			else
-			{
-				Paths.MicrosoftSDKDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Microsoft\Microsoft SDKs\Windows\v10.0", "InstallationFolder"));
-			}
+            // Get Microsoft SDK directory
+            if (IntPtr.Size == 8)
+            {
+                Paths.MicrosoftSDKDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v10.0", "InstallationFolder"));
+            }
+            else
+            {
+                Paths.MicrosoftSDKDir = IO.RemoteLastEnMark(Reg.ReadStr(RegRoot.LocalMachine, @"SOFTWARE\Microsoft\Microsoft SDKs\Windows\v10.0", "InstallationFolder"));
+            }
 
             if (Str.IsEmptyStr(Paths.MicrosoftSDKDir))
             {
                 throw new ApplicationException("Microsoft SDK not found.");
             }
 
-			Paths.MicrosoftSDKBinDir = Path.Combine(Paths.MicrosoftSDKDir, @"bin\x86");
+            Paths.MicrosoftSDKBinDir = Path.Combine(Paths.MicrosoftSDKDir, @"bin\x86");
 
             // Get makecat.exe file name
             Paths.MakeCatFilename = Path.Combine(Paths.MicrosoftSDKBinDir, "makecat.exe");
 
-			// Get the rc.exe file name
-			Paths.RcFilename = Path.Combine(Paths.MicrosoftSDKBinDir, "rc.exe");
+            // Get the rc.exe file name
+            Paths.RcFilename = Path.Combine(Paths.MicrosoftSDKBinDir, "rc.exe");
 
             // Get the cmd.exe file name
             Paths.CmdFileName = Path.Combine(Env.SystemDir, "cmd.exe");
-			if (File.Exists(Paths.CmdFileName) == false)
-			{
-				throw new ApplicationException(string.Format("File '{0}' not found.", Paths.CmdFileName));
-			}
+            if (File.Exists(Paths.CmdFileName) == false)
+            {
+                throw new ApplicationException(string.Format("File '{0}' not found.", Paths.CmdFileName));
+            }
 
-			// Get the TMP directory
-			Paths.TmpDirName = Path.Combine(Paths.SolutionBaseDirName, "tmp");
-			if (Directory.Exists(Paths.TmpDirName) == false)
-			{
-				Directory.CreateDirectory(Paths.TmpDirName);
-			}
-		}
+            // Get the TMP directory
+            Paths.TmpDirName = Path.Combine(Paths.SolutionBaseDirName, "tmp");
+            if (Directory.Exists(Paths.TmpDirName) == false)
+            {
+                Directory.CreateDirectory(Paths.TmpDirName);
+            }
+        }
 
         // Visual Studio 2019 の「VsDevCmd.bat」ファイルのパスを取得する
         public static string GetVsDevCmdFilePath()
@@ -243,6 +243,70 @@ namespace BuildTool
                 }
 
                 return line.Trim();
+            }
+        }
+
+        static bool TryNormalizeGitCommitId(string src, out string dst)
+        {
+            dst = "";
+
+            if (Str.IsEmptyStr(src)) return false;
+
+            src = src.Trim();
+
+            byte[] data = Str.HexToByte(src);
+
+            if (data.Length != 20)
+                return false;
+
+            dst = Str.ByteToHex(data).ToLower();
+
+            return true;
+        }
+
+        public static string GetUltraSubmoduleCommitId()
+        {
+            string tmpPath = Paths.SolutionBaseDirName;
+
+            // Get the HEAD contents
+            while (true)
+            {
+                string headFilename = Path.Combine(tmpPath, @".git\modules\submodules\IPA-DN-Ultra\HEAD");
+
+                try
+                {
+                    if (File.Exists(headFilename))
+                    {
+                        var headContents = File.ReadAllLines(headFilename);
+                        foreach (string line in headContents)
+                        {
+                            if (TryNormalizeGitCommitId(line, out string commitId))
+                            {
+                                return commitId;
+                            }
+
+                            string[] tokens = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            if (tokens.Length == 2 && tokens[0] == "ref:")
+                            {
+                                string refFilename = tokens[1].Trim();
+                                string refFullPath = Path.Combine(Path.GetDirectoryName(headFilename), refFilename);
+
+                                var lines2 = File.ReadAllLines(refFullPath);
+                                if (lines2.Length >= 1 && Str.IsEmptyStr(lines2[0]) == false)
+                                {
+                                    return lines2[0];
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                string parentPath = Path.GetDirectoryName(tmpPath);
+                if (tmpPath.Equals(parentPath, StringComparison.OrdinalIgnoreCase)) return "";
+
+                tmpPath = parentPath;
             }
         }
     }
