@@ -78,7 +78,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
-      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>
+      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res" /PRODUCT:"Thin Telework System by NTT-EAST and IPA"</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
