@@ -113,9 +113,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 #if ASPNET
-using Resources.BuildUtil.Properties;
+using Resources.BuildTool.Properties;
 #else
-using BuildUtil.Properties;
+using BuildTool.Properties;
 #endif
 
 namespace CoreUtil

@@ -124,7 +124,7 @@ using System.Security.Cryptography.X509Certificates;
 using CoreUtil;
 using System.Linq;
 
-namespace BuildUtil
+namespace BuildTool
 {
 	// Basic path information
 	public static class Paths

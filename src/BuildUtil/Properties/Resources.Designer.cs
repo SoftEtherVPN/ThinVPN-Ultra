@@ -92,7 +92,7 @@
 // test has been passed before release this source code.
 
 
-namespace BuildUtil.Properties {
+namespace BuildTool.Properties {
     using System;
     
     
@@ -123,7 +123,7 @@ namespace BuildUtil.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BuildUtil.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BuildTool.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

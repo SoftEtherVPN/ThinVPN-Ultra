@@ -123,7 +123,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using CoreUtil;
 
-namespace BuildUtil
+namespace BuildTool
 {
 	public static class PEUtil
 	{
@@ -213,7 +213,7 @@ namespace BuildUtil
 					try
 					{
 						// Execute
-						Win32BuildUtil.ExecCommand(Paths.CmdFileName, string.Format("/C \"{0}\"", batFileName), true);
+						Win32BuildTool.ExecCommand(Paths.CmdFileName, string.Format("/C \"{0}\"", batFileName), true);
 						ex = null;
 
 						break;

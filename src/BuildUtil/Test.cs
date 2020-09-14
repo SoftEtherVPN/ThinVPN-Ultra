@@ -124,7 +124,7 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using CoreUtil;
 
-namespace BuildUtil
+namespace BuildTool
 {
 	public static class TestClass
 	{

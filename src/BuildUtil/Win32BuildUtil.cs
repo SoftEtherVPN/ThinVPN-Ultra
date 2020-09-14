@@ -123,10 +123,10 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using CoreUtil;
 
-namespace BuildUtil
+namespace BuildTool
 {
 	// Build utility for Win32
-	public static class Win32BuildUtil
+	public static class Win32BuildTool
 	{
 		// Generate a version information resource
 		public static void GenerateVersionInfoResource(string targetExeName, string outName, string rc_name, string product_name, string postfix)

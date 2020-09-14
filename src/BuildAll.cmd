@@ -8,12 +8,12 @@ call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat"
 call "C:\Program Files\Microsoft Visual Studio 9.0\VC\vcvarsall.bat"
 echo on
 
-del %BATCH_DIR_NAME%\bin\BuildUtil.exe
+del %BATCH_DIR_NAME%\bin\BuildTool.exe
 
-C:\windows\Microsoft.NET\Framework\v3.5\MSBuild.exe /toolsversion:3.5 /verbosity:detailed /target:Clean /property:Configuration=Debug "%BATCH_DIR_NAME%\BuildUtil\BuildUtil.csproj"
+C:\windows\Microsoft.NET\Framework\v3.5\MSBuild.exe /toolsversion:3.5 /verbosity:detailed /target:Clean /property:Configuration=Debug "%BATCH_DIR_NAME%\BuildTool\BuildTool.csproj"
 
-C:\windows\Microsoft.NET\Framework\v3.5\MSBuild.exe /toolsversion:3.5 /verbosity:detailed /target:Rebuild /property:Configuration=Debug "%BATCH_DIR_NAME%\BuildUtil\BuildUtil.csproj"
+C:\windows\Microsoft.NET\Framework\v3.5\MSBuild.exe /toolsversion:3.5 /verbosity:detailed /target:Rebuild /property:Configuration=Debug "%BATCH_DIR_NAME%\BuildTool\BuildTool.csproj"
 
-cmd /k "%BATCH_DIR_NAME%\bin\BuildUtil.exe /CMD:All"
+cmd /k "%BATCH_DIR_NAME%\bin\BuildTool.exe /CMD:All"
 
 

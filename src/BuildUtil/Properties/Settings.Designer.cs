@@ -92,7 +92,7 @@
 // test has been passed before release this source code.
 
 
-namespace BuildUtil.Properties {
+namespace BuildTool.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -111,9 +111,9 @@ namespace BuildUtil.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
         [global::System.Configuration.DefaultSettingValueAttribute("http://dv/Sign/Sign.asmx")]
-        public string BuildUtil_SignService_Sign {
+        public string BuildTool_SignService_Sign {
             get {
-                return ((string)(this["BuildUtil_SignService_Sign"]));
+                return ((string)(this["BuildTool_SignService_Sign"]));
             }
         }
         
@@ -121,9 +121,9 @@ namespace BuildUtil.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
         [global::System.Configuration.DefaultSettingValueAttribute("http://hvsigncode/Sign.asmx")]
-        public string BuildUtilTmp_HvSignService_Sign {
+        public string BuildToolTmp_HvSignService_Sign {
             get {
-                return ((string)(this["BuildUtilTmp_HvSignService_Sign"]));
+                return ((string)(this["BuildToolTmp_HvSignService_Sign"]));
             }
         }
     }

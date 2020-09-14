@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Ham", "Ham\Ham.vcxproj", "{
 		{D11C227F-AE0E-4B8B-8D99-F9EA28FF3BE8} = {D11C227F-AE0E-4B8B-8D99-F9EA28FF3BE8}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildUtil", "BuildUtil\BuildUtil.csproj", "{9279DA54-8BBB-473F-A1FA-54B714CF33D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildTool", "BuildTool\BuildTool.csproj", "{9279DA54-8BBB-473F-A1FA-54B714CF33D8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Cedar", "Cedar\Cedar.vcxproj", "{D11C227F-AE0E-4B8B-8D99-F9EA28FF3BE8}"
 	ProjectSection(ProjectDependencies) = postProject

@@ -1,2 +1,2 @@
-copy %0\..\bin\BuildUtilTmp.exe %1
+copy %0\..\bin\BuildToolTmp.exe %1
 exit /b 0

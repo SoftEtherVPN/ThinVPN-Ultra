@@ -66,7 +66,7 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
+				CommandLine="$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -107,7 +107,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest"
+				CommandLine="$(SolutionDir)bin\BuildTool.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest"
 			/>
 		</Configuration>
 		<Configuration
@@ -158,7 +158,7 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
+				CommandLine="$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -199,7 +199,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x64_user.manifest"
+				CommandLine="$(SolutionDir)bin\BuildTool.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x64_user.manifest"
 			/>
 		</Configuration>
 		<Configuration
@@ -253,7 +253,7 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
+				CommandLine="$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -299,7 +299,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetPE4 &quot;$(TargetPath)&quot;&#x0D;&#x0A;$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest&#x0D;&#x0A;"
+				CommandLine="$(SolutionDir)bin\BuildTool.exe /CMD:SetPE4 &quot;$(TargetPath)&quot;&#x0D;&#x0A;$(SolutionDir)bin\BuildTool.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x86_user.manifest&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -354,7 +354,7 @@
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
+				CommandLine="$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource &quot;$(TargetPath)&quot; /OUT:&quot;$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res&quot;"
 			/>
 			<Tool
 				Name="VCLinkerTool"
@@ -400,7 +400,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="$(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x64_user.manifest"
+				CommandLine="$(SolutionDir)bin\BuildTool.exe /CMD:SetManifest &quot;$(TargetPath)&quot; /MANIFEST:x64_user.manifest"
 			/>
 		</Configuration>
 	</Configurations>

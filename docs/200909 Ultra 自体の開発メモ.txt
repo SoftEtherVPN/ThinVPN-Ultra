@@ -1,7 +1,7 @@
 ﻿こんにちは！
 
 ■ プロジェクト依存関係
-    BuildUtil <-- Mayaqua, Cedar, PenCore, Ham
+    BuildTool <-- Mayaqua, Cedar, PenCore, Ham
     
         Mayaqua <-- Cedar
     
@@ -137,14 +137,14 @@ C/C++
 
 ビルドイベント (EXE または DLL の場合のみ):
     リンク前のイベント:
-        $(SolutionDir)bin\BuildUtil.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"
+        $(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"
         ※ /POSTFIX:"(ShareEnabled)" 等も付けることができますよ
     リンク後のイベント (2 行)
         (Win32 の場合)
-            $(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x86_user.manifest
+            $(SolutionDir)bin\BuildTool.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x86_user.manifest
         (x64 の場合)
             (普通の EXE の場合)
-                $(SolutionDir)bin\BuildUtil.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x64_user.manifest
+                $(SolutionDir)bin\BuildTool.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x64_user.manifest
             ※ PenCore DLL の場合は不要
 
 
