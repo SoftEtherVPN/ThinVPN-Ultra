@@ -102,7 +102,18 @@
 // DDNS.c
 // Dynamic DNS Client
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // Get the current status of the DDNS client
 void DCGetStatus(DDNS_CLIENT *c, DDNS_CLIENT_STATUS *st)

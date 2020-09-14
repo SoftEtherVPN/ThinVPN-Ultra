@@ -9,7 +9,18 @@
 // WtServer.c
 // WideTunnel Server
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // セッションメイン
 void WtsSessionMain(TSESSION *s)

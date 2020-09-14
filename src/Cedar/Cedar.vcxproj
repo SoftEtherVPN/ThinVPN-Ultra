@@ -113,7 +113,7 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>CedarPch.h</PrecompiledHeaderFile>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
@@ -148,7 +148,7 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>CedarPch.h</PrecompiledHeaderFile>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
@@ -187,7 +187,7 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>CedarPch.h</PrecompiledHeaderFile>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
@@ -222,7 +222,7 @@
       <ControlFlowGuard>false</ControlFlowGuard>
       <CompileAs>CompileAsC</CompileAs>
       <DisableSpecificWarnings>4996;4091</DisableSpecificWarnings>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>CedarPch.h</PrecompiledHeaderFile>
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
@@ -264,12 +264,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Cedar.c" />
-    <ClCompile Include="CedarPch.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Client.c" />
     <ClCompile Include="CM.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -442,7 +436,6 @@
     <ClInclude Include="BridgeUnix.h" />
     <ClInclude Include="BridgeWin32.h" />
     <ClInclude Include="Cedar.h" />
-    <ClInclude Include="CedarPch.h" />
     <ClInclude Include="CedarType.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="CM.h" />

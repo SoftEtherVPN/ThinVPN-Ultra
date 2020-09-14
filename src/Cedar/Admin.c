@@ -104,7 +104,18 @@
 // Admin.c
 // RPC Module for Management
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // Macro for RPC function declaration
 #define	DECLARE_RPC_EX(rpc_name, data_type, function, in_rpc, out_rpc, free_rpc)		\

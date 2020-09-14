@@ -102,7 +102,18 @@
 // Command.c
 // vpncmd Command Line Management Utility
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // System checker definition
 typedef bool (CHECKER_PROC_DEF)();

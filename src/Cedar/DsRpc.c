@@ -11,7 +11,18 @@
 
 // Build 8600
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // RPC_DS_CONFIG
 void InRpcDsConfig(RPC_DS_CONFIG *t, PACK *p)

@@ -102,8 +102,18 @@
 // Cedar.c
 // Cedar Communication Module
 
+#include <GlobalConst.h>
 
-#include "CedarPch.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 static UINT init_cedar_counter = 0;
 static REF *cedar_log_ref = NULL;

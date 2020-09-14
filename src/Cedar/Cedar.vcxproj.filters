@@ -25,9 +25,6 @@
     <ClCompile Include="Cedar.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CedarPch.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Client.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -258,9 +255,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Cedar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CedarPch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CedarType.h">

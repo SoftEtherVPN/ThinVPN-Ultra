@@ -102,7 +102,18 @@
 // Listener.c
 // Listener module
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 static bool disable_dos = false;
 static UINT max_connections_per_ip = DEFAULT_MAX_CONNECTIONS_PER_IP;

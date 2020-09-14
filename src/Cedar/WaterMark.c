@@ -102,7 +102,18 @@
 // WaterMark.c
 // SoftEther protocol digital watermark data
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // Digital watermark image data (JPEG)
 BYTE WaterMark[] =

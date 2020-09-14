@@ -102,7 +102,18 @@
 // Connection.c
 // Connection Manager
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // Determine whether the socket is to use to send
 #define	IS_SEND_TCP_SOCK(ts)		\

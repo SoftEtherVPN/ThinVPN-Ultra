@@ -102,7 +102,18 @@
 // Nat.c
 // User-mode Router
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 static LOCK *nat_lock = NULL;
 static NAT *nat = NULL;

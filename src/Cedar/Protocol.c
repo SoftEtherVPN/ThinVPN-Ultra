@@ -102,7 +102,18 @@
 // Protocol.c
 // SoftEther protocol related routines
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 static UCHAR ssl_packet_start[3] = {0x17, 0x03, 0x00};
 

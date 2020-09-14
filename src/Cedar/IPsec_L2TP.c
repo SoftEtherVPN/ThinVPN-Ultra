@@ -102,7 +102,18 @@
 // IPsec_L2TP.c
 // L2TP protocol stack
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // Release the L2TP AVP value
 void FreeL2TPAVP(L2TP_AVP *a)

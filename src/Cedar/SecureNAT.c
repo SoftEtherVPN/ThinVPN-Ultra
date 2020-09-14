@@ -102,7 +102,18 @@
 // SecureNAT.c
 // SecureNAT code
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // SecureNAT server-side thread
 void SnSecureNATThread(THREAD *t, void *param)

@@ -104,7 +104,16 @@
 
 #include <GlobalConst.h>
 
-#include "CedarPch.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // Get whether the proxy server is specified by a private IP
 bool IsProxyPrivateIp(INTERNET_SETTING *s)

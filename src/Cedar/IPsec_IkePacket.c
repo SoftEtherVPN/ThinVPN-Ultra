@@ -102,7 +102,18 @@
 // IPsec_IkePacket.c
 // IKE (ISAKMP) packet processing
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 // Convert the string to a password
 BUF *IkeStrToPassword(char *str)

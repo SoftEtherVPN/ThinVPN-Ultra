@@ -104,7 +104,18 @@
 // Client.c
 // Client Manager
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 static CLIENT *client = NULL;
 static LISTENER *cn_listener = NULL;
@@ -128,7 +139,7 @@ void CiDisableWcmNetworkMinimize(CLIENT *c)
 	{
 		return;
 	}
-
+	
 	MsDisableWcmNetworkMinimize();
 #endif	// OS_WIN32
 }

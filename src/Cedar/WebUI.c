@@ -101,7 +101,18 @@
 // WebUI.c
 // Web User Interface module
 
-#include "CedarPch.h"
+#include <GlobalConst.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdarg.h>
+#include <time.h>
+#include <errno.h>
+
+#include <Mayaqua/Mayaqua.h>
+#include <Cedar/Cedar.h>
 
 static WU_CONTEXT *WuNewContext(WEBUI *wu, char *hubname);
 static void WuFreeContext(WU_CONTEXT *context);
