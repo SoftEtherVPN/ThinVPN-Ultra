@@ -130,7 +130,6 @@ namespace BuildUtil
 	{
 		public static void Test()
 		{
-			Win32BuildUtil.MakeDriverPackage();
 		}
 	}
 }

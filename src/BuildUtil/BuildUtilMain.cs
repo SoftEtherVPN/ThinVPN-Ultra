@@ -189,7 +189,7 @@ namespace BuildUtil
 
 			if (vl["DT"].IsEmpty == false)
 			{
-				BuildSoftwareList.ListCreatedDateTime = Str.StrToDateTime(vl["DT"].StrValue);
+				//BuildSoftwareList.ListCreatedDateTime = Str.StrToDateTime(vl["DT"].StrValue);
 			}
 
 			ConsoleService cs = c;

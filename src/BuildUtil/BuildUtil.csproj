@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="BuildUtilCommands.cs" />
     <Compile Include="BuildUtilMain.cs" />
-    <Compile Include="CodeSign.cs" />
     <Compile Include="CoreUtil\Bmp.cs" />
     <Compile Include="CoreUtil\Buf.cs" />
     <Compile Include="CoreUtil\Cache.cs" />
@@ -93,11 +92,7 @@
     <Compile Include="Properties\Resources.Designer.cs" />
     <Compile Include="Properties\Settings.Designer.cs" />
     <Compile Include="Test.cs" />
-    <Compile Include="UnixBuildSoftwares.cs" />
     <Compile Include="VpnBuilder.cs" />
-    <Compile Include="VpnBuilderConfig.cs" />
-    <Compile Include="VpnBuilderConfigTypes.cs" />
-    <Compile Include="Win32BuildSoftware.cs" />
     <Compile Include="Win32BuildUtil.cs" />
   </ItemGroup>
   <ItemGroup>
