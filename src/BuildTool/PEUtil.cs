@@ -195,14 +195,8 @@ namespace BuildTool
 				string exeTmp = IO.CreateTempFileNameByExt(".exe");
 				IO.FileCopy(exe, exeTmp);
 
-				// Create a batch file
-				string batFileName = Path.Combine(Paths.TmpDirName, "exec_mt.cmd");
-				StreamWriter bat = new StreamWriter(batFileName, false, Str.ShiftJisEncoding);
-				//bat.WriteLine("call \"{0}\"", Paths.GetVsDevCmdFilePath());
-				bat.WriteLine("echo on");
-                bat.WriteLine("\"{2}\" -manifest \"{0}\" -outputresource:\"{1}\";1", filename, exeTmp, Path.Combine(Paths.MicrosoftSDKBinDir, "mt.exe"));
-                bat.WriteLine("EXIT /B %ERRORLEVEL%");
-				bat.Close();
+				string mtFileName = Path.Combine(Paths.MicrosoftSDKBinDir, "mt.exe");
+				string mtArgs = string.Format("-manifest \"{0}\" -outputresource:\"{1}\";1", filename, exeTmp);
 
 				Exception ex = null;
 
@@ -213,7 +207,7 @@ namespace BuildTool
 					try
 					{
 						// Execute
-						Win32BuildTool.ExecCommand(Paths.CmdFileName, string.Format("/C \"{0}\"", batFileName), true);
+						Win32BuildTool.ExecCommand(mtFileName, mtArgs, false);
 						ex = null;
 
 						break;
