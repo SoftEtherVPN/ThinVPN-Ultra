@@ -140,36 +140,17 @@ namespace BuildTool
 		public static readonly string UltraBuildFilesDirName = IO.NormalizePath(Path.Combine(UltraBaseDirName, "BuildFiles"));
 
 		public static readonly string VisualStudioSolutionFileName;
-		public static readonly string DebugSnapshotBaseDir = @"S:\NTTVPN\DebugFilesSnapshot";
-		public static readonly string ReleaseDestDir = @"s:\NTTVPN\Releases";
-		public const string Prefix = "";
 
-		public static readonly string ReleaseDestDir_SEVPN = @"s:\NTTVPN\Releases_SEVPN";
-
-		public static readonly string BuildHamcoreFilesDirName = Path.Combine(SolutionBinDirName, "BuiltHamcoreFiles");
-		//public static readonly string VisualStudioVCDir;
-		//public static readonly string VisualStudioVCBatchFileName;
-		//public static readonly string DotNetFramework35Dir;
-		//public static readonly string MSBuildFileName;
 		public static readonly string TmpDirName;
 		public static readonly DateTime StartDateTime = DateTime.Now;
 		public static readonly string StartDateTimeStr;
 		public static readonly string CmdFileName;
 		public static readonly string ManifestsDir = Path.Combine(UltraBuildFilesDirName, "Manifests");
 		public static readonly string XCopyExeFileName = Path.Combine(Env.SystemDir, "xcopy.exe");
-		public static readonly string ReleaseDir = Path.Combine(SolutionBaseDirName, @"tmp\Release");
-		public static readonly string ReleaseSrckitDir = Path.Combine(SolutionBaseDirName, @"tmp\ReleaseSrcKit");
-		public static readonly string StringsDir = Path.Combine(SolutionBaseDirName, @"BuildFiles\Strings");
-		public static readonly string CrossCompilerBaseDir = @"S:\CommomDev\xc";
-		public static readonly string UnixInstallScript = Path.Combine(SolutionBaseDirName, @"BuildFiles\UnixFiles\InstallScript.txt");
-		public static readonly string OssCommentsFile = Path.Combine(StringsDir, "OssComments.txt");
-		public static readonly string AutorunSrcDir = IO.NormalizePath(Path.Combine(SolutionBaseDirName, @"..\Autorun"));
 		public static readonly string MicrosoftSDKDir;
 		public static readonly string MicrosoftSDKBinDir;
 		public static readonly string MakeCatFilename;
 		public static readonly string RcFilename;
-		public static readonly string SoftEtherBuildDir = Env.SystemDir.Substring(0, 2) + @"\tmp\softether_build_dir";
-		public static readonly string OpenSourceDestDir = Env.SystemDir.Substring(0, 2) + @"\tmp\softether_oss_dest_dir";
 
 		// Initialize
 		static Paths()
@@ -222,16 +203,6 @@ namespace BuildTool
 			{
 				throw new ApplicationException(string.Format("File '{0}' not found.", Paths.CmdFileName));
 			}
-
-			//// Get .NET Framework 3.5 directory
-			//Paths.DotNetFramework35Dir = Path.Combine(Env.WindowsDir, @"Microsoft.NET\Framework\v3.5");
-
-			//// Get msbuild.exe directory
-			//Paths.MSBuildFileName = Path.Combine(Paths.DotNetFramework35Dir, "MSBuild.exe");
-			//if (File.Exists(Paths.MSBuildFileName) == false)
-			//{
-			//	throw new ApplicationException(string.Format("File '{0}' not found.", Paths.MSBuildFileName));
-			//}
 
 			// Get the TMP directory
 			Paths.TmpDirName = Path.Combine(Paths.SolutionBaseDirName, "tmp");
