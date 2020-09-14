@@ -13,7 +13,7 @@ BEGIN
         BLOCK "041104b0"
         BEGIN
             VALUE "CompanyName", "NTT-East and IPA Anti-Corona Virus Telework Special Project"
-            VALUE "FileDescription", "$PRODUCTNAME$"
+            VALUE "FileDescription", "$INTERNALNAME$"
             VALUE "FileVersion", "$VER_MAJOR$, $VER_MINOR$, 0, $VER_BUILD$"
             VALUE "InternalName", "$INTERNALNAME$"
             VALUE "LegalCopyright", "Copyright (c) $YEAR$ Information-technology Promotion Agency, Nippon Telegraph and Telephone East Corporation, and all contributors. All rights reserved."
