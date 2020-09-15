@@ -107,6 +107,7 @@
 
 // Constant
 #define	HAMCORE_DIR_NAME			"hamcore"
+#define HAMCORE_ULTRA_SUBMODULE_DIR_NAME	"../../submodules/IPA-DN-Ultra/src/bin/hamcore"
 #define	HAMCORE_FILE_NAME			"hamcore.se2"
 #define	HAMCORE_FILE_NAME_2			"_hamcore.se2"
 #define	HAMCORE_TEXT_NAME			"hamcore.txt"
