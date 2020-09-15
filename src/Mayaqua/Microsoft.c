@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+ï»¿// SoftEther VPN Source Code - Stable Edition Repository
 // Mayaqua Kernel
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -7661,7 +7661,7 @@ bool MsIsUserSwitchingInstalled()
 	return false;
 }
 
-// ƒ[ƒJƒ‹‚Ì RDP ƒ|[ƒg‚Ö‚ÌÚ‘±‚ğƒ`ƒFƒbƒN
+// ãƒ­ãƒ¼ã‚«ãƒ«ã® RDP ãƒãƒ¼ãƒˆã¸ã®æ¥ç¶šã‚’ãƒã‚§ãƒƒã‚¯
 bool MsCheckLocalhostRemoteDesktopPort()
 {
 	UINT port, i;
@@ -7691,7 +7691,7 @@ bool MsEnableRemoteDesktop()
 
 	if (MsIsVista())
 	{
-		// ƒƒOƒIƒ“‰æ–Ê‚ğ•K‚¸o‚·‚æ‚¤‚Éİ’è‚·‚é (‚½‚¾‚µAƒ†[ƒU[‚É‚æ‚Á‚ÄŒ³‚É–ß‚³‚ê‚½ê‡‚Ío‚³‚È‚¢)
+		// ãƒ­ã‚°ã‚ªãƒ³ç”»é¢ã‚’å¿…ãšå‡ºã™ã‚ˆã†ã«è¨­å®šã™ã‚‹ (ãŸã ã—ã€ãƒ¦ãƒ¼ã‚¶ãƒ¼ã«ã‚ˆã£ã¦å…ƒã«æˆ»ã•ã‚ŒãŸå ´åˆã¯å‡ºã•ãªã„)
 		if (MsRegReadInt(REG_LOCAL_MACHINE,
 			"SYSTEM\\CurrentControlSet\\Control\\Terminal Server\\WinStations\\RDP-Tcp",
 			"UserAuthentication") != 0)
@@ -7710,18 +7710,18 @@ bool MsEnableRemoteDesktop()
 
 	if (MsIsWinXPOrGreater())
 	{
-		// Windows XP ˆÈ~‚ÅAƒOƒ‹[ƒvƒ|ƒŠƒV[‚Å RDP ‚ª–³Œø‚É‚È‚Á‚Ä‚¢‚éê‡‚Í
-		// ‹­§“I‚É—LŒø‚É‚·‚é
+		// Windows XP ä»¥é™ã§ã€ã‚°ãƒ«ãƒ¼ãƒ—ãƒãƒªã‚·ãƒ¼ã§ RDP ãŒç„¡åŠ¹ã«ãªã£ã¦ã„ã‚‹å ´åˆã¯
+		// å¼·åˆ¶çš„ã«æœ‰åŠ¹ã«ã™ã‚‹
 		if (MsRegReadInt(REG_LOCAL_MACHINE,
 			"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
 			"fDenyTSConnections") != 0)
 		{
-			// ‚Ü‚¸ƒOƒ‹[ƒvƒ|ƒŠƒV[‚ğ–³Œø‚É
+			// ã¾ãšã‚°ãƒ«ãƒ¼ãƒ—ãƒãƒªã‚·ãƒ¼ã‚’ç„¡åŠ¹ã«
 			MsRegWriteInt(REG_LOCAL_MACHINE,
 				"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
 				"fDenyTSConnections", 0);
 
-			// Ÿ‚É RDP ‚ğ–³Œø‰»‚µ‚Ä‚·‚®‚É—LŒø‰»
+			// æ¬¡ã« RDP ã‚’ç„¡åŠ¹åŒ–ã—ã¦ã™ãã«æœ‰åŠ¹åŒ–
 			MsRegWriteInt(REG_LOCAL_MACHINE,
 				"SYSTEM\\CurrentControlSet\\Control\\Terminal Server",
 				"fDenyTSConnections", 1);
@@ -13007,7 +13007,7 @@ MS_ISLOCKED *MsNewIsLocked()
 	MS_ISLOCKED *d;
 	THREAD *t;
 
-	//SleepThread(5000); // •s—v? 2020/4/8 dnobori
+	//SleepThread(5000); // ä¸è¦? 2020/4/8 dnobori
 
 	if (IsNt() == false || ms->nt->WTSRegisterSessionNotification == NULL ||
 		ms->nt->WTSUnRegisterSessionNotification == NULL)
@@ -13199,7 +13199,7 @@ bool MsIsAdmin()
 	return ms->IsAdmin;
 }
 
-// RDP ƒƒOƒIƒ“‰æ–Ê‚ª—LŒø‚©‚Ç‚¤‚©
+// RDP ãƒ­ã‚°ã‚ªãƒ³ç”»é¢ãŒæœ‰åŠ¹ã‹ã©ã†ã‹
 bool MsIsRdpAllowLoginScreen()
 {
 	char *key = "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services";
@@ -13220,7 +13220,7 @@ bool MsIsRdpAllowLoginScreen()
 	return false;
 }
 
-// RDP ƒƒOƒIƒ“‰æ–Ê‚ğ—LŒø / –³Œø‚É‚·‚é
+// RDP ãƒ­ã‚°ã‚ªãƒ³ç”»é¢ã‚’æœ‰åŠ¹ / ç„¡åŠ¹ã«ã™ã‚‹
 void MsSetRdpAllowLoginScreen(bool b)
 {
 	char *key = "SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services";
@@ -13228,12 +13228,12 @@ void MsSetRdpAllowLoginScreen(bool b)
 
 	if (b)
 	{
-		// —LŒø‰»
+		// æœ‰åŠ¹åŒ–
 		MsRegWriteInt(REG_LOCAL_MACHINE, key, value, 0);
 	}
 	else
 	{
-		// –³Œø‰»
+		// ç„¡åŠ¹åŒ–
 		if (MsRegIsValue(REG_LOCAL_MACHINE, key, value))
 		{
 			UINT v;

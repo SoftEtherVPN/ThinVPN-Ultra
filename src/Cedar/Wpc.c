@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -316,11 +316,11 @@ BUF *WpcGeneratePacket(PACK *pack, UCHAR *host_key, UCHAR *host_secret)
 
 	if (host_key != NULL && host_secret != NULL)
 	{
-		// 2020/5/6 �o�O�I HOSTKEY, HOSTSECRET �Ƃ��L�[���� 4 �����𒴂��邽�߁A�ŏ��� 4 ���� "HOST" �݂̂����M����Ă���B
-		// �����āA�T�[�o�[���ł� ���Ȃ� "HOST" �� 2 ����̂ŁA�ŏ��� 1 �ځA�܂� "HOSTKEY" �݂̂�ǂݍ���ŁA"HOSTSECRET" �͖������Ă���B
-		// �܂�AHOSTKEY �� HOSTSECRET �̗����� HOSTKEY ���g���Ă���B
-		// �������A���̋����͍�����ύX���邱�Ƃ��ł��Ȃ����߁A���ʂ��̂܂܂Ƃ���B(�Z�L�����e�B��̖��͂Ȃ�)
-		// ����A�T�[�o�[���ŕʂ̃L�[���K�v�ƂȂ鎞�́A�V���� 2 �ڂ� "HOST" ��ǂނ��ƂőΉ����邱�Ƃɂ���B
+		// 2020/5/6 バグ！ HOSTKEY, HOSTSECRET ともキー名が 4 文字を超えるため、最初の 4 文字 "HOST" のみが送信されている。
+		// そして、サーバー側では おなじ "HOST" が 2 個くるので、最初の 1 個目、つまり "HOSTKEY" のみを読み込んで、"HOSTSECRET" は無視している。
+		// つまり、HOSTKEY と HOSTSECRET の両方に HOSTKEY が使われている。
+		// しかし、この挙動は今から変更することができないため、当面このままとする。(セキュリティ上の問題はない)
+		// 今後、サーバー側で別のキーが必要となる時は、新たに 2 個目の "HOST" を読むことで対応することにする。
 
 		WpcAddDataEntryBin(b, "HOSTKEY", host_key, SHA1_SIZE);
 		WpcAddDataEntryBin(b, "HOSTSECRET", host_secret, SHA1_SIZE);

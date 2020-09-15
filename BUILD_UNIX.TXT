@@ -1,4 +1,4 @@
-How to build SoftEther VPN for UNIX
+﻿How to build SoftEther VPN for UNIX
 ===================================
 
 

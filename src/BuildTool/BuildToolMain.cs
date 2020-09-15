@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+﻿// SoftEther VPN Source Code - Stable Edition Repository
 // Build Utility
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.

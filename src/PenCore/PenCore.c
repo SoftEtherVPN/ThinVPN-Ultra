@@ -1,4 +1,4 @@
-void DllMainCRTStartup()
+﻿void DllMainCRTStartup()
 {
 }
 

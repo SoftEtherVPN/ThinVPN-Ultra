@@ -1,4 +1,4 @@
-
+ï»¿
 MICROSOFT CABINET SOFTWARE DEVELOPMENT KIT
 
 END-USER LICENSE AGREEMENT FOR MICROSOFT SOFTWARE
@@ -58,17 +58,17 @@ LIMITATION OF LIABILITY. Microsoft's entire liability and your exclusive remedy 
 NO LIABILITY FOR CONSEQUENTIAL DAMAGES. To the maximum extent permitted by applicable law, in no event shall Microsoft or its suppliers be liable for any damages whatsoever (including, without limitation, damages for loss of business profit, business interruption, loss of business information, or any other pecuniary loss) arising out of the use of, or inability to use, this Microsoft product, even if Microsoft has been advised of the possibility of such damages. Because some states/jurisdictions do not allow the exclusion or limitation of liability for consequential or incidental damages, the above limitation may not apply to you. 
 
 
-Si vous avez acquis votre produit Microsoft au CANADA, la garantie limitée suivante vous concerne: 
+Si vous avez acquis votre produit Microsoft au CANADA, la garantie limité¦¥ suivante vous concerne: 
 
-GARANTIE LIMITÉE
+GARANTIE LIMITï¾‰E
 
-EXCLUSION DE GARANTIES. Microsoft renonce entièrement à toute garantie pour le LOGICIEL. Le LOGICIEL et toute autre documentation s'y rapportant sont fournis « comme tels » sans aucune garantie quelle qu'elle soit, expresse ou implicite, y compris, mais ne se limitant pas aux garanties implicites de la qualité marchande ou un usage particulier. Le risque total découlant de l'utilisation ou de la performance du LOGICIEL est entre vos mains. 
+EXCLUSION DE GARANTIES. Microsoft renonce entié‘½ement ãƒ»toute garantie pour le LOGICIEL. Le LOGICIEL et toute autre documentation s'y rapportant sont fournis ï½« comme tels ï½» sans aucune garantie quelle qu'elle soit, expresse ou implicite, y compris, mais ne se limitant pas aux garanties implicites de la qualitãƒ»marchande ou un usage particulier. Le risque total dé¦—oulant de l'utilisation ou de la performance du LOGICIEL est entre vos mains. 
 
-RESPONSABILITÉ LIMITÉE. La seule obligation de Microsoft et votre recours exclusif concernant ce contrat n'excèderont pas cinq dollars (US$5.00). 
+RESPONSABILITï¾‰ LIMITï¾‰E. La seule obligation de Microsoft et votre recours exclusif concernant ce contrat n'excé¡eront pas cinq dollars (US$5.00). 
 
-ABSENCE DE RESPONSABILITÉ POUR LES DOMMAGES INDIRECTS. Microsoft ou ses 
-fournisseurs ne pourront être tenus responsables en aucune circonstance de tout dommage quel qu'il soit (y compris mais non de façon limitative les dommages directs ou indirects causés par la perte de bénéfices commerciaux, l'interruption des affaires, la perte d'information commerciale ou toute autre perte pécuniaire) résultant de l'utilisation ou de l'impossibilité d'utilisation de ce produit, et ce, même si la société Microsoft a été avisée de l'éventualité de tels dommages. Certains états/juridictions ne permettent pas l'exclusion ou la limitation de responsabilité relative aux dommages indirects ou consécutifs, et la limitation ci-dessus peut ne pas s'appliquer à votre égard. 
-La présente Convention est régie par les lois de la province d'Ontario, Canada. Chacune des parties à la Convention reconnaît irrévocablement la compétence des tribunaux de la province d'Ontario et consent à instituer tout litige qui pourrait découler de la Convention auprès des tribunaux situés dans le district judiciaire de York, province d'Ontario. 
-Au cas où vous auriez des questions concernant cette licence ou que vous désiriez vous mettre en rapport avec Microsoft pour quelque raison que ce soit, veuillez contacter la succursale Microsoft desservant votre pays, dont l'adresse est fournie dans ce produit, ou écrire à: Microsoft Customer Sales and Service, One Microsoft Way, Redmond, Washington 98052-6399. 
+ABSENCE DE RESPONSABILITï¾‰ POUR LES DOMMAGES INDIRECTS. Microsoft ou ses 
+fournisseurs ne pourront é»re tenus responsables en aucune circonstance de tout dommage quel qu'il soit (y compris mais non de faè¼Ÿn limitative les dommages directs ou indirects causé§¸ par la perte de bé§­é¦­ices commerciaux, l'interruption des affaires, la perte d'information commerciale ou toute autre perte pé¦—uniaire) ré§¸ultant de l'utilisation ou de l'impossibilitãƒ»d'utilisation de ce produit, et ce, méº¥e si la socié¨ãƒ»Microsoft a é¨ãƒ»avisé¦¥ de l'é¨…entualitãƒ»de tels dommages. Certains é¨ats/juridictions ne permettent pas l'exclusion ou la limitation de responsabilitãƒ»relative aux dommages indirects ou consé¦—utifs, et la limitation ci-dessus peut ne pas s'appliquer ãƒ»votre é¦®ard. 
+La pré§¸ente Convention est ré¦®ie par les lois de la province d'Ontario, Canada. Chacune des parties ãƒ»la Convention reconnaç¾¡ irré¨…ocablement la compé¨ence des tribunaux de la province d'Ontario et consent ãƒ»instituer tout litige qui pourrait dé¦—ouler de la Convention aupré‘š des tribunaux situé§¸ dans le district judiciaire de York, province d'Ontario. 
+Au cas oãƒ»vous auriez des questions concernant cette licence ou que vous dé§¸iriez vous mettre en rapport avec Microsoft pour quelque raison que ce soit, veuillez contacter la succursale Microsoft desservant votre pays, dont l'adresse est fournie dans ce produit, ou é¦—rire ãƒ» Microsoft Customer Sales and Service, One Microsoft Way, Redmond, Washington 98052-6399. 
 
 3/27/97  10:39 AM 970860004

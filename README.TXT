@@ -1,4 +1,4 @@
-SoftEther VPN (Stable Edition Repository)
+﻿SoftEther VPN (Stable Edition Repository)
 - An Open-Source Cross-platform Multi-protocol VPN Program
 https://www.softether.org/
 

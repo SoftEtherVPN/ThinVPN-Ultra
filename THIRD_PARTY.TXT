@@ -1,4 +1,4 @@
-BitVisor(R) VPN Client Module (IPsec Driver):
+﻿BitVisor(R) VPN Client Module (IPsec Driver):
 Copyright (c) 2007, 2008 University of Tsukuba.
 Copyright (C) 2007, 2008 National Institute of Information and Communications
 Technology.

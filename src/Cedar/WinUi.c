@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+ï»¿// SoftEther VPN Source Code - Stable Edition Repository
 // Cedar Communication Module
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -2475,12 +2475,12 @@ ONCEMSG_DLG *StartAsyncOnceMsg(wchar_t *title, wchar_t *message, bool show_check
 	return d;
 }
 
-// URDP ƒƒbƒZ[ƒWƒXƒŒƒbƒh
+// URDP ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚¹ãƒ¬ãƒƒãƒ‰
 void AsyncOnceMsgThread(THREAD *thread, void *param)
 {
 	ONCEMSG_DLG *d = (ONCEMSG_DLG *)param;
 	char valuename[MAX_PATH];
-	// ˆø”ƒ`ƒFƒbƒN
+	// å¼•æ•°ãƒã‚§ãƒƒã‚¯
 	if (thread == NULL || param == NULL)
 	{
 		return;
@@ -2492,7 +2492,7 @@ void AsyncOnceMsgThread(THREAD *thread, void *param)
 
 
 /*
-2020/4/18 ‰¹Á‚· ‚¤‚é‚³‚¢
+2020/4/18 éŸ³æ¶ˆã™ ã†ã‚‹ã•ã„
 switch (d->Icon)
 	{
 	case ICO_WARNING:

@@ -1,4 +1,4 @@
-All binary files on the 'hamcore' directory are free software under
+﻿All binary files on the 'hamcore' directory are free software under
 the Apache License, Version 2.0. (Except WinPcap binaries.)
 
 Some geeks should be interested in how to rebuild .sys (driver) files on

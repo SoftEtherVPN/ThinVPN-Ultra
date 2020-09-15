@@ -1,4 +1,4 @@
-ChangeLog of SoftEther VPN
+﻿ChangeLog of SoftEther VPN
 --------------------------
 
 The ChangeLog of SoftEther VPN is on our web site:

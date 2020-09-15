@@ -1,4 +1,4 @@
-// SoftEther VPN Source Code - Stable Edition Repository
+ï»¿// SoftEther VPN Source Code - Stable Edition Repository
 // Build Utility
 // 
 // SoftEther VPN Server, Client and Bridge are free software under the Apache License, Version 2.0.
@@ -212,7 +212,7 @@ namespace BuildTool
             }
         }
 
-        // Visual Studio 2019 ‚ÌuVsDevCmd.batvƒtƒ@ƒCƒ‹‚ÌƒpƒX‚ğæ“¾‚·‚é
+        // Visual Studio 2019 ã®ã€ŒVsDevCmd.batã€ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ã‚’å–å¾—ã™ã‚‹
         public static string GetVsDevCmdFilePath()
         {
             string vsWhere = Path.Combine(Paths.UltraBuildFilesDirName, @"Utility\vswhere.exe");
