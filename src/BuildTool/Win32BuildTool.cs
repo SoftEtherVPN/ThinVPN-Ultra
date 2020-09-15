@@ -181,7 +181,7 @@ namespace BuildTool
 
 			f.Close();
 
-			ExecCommand(Paths.RcFilename, "\"" + filename + "\"");
+			ExecCommand(Paths.RcFilename, "/nologo \"" + filename + "\"");
 
 			string rcDir = Path.GetDirectoryName(filename);
 			string rcFilename = Path.GetFileName(filename);

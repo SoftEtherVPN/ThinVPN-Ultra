@@ -167,10 +167,6 @@ namespace BuildTool
 			)]
 		public static int BuildTool(ConsoleService c, string cmdName, string str)
 		{
-			Con.WriteLine("");
-			Con.WriteLine("Copyright (c) SoftEther VPN Project. All Rights Reserved.");
-			Con.WriteLine("");
-
 			ConsoleParam[] args =
 			{
 				new ConsoleParam("IN", null, null, null, null),

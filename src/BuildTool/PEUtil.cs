@@ -196,7 +196,7 @@ namespace BuildTool
 				IO.FileCopy(exe, exeTmp);
 
 				string mtFileName = Path.Combine(Paths.MicrosoftSDKBinDir, "mt.exe");
-				string mtArgs = string.Format("-manifest \"{0}\" -outputresource:\"{1}\";1", filename, exeTmp);
+				string mtArgs = string.Format("-nologo -manifest \"{0}\" -outputresource:\"{1}\";1", filename, exeTmp);
 
 				Exception ex = null;
 
