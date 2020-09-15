@@ -1003,6 +1003,7 @@ BUF *ReadHamcoreW(wchar_t *filename)
 BUF *ReadHamcore(char *name)
 {
 	wchar_t tmp[MAX_SIZE];
+	wchar_t tmp2[MAX_SIZE];
 	wchar_t exe_dir[MAX_SIZE];
 	BUF *b;
 	char filename[MAX_PATH];
@@ -1037,6 +1038,15 @@ BUF *ReadHamcore(char *name)
 	UniFormat(tmp, sizeof(tmp), L"%s/%S/%S", exe_dir, HAMCORE_DIR_NAME, filename);
 
 	b = ReadDumpW(tmp);
+	if (b != NULL)
+	{
+		return b;
+	}
+
+	// Alternative hamcore real file in submodules/IPA-DN-Ultra
+	UniFormat(tmp2, sizeof(tmp2), L"%s/%S/%S", exe_dir, HAMCORE_ULTRA_SUBMODULE_DIR_NAME, filename);
+
+	b = ReadDumpW(tmp2);
 	if (b != NULL)
 	{
 		return b;
