@@ -114,18 +114,18 @@
 #include <Mayaqua/Mayaqua.h>
 
 // List of TABLE
-static LIST *TableList = NULL;
-static wchar_t old_table_name[MAX_SIZE] = {0};		// Old table name
-static LANGLIST current_lang = {0};
-static LANGLIST current_os_lang = {0};
+static LIST* TableList = NULL;
+static wchar_t old_table_name[MAX_SIZE] = { 0 };		// Old table name
+static LANGLIST current_lang = { 0 };
+static LANGLIST current_os_lang = { 0 };
 
 // Initialization of string table routine
 void InitTable()
 {
-	LIST *o;
+	LIST* o;
 	char tmp[MAX_SIZE];
-	LANGLIST *e = NULL;
-	LANGLIST *os_lang = NULL;
+	LANGLIST* e = NULL;
+	LANGLIST* os_lang = NULL;
 	char table_name[MAX_SIZE];
 	if (MayaquaIsMinimalMode())
 	{
@@ -136,7 +136,7 @@ void InitTable()
 	o = LoadLangList();
 	if (o == NULL)
 	{
-LABEL_FATAL_ERROR:
+	LABEL_FATAL_ERROR:
 		Alert("Fatal Error: The file \"hamcore.se2\" is missing or broken.\r\nPlease check hamcore.se2.\r\n\r\n(First, reboot the computer. If this problem occurs again, please reinstall VPN software files.)", NULL);
 		exit(-1);
 		return;
@@ -179,7 +179,7 @@ LABEL_FATAL_ERROR:
 }
 
 // Get the language of the current OS
-void GetCurrentOsLang(LANGLIST *e)
+void GetCurrentOsLang(LANGLIST* e)
 {
 	// Validate arguments
 	if (e == NULL)
@@ -203,7 +203,7 @@ UINT GetCurrentOsLangId()
 }
 
 // Get the current language
-void GetCurrentLang(LANGLIST *e)
+void GetCurrentLang(LANGLIST* e)
 {
 	// Validate arguments
 	if (e == NULL)
@@ -227,7 +227,7 @@ UINT GetCurrentLangId()
 }
 
 // Write to the lang.config file in the current directory
-bool SaveLangConfigCurrentDir(char *str)
+bool SaveLangConfigCurrentDir(char* str)
 {
 	// Validate arguments
 	if (str == NULL)
@@ -239,10 +239,10 @@ bool SaveLangConfigCurrentDir(char *str)
 }
 
 // Write to the lang.config file
-bool SaveLangConfig(wchar_t *filename, char *str)
+bool SaveLangConfig(wchar_t* filename, char* str)
 {
-	BUF *b;
-	LIST *o;
+	BUF* b;
+	LIST* o;
 	UINT i;
 	bool ret;
 	// Validate arguments
@@ -269,7 +269,7 @@ bool SaveLangConfig(wchar_t *filename, char *str)
 
 		for (i = 0;i < LIST_NUM(o);i++)
 		{
-			LANGLIST *e = LIST_DATA(o, i);
+			LANGLIST* e = LIST_DATA(o, i);
 
 			UniFormat(tmp, sizeof(tmp), L"#  %S: %s (%s)\r\n",
 				e->Name, e->TitleEnglish, e->TitleLocal);
@@ -292,7 +292,7 @@ bool SaveLangConfig(wchar_t *filename, char *str)
 }
 
 // Read the lang.config file in the current directory
-bool LoadLangConfigCurrentDir(char *str, UINT str_size)
+bool LoadLangConfigCurrentDir(char* str, UINT str_size)
 {
 	// Validate arguments
 	if (str == NULL)
@@ -304,9 +304,9 @@ bool LoadLangConfigCurrentDir(char *str, UINT str_size)
 }
 
 // Read the lang.config file
-bool LoadLangConfig(wchar_t *filename, char *str, UINT str_size)
+bool LoadLangConfig(wchar_t* filename, char* str, UINT str_size)
 {
-	BUF *b;
+	BUF* b;
 	bool ret = false;
 	// Validate arguments
 	if (filename == NULL || str == NULL)
@@ -322,7 +322,7 @@ bool LoadLangConfig(wchar_t *filename, char *str, UINT str_size)
 
 	while (true)
 	{
-		char *line = CfgReadNextLine(b);
+		char* line = CfgReadNextLine(b);
 
 		if (line == NULL)
 		{
@@ -350,7 +350,7 @@ bool LoadLangConfig(wchar_t *filename, char *str, UINT str_size)
 }
 
 // Choose the language from the ID
-LANGLIST *GetLangById(LIST *o, UINT id)
+LANGLIST* GetLangById(LIST* o, UINT id)
 {
 	UINT i;
 	// Validate arguments
@@ -361,7 +361,7 @@ LANGLIST *GetLangById(LIST *o, UINT id)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		LANGLIST *e = LIST_DATA(o, i);
+		LANGLIST* e = LIST_DATA(o, i);
 
 		if (e->Id == id)
 		{
@@ -373,9 +373,9 @@ LANGLIST *GetLangById(LIST *o, UINT id)
 }
 
 // Choice the best language for the current environment
-LANGLIST *GetBestLangForCurrentEnvironment(LIST *o)
+LANGLIST* GetBestLangForCurrentEnvironment(LIST* o)
 {
-	LANGLIST *ret = NULL;
+	LANGLIST* ret = NULL;
 	// Validate arguments
 	if (o == NULL)
 	{
@@ -404,10 +404,10 @@ LANGLIST *GetBestLangForCurrentEnvironment(LIST *o)
 }
 
 // Search for the best language from LANG string of UNIX
-LANGLIST *GetBestLangByLangStr(LIST *o, char *str)
+LANGLIST* GetBestLangByLangStr(LIST* o, char* str)
 {
 	UINT i;
-	LANGLIST *ret;
+	LANGLIST* ret;
 	// Validate arguments
 	if (o == NULL)
 	{
@@ -416,12 +416,12 @@ LANGLIST *GetBestLangByLangStr(LIST *o, char *str)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		LANGLIST *e = LIST_DATA(o, i);
+		LANGLIST* e = LIST_DATA(o, i);
 		UINT j;
 
 		for (j = 0;j < LIST_NUM(e->LangList);j++)
 		{
-			char *v = LIST_DATA(e->LangList, j);
+			char* v = LIST_DATA(e->LangList, j);
 
 			if (StrCmpi(v, str) == 0)
 			{
@@ -432,12 +432,12 @@ LANGLIST *GetBestLangByLangStr(LIST *o, char *str)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		LANGLIST *e = LIST_DATA(o, i);
+		LANGLIST* e = LIST_DATA(o, i);
 		UINT j;
 
 		for (j = 0;j < LIST_NUM(e->LangList);j++)
 		{
-			char *v = LIST_DATA(e->LangList, j);
+			char* v = LIST_DATA(e->LangList, j);
 
 			if (StartWith(str, v) || StartWith(v, str))
 			{
@@ -452,7 +452,7 @@ LANGLIST *GetBestLangByLangStr(LIST *o, char *str)
 	{
 		for (i = 0;i < LIST_NUM(o);i++)
 		{
-			LANGLIST *e = LIST_DATA(o, i);
+			LANGLIST* e = LIST_DATA(o, i);
 
 			return e;
 		}
@@ -462,9 +462,9 @@ LANGLIST *GetBestLangByLangStr(LIST *o, char *str)
 }
 
 // Search for the best language from LCID
-LANGLIST *GetBestLangByLcid(LIST *o, UINT lcid)
+LANGLIST* GetBestLangByLcid(LIST* o, UINT lcid)
 {
-	LANGLIST *ret;
+	LANGLIST* ret;
 	UINT i;
 	// Validate arguments
 	if (o == NULL)
@@ -474,7 +474,7 @@ LANGLIST *GetBestLangByLcid(LIST *o, UINT lcid)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		LANGLIST *e = LIST_DATA(o, i);
+		LANGLIST* e = LIST_DATA(o, i);
 
 		if (IsIntInList(e->LcidList, lcid))
 		{
@@ -493,10 +493,10 @@ LANGLIST *GetBestLangByLcid(LIST *o, UINT lcid)
 }
 
 // Search for the best language from the name
-LANGLIST *GetBestLangByName(LIST *o, char *name)
+LANGLIST* GetBestLangByName(LIST* o, char* name)
 {
 	UINT i;
-	LANGLIST *ret = NULL;
+	LANGLIST* ret = NULL;
 	// Validate arguments
 	if (o == NULL)
 	{
@@ -505,7 +505,7 @@ LANGLIST *GetBestLangByName(LIST *o, char *name)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		LANGLIST *e = LIST_DATA(o, i);
+		LANGLIST* e = LIST_DATA(o, i);
 
 		if (StrCmpi(e->Name, name) == 0)
 		{
@@ -521,7 +521,7 @@ LANGLIST *GetBestLangByName(LIST *o, char *name)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		LANGLIST *e = LIST_DATA(o, i);
+		LANGLIST* e = LIST_DATA(o, i);
 
 		if (StartWith(e->Name, name) || StartWith(name, e->Name))
 		{
@@ -539,7 +539,7 @@ LANGLIST *GetBestLangByName(LIST *o, char *name)
 }
 
 // Release the language list
-void FreeLangList(LIST *o)
+void FreeLangList(LIST* o)
 {
 	UINT i;
 	// Validate arguments
@@ -550,7 +550,7 @@ void FreeLangList(LIST *o)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		LANGLIST *e = LIST_DATA(o, i);
+		LANGLIST* e = LIST_DATA(o, i);
 
 		FreeStrList(e->LangList);
 		ReleaseIntList(e->LcidList);
@@ -562,11 +562,11 @@ void FreeLangList(LIST *o)
 }
 
 // Read the language list
-LIST *LoadLangList()
+LIST* LoadLangList()
 {
-	LIST *o = NewListFast(NULL);
-	char *filename = LANGLIST_FILENAME;
-	BUF *b;
+	LIST* o = NewListFast(NULL);
+	char* filename = LANGLIST_FILENAME;
+	BUF* b;
 
 #ifdef	OS_WIN32
 	if (MsIsWine())
@@ -583,7 +583,7 @@ LIST *LoadLangList()
 
 	while (true)
 	{
-		char *line = CfgReadNextLine(b);
+		char* line = CfgReadNextLine(b);
 
 		if (line == NULL)
 		{
@@ -594,13 +594,13 @@ LIST *LoadLangList()
 
 		if (IsEmptyStr(line) == false && StartWith(line, "#") == false)
 		{
-			TOKEN_LIST *t = ParseToken(line, "\t ");
+			TOKEN_LIST* t = ParseToken(line, "\t ");
 			if (t != NULL)
 			{
 				if (t->NumTokens == 6)
 				{
-					LANGLIST *e = ZeroMalloc(sizeof(LANGLIST));
-					TOKEN_LIST *t2;
+					LANGLIST* e = ZeroMalloc(sizeof(LANGLIST));
+					TOKEN_LIST* t2;
 
 					e->Id = ToInt(t->Token[0]);
 					StrCpy(e->Name, sizeof(e->Name), t->Token[1]);
@@ -661,9 +661,9 @@ LIST *LoadLangList()
 }
 
 // Get an error string in Unicode
-wchar_t *GetUniErrorStr(UINT err)
+wchar_t* GetUniErrorStr(UINT err)
 {
-	wchar_t *ret;
+	wchar_t* ret;
 	char name[MAX_SIZE];
 	Format(name, sizeof(name), "ERR_%u", err);
 
@@ -679,9 +679,9 @@ wchar_t *GetUniErrorStr(UINT err)
 }
 
 // Get an error string
-char *GetErrorStr(UINT err)
+char* GetErrorStr(UINT err)
 {
-	char *ret;
+	char* ret;
 	char name[MAX_SIZE];
 	Format(name, sizeof(name), "ERR_%u", err);
 
@@ -697,9 +697,9 @@ char *GetErrorStr(UINT err)
 }
 
 // Load the integer value from the table
-UINT GetTableInt(char *name)
+UINT GetTableInt(char* name)
 {
-	char *str;
+	char* str;
 	// Validate arguments
 	if (name == NULL)
 	{
@@ -711,13 +711,13 @@ UINT GetTableInt(char *name)
 }
 
 // Load a Unicode string from the table
-wchar_t *GetTableUniStr(char *name)
+wchar_t* GetTableUniStr(char* name)
 {
-	TABLE *t;
+	TABLE* t;
 	// Validate arguments
 	if (name == NULL)
 	{
-//		Debug("%s: ************\n", name);
+		//		Debug("%s: ************\n", name);
 		return L"";
 	}
 
@@ -733,9 +733,9 @@ wchar_t *GetTableUniStr(char *name)
 }
 
 // Load the string from the table
-char *GetTableStr(char *name)
+char* GetTableStr(char* name)
 {
-	TABLE *t;
+	TABLE* t;
 	// Validate arguments
 	if (name == NULL)
 	{
@@ -770,12 +770,12 @@ char *GetTableStr(char *name)
 }
 
 // Get the string name that begins with the specified name
-TOKEN_LIST *GetTableNameStartWith(char *str)
+TOKEN_LIST* GetTableNameStartWith(char* str)
 {
 	UINT i;
 	UINT len;
-	LIST *o;
-	TOKEN_LIST *t;
+	LIST* o;
+	TOKEN_LIST* t;
 	char tmp[MAX_SIZE];
 	// Validate arguments
 	if (str == NULL)
@@ -792,7 +792,7 @@ TOKEN_LIST *GetTableNameStartWith(char *str)
 
 	for (i = 0;i < LIST_NUM(TableList);i++)
 	{
-		TABLE *t = LIST_DATA(TableList, i);
+		TABLE* t = LIST_DATA(TableList, i);
 		UINT len2 = StrLen(t->name);
 
 		if (len2 >= len)
@@ -806,7 +806,7 @@ TOKEN_LIST *GetTableNameStartWith(char *str)
 
 	t = ZeroMalloc(sizeof(TOKEN_LIST));
 	t->NumTokens = LIST_NUM(o);
-	t->Token = ZeroMalloc(sizeof(char *) * t->NumTokens);
+	t->Token = ZeroMalloc(sizeof(char*) * t->NumTokens);
 
 	for (i = 0;i < t->NumTokens;i++)
 	{
@@ -819,9 +819,9 @@ TOKEN_LIST *GetTableNameStartWith(char *str)
 }
 
 // Search the table
-TABLE *FindTable(char *name)
+TABLE* FindTable(char* name)
 {
-	TABLE *t, tt;
+	TABLE* t, tt;
 	// Validate arguments
 	if (name == NULL || TableList == NULL)
 	{
@@ -836,15 +836,15 @@ TABLE *FindTable(char *name)
 }
 
 // A function that compares the table name
-int CmpTableName(void *p1, void *p2)
+int CmpTableName(void* p1, void* p2)
 {
-	TABLE *t1, *t2;
+	TABLE* t1, * t2;
 	if (p1 == NULL || p2 == NULL)
 	{
 		return 0;
 	}
-	t1 = *(TABLE **)p1;
-	t2 = *(TABLE **)p2;
+	t1 = *(TABLE**)p1;
+	t2 = *(TABLE**)p2;
 	if (t1 == NULL || t2 == NULL)
 	{
 		return 0;
@@ -854,18 +854,18 @@ int CmpTableName(void *p1, void *p2)
 }
 
 // Interpret a line
-TABLE *ParseTableLine(char *line, char *prefix, UINT prefix_size, LIST *replace_list)
+TABLE* ParseTableLine(char* line, char* prefix, UINT prefix_size, LIST* replace_list)
 {
 	UINT i, len;
 	UINT len_name;
 	UINT string_start;
-	char *name;
-	char *name2;
+	char* name;
+	char* name2;
 	UINT name2_size;
-	wchar_t *unistr;
-	char *str;
+	wchar_t* unistr;
+	char* str;
 	UINT unistr_size, str_size;
-	TABLE *t;
+	TABLE* t;
 	// Validate arguments
 	if (line == NULL || prefix == NULL)
 	{
@@ -936,7 +936,7 @@ TABLE *ParseTableLine(char *line, char *prefix, UINT prefix_size, LIST *replace_
 	if (UniInChar(unistr, L'$'))
 	{
 		// Replace the replacement string
-		wchar_t *tmp;
+		wchar_t* tmp;
 		UINT tmp_size = (UniStrSize(unistr) + 1024) * 2;
 		UINT i;
 
@@ -946,9 +946,9 @@ TABLE *ParseTableLine(char *line, char *prefix, UINT prefix_size, LIST *replace_
 
 		for (i = 0; i < LIST_NUM(replace_list);i++)
 		{
-			TABLE *r = LIST_DATA(replace_list, i);
+			TABLE* r = LIST_DATA(replace_list, i);
 
-			UniReplaceStrEx(tmp, tmp_size, tmp, (wchar_t *)r->name, r->unistr, false);
+			UniReplaceStrEx(tmp, tmp_size, tmp, (wchar_t*)r->name, r->unistr, false);
 		}
 
 		Free(unistr);
@@ -1014,16 +1014,16 @@ TABLE *ParseTableLine(char *line, char *prefix, UINT prefix_size, LIST *replace_
 }
 
 // Unescape the string
-void UnescapeStr(char *src)
+void UnescapeStr(char* src)
 {
 	UINT i, len, wp;
-	char *tmp;
+	char* tmp;
 	// Validate arguments
 	if (src == NULL)
 	{
 		return;
 	}
-	
+
 	len = StrLen(src);
 	tmp = Malloc(len + 1);
 	wp = 0;
@@ -1071,7 +1071,7 @@ FINISH:
 void FreeTable()
 {
 	UINT i, num;
-	TABLE **tables;
+	TABLE** tables;
 	if (TableList == NULL)
 	{
 		return;
@@ -1083,7 +1083,7 @@ void FreeTable()
 	tables = ToArray(TableList);
 	for (i = 0;i < num;i++)
 	{
-		TABLE *t = tables[i];
+		TABLE* t = tables[i];
 		Free(t->name);
 		Free(t->str);
 		Free(t->unistr);
@@ -1099,11 +1099,11 @@ void FreeTable()
 }
 
 // Read a string table from the buffer
-bool LoadTableFromBuf(BUF *b)
+bool LoadTableFromBuf(BUF* b)
 {
-	char *tmp;
+	char* tmp;
 	char prefix[MAX_SIZE];
-	LIST *replace_list = NULL;
+	LIST* replace_list = NULL;
 	UINT i;
 	// Validate arguments
 	if (b == NULL)
@@ -1124,7 +1124,7 @@ bool LoadTableFromBuf(BUF *b)
 	// Read the contents of the buffer line by line
 	while (true)
 	{
-		TABLE *t;
+		TABLE* t;
 		bool ok = true;
 
 		tmp = CfgReadNextLine(b);
@@ -1141,21 +1141,36 @@ bool LoadTableFromBuf(BUF *b)
 			{
 				if (StartWith(key, "$") && EndWith(key, "$") && StrLen(key) >= 3)
 				{
-					TABLE *t;
+					TABLE* t;
 					wchar_t univalue[MAX_SIZE];
 					wchar_t uniname[MAX_SIZE];
-
-					t = ZeroMalloc(sizeof(TABLE));
+					UINT i;
+					bool exists = false;
 
 					Zero(univalue, sizeof(univalue));
 					Utf8ToUni(univalue, sizeof(univalue), value, StrLen(value));
 
 					StrToUni(uniname, sizeof(uniname), key);
 
-					t->name = (char *)CopyUniStr(uniname);
-					t->unistr = CopyUniStr(univalue);
+					// Check if exists
+					for (i = 0;i < LIST_NUM(replace_list);i++)
+					{
+						TABLE* t2 = LIST_DATA(replace_list, i);
+						if (UniStrCmpi((wchar_t*)t2->name, uniname) == 0)
+						{
+							exists = true;
+							break;
+						}
+					}
 
-					Add(replace_list, t);
+					if (exists == false)
+					{
+						t = ZeroMalloc(sizeof(TABLE));
+						t->name = (char*)CopyUniStr(uniname);
+						t->unistr = CopyUniStr(univalue);
+
+						Add(replace_list, t);
+					}
 
 					// Found a replacement definition
 					ok = false;
@@ -1178,7 +1193,7 @@ bool LoadTableFromBuf(BUF *b)
 
 	for (i = 0;i < LIST_NUM(replace_list);i++)
 	{
-		TABLE *t = LIST_DATA(replace_list, i);
+		TABLE* t = LIST_DATA(replace_list, i);
 
 		Free(t->name);
 		Free(t->str);
@@ -1193,7 +1208,7 @@ bool LoadTableFromBuf(BUF *b)
 }
 
 // Generate the Unicode string cache file name
-void GenerateUnicodeCacheFileName(wchar_t *name, UINT size, wchar_t *strfilename, UINT strfilesize, UCHAR *filehash)
+void GenerateUnicodeCacheFileName(wchar_t* name, UINT size, wchar_t* strfilename, UINT strfilesize, UCHAR* filehash)
 {
 	wchar_t tmp[MAX_SIZE];
 	wchar_t hashstr[64];
@@ -1229,12 +1244,12 @@ void GenerateUnicodeCacheFileName(wchar_t *name, UINT size, wchar_t *strfilename
 }
 
 // Save the Unicode cache
-void SaveUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
+void SaveUnicodeCache(wchar_t* strfilename, UINT strfilesize, UCHAR* hash)
 {
 	UNICODE_CACHE c;
-	BUF *b;
+	BUF* b;
 	UINT i;
-	IO *io;
+	IO* io;
 	wchar_t name[MAX_PATH];
 	UCHAR binhash[MD5_SIZE];
 	// Validate arguments
@@ -1265,7 +1280,7 @@ void SaveUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
 	WriteBufInt(b, LIST_NUM(TableList));
 	for (i = 0;i < LIST_NUM(TableList);i++)
 	{
-		TABLE *t = LIST_DATA(TableList, i);
+		TABLE* t = LIST_DATA(TableList, i);
 		WriteBufInt(b, StrLen(t->name));
 		WriteBuf(b, t->name, StrLen(t->name));
 		WriteBufInt(b, StrLen(t->str));
@@ -1291,12 +1306,12 @@ void SaveUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
 }
 
 // Reading the Unicode cache
-bool LoadUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
+bool LoadUnicodeCache(wchar_t* strfilename, UINT strfilesize, UCHAR* hash)
 {
 	UNICODE_CACHE c, t;
-	BUF *b;
+	BUF* b;
 	UINT i, num;
-	IO *io;
+	IO* io;
 	wchar_t name[MAX_PATH];
 	UCHAR binhash[MD5_SIZE];
 	UCHAR binhash_2[MD5_SIZE];
@@ -1325,7 +1340,7 @@ bool LoadUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
 	FileClose(io);
 
 	Hash(binhash, b->Buf, b->Size >= MD5_SIZE ? (b->Size - MD5_SIZE) : 0, false);
-	Copy(binhash_2, ((UCHAR *)b->Buf) + (b->Size >= MD5_SIZE ? (b->Size - MD5_SIZE) : 0), MD5_SIZE);
+	Copy(binhash_2, ((UCHAR*)b->Buf) + (b->Size >= MD5_SIZE ? (b->Size - MD5_SIZE) : 0), MD5_SIZE);
 	if (Cmp(binhash, binhash_2, MD5_SIZE) != 0)
 	{
 		FreeBuf(b);
@@ -1367,7 +1382,7 @@ bool LoadUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
 	for (i = 0;i < num;i++)
 	{
 		UINT len;
-		TABLE *t = ZeroMalloc(sizeof(TABLE));
+		TABLE* t = ZeroMalloc(sizeof(TABLE));
 
 		len = ReadBufInt(b);
 		t->name = ZeroMalloc(len + 1);
@@ -1392,11 +1407,13 @@ bool LoadUnicodeCache(wchar_t *strfilename, UINT strfilesize, UCHAR *hash)
 }
 
 // Read the string table
-bool LoadTableMain(wchar_t *filename)
+bool LoadTableMain(wchar_t* filename)
 {
-	BUF *b;
+	BUF* b;
 	UINT64 t1, t2;
 	UCHAR hash[MD5_SIZE];
+	UINT i = CLEAN;
+	wchar_t patch_filename[MAX_PATH] = CLEAN;
 	// Validate arguments
 	if (filename == NULL)
 	{
@@ -1425,6 +1442,32 @@ bool LoadTableMain(wchar_t *filename)
 		Alert(tmp, NULL);
 		exit(-1);
 		return false;
+	}
+
+	// Open the additional file
+	if (UniEndWith(filename, L".stb"))
+	{
+		UINT len;
+		UniStrCpy(patch_filename, sizeof(patch_filename), filename);
+		len = UniStrLen(patch_filename);
+		if (len >= 5)
+		{
+			BUF* b2;
+			len -= 4;
+			patch_filename[len] = 0;
+			UniStrCat(patch_filename, sizeof(patch_filename), L".patch.stb");
+
+			b2 = ReadDumpW(patch_filename);
+			if (b2 != NULL)
+			{
+				SeekBufToEnd(b2);
+				WriteBufBuf(b2, b);
+				FreeBuf(b);
+				b = b2;
+
+				SeekBufToBegin(b);
+			}
+		}
 	}
 
 	Hash(hash, b->Buf, b->Size, false);
@@ -1468,19 +1511,19 @@ bool LoadTableMain(wchar_t *filename)
 
 	return true;
 }
-bool LoadTable(char *filename)
+bool LoadTable(char* filename)
 {
-	wchar_t *filename_a = CopyStrToUni(filename);
+	wchar_t* filename_a = CopyStrToUni(filename);
 	bool ret = LoadTableW(filename_a);
 
 	Free(filename_a);
 
 	return ret;
 }
-bool LoadTableW(wchar_t *filename)
+bool LoadTableW(wchar_t* filename)
 {
 	bool ret;
-	BUF *b;
+	BUF* b;
 	wchar_t replace_name[MAX_PATH];
 
 	Zero(replace_name, sizeof(replace_name));
@@ -1490,7 +1533,7 @@ bool LoadTableW(wchar_t *filename)
 	b = ReadDump("@table_name.txt");
 	if (b != NULL)
 	{
-		char *s = CfgReadNextLine(b);
+		char* s = CfgReadNextLine(b);
 		if (s != NULL)
 		{
 			if (IsEmptyStr(s) == false)
