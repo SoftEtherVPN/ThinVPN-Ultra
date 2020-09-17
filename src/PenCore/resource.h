@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by PenCore.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// PenCore.rc で使用
 //
 #define BMP_GOVFW1                      1
 #define IDOK3                           2
@@ -1192,8 +1192,6 @@
 #define BMP_DESKCLIENT                  2514
 #define ICO_NETCONN                     2515
 #define ICO_DESKSERVER_TRAY             2516
-#define BMP_BANNER2                     2517
-#define BMP_BANNER1                     2518
 #define BMP_NOTICE                      2519
 #define ICO_HACKER                      2520
 #define ICO_NORMALUSER                  2521
@@ -1436,7 +1434,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        251
 #define _APS_NEXT_COMMAND_VALUE         40111
-#define _APS_NEXT_CONTROL_VALUE         1523
+#define _APS_NEXT_CONTROL_VALUE         1524
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

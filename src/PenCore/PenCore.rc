@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 resources
+// 日本語 (日本) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -53,7 +51,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     D_SECURE, DIALOG
     BEGIN
@@ -1580,7 +1578,7 @@ EXSTYLE WS_EX_APPWINDOW
 CAPTION "@D_SECURE"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         107,S_IMAGE,"Static",SS_BITMAP,7,5,81,54
+    CONTROL         BMP_SECURE2,S_IMAGE,"Static",SS_BITMAP,7,5,81,54
     LTEXT           "@S_TITLE",S_TITLE,99,5,166,17
     LTEXT           "%s",S_INSERT_SECURE,99,25,200,17
     CONTROL         "@S_DEVICE_INFO",S_DEVICE_INFO,"Static",SS_LEFTNOWORDWRAP | WS_GROUP,106,59,173,23
@@ -1865,7 +1863,7 @@ BEGIN
     PUSHBUTTON      "@B_DETAIL",B_DETAIL,344,277,87,15
     DEFPUSHBUTTON   "@IDOK",IDOK,308,300,64,17
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,380,300,64,17
-    CONTROL         178,S_ROUTER_LOGO,"Static",SS_BITMAP | NOT WS_VISIBLE,358,5,86,89
+    CONTROL         BMP_ROUTER_LOGO,S_ROUTER_LOGO,"Static",SS_BITMAP | NOT WS_VISIBLE,358,5,86,89
 END
 
 D_CM_PROXY DIALOGEX 0, 0, 255, 131
@@ -2028,7 +2026,7 @@ CAPTION "@D_ABOUT"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     DEFPUSHBUTTON   "@IDCANCEL",IDCANCEL,250,290,76,16
-    CONTROL         224,S_LOGO,"Static",SS_BITMAP,7,5,319,66
+    CONTROL         BMP_ABOUTBOX,S_LOGO,"Static",SS_BITMAP,7,5,319,66
     LTEXT           "@S_INFO1",S_INFO1,7,71,319,15
     PUSHBUTTON      "@B_AUTHORS",B_AUTHORS,251,71,75,16,NOT WS_VISIBLE
     LTEXT           "@S_INFO2",S_INFO2,7,86,319,34
@@ -2104,7 +2102,7 @@ EXSTYLE WS_EX_APPWINDOW
 CAPTION "@D_SM_MAIN"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         141,IDC_STATIC,"Static",SS_BITMAP,0,0,275,46
+    CONTROL         BMP_MANAGER_LOGO,IDC_STATIC,"Static",SS_BITMAP,0,0,275,46
     GROUPBOX        "@STATIC1",IDC_STATIC,6,53,261,187
     ICON            ICO_VPNSERVER,IDC_STATIC,14,67,20,20
     LTEXT           "@STATIC2",IDC_STATIC,41,67,218,29
@@ -3022,7 +3020,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "@D_NM_MAIN"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         176,IDC_STATIC,"Static",SS_BITMAP,7,5,338,89
+    CONTROL         BMP_ROUTER_BANNER,IDC_STATIC,"Static",SS_BITMAP,7,5,338,89
     GROUPBOX        "@STATIC1",IDC_STATIC,7,95,337,73
     ICON            ICO_VPNSERVER,IDC_STATIC,14,105,20,18
     LTEXT           "@STATIC2",IDC_STATIC,38,107,297,18
@@ -3167,7 +3165,7 @@ BEGIN
     PUSHBUTTON      "@B_NAT",B_NAT,17,218,100,16
     PUSHBUTTON      "@B_DHCP",B_DHCP,122,218,100,16
     PUSHBUTTON      "@B_STATUS",B_STATUS,226,218,112,16
-    CONTROL         179,S_TSUKUBA1,"Static",SS_BITMAP | NOT WS_VISIBLE,644,-7,68,23
+    CONTROL         BMP_COINS,S_TSUKUBA1,"Static",SS_BITMAP | NOT WS_VISIBLE,644,-7,68,23
     LTEXT           "@S_TSUKUBA2",S_TSUKUBA2,78,251,204,16,NOT WS_VISIBLE
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,288,251,60,16
 END
@@ -4275,7 +4273,7 @@ BEGIN
     ICON            ICO_IPSEC,IDC_STATIC,7,5,20,18
     GROUPBOX        "@S01",IDC_STATIC,7,47,409,142
     LTEXT           "@S02",IDC_STATIC,14,58,267,23
-    CONTROL         197,IDC_STATIC,"Static",SS_BITMAP,288,56,121,33
+    CONTROL         BMP_L2TP,IDC_STATIC,"Static",SS_BITMAP,288,56,121,33
     CONTROL         "@R_L2TP_OVER_IPSEC",R_L2TP_OVER_IPSEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,82,269,9
     LTEXT           "@S03",IDC_STATIC,31,95,286,13
     CONTROL         "@R_L2TP_RAW",R_L2TP_RAW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,111,269,9
@@ -4285,7 +4283,7 @@ BEGIN
     LTEXT           "@S_2",S_2,48,143,361,23
     GROUPBOX        "@S05",IDC_STATIC,7,194,409,48
     LTEXT           "@S06",IDC_STATIC,16,203,294,17
-    CONTROL         195,IDC_STATIC,"Static",SS_BITMAP,314,202,94,37,WS_EX_STATICEDGE
+    CONTROL         BMP_ETHERIP,IDC_STATIC,"Static",SS_BITMAP,314,202,94,37,WS_EX_STATICEDGE
     CONTROL         "@R_ETHERIP",R_ETHERIP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,224,184,9
     PUSHBUTTON      "@B_DETAIL",B_DETAIL,204,221,103,15
     GROUPBOX        "@S07",IDC_STATIC,7,249,261,51
@@ -4296,7 +4294,7 @@ BEGIN
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,364,287,52,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,14,137,395,1
     ICON            ICO_INFORMATION,IDC_STATIC,24,140,20,18
-    CONTROL         227,IDC_STATIC,"Static",SS_BITMAP,318,89,90,33
+    CONTROL         IDB_BITMAP1,IDC_STATIC,"Static",SS_BITMAP,318,89,90,33
 END
 
 D_SM_ETHERIP DIALOGEX 0, 0, 411, 244
@@ -4310,7 +4308,7 @@ BEGIN
     LTEXT           "@S02",IDC_STATIC,7,74,222,29
     LTEXT           "@S_BOLD",S_BOLD,7,107,222,10
     CONTROL         "",L_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,119,311,119
-    CONTROL         202,IDC_STATIC,"Static",SS_BITMAP,233,5,171,108,WS_EX_DLGMODALFRAME
+    CONTROL         BMP_IX2015,IDC_STATIC,"Static",SS_BITMAP,233,5,171,108,WS_EX_DLGMODALFRAME
     PUSHBUTTON      "@B_ADD",B_ADD,326,132,78,16
     DEFPUSHBUTTON   "@IDOK",IDOK,326,150,78,16
     PUSHBUTTON      "@B_DELETE",B_DELETE,326,169,78,16
@@ -4349,7 +4347,7 @@ BEGIN
     LTEXT           "@S_TITLE",S_TITLE,32,6,385,16
     GROUPBOX        "@S_13",IDC_STATIC,8,26,409,173
     LTEXT           "@S_1",IDC_STATIC,15,36,195,37
-    CONTROL         205,IDC_STATIC,"Static",SS_BITMAP,217,35,194,75
+    CONTROL         BMP_OPENVPN,IDC_STATIC,"Static",SS_BITMAP,217,35,194,75
     CONTROL         "@R_OPENVPN",R_OPENVPN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,17,75,194,9
     LTEXT           "@S_UDP",S_UDP,25,87,186,9
     EDITTEXT        E_UDP,25,96,127,13,ES_AUTOHSCROLL
@@ -4361,7 +4359,7 @@ BEGIN
     PUSHBUTTON      "@B_CONFIG",B_CONFIG,120,177,189,15
     GROUPBOX        "@S_2",IDC_STATIC,7,202,409,98
     LTEXT           "@S_3",IDC_STATIC,14,212,195,37
-    CONTROL         206,IDC_STATIC,"Static",SS_BITMAP,215,209,194,85
+    CONTROL         BMP_SSTP,IDC_STATIC,"Static",SS_BITMAP,215,209,194,85
     CONTROL         "@R_SSTP",R_SSTP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,252,194,9
     LTEXT           "@S_SSTP",S_SSTP,21,265,188,33
     LTEXT           "@S_4",IDC_STATIC,7,302,186,24
@@ -4413,7 +4411,7 @@ FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_SPECIALLISTENER,IDC_STATIC,7,5,20,18
     LTEXT           "@S_TITLE",S_TITLE,32,6,260,16
-    CONTROL         208,IDC_STATIC,"Static",SS_BITMAP,36,112,286,159
+    CONTROL         BMP_SPECIALLISTENER,IDC_STATIC,"Static",SS_BITMAP,36,112,286,159
     GROUPBOX        "@S_1",S_1,7,30,343,79
     LTEXT           "@S_2",IDC_STATIC,14,42,329,31
     CONTROL         "@R_OVER_ICMP",R_OVER_ICMP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,29,73,272,12
@@ -4501,7 +4499,7 @@ BEGIN
     ICON            ICO_INSTALLER,IDC_STATIC,7,5,20,20,WS_TABSTOP
     LTEXT           "@S_WELCOME",S_WELCOME,39,18,277,43
     LTEXT           "@S_TITLE",S_TITLE,39,5,284,10
-    CONTROL         223,IDC_STATIC,"Static",SS_BITMAP,36,63,277,92
+    CONTROL         BMP_VPNSERVER_FIGURE,IDC_STATIC,"Static",SS_BITMAP,36,63,277,92
 END
 
 D_SW_MODE DIALOGEX 0, 0, 323, 155
@@ -4602,7 +4600,7 @@ BEGIN
     CONTROL         "",IDC_PROGRESS1,"msctls_progress32",0x0,7,121,309,13
     LTEXT           "@S_INFO",S_INFO,32,65,284,19
     LTEXT           "STATUS",S_STATUS,7,99,309,21
-    CONTROL         224,IDC_STATIC,"Static",SS_BITMAP,12,-1,319,66
+    CONTROL         BMP_ABOUTBOX,IDC_STATIC,"Static",SS_BITMAP,12,-1,319,66
 END
 
 D_SW_ERROR DIALOGEX 0, 0, 323, 155
@@ -4624,7 +4622,7 @@ BEGIN
     CONTROL         "RUN_TEXT",B_RUN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,40,35,276,12
     LTEXT           "@S_INFO8",S_INFO8,38,60,278,46
     ICON            ICO_LINK,S_ICON2,7,57,20,20,NOT WS_VISIBLE | WS_TABSTOP
-    CONTROL         243,IDC_STATIC,"Static",SS_BITMAP | NOT WS_VISIBLE,119,108,202,39
+    CONTROL         BMP_CREDIT,IDC_STATIC,"Static",SS_BITMAP | NOT WS_VISIBLE,119,108,202,39
 END
 
 D_SW_UNINST1 DIALOGEX 0, 0, 323, 155
@@ -4644,9 +4642,9 @@ FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     CONTROL         "",L_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,55,309,60
     ICON            ICO_LANGUAGE,IDC_STATIC,7,0,20,18
-    CONTROL         218,IDC_STATIC,"Static",SS_BITMAP,57,0,113,21
-    CONTROL         216,IDC_STATIC,"Static",SS_BITMAP,7,23,307,30
-    CONTROL         217,IDC_STATIC,"Static",SS_BITMAP,7,116,307,30
+    CONTROL         BMP_SW_LANG_3,IDC_STATIC,"Static",SS_BITMAP,57,0,113,21
+    CONTROL         BMP_SW_LANG_1,IDC_STATIC,"Static",SS_BITMAP,7,23,307,30
+    CONTROL         BMP_SW_LANG_2,IDC_STATIC,"Static",SS_BITMAP,7,116,307,30
     EDITTEXT        E_CURRENT,173,3,143,15,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
 END
 
@@ -4720,7 +4718,7 @@ EXSTYLE WS_EX_TOPMOST
 CAPTION "@D_UPDATE_NOTICE"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         225,IDC_STATIC,"Static",SS_BITMAP | WS_TABSTOP,2,1,254,68
+    CONTROL         BMP_UPDATE,IDC_STATIC,"Static",SS_BITMAP | WS_TABSTOP,2,1,254,68
     DEFPUSHBUTTON   "@IDOK",IDOK,7,182,117,17
     PUSHBUTTON      "@B_CONFIG",B_CONFIG,162,95,90,15
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,135,182,117,17
@@ -4752,7 +4750,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "@D_SM_VMBRIDGE"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         228,IDC_STATIC,"Static",SS_BITMAP,12,65,286,73
+    CONTROL         BMP_VMBRIDGE,IDC_STATIC,"Static",SS_BITMAP,12,65,286,73
     ICON            ICO_NIC_ONLINE,IDC_STATIC,6,4,18,18
     LTEXT           "@S_TITLE",S_TITLE,32,5,272,19
     LTEXT           "@S_1",IDC_STATIC,7,26,297,24
@@ -4766,7 +4764,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "@D_SM_AZURE"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         229,S_BMP_EN,"Static",SS_BITMAP,7,0,397,173
+    CONTROL         BMP_AZURE,S_BMP_EN,"Static",SS_BITMAP,7,0,397,173
     LTEXT           "@S_TITLE",S_TITLE,7,177,397,16
     LTEXT           "@S_1",IDC_STATIC,7,194,397,24
     LTEXT           "@S_2",IDC_STATIC,7,217,397,24
@@ -4780,11 +4778,11 @@ BEGIN
     PUSHBUTTON      "@B_CHANGE",B_CHANGE,252,293,67,15
     PUSHBUTTON      "@B_WEB",B_WEB,332,261,72,30,BS_MULTILINE
     DEFPUSHBUTTON   "@IDCANCEL",IDCANCEL,331,296,73,16
-    CONTROL         230,S_BMP_JA,"Static",SS_BITMAP,7,0,397,173
+    CONTROL         BMP_AZURE_JA,S_BMP_JA,"Static",SS_BITMAP,7,0,397,173
     ICON            ICO_AZURE,IDC_STATIC,7,239,20,18
     LTEXT           "STATUS_STRING",S_STATUS,22,287,95,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,0,174,415,1
-    CONTROL         232,S_BMP_CN,"Static",SS_BITMAP,7,0,397,173
+    CONTROL         IDB_BITMAP2,S_BMP_CN,"Static",SS_BITMAP,7,0,397,173
 END
 
 D_SM_PROXY DIALOGEX 0, 0, 227, 143
@@ -4822,7 +4820,7 @@ BEGIN
     CONTROL         "",IDC_PROGRESS1,"msctls_progress32",NOT WS_VISIBLE,372,53,63,9
     LTEXT           "@S_REFRESH",S_REFRESH,375,43,71,8,NOT WS_VISIBLE
     LTEXT           "Implemented as a plug-in for SoftEther VPN. (c) VPN Gate Project at University of Tsukuba, Japan.",S_COPYRIGHT,7,293,268,7
-    CONTROL         240,S_TSUKUBA,"Static",SS_BITMAP,397,2,44,13
+    CONTROL         BMP_UNIVTSUKUBA,S_TSUKUBA,"Static",SS_BITMAP,397,2,44,13
     RTEXT           "@S_RESEARCH",S_RESEARCH,219,5,174,11
     LTEXT           "@S_INFO9",S_INFO9,7,251,432,23
 END
@@ -4847,7 +4845,7 @@ CAPTION "@D_VGS_CONFIG"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     CONTROL         "@R_ENABLE",R_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,227,330,13
-    CONTROL         238,S_VPNGATEJA,"Static",SS_BITMAP,0,0,370,136
+    CONTROL         BMP_VPNGATEJA,S_VPNGATEJA,"Static",SS_BITMAP,0,0,370,136
     ICON            ICO_RESEARCH,IDC_STATIC,7,143,20,18
     LTEXT           "@S_TITLE",S_TITLE,33,145,195,15
     LTEXT           "@S_INFO1",S_INFO1,33,163,330,31
@@ -4858,7 +4856,7 @@ BEGIN
     DEFPUSHBUTTON   "@IDOK",IDOK,230,290,64,15
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,299,290,64,15
     PUSHBUTTON      "@B_WEB",B_WEB,228,143,135,15
-    CONTROL         237,S_VPNGATEEN,"Static",SS_BITMAP,0,0,370,136
+    CONTROL         BMP_VPNGATEEN,S_VPNGATEEN,"Static",SS_BITMAP,0,0,370,136
 END
 
 D_VGS_OPTION DIALOGEX 0, 0, 355, 295
@@ -5108,7 +5106,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_
 CAPTION "@D_DU_MAIN"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         2514,-1,"Static",SS_BITMAP,0,-1,308,48
+    CONTROL         BMP_DESKCLIENT,-1,"Static",SS_BITMAP,0,-1,308,48
     RTEXT           "@S_PCID",S_PCID,11,59,71,13
     COMBOBOX        C_PCID,88,56,154,159,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "@B_ERASE",B_ERASE,251,55,49,16
@@ -5117,8 +5115,6 @@ BEGIN
     PUSHBUTTON      "&Wake on LAN",B_WOL,134,78,54,16
     PUSHBUTTON      "@B_SHARE",B_SHARE,191,78,52,16
     PUSHBUTTON      "@B_OPTION",B_OPTION,246,78,54,16
-    CONTROL         2518,S_BANNER1,"Static",SS_BITMAP | SS_NOTIFY | NOT WS_VISIBLE,36,119,267,40
-    CONTROL         2517,S_BANNER2,"Static",SS_BITMAP | SS_NOTIFY | NOT WS_VISIBLE,36,119,267,40
 END
 
 D_DU_OPTION DIALOGEX 0, 0, 447, 367
@@ -5344,7 +5340,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "@D_DI_NOTICE"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         2519,IDC_STATIC,"Static",SS_BITMAP,0,0,361,335
+    CONTROL         BMP_NOTICE,IDC_STATIC,"Static",SS_BITMAP,0,0,361,335
     DEFPUSHBUTTON   "@IDOK",IDOK,209,339,85,16
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,300,339,56,16
 END
@@ -5354,7 +5350,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "@D_DG_PASSWORD1"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         2523,S_LANG_JP,"Static",SS_BITMAP,7,7,139,166
+    CONTROL         BMP_PASSWORD1,S_LANG_JP,"Static",SS_BITMAP,7,7,139,166
     LTEXT           "@S_1",S_1,153,7,207,74
     LTEXT           "@S_2",S_2,153,83,207,125
     DEFPUSHBUTTON   "@IDCANCEL",IDCANCEL,300,210,60,18
@@ -5366,7 +5362,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "@D_DG_PASSWORD2"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         2524,S_LANG_JP,"Static",SS_BITMAP,7,7,146,166
+    CONTROL         BMP_PASSWORD2,S_LANG_JP,"Static",SS_BITMAP,7,7,146,166
     LTEXT           "@S_1",S_1,159,7,201,48
     LTEXT           "@S_2",S_2,159,64,201,125
     CONTROL         "@C_DONTSHOW",C_DONTSHOW,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,159,191,201,10
@@ -5380,7 +5376,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "@D_DI_THANKS"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         2525,IDC_STATIC,"Static",SS_BITMAP,0,0,305,260
+    CONTROL         BMP_THANKS,IDC_STATIC,"Static",SS_BITMAP,0,0,305,260
     DEFPUSHBUTTON   "@IDCANCEL",IDCANCEL,111,267,85,20
 END
 
@@ -5413,7 +5409,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "@D_DI_THANKS"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         2531,IDC_STATIC,"Static",SS_BITMAP,0,0,305,260
+    CONTROL         BMP_THANKS_EN,IDC_STATIC,"Static",SS_BITMAP,0,0,305,260
     DEFPUSHBUTTON   "@IDCANCEL",IDCANCEL,111,267,85,20
 END
 
@@ -5479,7 +5475,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | WS_
 CAPTION "@D_DG_MAIN"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         2513,IDC_STATIC,"Static",SS_BITMAP | WS_TABSTOP,0,-1,308,48
+    CONTROL         BMP_DESKSERVER,IDC_STATIC,"Static",SS_BITMAP | WS_TABSTOP,0,-1,308,48
     GROUPBOX        "@S1",IDC_STATIC,7,54,293,170
     RTEXT           "@S_PCID",S_PCID,14,71,51,10
     EDITTEXT        E_PCID,69,68,129,15,ES_AUTOHSCROLL
@@ -5527,7 +5523,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "NTT 東日本 - IPA 「シン・テレワークシステム」 業務完了"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         242,IDC_STATIC,"Static",SS_BITMAP | WS_TABSTOP,65,2,173,186
+    CONTROL         BMP_THEEND,IDC_STATIC,"Static",SS_BITMAP | WS_TABSTOP,65,2,173,186
     CONTROL         "次回から表示しない(&N)",C_NOMORE,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,7,197,107,13
     DEFPUSHBUTTON   "閉じる(&C)",IDCANCEL,117,194,71,22
 END
@@ -5560,7 +5556,7 @@ BEGIN
     PUSHBUTTON      "新規コード(&N)",B_NEW_EMERGENCY,191,328,53,18
     DEFPUSHBUTTON   "&OK",IDOK,111,356,64,17
     PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,356,64,17
-    CONTROL         247,IDC_STATIC,"Static",SS_BITMAP,9,0,234,86
+    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP,9,0,234,86
 END
 
 D_DU_OTP DIALOGEX 0, 0, 251, 243
@@ -5575,7 +5571,7 @@ BEGIN
     LTEXT           "しばらく経過してもメールが届かない場合は、一度キャンセルしてから、再度ログインを試行してください。",S_3,32,193,212,27
     DEFPUSHBUTTON   "&OK",IDOK,111,221,64,17
     PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,221,64,17
-    CONTROL         247,IDC_STATIC,"Static",SS_BITMAP,9,0,234,88
+    CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP,9,0,234,88
 END
 
 D_DG_MAC DIALOGEX 0, 0, 275, 342
@@ -5609,7 +5605,7 @@ EXSTYLE WS_EX_TOPMOST
 CAPTION "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 "
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         1,IDC_STATIC,"Static",SS_BITMAP,7,0,345,138
+    CONTROL         IDOK,IDC_STATIC,"Static",SS_BITMAP,7,0,345,138
     LTEXT           "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 を有効化しますか?",S_BOLD,30,143,322,20
     LTEXT           "「完全閉域化ファイアウォール機能」 を有効にすると、行政情報システムへのシンクライアント通信のための SSL-VPN 接続中は、本 PC とインターネットとの通信 (本 SSL-VPN 接続をのぞく) をすべて遮断できます。Windows のカーネルに最高優先上位のパケットフィルタを挿入することにより、他の通信に対する強力な遮断が実施されることから、他のアプリケーション (Web ブラウザ等を含む) は、これに反して通信をすることはできなくなり、セキュリティ脅威となり得る通信をシャットアウトできます。",S_INFO1,7,165,345,38
     GROUPBOX        "「完全閉域化ファイアウォール機能」 による自宅と行政機関との間の完全閉域網化について",S_BOLD2,7,207,345,84
@@ -5632,7 +5628,7 @@ BEGIN
     ICON            ICO_INFORMATION,IDC_STATIC,12,256,20,20
     DEFPUSHBUTTON   "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 を終了する(&X)",IDCANCEL,33,296,290,22
     ICON            ICO_LANG_JAPANESE,IDC_STATIC,13,153,20,20
-    CONTROL         1,IDC_STATIC,"Static",SS_BITMAP,7,0,345,138
+    CONTROL         IDOK,IDC_STATIC,"Static",SS_BITMAP,7,0,345,138
     GROUPBOX        "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」",S_BOLD2,7,143,345,145
 END
 
@@ -5641,7 +5637,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Wake on LAN 機能の設定"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         250,IDC_STATIC,"Static",SS_BITMAP,7,0,366,132
+    CONTROL         BMP_WOL,IDC_STATIC,"Static",SS_BITMAP,7,0,366,132
     GROUPBOX        "この PC を (1) Wake on LAN ターゲット PC として設定",IDC_STATIC,7,134,180,186
     ICON            ICO_DISPLAY,IDC_STATIC,14,146,20,20
     LTEXT           "Wake on LAN ターゲット PC として有効化しておくと、リモートから、同じ LAN 内の 1 台の Wake on LAN トリガー PC (常時電源 ON) を経由して、このコンピュータの電源を ON にすることができます。",IDC_STATIC,39,147,143,42
@@ -5667,7 +5663,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Wake on LAN 機能"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         250,IDC_STATIC,"Static",SS_BITMAP,7,0,366,132
+    CONTROL         BMP_WOL,IDC_STATIC,"Static",SS_BITMAP,7,0,366,132
     ICON            ICO_DISPLAY,IDC_STATIC,18,153,18,18
     LTEXT           "(1) Wake on LAN ターゲット PC のコンピュータ ID:",S_PCID,47,157,147,13
     COMBOBOX        C_PCID,198,154,154,159,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
@@ -5690,86 +5686,167 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 ICO_TEST                ICON                    "Test.ico"
+
 ICO_KEY                 ICON                    "Key.ico"
+
 ICO_CERT                ICON                    "Cert.ico"
+
 ICO_SERVER_ONLINE       ICON                    "Server.ico"
+
 ICO_WARNING             ICON                    "Warning.ico"
+
 ICO_NULL                ICON                    "Null.ico"
+
 ICO_TOWER               ICON                    "Tower.ico"
+
 ICO_VPN                 ICON                    "VPN.ico"
+
 ICO_VPNSERVER           ICON                    "VPNSvr.ico"
+
 ICO_NIC_ONLINE          ICON                    "NIC.ico"
+
 ICO_SETUP               ICON                    "Setup.ico"
+
 ICO_MACHINE             ICON                    "Machine.ico"
+
 ICO_HUB                 ICON                    "Hub.ico"
+
 ICO_VLAN                ICON                    "VLan.ico"
+
 ICO_SERVER_OFFLINE      ICON                    "Server_Offline.ico"
+
 ICO_NIC_OFFLINE         ICON                    "NIC_Offline.ico"
+
 ICO_INFORMATION         ICON                    "Information.ico"
+
 ICO_STOP                ICON                    "Stop.ico"
+
 ICO_SERVER_DELETE       ICON                    "Server_Delete.ico"
+
 ICO_SERVER_ONLINE_EX    ICON                    "Server_Online_Ex.ico"
+
 ICO_SERVER_OFFLINE_EX   ICON                    "Server_Offline_Ex.ico"
+
 ICO_INTERNET            ICON                    "Internet.ico"
+
 ICO_DISPLAY             ICON                    "Display.ico"
+
 ICO_GROUP               ICON                    "Group.ico"
+
 ICO_USER                ICON                    "User.ico"
+
 ICO_USER_ADMIN          ICON                    "UserAdmin.ico"
+
 ICO_HUB_OFFLINE         ICON                    "Hub_Offline.ico"
+
 ICO_FARM                ICON                    "Farm.ico"
+
 ICO_X                   ICON                    "X.ico"
+
 ICO_PROTOCOL            ICON                    "Protocol.ico"
+
 ICO_PROTOCOL_X          ICON                    "Protocol2.ico"
+
 ICO_DISCARD             ICON                    "Discard.ico"
+
 ICO_PASS                ICON                    "Pass.ico"
+
 ICO_PROTOCOL_OFFLINE    ICON                    "ProtocolOffline.ico"
+
 ICO_MEMORY              ICON                    "Memory.ico"
+
 ICO_PKCS12              ICON                    "PKCS12.ico"
+
 ICO_SERVER_CERT         ICON                    "ServerCert.ico"
+
 ICO_LINK                ICON                    "Link.ico"
+
 ICO_PENGUIN             ICON                    "Penguin.ico"
+
 ICO_LINK2               ICON                    "Link2.ico"
+
 ICO_CASCADE             ICON                    "Cascade.ico"
+
 ICO_USER_DENY           ICON                    "UserDeny.ico"
+
 ICO_GROUP_DENY          ICON                    "GroupDeny.ico"
+
 ICO_LOG                 ICON                    "Log.ico"
+
 ICO_LOG2                ICON                    "Log2.ico"
+
 ICO_DATETIME            ICON                    "DateTime.ico"
+
 ICO_NEW                 ICON                    "New.ico"
+
 ICO_PASS_DISABLE        ICON                    "PassDisable.ico"
+
 ICO_DISCARD_DISABLE     ICON                    "DiscardDisable.ico"
+
 ICO_CASCADE_ERROR       ICON                    "CascadeOffline.ico"
+
 ICO_CASCADE_OFFLINE     ICON                    "CascadeOffline2.ico"
+
 ICO_PROTOCOL_DHCP       ICON                    "ProtocolDhcp.ico"
+
 ICO_ROUTER              ICON                    "Router.ico"
+
 ICO_BRIDGE              ICON                    "Bridge.ico"
+
 ICO_SWITCH              ICON                    "Switch.ico"
+
 ICO_SWITCH_OFFLINE      ICON                    "SwitchOffline.ico"
+
 ICO_SECURE              ICON                    "Secure.ico"
+
 ICO_CERT_X              ICON                    "CertX.ico"
+
 ICO_INTERNET_X          ICON                    "InternetX.ico"
+
 ICO_LICENSE             ICON                    "License.ico"
+
 ICO_SESSION_BRIDGE      ICON                    "SessionBridge.ico"
+
 ICO_SESSION_MONITOR     ICON                    "SessionMonitor.ico"
+
 ICO_TRAY1               ICON                    "Tray1.ico"
+
 ICO_TRAY2               ICON                    "Tray2.ico"
+
 ICO_TRAY3               ICON                    "Tray3.ico"
+
 ICO_TRAY4               ICON                    "Tray4.ico"
+
 ICO_TRAY0               ICON                    "Tray0.ico"
+
 ICO_DESKSERVER_EXE      ICON                    "deskserverexe.ico"
+
 ICO_DESKCLIENT          ICON                    "deskclient.ico"
+
 ICO_DESKSERVER          ICON                    "deskserver.ico"
+
 ICO_NETCONN             ICON                    "NetConn.ico"
+
 ICO_DESKSERVER_TRAY     ICON                    "deskservertray.ico"
+
 ICO_HACKER              ICON                    "Hacker.ico"
+
 ICO_NORMALUSER          ICON                    "NormalUser.ico"
+
 ICO_NONE                ICON                    "None.ico"
+
 ICO_SHARE               ICON                    "Share.ico"
+
 ICO_DESKSERVER_TRAY2    ICON                    "deskservertray2.ico"
+
 ICO_THINCLIENT          ICON                    "ThinClient.ico"
+
 ICO_VB6                 ICON                    "VB6.ico"
+
 ICO_WIN95NET            ICON                    "Win95Net.ico"
+
 ICO_SHIELD              ICON                    "Shield.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -5777,37 +5854,65 @@ ICO_SHIELD              ICON                    "Shield.ico"
 //
 
 BMP_TEST                BITMAP                  "Test.bmp"
+
 BMP_SECURE              BITMAP                  "Secure.bmp"
+
 BMP_SECURE2             BITMAP                  "Secure2.bmp"
+
 BMP_MANAGER_LOGO        BITMAP                  "ManagerLogo.bmp"
+
 BMP_SPLASH_CLIENT       BITMAP                  "SplashClient.bmp"
+
 BMP_SPLASH_MANAGER      BITMAP                  "SplashManager.bmp"
+
 BMP_ROUTER_BANNER       BITMAP                  "RouterBanner.bmp"
+
 BMP_SPLASH_ROUTER       BITMAP                  "SplashRouter.bmp"
+
 BMP_ROUTER_LOGO         BITMAP                  "RouterLogo.bmp"
+
 BMP_COINS               BITMAP                  "Coins.bmp"
+
 BMP_SECURE3             BITMAP                  "Secure3.bmp"
+
 BMP_SPLASH_ETHERLOGGER  BITMAP                  "SplashLogger.bmp"
+
 BMP_CLIENT_BANNER       BITMAP                  "ClientBanner.bmp"
+
 BMP_SETUP_2             BITMAP                  "setup_2.bmp"
+
 BMP_SETUP_1             BITMAP                  "setup_1.bmp"
+
 BMP_TSUKUBA             BITMAP                  "Tsukuba.bmp"
+
 BMP_DESKSERVER          BITMAP                  "deskserver.bmp"
+
 BMP_DESKCLIENT          BITMAP                  "deskclient.bmp"
-BMP_BANNER2             BITMAP                  "Banner2.bmp"
-BMP_BANNER1             BITMAP                  "Banner1.bmp"
+
 BMP_NOTICE              BITMAP                  "Notice.bmp"
+
 BMP_PASSWORD1           BITMAP                  "Password1.bmp"
+
 BMP_PASSWORD2           BITMAP                  "Password2.bmp"
+
 BMP_THANKS              BITMAP                  "Thanks.bmp"
+
 BMP_PASSWORD1_EN        BITMAP                  "Password1_en.bmp"
+
 BMP_PASSWORD2_EN        BITMAP                  "Password2_en.bmp"
+
 BMP_THANKS_EN           BITMAP                  "Thanks_en.bmp"
+
 BMP_THEEND              BITMAP                  "TheEnd.bmp"
+
 BMP_CREDIT              BITMAP                  "CREDIT.bmp"
+
 BMP_OTP                 BITMAP                  "Otp.bmp"
+
 BMP_GOVFW1              BITMAP                  "GovFw1.bmp"
+
 BMP_WOL                 BITMAP                  "WoL.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -5816,12 +5921,13 @@ BMP_WOL                 BITMAP                  "WoL.bmp"
 
 AVI_PROGRESS            AVI                     "Progress.avi"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Menu
 //
 
-M_MAIN MENU 
+M_MAIN MENU
 BEGIN
     POPUP "@CMD_TOP_CONNECT"
     BEGIN
@@ -5910,7 +6016,7 @@ BEGIN
     END
 END
 
-M_VOICE_BACKUP MENU 
+M_VOICE_BACKUP MENU
 BEGIN
     POPUP "@CMD_TOP_VOICE"
     BEGIN
@@ -5928,7 +6034,8 @@ END
 //
 
 BIN_WINPCAP             BIN                     "Dummy.bin"
-#endif    // 日本語 resources
+
+#endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -5936,10 +6043,8 @@ BIN_WINPCAP             BIN                     "Dummy.bin"
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -5949,20 +6054,35 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 ICO_IPSEC               ICON                    "IPsec.ico"
+
 ICO_DDNS                ICON                    "DDNS.ico"
+
 ICO_OPENVPN             ICON                    "OpenVPN.ico"
+
 ICO_SPECIALLISTENER     ICON                    "SpecialListener.ico"
+
 ICO_INSTALLER           ICON                    "Installer.ico"
+
 ICO_LANGUAGE            ICON                    "Language.ico"
+
 ICO_LANG_CHINESE        ICON                    "LANG_CHINESE.ico"
+
 ICO_LANG_ENGLISH        ICON                    "LANG_ENGLISH.ico"
+
 ICO_LANG_JAPANESE       ICON                    "LANG_JAPANESE.ico"
+
 ICO_EASYINSTALLER       ICON                    "EasyInstaller.ico"
+
 ICO_AZURE               ICON                    "Azure.ico"
+
 ICO_ZURUHAM             ICON                    "ZuruHam.ico"
+
 ICO_ZURUKKO             ICON                    "Zurukko.ico"
+
 ICO_RESEARCH            ICON                    "Research.ico"
+
 ICO_POLICE              ICON                    "Police.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -5970,30 +6090,55 @@ ICO_POLICE              ICON                    "Police.ico"
 //
 
 BMP_ETHERIP             BITMAP                  "EtherIP.bmp"
+
 BMP_L2TP                BITMAP                  "L2TP.bmp"
+
 BMP_IX2015              BITMAP                  "IX2015.bmp"
+
 BMP_OPENVPN             BITMAP                  "OpenVPN.bmp"
+
 BMP_SSTP                BITMAP                  "SSTP.bmp"
+
 BMP_SPECIALLISTENER     BITMAP                  "SpecialListener.bmp"
+
 BMP_SELOGO49x49         BITMAP                  "SELOGO49x49.bmp"
+
 BMP_UT                  BITMAP                  "BMP_UT.bmp"
+
 BMP_SW_LANG_1           BITMAP                  "SW_LANG_1.bmp"
+
 BMP_SW_LANG_2           BITMAP                  "SW_LANG_2.bmp"
+
 BMP_SW_LANG_3           BITMAP                  "SW_LANG_3.bmp"
+
 BMP_VPNSERVER_FIGURE    BITMAP                  "VPNServerFigure.bmp"
+
 BMP_ABOUTBOX            BITMAP                  "AboutBox.bmp"
+
 BMP_UPDATE              BITMAP                  "Update.bmp"
+
 BMP_IBARAKI             BITMAP                  "Ibaraki.bmp"
+
 BMP_WINPC               BITMAP                  "WinPC.bmp"
+
 BMP_VMBRIDGE            BITMAP                  "VMBridge.bmp"
+
 BMP_AZURE               BITMAP                  "Azure.bmp"
+
 BMP_AZURE_JA            BITMAP                  "AzureJa.bmp"
+
 BMP_AZURE_CN            BITMAP                  "AzureCn.bmp"
+
 BMP_VPNGATEBANNER       BITMAP                  "VPNGateBanner.bmp"
+
 BMP_ZURUKKO             BITMAP                  "Zurukko.bmp"
+
 BMP_VPNGATEEN           BITMAP                  "VPNGateEN.bmp"
+
 BMP_VPNGATEJA           BITMAP                  "VPNGateJA.bmp"
+
 BMP_UNIVTSUKUBA         BITMAP                  "UnivTsukuba.bmp"
+
 #endif    // 英語 (米国) resources
 /////////////////////////////////////////////////////////////////////////////
 
