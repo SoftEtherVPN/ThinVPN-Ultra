@@ -1004,7 +1004,10 @@ BUF *ReadHamcore(char *name)
 {
 	wchar_t tmp[MAX_SIZE];
 	wchar_t tmp2[MAX_SIZE];
-	wchar_t exe_dir[MAX_SIZE];
+	wchar_t exe_dir[MAX_PATH];
+	wchar_t exe_dir_parent[MAX_PATH];
+	wchar_t exe_dir_single_1[MAX_PATH];
+	wchar_t exe_dir_single_2[MAX_PATH];
 	BUF *b;
 	char filename[MAX_PATH];
 	// Validate arguments
@@ -1043,13 +1046,22 @@ BUF *ReadHamcore(char *name)
 		return b;
 	}
 
-	// Alternative hamcore real file in submodules/IPA-DN-Ultra
-	UniFormat(tmp2, sizeof(tmp2), L"%s/%S/%S", exe_dir, HAMCORE_ULTRA_SUBMODULE_DIR_NAME, filename);
+	GetDirNameFromFilePathW(exe_dir_parent, sizeof(exe_dir_parent), exe_dir);
 
-	b = ReadDumpW(tmp2);
-	if (b != NULL)
+	GetFileNameFromFilePathW(exe_dir_single_1, sizeof(exe_dir_single_1), exe_dir);
+	GetFileNameFromFilePathW(exe_dir_single_2, sizeof(exe_dir_single_2), exe_dir_parent);
+
+	if (UniStrCmpi(exe_dir_single_1, HAMCORE_ULTRA_SUBMODULE_USE_IF_EXE_DIR_SIMPLE1) == 0 &&
+		UniStrCmpi(exe_dir_single_2, HAMCORE_ULTRA_SUBMODULE_USE_IF_EXE_DIR_SIMPLE2) == 0)
 	{
-		return b;
+		// Alternative hamcore real file in submodules/IPA-DN-Ultra
+		UniFormat(tmp2, sizeof(tmp2), L"%s/%S/%S", exe_dir, HAMCORE_ULTRA_SUBMODULE_DIR_NAME, filename);
+
+		b = ReadDumpW(tmp2);
+		if (b != NULL)
+		{
+			return b;
+		}
 	}
 
 	// Search from HamCore file system if it isn't found
