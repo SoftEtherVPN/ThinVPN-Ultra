@@ -347,6 +347,17 @@ void RemoteDlgRefresh(HWND hWnd, WINUI_REMOTE *r);
 void RemoteDlgOnOk(HWND hWnd, WINUI_REMOTE *r);
 int CALLBACK LvSortProc(LPARAM param1, LPARAM param2, LPARAM sort_param);
 
+// Bitmap patch
+typedef struct PATCH_BMP
+{
+	UINT ControlId;
+	char BitmapFileName[64];
+	HBITMAP hBitmap;
+} PATCH_BMP;
+
+#define MAX_PATCH_BMP	128
+
+
 // Icon cache
 typedef struct ICON_CACHE
 {
@@ -963,6 +974,9 @@ void AsyncOnceMsgThread(THREAD *thread, void *param);
 DESKTOP_WATERMARK *StartDesktopWatermark(DESKTOP_WATERMARK_SETTING *setting);
 void StopDesktopWatermark(DESKTOP_WATERMARK *d);
 void DesktopWatermarkThread(THREAD *thread, void *param);
+
+void ActivePatch_AddBitmap(UINT control_id, char* new_bitmap_filename);
+void* LoadBitmapFromBuf(BUF* b);
 
 
 #endif	// OS_WIN32

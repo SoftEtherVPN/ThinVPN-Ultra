@@ -153,6 +153,8 @@ static bool g_led_special = false;
 static bool g_tcpip_topmost = false;
 static DWORD tls_current_wizard = 0xFFFFFFFF;
 
+static PATCH_BMP PatchBmpList[MAX_PATCH_BMP] = CLEAN;
+
 #define WINUI_PSM_SHOWWIZBUTTONS              (WM_USER + 138)
 #define WINUI_PropSheet_ShowWizButtons(hDlg, dwFlag, dwButton) \
 	PSTMSG(hDlg, WINUI_PSM_SHOWWIZBUTTONS, (WPARAM)(dwFlag), (LPARAM)(dwButton))
@@ -165,6 +167,41 @@ typedef struct _WINUI_SHSTOCKICONINFO
 	int   iIcon;
 	WCHAR szPath[MAX_PATH];
 } WINUI_SHSTOCKICONINFO;
+
+void ActivePatch_AddBitmap(UINT control_id, char* new_bitmap_filename)
+{
+	UINT i;
+	bool exists = false;
+	if (control_id == 0 || StrLen(new_bitmap_filename) == 0)
+	{
+		return;
+	}
+
+	for (i = 0;i < MAX_PATCH_BMP;i++)
+	{
+		PATCH_BMP* p = &PatchBmpList[i];
+		if (p->ControlId == control_id)
+		{
+			StrCpy(p->BitmapFileName, sizeof(p->BitmapFileName), new_bitmap_filename);
+			exists = true;
+			break;
+		}
+	}
+
+	if (exists == false)
+	{
+		for (i = 0;i < MAX_PATCH_BMP;i++)
+		{
+			PATCH_BMP* p = &PatchBmpList[i];
+			if (p->ControlId == 0)
+			{
+				p->ControlId = control_id;
+				StrCpy(p->BitmapFileName, sizeof(p->BitmapFileName), new_bitmap_filename);
+				break;
+			}
+		}
+	}
+}
 
 HFONT CreateDrawTextFont(char *name, UINT size, bool bold, bool italic, bool underline, bool strikeout)
 {
@@ -3734,6 +3771,41 @@ void AdjustDialogXY(UINT *x, UINT *y, UINT dlgfont_x, UINT dlgfont_y)
 	}
 }
 
+static UINT load_bitmap_tmp_id = 0;
+
+// Load a bitmap file from memory
+void* LoadBitmapFromBuf(BUF* b)
+{
+	HBITMAP ret = CLEAN;
+	wchar_t path[MAX_PATH] = CLEAN;
+	wchar_t name[MAX_PATH] = CLEAN;
+	if (b == NULL)
+	{
+		return NULL;
+	}
+
+	load_bitmap_tmp_id++;
+
+	UniFormat(name, sizeof(name), L"bmp_%04u.bmp", load_bitmap_tmp_id);
+	
+	CombinePathW(path, sizeof(path), MsGetMyTempDirW(), name);
+
+	if (DumpBufW(b, path) == false)
+	{
+		FileDeleteW(path);
+		return NULL;
+	}
+
+	ret = LoadImageW(NULL, path, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	if (ret == NULL)
+	{
+		FileDeleteW(path);
+		return NULL;
+	}
+
+	return ret;
+}
+
 // Internationalizing process for the dialog box
 void InitDialogInternational(HWND hWnd, void *pparam)
 {
@@ -3871,6 +3943,54 @@ void InitDialogInternational(HWND hWnd, void *pparam)
 	}
 
 	FreeWindowList(o);
+
+	// Bitmap active patch
+	for (i = 0;i < MAX_PATCH_BMP;i++)
+	{
+		PATCH_BMP* p = &PatchBmpList[i];
+		if (p->ControlId != 0)
+		{
+			HWND hControl = DlgItem(hWnd, p->ControlId);
+			if (hControl != NULL)
+			{
+				char class_name[MAX_SIZE];
+
+				Zero(class_name, sizeof(class_name));
+				GetClassNameA(hControl, class_name, sizeof(class_name));
+
+				if (StrCmpi(class_name, "static") == 0)
+				{
+					UINT style = GetStyle(hControl, 0);
+
+					if (style & SS_BITMAP)
+					{
+						if (p->hBitmap == NULL)
+						{
+							wchar_t filename[MAX_PATH];
+							BUF* b;
+
+							UniFormat(filename, sizeof(filename), L"|%S", p->BitmapFileName);
+
+							b = ReadDumpW(filename);
+
+							p->hBitmap = LoadBitmapFromBuf(b);
+
+							FreeBuf(b);
+
+							if (p->hBitmap != NULL)
+							{
+								SendMessage(hControl, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)p->hBitmap);
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
 
 	if (MsIsVista() && need_resize)
 	{
@@ -10736,7 +10856,7 @@ UINT DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, bool white_color
 	switch (msg)
 	{
 	case WM_INITDIALOG:
-		if (true)
+		if (false)
 		{
 			RECT rect1;
 
