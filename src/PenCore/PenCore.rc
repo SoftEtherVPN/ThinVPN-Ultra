@@ -4572,8 +4572,8 @@ BEGIN
     RTEXT           "@S_DEST",S_DEST,7,59,72,11
     EDITTEXT        E_DIR,82,57,189,11,ES_AUTOHSCROLL
     PUSHBUTTON      "@B_BROWSE",B_BROWSE,276,56,46,13
-    CONTROL         "行政情報システム適応モード (中継システムの IP 範囲を限定)",R_LIMITED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,74,187,9
-    PUSHBUTTON      "行政情報システム適応モードとは",B_LIMITED_HELP,222,72,100,13
+    CONTROL         "@R_LIMITED",R_LIMITED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,74,187,9
+    PUSHBUTTON      "@B_LIMITED_HELP",B_LIMITED_HELP,222,72,100,13
     CONTROL         "@R_SHOWCUSTOM",R_SHOWCUSTOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,33,89,283,9
     CONTROL         "@R_FOR_SYSTEM",R_FOR_SYSTEM,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,46,104,263,9
     CONTROL         "@R_FOR_USER",R_FOR_USER,"Button",BS_AUTORADIOBUTTON,46,117,263,9
@@ -4981,33 +4981,33 @@ BEGIN
     EDITTEXT        E_PASSWORD1,77,134,155,12,ES_PASSWORD | ES_AUTOHSCROLL
     RTEXT           "@S_PASSWORD3",S_PASSWORD3,16,153,56,12
     EDITTEXT        E_PASSWORD2,77,151,155,12,ES_PASSWORD | ES_AUTOHSCROLL
-    GROUPBOX        "高度なユーザー認証機能の設定",S_S10,7,181,247,123
-    LTEXT           "高度なユーザー認証機能を使用すると、ユーザー名とパスワードによる認証や、外部の Radius サーバーや Active Directory サーバーを使用した認証、X.509 証明書を利用した PKI 認証などが利用できるようになります。パスワードのみによる簡易ユーザー認証は利用できなくなります。",S_S11,14,195,233,36
-    CONTROL         "高度なユーザー認証機能を使用する(&A)",C_USE_ADVANCED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,232,226,15
-    PUSHBUTTON      "ユーザーの管理(&U)",B_USER,24,253,104,17
-    PUSHBUTTON      "信頼する証明機関の証明書(&T)",B_CA,135,253,104,17
-    PUSHBUTTON      "外部認証サーバーの設定(&R)",B_RADIUS,24,279,104,17
-    PUSHBUTTON      "無効な証明書(&V)",B_CRL,134,279,104,17
-    GROUPBOX        "クライアント端末のセキュリティチェック機能",S_S12,7,309,247,65
+    GROUPBOX        "@S_S10",S_S10,7,181,247,123
+    LTEXT           "@S_S11",S_S11,14,195,233,36
+    CONTROL         "@C_USE_ADVANCED",C_USE_ADVANCED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,232,226,15
+    PUSHBUTTON      "@B_USER",B_USER,24,253,104,17
+    PUSHBUTTON      "@B_CA",B_CA,135,253,104,17
+    PUSHBUTTON      "@B_RADIUS",B_RADIUS,24,279,104,17
+    PUSHBUTTON      "@B_CRL",B_CRL,134,279,104,17
+    GROUPBOX        "@S_S12",S_S12,7,309,247,65
     ICON            ICO_SHIELD,IDC_STATIC,16,319,18,18
-    LTEXT           "「シン・テレワークシステム クライアント」 がこのサーバーに接続する際のセキュリティチェックを実施することができます。",S_S13,40,320,207,20
-    CONTROL         "クライアント検疫の実施 (アンチウイルスおよび Windows Update 適用検査)",C_INSPECTION,
+    LTEXT           "@S_S13",S_S13,40,320,207,20
+    CONTROL         "@C_INSPECTION",C_INSPECTION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,340,234,10
-    CONTROL         "クライアント MAC アドレス認証",C_CHECKMAC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,356,110,10
-    PUSHBUTTON      "接続許可 MAC アドレスの登録",B_MAC,125,353,118,17
-    GROUPBOX        "ワンタイムパスワード (OTP) 機能 (二要素認証)",IDC_STATIC,263,38,185,85
+    CONTROL         "@C_CHECKMAC",C_CHECKMAC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,356,110,10
+    PUSHBUTTON      "@B_MAC",B_MAC,125,353,118,17
+    GROUPBOX        "@S_20091801",IDC_STATIC,263,38,185,85
     ICON            ICO_IPSEC,IDC_STATIC,269,52,20,20
-    LTEXT           "毎回必ずログイン時に事前設定したメールアドレスにワンタイムパスワード (OTP) が送付されるようにできます。OTP が一致しなければログインできません。セキュリティポリシー上、二要素認証の利用が必須の企業環境で利用できます。",IDC_STATIC,293,52,148,44
-    PUSHBUTTON      "ワンタイムパスワード (O&TP) 機能の設定",B_OTP,305,99,133,17
+    LTEXT           "@S_20091802",IDC_STATIC,293,52,148,44
+    PUSHBUTTON      "@B_OTP",B_OTP,305,99,133,17
     GROUPBOX        "@S4",IDC_STATIC,263,128,185,137
     ICON            ICO_PKCS12,IDC_STATIC,269,141,20,20
     LTEXT           "@S5",IDC_STATIC,293,141,147,54
     CONTROL         "@C_CHECK_CERT",C_CHECK_CERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,274,198,167,10
     LTEXT           "@S_CHECK_CERT",S_CHECK_CERT,277,214,164,47
-    GROUPBOX        "IP アクセス制御リスト(&R)",IDC_STATIC,263,270,185,76
+    GROUPBOX        "@S_20091803",IDC_STATIC,263,270,185,76
     ICON            ICO_INTERNET,S_ACL_2,270,285,20,20
-    LTEXT           "クライアントコンピュータの IP アドレスによって、このサーバーへの VPN 接続を許可または拒否することができます。",S_ACL,294,284,146,34
-    PUSHBUTTON      "IP アクセス制御リスト(&L)",B_ACL,337,323,102,19
+    LTEXT           "@S_ACL",S_ACL,294,284,146,34
+    PUSHBUTTON      "@B_ACL",B_ACL,337,323,102,19
     PUSHBUTTON      "@B_HASH",B_HASH,264,357,79,17
     DEFPUSHBUTTON   "@IDOK",IDOK,347,357,43,17
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,393,357,55,17
@@ -5032,36 +5032,36 @@ BEGIN
     CONTROL         "@B_URDP",B_URDP,"Button",BS_AUTORADIOBUTTON,41,227,216,10
     ICON            ICO_INFORMATION,S_ICON,23,247,20,20
     LTEXT           "@S_INFO",S_INFO,48,246,208,31
-    CONTROL         "以下のユーザーを常に Remote Desktop Users グループに追加(&G)",B_ADDGROUP,
+    CONTROL         "@B_ADDGROUP",B_ADDGROUP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,281,226,12
-    RTEXT           "ユーザー名:",S_1,14,302,60,11
+    RTEXT           "@S_1",S_1,14,302,60,11
     EDITTEXT        E_USERNAME,78,300,102,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "現在のユーザーを指定",B_CURRENTUSER,185,298,73,15
-    CONTROL         "Windows の RDP の設定のシン・テレワークシステムへの最適化を維持(&O)",B_RDP_OPTIMIZE,
+    PUSHBUTTON      "@B_CURRENTUSER",B_CURRENTUSER,185,298,73,15
+    CONTROL         "@B_RDP_OPTIMIZE",B_RDP_OPTIMIZE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,318,226,12
-    LTEXT           "RDP 接続受付時に以下のサービスを停止(&S): (スペース区切りで複数指定可)",S_18,33,334,222,11
+    LTEXT           "@S_18",S_18,33,334,222,11
     EDITTEXT        E_STOPSVC,33,347,220,12,ES_AUTOHSCROLL
     PUSHBUTTON      "@B_URDPCONFIG",B_URDPCONFIG,134,7,168,16,NOT WS_VISIBLE
     GROUPBOX        "@S7",IDC_STATIC,268,29,176,114
     CONTROL         "@C_LOG",C_LOG,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,275,40,162,12
     PUSHBUTTON      "@B_LOG",B_LOG,371,55,66,16
-    CONTROL         "Windows のイベントログに記録する(&E)",C_EVENTLOG,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,275,75,162,11
-    CONTROL         "syslog プロトコルで送信する(&S)",C_SYSLOG,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,275,93,162,10
-    RTEXT           "syslog サーバー名(&S):",S_01,270,111,67,8
+    CONTROL         "@C_EVENTLOG",C_EVENTLOG,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,275,75,162,11
+    CONTROL         "@C_SYSLOG",C_SYSLOG,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,275,93,162,10
+    RTEXT           "@S_01",S_01,270,111,67,8
     EDITTEXT        E_SYSLOG_HOSTNAME,342,109,95,12,ES_AUTOHSCROLL
-    RTEXT           "ポート番号(&O):",S_02,275,126,62,8
+    RTEXT           "@S_02",S_02,275,126,62,8
     EDITTEXT        E_SYSLOG_PORT,342,124,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
-    GROUPBOX        "Wake on LAN 機能",S_STATIC11,268,145,176,65
+    GROUPBOX        "@S_STATIC11",S_STATIC11,268,145,176,65
     ICON            ICO_NIC_ONLINE,IDC_STATIC,273,153,20,20
-    LTEXT           "Wake on LAN 機能を使用すると、電源が OFF またはスタンバイモード中の職場の PC の電源を、自宅から ON することができます。",IDC_STATIC,298,156,139,31
-    PUSHBUTTON      "Wake on LAN 機能の設定(&W)...",B_WOL,314,188,123,16
-    GROUPBOX        "撮影・キャプチャ等秘密情報持ち出し抑止機能",S_STATIC16,268,213,176,53
-    CONTROL         "撮影・キャプチャ防止の透かしメッセージを表示(&W)",C_SHOW_WATERMARK,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,276,227,161,11
+    LTEXT           "@S_20091801",IDC_STATIC,298,156,139,31
+    PUSHBUTTON      "@B_WOL",B_WOL,314,188,123,16
+    GROUPBOX        "@S_STATIC16",S_STATIC16,268,213,176,53
+    CONTROL         "@C_SHOW_WATERMARK",C_SHOW_WATERMARK,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,276,227,161,11
     EDITTEXT        E_WATERMARK_STR,276,245,162,12,ES_AUTOHSCROLL
-    GROUPBOX        "共有機能の禁止",S_STATIC2,268,271,176,76
+    GROUPBOX        "@S_STATIC2",S_STATIC2,268,271,176,76
     ICON            ICO_DISCARD,S_ICON1,275,282,20,20
     LTEXT           "---",S_STATIC1,298,287,139,40
-    CONTROL         "共有機能の使用を禁止する(&D)",C_DISABLESHARE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,329,136,14
+    CONTROL         "@C_DISABLESHARE",C_DISABLESHARE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,301,329,136,14
     DEFPUSHBUTTON   "@IDOK",IDOK,311,350,64,17
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,380,350,64,17
 END
@@ -5079,9 +5079,9 @@ BEGIN
     EDITTEXT        E_PASSWORD1,87,84,141,12,ES_PASSWORD | ES_AUTOHSCROLL
     RTEXT           "@S3",IDC_STATIC2,33,106,49,12
     EDITTEXT        E_PASSWORD2,87,104,141,12,ES_PASSWORD | ES_AUTOHSCROLL
-    GROUPBOX        "設定ツールを起動することができるユーザーの限定",IDC_STATIC,26,138,222,72
-    LTEXT           "このサーバー設定ツールを、現在のユーザー ""%s"" でのみ起動可能に設定できます。",S_INFO,36,152,206,20
-    CONTROL         "現在のユーザー ""%s"" でのみ起動可能に設定する(&O)",R_USER,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,54,176,186,22
+    GROUPBOX        "@S_20091801",IDC_STATIC,26,138,222,72
+    LTEXT           "@S_INFO",S_INFO,36,152,206,20
+    CONTROL         "@R_USER",R_USER,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,54,176,186,22
     DEFPUSHBUTTON   "@IDOK",IDOK,168,220,52,16
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,228,220,52,16
     ICON            ICO_USER,IDC_STATIC,33,176,18,18
@@ -5135,7 +5135,7 @@ BEGIN
     LTEXT           "@S6",IDC_STATIC,36,146,160,51
     CONTROL         "@C_CHECK_CERT",C_CHECK_CERT,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,36,201,164,12
     LTEXT           "@S_CHECK_CERT",S_CHECK_CERT,36,220,161,47
-    CONTROL         "接続先のサーバーが「行政情報システム適応モード」の場合、「完全閉域化ファイアウォール」を起動",C_LIMITED_FW,
+    CONTROL         "@C_LIMITED_FW",C_LIMITED_FW,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,36,271,160,26
     GROUPBOX        "@S7",IDC_STATIC,208,36,232,237
     ICON            ICO_DESKSERVER_EXE,IDC_STATIC,216,50,20,20
@@ -5394,9 +5394,9 @@ BEGIN
     LTEXT           "@S_INFO",S_INFO,62,119,218,84
     CONTROL         "@C_SHARE_PRINTER",C_SHARE_PRINTER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,208,250,14
     CONTROL         "@C_SHARE_COMPORT",C_SHARE_COMPORT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,228,250,14
-    CONTROL         "クライアント側の Web カメラでテレビ会議の映像送出を可能にする",C_SHARE_CAMERA,
+    CONTROL         "@C_SHARE_CAMERA",C_SHARE_CAMERA,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,249,250,14
-    CONTROL         "クライアント側のマイクでテレビ会議の音声送出を可能にする",C_SHARE_AUDIOREC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,269,250,14
+    CONTROL         "@C_SHARE_AUDIOREC",C_SHARE_AUDIOREC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,269,250,14
     ICON            ICO_INFORMATION,IDC_STATIC,7,293,20,20
     LTEXT           "@S_INFO_2",S_INFO_2,30,294,250,31
     LTEXT           "@S_INFO_3",S_INFO_3,30,330,250,28
@@ -5436,38 +5436,38 @@ END
 
 D_DU_AUTH DIALOGEX 0, 0, 275, 383
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "高度なユーザー認証"
+CAPTION "@D_DU_AUTH"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_LICENSE,IDC_STATIC,7,7,20,20
-    LTEXT           "シン・テレワークシステム サーバー ""%S"" に接続するためには、ユーザー認証を行う必要があります。\r\n認証方法を選択してから、ユーザー名を入力して、必要なデータを入力してください。",S_TITLE,31,7,237,29,WS_TABSTOP
-    GROUPBOX        "ユーザー名およびユーザー認証方法",IDC_STATIC,26,43,222,85
-    RTEXT           "認証方法(&M):",IDC_STATIC,33,56,49,13
-    CONTROL         "パスワード認証(&P)",C_PASSWORD,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,87,55,122,10
-    CONTROL         "証明書認証(&C)",C_CERT,"Button",BS_AUTORADIOBUTTON,87,70,122,10
-    CONTROL         "スマートカード認証(&S)",C_SMARTCARD,"Button",BS_AUTORADIOBUTTON,87,85,122,10
+    LTEXT           "@S_TITLE",S_TITLE,31,7,237,29,WS_TABSTOP
+    GROUPBOX        "@S_20091801",IDC_STATIC,26,43,222,85
+    RTEXT           "@S_20091802",IDC_STATIC,33,56,49,13
+    CONTROL         "@C_PASSWORD",C_PASSWORD,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,87,55,122,10
+    CONTROL         "@C_CERT",C_CERT,"Button",BS_AUTORADIOBUTTON,87,70,122,10
+    CONTROL         "@C_SMARTCARD",C_SMARTCARD,"Button",BS_AUTORADIOBUTTON,87,85,122,10
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,41,99,191,1
-    RTEXT           "ユーザー名(&U):",IDC_STATIC,33,109,49,13
+    RTEXT           "@S_20091803",IDC_STATIC,33,109,49,13
     EDITTEXT        E_USERNAME,87,107,141,12,ES_AUTOHSCROLL
-    GROUPBOX        "パスワード認証",IDC_STATIC,26,131,222,59
+    GROUPBOX        "@S_20091804",IDC_STATIC,26,131,222,59
     ICON            ICO_KEY,IDC_STATIC,33,142,20,20
-    LTEXT           "パスワード認証を使用する場合は、パスワードを入力して [OK] をクリックしてください。",S_S1,61,143,179,20
-    RTEXT           "パスワード(&P):",S_S2,33,168,49,13
+    LTEXT           "@S_S1",S_S1,61,143,179,20
+    RTEXT           "@S_S2",S_S2,33,168,49,13
     EDITTEXT        E_PASSWORD,87,166,141,12,ES_PASSWORD | ES_AUTOHSCROLL
-    GROUPBOX        "証明書認証",IDC_STATIC,26,193,222,55
+    GROUPBOX        "@S_20091805",IDC_STATIC,26,193,222,55
     ICON            ICO_CERT,IDC_STATIC,33,202,20,20
-    LTEXT           "証明書認証を使用する場合は、[参照] をクリックして PKCS#12 形式の証明書ファイル (.p12 または .pfx) を指定してください。",S_S4,61,204,183,19
+    LTEXT           "@S_S4",S_S4,61,204,183,19
     EDITTEXT        E_CERTPATH,61,227,141,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "参照(&B)...",B_BROWSE,205,225,39,16
-    GROUPBOX        "スマートカード認証",IDC_STATIC,26,254,222,100
+    PUSHBUTTON      "@B_BROWSE",B_BROWSE,205,225,39,16
+    GROUPBOX        "@S_20091806",IDC_STATIC,26,254,222,100
     ICON            ICO_SECURE,IDC_STATIC,32,264,20,20
-    LTEXT           "1. 認証に使用するスマートカードを選択してください。",S_SMARTCARD_DEVICE,58,268,179,20
-    PUSHBUTTON      "スマートカードの選択(&E)...",B_SELECT_SMARTCARD,59,288,95,16
-    LTEXT           "2. スマートカード内の証明書と秘密鍵を指定してください。",S_CERT_STR,58,312,179,10
-    PUSHBUTTON      "証明書と秘密鍵の指定(&K)...",B_SELECT_SCARD_CERT,59,325,94,16
+    LTEXT           "@S_SMARTCARD_DEVICE",S_SMARTCARD_DEVICE,58,268,179,20
+    PUSHBUTTON      "@B_SELECT_SMARTCARD",B_SELECT_SMARTCARD,59,288,95,16
+    LTEXT           "@S_CERT_STR",S_CERT_STR,58,312,179,10
+    PUSHBUTTON      "@B_SELECT_SCARD_CERT",B_SELECT_SCARD_CERT,59,325,94,16
     LTEXT           "AAA: \r\nBBB: \r\n",S_CERT_AND_KEY,157,324,89,27
-    DEFPUSHBUTTON   "&OK",IDOK,158,360,52,16
-    PUSHBUTTON      "キャンセル",IDCANCEL,216,360,52,16
+    DEFPUSHBUTTON   "@IDOK",IDOK,158,360,52,16
+    PUSHBUTTON      "@IDCANCEL",IDCANCEL,216,360,52,16
 END
 
 D_DG_MAIN DIALOGEX 0, 0, 307, 361
@@ -5520,161 +5520,161 @@ END
 
 D_DU_THEEND DIALOGEX 0, 0, 306, 221
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "NTT 東日本 - IPA 「シン・テレワークシステム」 業務完了"
+CAPTION "@D_DU_THEEND"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     CONTROL         BMP_THEEND,IDC_STATIC,"Static",SS_BITMAP | WS_TABSTOP,65,2,173,186
-    CONTROL         "次回から表示しない(&N)",C_NOMORE,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,7,197,107,13
-    DEFPUSHBUTTON   "閉じる(&C)",IDCANCEL,117,194,71,22
+    CONTROL         "@C_NOMORE",C_NOMORE,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,7,197,107,13
+    DEFPUSHBUTTON   "@IDCANCEL",IDCANCEL,117,194,71,22
 END
 
 D_DU_DIALUP DIALOGEX 0, 0, 247, 66
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "NTT 東日本 - IPA 「ｼﾝ･ﾃﾚﾜｰｸｼｽﾃﾑ」 ﾃﾞｨｼﾞﾀﾙ高速ﾊﾟｹｯﾄ通信"
+CAPTION "@D_DU_DIALUP"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_WIN95NET,IDC_STATIC,15,14,20,20
-    LTEXT           "「特殊局」に高速ﾊﾟｹｯﾄ通信で接続中...",S_STATIC,47,18,190,8
-    DEFPUSHBUTTON   "ｷｬﾝｾﾙ",IDCANCEL,94,39,63,18
+    LTEXT           "@S_1",S_STATIC,47,18,190,8
+    DEFPUSHBUTTON   "@IDCANCEL",IDCANCEL,94,39,63,18
 END
 
 D_DG_OTP DIALOGEX 0, 0, 251, 378
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "ワンタイムパスワード (OTP) 認証設定 - シン・テレワークシステム サーバー"
+CAPTION "@D_DG_OTP"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_IPSEC,IDC_STATIC,7,89,18,18
-    LTEXT           "ログイン時に、毎回、事前設定したメールアドレスにワンタイムパスワード (OTP) が送付されるようにできます。OTP が一致しなければログインできません。セキュリティポリシー上、二要素認証の利用が必須の企業環境で利用できます。",IDC_STATIC,32,89,212,28
-    CONTROL         "ワンタイムパスワード認証機能 (OTP) を有効にする(&E)",B_OTP_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,117,206,15
-    LTEXT           "OTP 送付先のメールアドレス(&M):",S_1,43,133,104,10
+    LTEXT           "@S_11",IDC_STATIC,32,89,212,28
+    CONTROL         "@B_OTP_ENABLE",B_OTP_ENABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,30,117,206,15
+    LTEXT           "@S_1",S_1,43,133,104,10
     EDITTEXT        E_MAIL,43,146,191,15,ES_AUTOHSCROLL
-    LTEXT           "スマートフォン等でいつでも受信できるメールアドレスの設定をお勧めします。\r\n\r\nOTP メールは、ドメイン 「@otp.cyber.ipa.go.jp」 から送信されます。",S_2,43,165,192,43
-    LTEXT           "職場の PC で本機能を設定する場合は、退社前に必ず手元の別のパソコンから試しに接続するなど、OTP が正しく作動することのテストをしてください。自宅に帰宅された後、万一 OTP が正しく送信されない場合は、会社に来るまでログインできなくなります。\r\n\r\nメールアドレス文字列は本コンピュータ上でのみ保持され、中継システムで管理・保管されることはありません (ただし、メール送信時の SMTP サーバーの内部ログに一時的に保持される場合はあります)。",S_3,32,210,212,68
-    LTEXT           "何らの原因で「ワンタイムパスワード」(OTP) が受信できなかった場合の情報セキュリティの低下 (可用性の低下) を防止するため、以下の「非常用 OTP 代替コード」が提供されます。代替コードは、メモをして自宅等の安全な場所に保管してください。非常時のみ使用できます。普段は使用しないでください。",S_5,32,277,212,36
-    LTEXT           "非常用 OTP 代替コード (30 桁):",S_18,32,316,212,10
+    LTEXT           "@S_2",S_2,43,165,192,43
+    LTEXT           "@S_3",S_3,32,210,212,68
+    LTEXT           "@S_5",S_5,32,277,212,36
+    LTEXT           "@S_18",S_18,32,316,212,10
     EDITTEXT        E_EMERGENCY,32,330,155,15,ES_AUTOHSCROLL | ES_READONLY
-    PUSHBUTTON      "新規コード(&N)",B_NEW_EMERGENCY,191,328,53,18
-    DEFPUSHBUTTON   "&OK",IDOK,111,356,64,17
-    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,356,64,17
+    PUSHBUTTON      "@B_NEW_EMERGENCY",B_NEW_EMERGENCY,191,328,53,18
+    DEFPUSHBUTTON   "@IDOK",IDOK,111,356,64,17
+    PUSHBUTTON      "@IDCANCEL",IDCANCEL,180,356,64,17
     CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP,9,0,234,86
 END
 
 D_DU_OTP DIALOGEX 0, 0, 251, 243
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "ワンタイムパスワード (OTP) 認証 - シン・テレワークシステム サーバー"
+CAPTION "@D_DU_OTP"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_IPSEC,IDC_STATIC,7,98,20,20
-    LTEXT           "NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 (コンピュータ ID: %S) の設定画面で事前設定されているメールアドレスに、ワンタイムパスワード (OTP) が送付されました。\r\n\r\nメールをご確認いただき、OTP を入力してください。",S_TITLE,32,98,212,51
-    LTEXT           "ワンタイムパスワード (OT&P):",S_1,36,152,104,10
+    LTEXT           "@S_TITLE",S_TITLE,32,98,212,51
+    LTEXT           "@S_1",S_1,36,152,104,10
     EDITTEXT        E_OTP,36,168,191,15,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "しばらく経過してもメールが届かない場合は、一度キャンセルしてから、再度ログインを試行してください。",S_3,32,193,212,27
-    DEFPUSHBUTTON   "&OK",IDOK,111,221,64,17
-    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,180,221,64,17
+    LTEXT           "@S_3",S_3,32,193,212,27
+    DEFPUSHBUTTON   "@IDOK",IDOK,111,221,64,17
+    PUSHBUTTON      "@IDCANCEL",IDCANCEL,180,221,64,17
     CONTROL         IDB_BITMAP3,IDC_STATIC,"Static",SS_BITMAP,9,0,234,88
 END
 
 D_DG_MAC DIALOGEX 0, 0, 275, 342
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "クライアント MAC アドレス認証"
+CAPTION "@D_DG_MAC"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_NIC_ONLINE,S_ACL_5,7,5,20,20
-    LTEXT           "「シン・テレワークシステム クライアント」 のクライアント端末の MAC アドレスが一致した場合のみ、接続を許可することができます。\r\n\r\nMAC アドレスを登録してください。 (最大 50 個程度まで登録できます。)\r\n\r\nMAC アドレスは、00-12-34-AA-BB-CC のように 1 行につき 1 個入力します。改行により、複数個登録可能です。大文字・小文字は区別されません。ハイフンまたはコロンは省略できます。",S_MSG_2,31,5,237,76,WS_TABSTOP
+    LTEXT           "@S_MSG_2",S_MSG_2,31,5,237,76,WS_TABSTOP
     EDITTEXT        E_TEXT,30,84,233,97,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
-    GROUPBOX        "MAC アドレスについて",IDC_STATIC,7,185,261,84
+    GROUPBOX        "@S_1",IDC_STATIC,7,185,261,84
     ICON            ICO_INFORMATION,IDC_STATIC,14,197,20,20
-    LTEXT           "「MAC アドレス」とは、端末に内蔵されているハードウェア固有のアドレスです。予めクライアントコンピュータの画面で確認しておいたものを、正確に入力する必要があります。1 文字でも異なっていると、接続が許可されません。\r\n\r\nクライアント端末の Windows の「コマンド プロンプト」を開き、\r\n> ipconfig /all\r\nと入力することで、MAC アドレスを確認できます。",S_INFO,39,198,222,64
-    DEFPUSHBUTTON   "&OK",IDOK,131,320,64,17
-    PUSHBUTTON      "キャンセル",IDCANCEL,203,320,64,17
-    LTEXT           "【システム管理者の方へ】\r\n「エンタープライズ環境用ポリシー規制サーバー」を社内 LAN 上に設置している場合は、当該ポリシーサーバーで MAC アドレスの一覧を定義し一元管理することもできます。詳しくは、シン・テレワークシステムの Web サイトをご参照ください。",S_MSG_3,7,275,261,38,WS_TABSTOP
+    LTEXT           "@S_INFO",S_INFO,39,198,222,64
+    DEFPUSHBUTTON   "@IDOK",IDOK,131,320,64,17
+    PUSHBUTTON      "@IDCANCEL",IDCANCEL,203,320,64,17
+    LTEXT           "@S_MSG_3",S_MSG_3,7,275,261,38,WS_TABSTOP
 END
 
 D_DU_INSPECT DIALOGEX 0, 0, 267, 58
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "NTT 東日本 - IPA 「シン・テレワークシステム」 - クライアント検疫"
+CAPTION "@D_DU_INSPECT"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_SHIELD,IDC_STATIC,7,19,18,18
-    LTEXT           "接続先の NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 の設定に基づき、クライアント端末のセキュリティチェックを実行しています。しばらくお待ちください...",S_INFO,31,19,229,27
+    LTEXT           "@S_INFO",S_INFO,31,19,229,27
 END
 
 D_DU_GOVFW1 DIALOGEX 0, 0, 359, 362
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_TOPMOST
-CAPTION "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 "
+CAPTION "@D_DU_GOVFW1"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     CONTROL         IDOK,IDC_STATIC,"Static",SS_BITMAP,7,0,345,138
-    LTEXT           "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 を有効化しますか?",S_BOLD,30,143,322,20
-    LTEXT           "「完全閉域化ファイアウォール機能」 を有効にすると、行政情報システムへのシンクライアント通信のための SSL-VPN 接続中は、本 PC とインターネットとの通信 (本 SSL-VPN 接続をのぞく) をすべて遮断できます。Windows のカーネルに最高優先上位のパケットフィルタを挿入することにより、他の通信に対する強力な遮断が実施されることから、他のアプリケーション (Web ブラウザ等を含む) は、これに反して通信をすることはできなくなり、セキュリティ脅威となり得る通信をシャットアウトできます。",S_INFO1,7,165,345,38
-    GROUPBOX        "「完全閉域化ファイアウォール機能」 による自宅と行政機関との間の完全閉域網化について",S_BOLD2,7,207,345,84
-    LTEXT           "接続先の 「シン・テレワークシステム サーバー」 (職場側 PC) は、「行政情報システム適応モード」で動作しており、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムの固定された 30 個程度の IP アドレスのみと、通信を行なっています。このことを「特定通信」といいます。",S_INFO9,15,221,328,30
-    LTEXT           "行政情報システムへのアクセス時のインターネット分離を実現し、「IP-VPN」 や 「閉域 SIM」 等との同等の閉域性を実現するためには、シンクライアント方式での通信中は、このクライアント端末においても、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムとの間のみ「特定通信」を許可し、他の通信を一時的に遮断することが望ましいと考えられます。",S_INFO10,15,251,328,35
-    DEFPUSHBUTTON   "はい、「完全閉域化ファイアウォール」を有効にします。",IDOK,24,294,198,22
-    PUSHBUTTON      "いいえ、有効にしません。",IDCANCEL,235,294,100,22
-    LTEXT           "「はい」をクリックすると、「完全閉域化ファイアウォール機能」 が動作を開始し、このコンピュータからは 「行政情報システム適応モード」 のシンクライアント通信のみが可能となり、インターネットとの通信はすべて遮断されます。なお、「完全閉域化ファイアウォール機能」 を終了すると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作し、Windows のシステム設定を変更することはありません。",IDC_STATIC,7,321,345,41
+    LTEXT           "@S_BOLD",S_BOLD,30,143,322,20
+    LTEXT           "@S_INFO1",S_INFO1,7,165,345,38
+    GROUPBOX        "@S_BOLD2",S_BOLD2,7,207,345,84
+    LTEXT           "@S_INFO9",S_INFO9,15,221,328,30
+    LTEXT           "@S_INFO10",S_INFO10,15,251,328,35
+    DEFPUSHBUTTON   "@IDOK",IDOK,24,294,198,22
+    PUSHBUTTON      "@IDCANCEL",IDCANCEL,235,294,100,22
+    LTEXT           "@S_1",IDC_STATIC,7,321,345,41
     ICON            ICO_SHIELD,IDC_STATIC,7,139,20,20
 END
 
 D_DU_GOVFW2 DIALOGEX 0, 0, 359, 327
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 が作動中です"
+CAPTION "@D_DU_GOVFW2"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    LTEXT           "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 が作動中です",S_BOLD,37,156,311,20
-    LTEXT           "このウインドウを閉じるまでの間、「完全閉域化ファイアウォール機能」 が有効となっています。グローバル IPv4 / IPv6 アドレスへの通信は、SSL-VPN 閉域中継システム以外、すべて遮断されています。\r\n\r\n通信遮断が正しく行なわれていることを検証するには、Web ブラウザによる Web サイトのブラウジングができないことを確認してみてください。\r\n\r\nWindows の特殊な改造を行なっている場合や、他社製の特殊なカーネル改造プログラムを動作させている場合、本機能は正しく動作しない場合があります。",S_INFO1,12,182,335,72
-    LTEXT           "このウインドウは裏面に移動して隠すことができます。シンクライアント画面を前面にして作業することができます。このウインドウを閉じると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作しており、Windows のシステム設定を変更することはありません。",IDC_STATIC,36,257,309,28
+    LTEXT           "@S_BOLD",S_BOLD,37,156,311,20
+    LTEXT           "@S_INFO1",S_INFO1,12,182,335,72
+    LTEXT           "@S_1",IDC_STATIC,36,257,309,28
     ICON            ICO_INFORMATION,IDC_STATIC,12,256,20,20
-    DEFPUSHBUTTON   "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 を終了する(&X)",IDCANCEL,33,296,290,22
+    DEFPUSHBUTTON   "@IDCANCEL",IDCANCEL,33,296,290,22
     ICON            ICO_LANG_JAPANESE,IDC_STATIC,13,153,20,20
     CONTROL         IDOK,IDC_STATIC,"Static",SS_BITMAP,7,0,345,138
-    GROUPBOX        "行政情報システム適応モード用 「完全閉域化ファイアウォール機能」",S_BOLD2,7,143,345,145
+    GROUPBOX        "@S_BOLD2",S_BOLD2,7,143,345,145
 END
 
 D_DG_WOL DIALOGEX 0, 0, 383, 349
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Wake on LAN 機能の設定"
+CAPTION "@D_DG_WOL"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     CONTROL         BMP_WOL,IDC_STATIC,"Static",SS_BITMAP,7,0,366,132
-    GROUPBOX        "この PC を (1) Wake on LAN ターゲット PC として設定",IDC_STATIC,7,134,180,186
+    GROUPBOX        "@S_1",IDC_STATIC,7,134,180,186
     ICON            ICO_DISPLAY,IDC_STATIC,14,146,20,20
-    LTEXT           "Wake on LAN ターゲット PC として有効化しておくと、リモートから、同じ LAN 内の 1 台の Wake on LAN トリガー PC (常時電源 ON) を経由して、このコンピュータの電源を ON にすることができます。",IDC_STATIC,39,147,143,42
+    LTEXT           "@S_2",IDC_STATIC,39,147,143,42
     ICON            ICO_NIC_ONLINE,IDC_STATIC,14,190,20,20
-    LTEXT           "有線 LAN カードが Wake on LAN に対応しており、Hub に接続されている必要があります。また、「デバイスマネージャ」の LAN カードの設定、および、PC 本体の BIOS の設定画面で、Wake on LAN を有効にする必要がある場合があります。さらに、Wake on LAN 時に「PXE ブート」が使用されないような BIOS 設定にしておく必要があります。",IDC_STATIC,39,190,143,60
-    CONTROL         "Wake on LAN ターゲット PC として設定(&T)",C_WOL_TARGET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,250,165,19
-    LTEXT           "LAN カードの Wake on LAN 機能を手動で有効にする必要がある場合があります。",IDC_STATIC,14,272,166,20
-    PUSHBUTTON      "Windows の 「デバイスマネージャ」 を開く(&M)...",B_DEVMGR,19,294,156,19
-    GROUPBOX        "この PC を (2) Wake on LAN トリガー PC として設定",IDC_STATIC,196,134,180,187
+    LTEXT           "@S_3",IDC_STATIC,39,190,143,60
+    CONTROL         "@C_WOL_TARGET",C_WOL_TARGET,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,250,165,19
+    LTEXT           "@S_4",IDC_STATIC,14,272,166,20
+    PUSHBUTTON      "@B_DEVMGR",B_DEVMGR,19,294,156,19
+    GROUPBOX        "@S_5",IDC_STATIC,196,134,180,187
     ICON            ICO_LINK2,IDC_STATIC,202,146,20,20
-    LTEXT           "Wake on LAN トリガー PC は、ターゲット PC (複数設置可) と 同じ LAN (レイヤ 2 イーサネット) 内に少なくとも 1 台必要です。また、原理上、常時電源を ON にする必要があります。",IDC_STATIC,226,147,143,42
+    LTEXT           "@S_6",IDC_STATIC,226,147,143,42
     ICON            ICO_USER,IDC_STATIC,202,192,20,20
-    LTEXT           "ユーザーは、「シン・テレワークシステム クライアント」の Wake on LAN 起動機能で、「トリガー PC」 と 「ターゲット PC」 のコンピュータ ID を入力する必要があります。そのため、トリガー PC のコンピュータ ID は、組織ユーザーに周知してください。",IDC_STATIC,226,190,143,50
-    CONTROL         "Wake on LAN トリガー PC として設定(&R)",C_WOL_TRIGGER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,204,250,164,19
-    DEFPUSHBUTTON   "&OK",IDOK,241,327,64,17
-    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,312,327,64,17
-    LTEXT           "職場で Wake on LAN 機能を利用する場合は、必ず、第三のクライアント PC を用いて Wake on LAN が正しく動作するかどうか何度か確かめてください。",IDC_STATIC,7,324,230,20
-    LTEXT           "「トリガー PC」 の 「シン・テレワークシステム サーバー」 は、Wake on LAN トリガー専用に 1 台用意することをお勧めします。トリガー PC を用いて Wake on LAN パケットを送信するユーザーは、トリガー PC にリモートログインできる必要はありません。すなわち、パスワードを共有する必要はありません。",IDC_STATIC,203,271,166,45
+    LTEXT           "@S_7",IDC_STATIC,226,190,143,50
+    CONTROL         "@C_WOL_TRIGGER",C_WOL_TRIGGER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,204,250,164,19
+    DEFPUSHBUTTON   "@IDOK",IDOK,241,327,64,17
+    PUSHBUTTON      "@IDCANCEL",IDCANCEL,312,327,64,17
+    LTEXT           "@S_9",IDC_STATIC,7,324,230,20
+    LTEXT           "@S_10",IDC_STATIC,203,271,166,45
 END
 
 D_DU_WOL DIALOGEX 0, 0, 383, 262
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Wake on LAN 機能"
+CAPTION "@D_DU_WOL"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     CONTROL         BMP_WOL,IDC_STATIC,"Static",SS_BITMAP,7,0,366,132
     ICON            ICO_DISPLAY,IDC_STATIC,18,153,18,18
-    LTEXT           "(1) Wake on LAN ターゲット PC のコンピュータ ID:",S_PCID,47,157,147,13
+    LTEXT           "@S_PCID",S_PCID,47,157,147,13
     COMBOBOX        C_PCID,198,154,154,159,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     ICON            ICO_LINK2,IDC_STATIC,18,182,18,18
-    LTEXT           "(2) Wake on LAN トリガー PC のコンピュータ ID:",S_PCID2,47,185,145,13
+    LTEXT           "@S_PCID2",S_PCID2,47,185,145,13
     COMBOBOX        C_PCID2,198,182,154,159,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     ICON            ICO_INFORMATION,IDC_STATIC,45,206,18,18
-    LTEXT           "「シン・テレワークシステム サーバー」 側の設定で、あらかじめ Wake on LAN 機能が有効になっている必要があります。",IDC_STATIC,70,209,298,18
-    DEFPUSHBUTTON   "&Wake on LAN の実行",IDOK,199,240,106,17
-    PUSHBUTTON      "閉じる(&C)",IDCANCEL,312,240,64,17
-    GROUPBOX        "Wake on LAN 機能を用いてターゲット PC の電源を ON にする",IDC_STATIC,7,133,369,99
+    LTEXT           "@S_1",IDC_STATIC,70,209,298,18
+    DEFPUSHBUTTON   "@IDOK",IDOK,199,240,106,17
+    PUSHBUTTON      "@IDCANCEL",IDCANCEL,312,240,64,17
+    GROUPBOX        "@S_2",IDC_STATIC,7,133,369,99
 END
 
 
