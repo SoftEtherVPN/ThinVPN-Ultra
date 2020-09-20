@@ -258,9 +258,9 @@ ERR_240					The relay system on the Internet is busy or temporarily out of servi
 ERR_241					The relay system on the Internet is busy or temporarily out of service. Please try again in about an hour.
 ERR_242					The relay system on the Internet is busy or temporarily out of service. Please try again in about 8 hours.
 ERR_243					The relay system on the Internet is busy or temporarily out of service. Please try again in approximately 24 hours.
-ERR_252					The Thin Telework System Server on the specified target PC does not have the Wake on LAN target PC setting enabled. \r\n\r\nIn the configuration tool of the Thin Telework System Server on the specified target PC, go to the Wake on LAN configuration screen and change the settings to act as the Target PC. \r\n\r\nTo use the Wake on LAN feature, the Thin Telework System Server version of June 2020 or later is required.
-ERR_253					The Thin Telework System Server on the specified target PC does not have the Wake on LAN trigger PC setting enabled. \r\n\r\nIn the configuration tool of the Thin Telework System Server on the specified trigger PC, go to the Wake on LAN configuration screen and change the settings to act as the trigger PC. \r\n\r\nTo use the Wake on LAN feature, the Thin Telework System Server version of June 2020 or later is required.
-ERR_254					The version of the Thin Telework System Server on the specified trigger PC is out of date and must be updated to a newer version.\r\n\r\nThe Thin Telework System server version of June 2020 or later is required for the ability to use the Wake on LAN feature.
+ERR_252					The Thin Telework System Server on the specified Target PC does not have the Wake on LAN Target PC setting enabled. \r\n\r\nIn the configuration tool of the Thin Telework System Server on the specified Target PC, go to the Wake on LAN configuration screen and change the settings to act as the Target PC. \r\n\r\nTo use the Wake on LAN feature, the Thin Telework System Server version of June 2020 or later is required.
+ERR_253					The Thin Telework System Server on the specified Target PC does not have the Wake on LAN Trigger PC setting enabled. \r\n\r\nIn the configuration tool of the Thin Telework System Server on the specified Trigger PC, go to the Wake on LAN configuration screen and change the settings to act as the Trigger PC. \r\n\r\nTo use the Wake on LAN feature, the Thin Telework System Server version of June 2020 or later is required.
+ERR_254					The version of the Thin Telework System Server on the specified Trigger PC is out of date and must be updated to a newer version.\r\n\r\nThe Thin Telework System server version of June 2020 or later is required for the ability to use the Wake on LAN feature.
 
 
 
@@ -455,7 +455,7 @@ DG_LIMITED_MODE_HELP	$APPFULL_SERVER$\r\nAbout "Government Systems Level Securit
 
 DG_RESET_CERT_MSG		In the next startup of the $APPSHORT_SERVER$ timing, this computer's Unique ID will be erased and initialized. The Computer ID will be reset. You will be unable to reuse the current Computer ID forever. This operation cannot be cancelled.\r\n\r\nDo you want to really continue?
 DG_RESET_CERT_DONE		Unique ID initialization process is reserved. In the next startup of the $APPSHORT_SERVER$ timing, this computer's Unique ID will be erased and initialized. This operation cannot be cancelled.
-DG_CHANGE_WOL_TARGET	You are changing the Wake on LAN target PC settings.\r\n\r\nThe connectivity of $APPSHORT_SERVER$ to the Internet will be disconnected and reconnected to apply this setting.\r\n\r\nIf you are remotely login to this computer, the communcation will be terminated. In this case you have to reconnect to this computer.
+DG_CHANGE_WOL_TARGET	You are changing the Wake on LAN Target PC settings.\r\n\r\nThe connectivity of $APPSHORT_SERVER$ to the Internet will be disconnected and reconnected to apply this setting.\r\n\r\nIf you are remotely login to this computer, the communcation will be terminated. In this case you have to reconnect to this computer.
 DG_DEVMGMT_RUN_ERROR	Failed to open the Device Manager provided by Windows.\r\n\r\nRun the Device Manager manually from the control panel.
 
 
@@ -4888,126 +4888,126 @@ S4						When you press the "Reset unique ID on next start-up" button, the unique
 
 
 PREFIX					D_DU_AUTH
-CAPTION					高度なユーザー認証
-S_TITLE					シン・テレワークシステム サーバー "%S" に接続するためには、ユーザー認証を行う必要があります。\r\n認証方法を選択してから、ユーザー名を入力して、必要なデータを入力してください。
-S_20091801				ユーザー名およびユーザー認証方法
-S_20091802				認証方法(&M):
-C_PASSWORD				パスワード認証(&P)
-C_CERT					証明書認証(&C)
-C_SMARTCARD				スマートカード認証(&S)
-S_20091803				ユーザー名(&U):
-S_20091804				パスワード認証
-S_S1					パスワード認証を使用する場合は、パスワードを入力して [OK] をクリックしてください。
-S_S2					パスワード(&P):
-S_20091805				証明書認証
-S_S4					証明書認証を使用する場合は、[参照] をクリックして PKCS#12 形式の証明書ファイル (.p12 または .pfx) を指定してください。
-B_BROWSE				参照(&B)...
-S_20091806				スマートカード認証
-S_SMARTCARD_DEVICE		1. 認証に使用するスマートカードを選択してください。
-B_SELECT_SMARTCARD		スマートカードの選択(&E)...
-S_CERT_STR				2. スマートカード内の証明書と秘密鍵を指定してください。
-B_SELECT_SCARD_CERT		証明書と秘密鍵の指定(&K)...
+CAPTION					Advance User Authentication
+S_TITLE					The $APPSHORT_SERVER$ '%S' requires advanced user authentication.\r\nSpecify the authentication methods, input the username and other necessary fields.
+S_20091801				Username and authentication method
+S_20091802				Authentication &method:
+C_PASSWORD				&Password authentication
+C_CERT					&Certificate authentication
+C_SMARTCARD				&Smartcard authentication
+S_20091803				&Username
+S_20091804				Password authentication
+S_S1					Input the password and click OK.
+S_S2					&Password:
+S_20091805				Certificate authentication
+S_S4					Click Browse and specify a PKCS#12 certification file (.p12 or .pfx).
+B_BROWSE				&Browse...
+S_20091806				Smartcard authentication
+S_SMARTCARD_DEVICE		1. Choose the smartcard for user authentication.
+B_SELECT_SMARTCARD		Sel&ect the smartcard...
+S_CERT_STR				2. Specify the certificate and private key in the smartcard.
+B_SELECT_SCARD_CERT		Specify the certificate and private &key...
 IDOK					&OK
-IDCANCEL				キャンセル
+IDCANCEL				Cancel
 
 
 PREFIX					D_DU_THEEND
-CAPTION					NTT 東日本 - IPA 「シン・テレワークシステム」 業務完了
-C_NOMORE				次回から表示しない(&N)
-IDCANCEL				閉じる(&C)
+CAPTION					$APPFULL$ - Thanks for your hard work
+C_NOMORE				Do &not show again
+IDCANCEL				&Close
 
 
 PREFIX					D_DU_DIALUP
-CAPTION					NTT 東日本 - IPA 「ｼﾝ･ﾃﾚﾜｰｸｼｽﾃﾑ」 ﾃﾞｨｼﾞﾀﾙ高速ﾊﾟｹｯﾄ通信
-S_1						「特殊局」に高速ﾊﾟｹｯﾄ通信で接続中...
-IDCANCEL				ｷｬﾝｾﾙ
+CAPTION					NTT East - IPA Digital ISDN 128Kbps High-speed Packet Communication
+S_1						Connecting to Special Affairs Bureau...
+IDCANCEL				Cancel
 
 
 PREFIX					D_DG_OTP
-CAPTION					ワンタイムパスワード (OTP) 認証設定 - シン・テレワークシステム サーバー
-S_11					ログイン時に、毎回、事前設定したメールアドレスにワンタイムパスワード (OTP) が送付されるようにできます。OTP が一致しなければログインできません。セキュリティポリシー上、二要素認証の利用が必須の企業環境で利用できます。
-B_OTP_ENABLE			ワンタイムパスワード認証機能 (OTP) を有効にする(&E)
-S_1						OTP 送付先のメールアドレス(&M):
-S_2						スマートフォン等でいつでも受信できるメールアドレスの設定をお勧めします。\r\n\r\nOTP メールは、ドメイン 「@otp.cyber.ipa.go.jp」 から送信されます。
-S_3						職場の PC で本機能を設定する場合は、退社前に必ず手元の別のパソコンから試しに接続するなど、OTP が正しく作動することのテストをしてください。自宅に帰宅された後、万一 OTP が正しく送信されない場合は、会社に来るまでログインできなくなります。\r\n\r\nメールアドレス文字列は本コンピュータ上でのみ保持され、中継システムで管理・保管されることはありません (ただし、メール送信時の SMTP サーバーの内部ログに一時的に保持される場合はあります)。
-S_5						何らの原因で「ワンタイムパスワード」(OTP) が受信できなかった場合の情報セキュリティの低下 (可用性の低下) を防止するため、以下の「非常用 OTP 代替コード」が提供されます。代替コードは、メモをして自宅等の安全な場所に保管してください。非常時のみ使用できます。普段は使用しないでください。
-S_18					非常用 OTP 代替コード (30 桁):
-B_NEW_EMERGENCY			新規コード(&N)
+CAPTION					One Time Password (OTP) setting - $APPSHORT_SERVER$
+S_11					One Time Password (OTP) requires you to input random OTP which is sent to you via email. This function complies with two-factor authentication security policy of your organization.
+B_OTP_ENABLE			&Enable One Time Password (OTP) function
+S_1						OTP destination e&mail address:
+S_2						It is recommended to specify a smartphone email address.\r\n\r\nOTP email will be sent from the domain '@otp.cyber.ipa.go.jp'.
+S_3						You have to test OTP works fine before return to your home. If OTP doesn't work fine you have to come back to the office.\r\n\r\nEmail address string will only be saved on this local computer. No stored on the relay system. (except temporary log files.)
+S_5						In the urgent case if you cannot receive One Time Password (OTP) via email you can use Emergency OTP Alternative Code below. Memorize the emergency code in your safe place. It is only for urgent case. Do not use it in usual daily use.
+S_18					Emergency OTP alternative:
+B_NEW_EMERGENCY			&New code
 IDOK					&OK
-IDCANCEL				キャンセル(&C)
+IDCANCEL				&Cancel
 
 
 PREFIX					D_DU_OTP
-CAPTION					ワンタイムパスワード (OTP) 認証 - シン・テレワークシステム サーバー
-S_TITLE					NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 (コンピュータ ID: %S) の設定画面で事前設定されているメールアドレスに、ワンタイムパスワード (OTP) が送付されました。\r\n\r\nメールをご確認いただき、OTP を入力してください。
-S_1						ワンタイムパスワード (OT&P):
-S_3						しばらく経過してもメールが届かない場合は、一度キャンセルしてから、再度ログインを試行してください。
+CAPTION					One Time Password (OTP) setting - $APPSHORT_SERVER$
+S_TITLE					$APPFULL_SERVER$ (Computer ID: %S) sents you the One Time Password (OTP) via your speficied email address.\r\n\r\nCheck your mailbox and input the OTP below.
+S_1						One Time &Password (OTP):
+S_3						If mail not found you can retry again after few minutes.
 IDOK					&OK
-IDCANCEL				キャンセル(&C)
+IDCANCEL				&Cancel
 
 
 PREFIX					D_DG_MAC
-CAPTION					クライアント MAC アドレス認証
-S_MSG_2					「シン・テレワークシステム クライアント」 のクライアント端末の MAC アドレスが一致した場合のみ、接続を許可することができます。\r\n\r\nMAC アドレスを登録してください。 (最大 50 個程度まで登録できます。)\r\n\r\nMAC アドレスは、00-12-34-AA-BB-CC のように 1 行につき 1 個入力します。改行により、複数個登録可能です。大文字・小文字は区別されません。ハイフンまたはコロンは省略できます。
-S_1						MAC アドレスについて
-S_INFO					「MAC アドレス」とは、端末に内蔵されているハードウェア固有のアドレスです。予めクライアントコンピュータの画面で確認しておいたものを、正確に入力する必要があります。1 文字でも異なっていると、接続が許可されません。\r\n\r\nクライアント端末の Windows の「コマンド プロンプト」を開き、\r\n> ipconfig /all\r\nと入力することで、MAC アドレスを確認できます。
+CAPTION					Client MAC Address Authentication
+S_MSG_2					You can set up Client MAC Address Authentication to only accept MAC-address matched client PCs. \r\n\r\nDefine the MAC address list here, up to 50 addresses.\r\n\r\nA single MAC address should be one line. For example: 00-12-34-AA-BB-CC. Use new lines for multiple MAC address add. Not case sensitive. Hyphon or colon can be omitted.
+S_1						What is MAC address?
+S_INFO					MAC address is a hardware unique address in the computer. You have to readout your client MAC address in advance with "ipconfig /all" command on the client Windows PC's "Command Prompt". The MAC address is exactly match. Be careful not to input incorrectly.
 IDOK					&OK
-IDCANCEL				キャンセル
-S_MSG_3					【システム管理者の方へ】\r\n「エンタープライズ環境用ポリシー規制サーバー」を社内 LAN 上に設置している場合は、当該ポリシーサーバーで MAC アドレスの一覧を定義し一元管理することもできます。詳しくは、シン・テレワークシステムの Web サイトをご参照ください。
+IDCANCEL				Cancel
+S_MSG_3					For System Administrators\r\nYou can define MAC address list on your Enterprise Policy Enforcement Server. For details please refer to the $APPSHORT$ web site.
 
 
 PREFIX					D_DU_INSPECT
-CAPTION					NTT 東日本 - IPA 「シン・テレワークシステム」 - クライアント検疫
-S_INFO					接続先の NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 の設定に基づき、クライアント端末のセキュリティチェックを実行しています。しばらくお待ちください...
+CAPTION					$APPFULL$ - Client Quarantine System
+S_INFO					Running the Client Quarantine System due to the security policy setting of the destination $APPFULL_SERVER$. Please wait...
 
 
 PREFIX					D_DU_GOVFW1
-CAPTION					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」
-S_BOLD					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 を有効化しますか?
-S_INFO1					「完全閉域化ファイアウォール機能」 を有効にすると、行政情報システムへのシンクライアント通信のための SSL-VPN 接続中は、本 PC とインターネットとの通信 (本 SSL-VPN 接続をのぞく) をすべて遮断できます。Windows のカーネルに最高優先上位のパケットフィルタを挿入することにより、他の通信に対する強力な遮断が実施されることから、他のアプリケーション (Web ブラウザ等を含む) は、これに反して通信をすることはできなくなり、セキュリティ脅威となり得る通信をシャットアウトできます。
-S_BOLD2					「完全閉域化ファイアウォール機能」 による自宅と行政機関との間の完全閉域網化について
-S_INFO9					接続先の 「シン・テレワークシステム サーバー」 (職場側 PC) は、「行政情報システム適応モード」で動作しており、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムの固定された 30 個程度の IP アドレスのみと、通信を行なっています。このことを「特定通信」といいます。
-S_INFO10				行政情報システムへのアクセス時のインターネット分離を実現し、「IP-VPN」 や 「閉域 SIM」 等との同等の閉域性を実現するためには、シンクライアント方式での通信中は、このクライアント端末においても、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムとの間のみ「特定通信」を許可し、他の通信を一時的に遮断することが望ましいと考えられます。
-IDOK					はい、「完全閉域化ファイアウォール」を有効にします。
-IDCANCEL				いいえ、有効にしません。
-S_1						「はい」をクリックすると、「完全閉域化ファイアウォール機能」 が動作を開始し、このコンピュータからは 「行政情報システム適応モード」 のシンクライアント通信のみが可能となり、インターネットとの通信はすべて遮断されます。なお、「完全閉域化ファイアウォール機能」 を終了すると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作し、Windows のシステム設定を変更することはありません。
+CAPTION					Strong Isolation Firewall for Government Systems Level Security Mode
+S_BOLD					Enable Strong Isolation Firewall for Government Systems Level Security Mode?
+S_INFO1					Strong Isolation Firewall will deny all Internet communications (excep $APPSHORT$'s SSL-VPN packets). This function inserts the highest-priority packet filter to the Windows Kernel. Malicous programs will not be able to communicate to the Internet. This is very strong function to prevent any malicious communications during the telework session.
+S_BOLD2					Strong Isolation Firewall makes private circuit between your home and organization
+S_INFO9					The $APPSHORT_SERVER$ (workplace PC), which you are connecting to, operates in "Government Systems Level Security Mode" and communicates only with about 30 IP addresses of the SSL-VPN closed-region relay system of the $APPSHORT$ operated by the IPA. This is called "specific communication".
+S_INFO10				In order to achieve separation of the Internet when accessing the administrative information system and to achieve the same closed area as "IP-VPN" or "closed SIM", it is desirable to allow "specified communications" between the client terminal and the SSL-VPN closed area relay system of the $APPSHORT$ operated by the IPA while communicating in the thin client mode, and to temporarily block other communications.
+IDOK					Yes, Enable Strong Isolation Firewall.
+IDCANCEL				No, Do Not Use.
+S_1						Clicking Yes will start the Strong Isolation Firewall to make this computer be isolated from the Internet. You can stop the Strong Isolation Firewall anytime and isolation will be immediately disabled. This function works only on the memory. No Windows communication settings will be altered.
 
 
 PREFIX					D_DU_GOVFW2
-CAPTION					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 が作動中です
-S_BOLD					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 が作動中です
-S_INFO1					このウインドウを閉じるまでの間、「完全閉域化ファイアウォール機能」 が有効となっています。グローバル IPv4 / IPv6 アドレスへの通信は、SSL-VPN 閉域中継システム以外、すべて遮断されています。\r\n\r\n通信遮断が正しく行なわれていることを検証するには、Web ブラウザによる Web サイトのブラウジングができないことを確認してみてください。\r\n\r\nWindows の特殊な改造を行なっている場合や、他社製の特殊なカーネル改造プログラムを動作させている場合、本機能は正しく動作しない場合があります。
-S_1						このウインドウは裏面に移動して隠すことができます。シンクライアント画面を前面にして作業することができます。このウインドウを閉じると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作しており、Windows のシステム設定を変更することはありません。
-IDCANCEL				行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 を終了する(&X)
-S_BOLD2					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」
+CAPTION					Strong Isolation Firewall for Government Systems Level Security Mode is active
+S_BOLD					Strong Isolation Firewall for Government Systems Level Security Mode is active
+S_INFO1					Strong Isolation Firewall runs activily until you close this window. All communication towards any global IPv4 / IPv6 address except the $APPSHORT$ SSL-VPN communication relay server are denied.\r\n\r\nYou have to check if the isolation works fine by using web browsers to access to general web sites.\r\n\r\nIf your Windows has abnormal configuration or there is a third-party kernel modification programs, this isolation system may not work correctly.
+S_1						You can hide this window moving it to background next to the thin-client main screen. You can close this window anytime and isolation will stop immediately. This function runs only on the memory and there is no modification to the Windows settings.
+IDCANCEL				E&xit Strong Isolation Firewall for Government Systems Level Security Mode
+S_BOLD2					Strong Isolation Firewall for Government Systems Level Security Mode
 
 
 PREFIX					D_DG_WOL
-CAPTION					Wake on LAN 機能の設定
-S_1						この PC を (1) Wake on LAN ターゲット PC として設定
-S_2						Wake on LAN ターゲット PC として有効化しておくと、リモートから、同じ LAN 内の 1 台の Wake on LAN トリガー PC (常時電源 ON) を経由して、このコンピュータの電源を ON にすることができます。
-S_3						有線 LAN カードが Wake on LAN に対応しており、Hub に接続されている必要があります。また、「デバイスマネージャ」の LAN カードの設定、および、PC 本体の BIOS の設定画面で、Wake on LAN を有効にする必要がある場合があります。さらに、Wake on LAN 時に「PXE ブート」が使用されないような BIOS 設定にしておく必要があります。
-C_WOL_TARGET			Wake on LAN ターゲット PC として設定(&T)
-S_4						LAN カードの Wake on LAN 機能を手動で有効にする必要がある場合があります。
-B_DEVMGR				Windows の 「デバイスマネージャ」 を開く(&M)...
-S_5						この PC を (2) Wake on LAN トリガー PC として設定
-S_6						Wake on LAN トリガー PC は、ターゲット PC (複数設置可) と 同じ LAN (レイヤ 2 イーサネット) 内に少なくとも 1 台必要です。また、原理上、常時電源を ON にする必要があります。
-S_7						ユーザーは、「シン・テレワークシステム クライアント」の Wake on LAN 起動機能で、「トリガー PC」 と 「ターゲット PC」 のコンピュータ ID を入力する必要があります。そのため、トリガー PC のコンピュータ ID は、組織ユーザーに周知してください。
-C_WOL_TRIGGER			Wake on LAN トリガー PC として設定(&R)
+CAPTION					Wake on LAN function settings
+S_1						1) Set up this PC as your Wake on LAN Target PC
+S_2						Wake on LAN Target PC can be powered-on by a Trigger PC with WoL packets. The remote user send instructions to the Trigger PC to wake on the Target PC.
+S_3						Requirements: Physical network adapter (NIC) compatible with Wake on LAN, and phyiscall connected to the Ethernet switch. Also enable WoL setting on the Windows Device Managed and the BIOS screen on the computer. Also, PXE boot should be disabled not to fail due to attempting the PXE boot.
+C_WOL_TARGET			Set up this PC as Wake on LAN &target
+S_4						You have to activate Wake on LAN function on the network adapter (NIC).
+B_DEVMGR				Open Windows Device &Manager...
+S_5						2) Set up this PC as your Wake on LAN Trigger PC
+S_6						At least one Wake on LAN Trigger PC must be placed on the same LAN segment to the Wake on LAN Target PC. Wake on LAN Trigger PC's power must be always ON.
+S_7						A user must input both Trigger PC and targer PC's computer IDs on the $APPSHORT_CLIENT$ WoL client screen. You must let users know the Trigger PC's Computer ID.
+C_WOL_TRIGGER			Set up this PC as Wake on LAN t&rigger PC
 IDOK					&OK
-IDCANCEL				キャンセル(&C)
-S_9						職場で Wake on LAN 機能を利用する場合は、必ず、第三のクライアント PC を用いて Wake on LAN が正しく動作するかどうか何度か確かめてください。
-S_10					「トリガー PC」 の 「シン・テレワークシステム サーバー」 は、Wake on LAN トリガー専用に 1 台用意することをお勧めします。トリガー PC を用いて Wake on LAN パケットを送信するユーザーは、トリガー PC にリモートログインできる必要はありません。すなわち、パスワードを共有する必要はありません。
+IDCANCEL				&Cancel
+S_9						You have to test Wake on LAN function before leave your work office.
+S_10					It is recommended to set up a dedicated PC as a wake on LAN Trigger PC. No user authentication is required to send WoL instructions to the Trigger PC from a user remotely. It means that user need not to know the user authentication password of the Trigger PC.
 
 
 PREFIX					D_DU_WOL
-CAPTION					Wake on LAN 機能
-S_PCID					(1) Wake on LAN ターゲット PC のコンピュータ ID:
-S_PCID2					(2) Wake on LAN トリガー PC のコンピュータ ID:
-S_1						「シン・テレワークシステム サーバー」 側の設定で、あらかじめ Wake on LAN 機能が有効になっている必要があります。
-IDOK					&Wake on LAN の実行
-IDCANCEL				閉じる(&C)
-S_2						Wake on LAN 機能を用いてターゲット PC の電源を ON にする
+CAPTION					Wake on LAN function
+S_PCID					1) Wake on LAN Target PC's Computer ID:
+S_PCID2					2) Wake on LAN Trigger PC's Computer ID:
+S_1						Make sure that $APPSHORT_SERVER$'s settings screen enables Wake on LAN functions.
+IDOK					Run &Wake on LAN
+IDCANCEL				&Close
+S_2						Power-on the Target PC by Wake on LAN function
 
 
 
