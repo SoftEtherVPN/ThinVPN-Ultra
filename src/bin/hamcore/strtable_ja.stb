@@ -25,7 +25,6 @@ DEFAULE_LOCALE			年 月 日 時 分 秒 日 月 火 水 木 金 土 日 時間 
 
 DASAI_FONT				ＭＳ ゴシック
 
-
 # 言語
 # (0: 日本語, 1: 英語)
 LANG					0

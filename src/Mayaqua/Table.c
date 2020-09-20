@@ -1183,8 +1183,27 @@ bool LoadTableFromBuf(BUF* b)
 			t = ParseTableLine(tmp, prefix, sizeof(prefix), replace_list);
 			if (t != NULL)
 			{
-				// Register
-				Insert(TableList, t);
+				TABLE tt = CLEAN;
+
+				if (StrCmpi(t->name, "TESTSTR1") == 0)
+				{
+					DoNothing();
+				}
+				// Check if exists
+				tt.name = t->name;
+				if (Search(TableList, &tt) == NULL)
+				{
+					// Not exists
+					Insert(TableList, t);
+				}
+				else
+				{
+					// Already exists
+					Free(t->name);
+					Free(t->str);
+					Free(t->unistr);
+					Free(t);
+				}
 			}
 		}
 
@@ -1200,6 +1219,15 @@ bool LoadTableFromBuf(BUF* b)
 		Free(t->unistr);
 
 		Free(t);
+	}
+
+	for (i = 0;i < LIST_NUM(TableList);i++)
+	{
+		TABLE* t = LIST_DATA(TableList, i);
+		if (StrCmpi(t->name, "TESTSTR1") == 0)
+		{
+			Print("%s - %s\n", t->name, t->str);
+		}
 	}
 
 	ReleaseList(replace_list);
