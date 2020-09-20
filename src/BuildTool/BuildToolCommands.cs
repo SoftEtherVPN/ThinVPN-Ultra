@@ -148,11 +148,11 @@ namespace BuildTool
 		// Check the stb file consistency
 		[ConsoleCommandMethod(
 			"Check the stb file consistency",
-			"CheckStb [dir]",
+			"StbChecker [dir]",
 			"Check the stb file consistency",
 			"[dir]:Specify the target directory."
 			)]
-        static int CheckStb(ConsoleService c, string cmdName, string str)
+        static int StbChecker(ConsoleService c, string cmdName, string str)
         {
 			ConsoleParam[] args =
 			{
