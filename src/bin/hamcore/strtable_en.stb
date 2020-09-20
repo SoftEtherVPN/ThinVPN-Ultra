@@ -311,7 +311,7 @@ DESK_ENVSTR_MSTSC_51_PROXY_EXE	mstsc_51_url_proxy_en
 
 
 # PacketiX Desktop VPN Server 関係
-QDS_LOG_INFO				Information
+DS_LOG_INFO				Information
 DS_LOG_WARNING			Warning
 DS_LOG_ERROR			Error
 DS_9823_WARNING			There is a possibility that there is software that compete with $APPSHORT_SERVER$ running.\r\nPlease stop any anti-virus or firewall software.\r\nAnd please stop any process which is using TCP/IP port 9823.\r\n\r\nPress OK to continue executing in User-mode. But you can't use $APPSHORT_SERVER$ Configuration Tool to configure $APPSHORT_SERVER$.
@@ -433,11 +433,7 @@ DG_OPTION_RDP_ONLY		Because $APPSHORT_SERVER$ is running as service mode now, on
 DG_OPTION_URDP_ONLY		Because Windows on this computer doesn't include Remote Desktop function, only User-mode Remote Desktop can be used. If you upgrade Windows version to Pro, you will be able to use the Windows-builtin RDP system and you can use the remote desktop with comfortable.
 DG_OPTION_URDP_MSG		Only expert computer user should use detail settings.\r\n\r\nDo you want to continue?
 DG_PCID_KILLFOCUS		Do you want to set Computer ID '%S' for this computer?
-
-
-
-
-
+DG_MENU_HASH_ID			View &Unique ID...
 DG_ADMINUSERNAME_MSG	You can setup the $APPSHORT_CLIENT$ configuration tool to be opened only by the user "%s".\r\n\r\nDo you want to setup the $APPSHORT_CLIENT$ configuration tool to be opened only by the user "%s" ?
 DG_ADMINUSERNAME_MSG2	This $APPSHORT_SERVER$ configuration tool is set up to be opened only by the user "%s".\r\n\r\nYou can change this setting later by clicking the "Password Configuration" button.
 # 共有機能関係 (OPTION ダイアログ上のテキスト)
@@ -1185,6 +1181,7 @@ CM_ST_UDP_ACCEL_ENABLED	UDP Acceleration is Supported
 CM_ST_UDP_ACCEL_USING	UDP Acceleration is Active
 CM_ST_RUDP				TCP over UDP (NAT Traversal)
 CM_ST_UNDERLAY_PROTOCOL	Physical Underlay Protocol
+CM_ST_PROTOCOL_DETAILS	Protocol Details
 CM_ST_COMPRESS_TRUE		Yes (%u %%)
 CM_ST_COMPRESS_FALSE	No (No Compression)
 CM_ST_SESSION_NAME		Session Name
@@ -1416,6 +1413,7 @@ SVC_SERVICE_MUTEX		Because service %S has process %s that is already started, th
 SVC_USERMODE_MENU_1		&Hide Tasktray Icon
 SVC_USERMODE_MENU_2		E&xit $APPFULL_SERVER$
 SVC_HIDE_TRAY_MSG		This will hide the tasktray icons when starting %S in user mode. \r\nBeginning from next time %S is started in user mode, icons will not be displayed in the tasktray. \r\nThe menu to exit the process will also be hidden. \r\n\r\nTo exit the process in the case of Windows 98 / Me, use the Ctrl + Alt + Del key combination and select to end the process. \r\nWhen using other operating systems, use Task Manager. \r\n\r\nTo redisplay the tasktray icons, use the /usermode_showtray option when starting in user mode next time.
+SVC_EXIT_CONFIRM_MSG	$APPFULL_SERVER$ is running as User Mode currently.\r\n\r\nIf you exit this program, the server function will stop and will be unable to accept any new remote access.\r\n\r\nIf you are controlling this screen from remote you will be unable to access to this computer until you physicall walk to the local machine and operate the local console.\r\n\r\nDo you really want to terminate the server process?
 
 
 # Concerning services (UNIX)
@@ -4318,6 +4316,8 @@ R_SHOWCUSTOM			&Advanced Install Options for Experts
 R_FOR_SYSTEM			Install to this Computer as System Service(&Y)
 R_FOR_USER				Install only on the Environment of User "%s"
 S_WARNING				Caution: Not recommended. Only while the user "%s" logged on to the Windows, %s accepts remote control. Some remote sharing functions will be disabled.
+R_LIMITED				Government Security Mode (Relay IP addresses white list)
+B_LIMITED_HELP			About Government Security Mode
 
 
 PREFIX					D_SW_READY
@@ -4601,6 +4601,24 @@ S_CHECK_CERT			If certificate errors always occur, turn off this function. Pleas
 IDOK					&OK
 IDCANCEL				Cancel
 B_HASH					Print Unique ID...
+S_S10					Advanced User Authenthcation Settings
+S_S11					If you enable Advanced User Authenthcation you will be able to use advanced username-password authentication, external RADIUS or Active Directory authentication, or X.509 PKI certificate authenticaion. Simple password authentication will be disabled.
+C_USE_ADVANCED			Enable &Advanced User Authenthcation
+B_USER					&User management
+B_CA					&Trusted CA certificates
+B_RADIUS				External authentication servers
+B_CRL					Re&voked certifiates
+S_S12					Client PC security inspection
+S_S13					Enforce $APPSHORT_CLIENT$'s local computer security inspection.
+C_INSPECTION			Client quarantine (anti-virus and Windows Update check)
+C_CHECKMAC				Client MAC address authentication
+B_MAC					Register allowed MAC addresses list
+S_20091801				One Time Password (OTP) (Two-factor auth)
+S_20091802				One Time Password (OTP) can be sent to a pre-defined email address every time you log in, otherwise you will not be able to log in. This feature is to comply with two-factor authentication mandated security policy.
+B_OTP					One Time &Password (OTP) config
+S_20091803				IP Access Control List
+S_ACL					Set up IP Access Control List rule to allow or deny source client IP address.
+B_ACL					IP Access Control &List
 
 
 PREFIX					D_DG_OPTION
@@ -4622,6 +4640,23 @@ S6						Remote Desktop Settings
 S7						Save Logs
 C_LOG					Save &Local logs
 B_LOG					&Open log directory
+B_ADDGROUP				Add below user to Remote Desktop Users &group of Windows
+S_1						Username:
+B_CURRENTUSER			Specify current username
+B_RDP_OPTIMIZE			&Optimize Windows RDP internal settings for $APPSHORT$
+S_18					&Stop the following service(s) on accepting new RDP: (Delimiter: space letter)
+C_EVENTLOG				Save Windows &Event Log
+C_SYSLOG				Send &syslog protocol
+S_01					syslog server n&ame:
+S_02					P&ort number:
+S_STATIC11				Wake on LAN function
+S_20091801				Wake on LAN function allows you to power on the office PC from your home remotely.
+B_WOL					&Wake on LAN configuration...
+S_STATIC16				Your Eyes Only &Watermark...
+C_SHOW_WATERMARK		Your Eyes Only &Watermark message
+S_STATIC2				Disable Sharing Functions
+C_DISABLESHARE			&Disable Sharing Functions
+
 
 PREFIX					D_DG_PASSWORD
 CAPTION					Set the Password for Configuration Tool
@@ -4632,6 +4667,9 @@ S2						&Password:
 S3						Confirm(&E):
 IDOK					&OK
 IDCANCEL				Cancel
+S_20091801				Limit username who can open this configuration tool
+S_INFO					You can set up the limitation so that only "%s" will be able to open this configuration tool.
+R_USER					Set up this configuration tool available &only for the user "%s"
 
 
 PREFIX					D_DG_LOGIN
@@ -4680,6 +4718,8 @@ S_UX					User experience features aimed at improving telework
 C_ENABLE_RELAX			Enab&le 'relax mode' before starting telework
 C_SHOW_THEEND			When the &telework is completed, the "Thank you for your work" screen is displayed
 C_MULTIDISPLAY			Use the virtual &multi-display feature, if available
+C_LIMITED_FW			Start Strong Isolation Firewall in Government Security Mode
+
 
 PREFIX					D_DU_DOWNLOAD
 CAPTION					Downloading Remote Desktop Client Software
@@ -4751,6 +4791,7 @@ S_DIR2					&Destination Directory:
 B_RESTORE				&Restore
 IDOK					&OK
 IDCANCEL				Cancel
+C_SECURITY				Use normal Windows &Logon screen via RDP
 
 
 PREFIX					D_DI_SELECT_TYPE
@@ -4818,12 +4859,15 @@ S1						If you enable the following sharing functions you can share contents of 
 S_INFO					Sharing functions are very useful. But it has possibility of information leaking or accident with computer viruses.\r\n\r\nPlease note policies on your company or do not use this function on your office PC.\r\nIf your company doesn't allow to take-home files do not use Hard Disks Sharing.
 C_SHARE_CLIPBOARD		Use &Clipboard Sharing
 C_SHARE_DISK			Use Hard &Disks Sharing
+C_SHARE_COMPORT			Use &Serial Ports Sharing
 C_SHARE_PRINTER			Use &Printers Sharing
 S_INFO_2				These sharing functions can be used when the target computer is running Windows Pro versions, and Windows Remote Desktop (System-mode) must be enabled.
 S_INFO_3				And also there sharing functions depends on the security policies on the target computer.
 IDOK					&OK
 IDCANCEL				Cancel
 B_USAGE					Hard Disk Sharing &Usage...
+C_SHARE_CAMERA			Share client PC's web camera to server PC
+C_SHARE_AUDIOREC		Share client PC's microphone to server PC
 
 
 PREFIX					D_DG_HASH
@@ -4841,6 +4885,129 @@ S4						When you press the "Reset unique ID on next start-up" button, the unique
 
 
 
+
+
+PREFIX					D_DU_AUTH
+CAPTION					高度なユーザー認証
+S_TITLE					シン・テレワークシステム サーバー "%S" に接続するためには、ユーザー認証を行う必要があります。\r\n認証方法を選択してから、ユーザー名を入力して、必要なデータを入力してください。
+S_20091801				ユーザー名およびユーザー認証方法
+S_20091802				認証方法(&M):
+C_PASSWORD				パスワード認証(&P)
+C_CERT					証明書認証(&C)
+C_SMARTCARD				スマートカード認証(&S)
+S_20091803				ユーザー名(&U):
+S_20091804				パスワード認証
+S_S1					パスワード認証を使用する場合は、パスワードを入力して [OK] をクリックしてください。
+S_S2					パスワード(&P):
+S_20091805				証明書認証
+S_S4					証明書認証を使用する場合は、[参照] をクリックして PKCS#12 形式の証明書ファイル (.p12 または .pfx) を指定してください。
+B_BROWSE				参照(&B)...
+S_20091806				スマートカード認証
+S_SMARTCARD_DEVICE		1. 認証に使用するスマートカードを選択してください。
+B_SELECT_SMARTCARD		スマートカードの選択(&E)...
+S_CERT_STR				2. スマートカード内の証明書と秘密鍵を指定してください。
+B_SELECT_SCARD_CERT		証明書と秘密鍵の指定(&K)...
+IDOK					&OK
+IDCANCEL				キャンセル
+
+
+PREFIX					D_DU_THEEND
+CAPTION					NTT 東日本 - IPA 「シン・テレワークシステム」 業務完了
+C_NOMORE				次回から表示しない(&N)
+IDCANCEL				閉じる(&C)
+
+
+PREFIX					D_DU_DIALUP
+CAPTION					NTT 東日本 - IPA 「ｼﾝ･ﾃﾚﾜｰｸｼｽﾃﾑ」 ﾃﾞｨｼﾞﾀﾙ高速ﾊﾟｹｯﾄ通信
+S_1						「特殊局」に高速ﾊﾟｹｯﾄ通信で接続中...
+IDCANCEL				ｷｬﾝｾﾙ
+
+
+PREFIX					D_DG_OTP
+CAPTION					ワンタイムパスワード (OTP) 認証設定 - シン・テレワークシステム サーバー
+S_11					ログイン時に、毎回、事前設定したメールアドレスにワンタイムパスワード (OTP) が送付されるようにできます。OTP が一致しなければログインできません。セキュリティポリシー上、二要素認証の利用が必須の企業環境で利用できます。
+B_OTP_ENABLE			ワンタイムパスワード認証機能 (OTP) を有効にする(&E)
+S_1						OTP 送付先のメールアドレス(&M):
+S_2						スマートフォン等でいつでも受信できるメールアドレスの設定をお勧めします。\r\n\r\nOTP メールは、ドメイン 「@otp.cyber.ipa.go.jp」 から送信されます。
+S_3						職場の PC で本機能を設定する場合は、退社前に必ず手元の別のパソコンから試しに接続するなど、OTP が正しく作動することのテストをしてください。自宅に帰宅された後、万一 OTP が正しく送信されない場合は、会社に来るまでログインできなくなります。\r\n\r\nメールアドレス文字列は本コンピュータ上でのみ保持され、中継システムで管理・保管されることはありません (ただし、メール送信時の SMTP サーバーの内部ログに一時的に保持される場合はあります)。
+S_5						何らの原因で「ワンタイムパスワード」(OTP) が受信できなかった場合の情報セキュリティの低下 (可用性の低下) を防止するため、以下の「非常用 OTP 代替コード」が提供されます。代替コードは、メモをして自宅等の安全な場所に保管してください。非常時のみ使用できます。普段は使用しないでください。
+S_18					非常用 OTP 代替コード (30 桁):
+B_NEW_EMERGENCY			新規コード(&N)
+IDOK					&OK
+IDCANCEL				キャンセル(&C)
+
+
+PREFIX					D_DU_OTP
+CAPTION					ワンタイムパスワード (OTP) 認証 - シン・テレワークシステム サーバー
+S_TITLE					NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 (コンピュータ ID: %S) の設定画面で事前設定されているメールアドレスに、ワンタイムパスワード (OTP) が送付されました。\r\n\r\nメールをご確認いただき、OTP を入力してください。
+S_1						ワンタイムパスワード (OT&P):
+S_3						しばらく経過してもメールが届かない場合は、一度キャンセルしてから、再度ログインを試行してください。
+IDOK					&OK
+IDCANCEL				キャンセル(&C)
+
+
+PREFIX					D_DG_MAC
+CAPTION					クライアント MAC アドレス認証
+S_MSG_2					「シン・テレワークシステム クライアント」 のクライアント端末の MAC アドレスが一致した場合のみ、接続を許可することができます。\r\n\r\nMAC アドレスを登録してください。 (最大 50 個程度まで登録できます。)\r\n\r\nMAC アドレスは、00-12-34-AA-BB-CC のように 1 行につき 1 個入力します。改行により、複数個登録可能です。大文字・小文字は区別されません。ハイフンまたはコロンは省略できます。
+S_1						MAC アドレスについて
+S_INFO					「MAC アドレス」とは、端末に内蔵されているハードウェア固有のアドレスです。予めクライアントコンピュータの画面で確認しておいたものを、正確に入力する必要があります。1 文字でも異なっていると、接続が許可されません。\r\n\r\nクライアント端末の Windows の「コマンド プロンプト」を開き、\r\n> ipconfig /all\r\nと入力することで、MAC アドレスを確認できます。
+IDOK					&OK
+IDCANCEL				キャンセル
+S_MSG_3					【システム管理者の方へ】\r\n「エンタープライズ環境用ポリシー規制サーバー」を社内 LAN 上に設置している場合は、当該ポリシーサーバーで MAC アドレスの一覧を定義し一元管理することもできます。詳しくは、シン・テレワークシステムの Web サイトをご参照ください。
+
+
+PREFIX					D_DU_INSPECT
+CAPTION					NTT 東日本 - IPA 「シン・テレワークシステム」 - クライアント検疫
+S_INFO					接続先の NTT 東日本 - IPA 「シン・テレワークシステム サーバー」 の設定に基づき、クライアント端末のセキュリティチェックを実行しています。しばらくお待ちください...
+
+
+PREFIX					D_DU_GOVFW1
+CAPTION					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」
+S_BOLD					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 を有効化しますか?
+S_INFO1					「完全閉域化ファイアウォール機能」 を有効にすると、行政情報システムへのシンクライアント通信のための SSL-VPN 接続中は、本 PC とインターネットとの通信 (本 SSL-VPN 接続をのぞく) をすべて遮断できます。Windows のカーネルに最高優先上位のパケットフィルタを挿入することにより、他の通信に対する強力な遮断が実施されることから、他のアプリケーション (Web ブラウザ等を含む) は、これに反して通信をすることはできなくなり、セキュリティ脅威となり得る通信をシャットアウトできます。
+S_BOLD2					「完全閉域化ファイアウォール機能」 による自宅と行政機関との間の完全閉域網化について
+S_INFO9					接続先の 「シン・テレワークシステム サーバー」 (職場側 PC) は、「行政情報システム適応モード」で動作しており、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムの固定された 30 個程度の IP アドレスのみと、通信を行なっています。このことを「特定通信」といいます。
+S_INFO10				行政情報システムへのアクセス時のインターネット分離を実現し、「IP-VPN」 や 「閉域 SIM」 等との同等の閉域性を実現するためには、シンクライアント方式での通信中は、このクライアント端末においても、IPA が運用する 「シン・テレワークシステム」 の SSL-VPN 閉域中継システムとの間のみ「特定通信」を許可し、他の通信を一時的に遮断することが望ましいと考えられます。
+IDOK					はい、「完全閉域化ファイアウォール」を有効にします。
+IDCANCEL				いいえ、有効にしません。
+S_1						「はい」をクリックすると、「完全閉域化ファイアウォール機能」 が動作を開始し、このコンピュータからは 「行政情報システム適応モード」 のシンクライアント通信のみが可能となり、インターネットとの通信はすべて遮断されます。なお、「完全閉域化ファイアウォール機能」 を終了すると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作し、Windows のシステム設定を変更することはありません。
+
+
+PREFIX					D_DU_GOVFW2
+CAPTION					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 が作動中です
+S_BOLD					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 が作動中です
+S_INFO1					このウインドウを閉じるまでの間、「完全閉域化ファイアウォール機能」 が有効となっています。グローバル IPv4 / IPv6 アドレスへの通信は、SSL-VPN 閉域中継システム以外、すべて遮断されています。\r\n\r\n通信遮断が正しく行なわれていることを検証するには、Web ブラウザによる Web サイトのブラウジングができないことを確認してみてください。\r\n\r\nWindows の特殊な改造を行なっている場合や、他社製の特殊なカーネル改造プログラムを動作させている場合、本機能は正しく動作しない場合があります。
+S_1						このウインドウは裏面に移動して隠すことができます。シンクライアント画面を前面にして作業することができます。このウインドウを閉じると、直ちに閉域化は解除され、元の状態に戻ります。本機能はメモリ上で動作しており、Windows のシステム設定を変更することはありません。
+IDCANCEL				行政情報システム適応モード用 「完全閉域化ファイアウォール機能」 を終了する(&X)
+S_BOLD2					行政情報システム適応モード用 「完全閉域化ファイアウォール機能」
+
+
+PREFIX					D_DG_WOL
+CAPTION					Wake on LAN 機能の設定
+S_1						この PC を (1) Wake on LAN ターゲット PC として設定
+S_2						Wake on LAN ターゲット PC として有効化しておくと、リモートから、同じ LAN 内の 1 台の Wake on LAN トリガー PC (常時電源 ON) を経由して、このコンピュータの電源を ON にすることができます。
+S_3						有線 LAN カードが Wake on LAN に対応しており、Hub に接続されている必要があります。また、「デバイスマネージャ」の LAN カードの設定、および、PC 本体の BIOS の設定画面で、Wake on LAN を有効にする必要がある場合があります。さらに、Wake on LAN 時に「PXE ブート」が使用されないような BIOS 設定にしておく必要があります。
+C_WOL_TARGET			Wake on LAN ターゲット PC として設定(&T)
+S_4						LAN カードの Wake on LAN 機能を手動で有効にする必要がある場合があります。
+B_DEVMGR				Windows の 「デバイスマネージャ」 を開く(&M)...
+S_5						この PC を (2) Wake on LAN トリガー PC として設定
+S_6						Wake on LAN トリガー PC は、ターゲット PC (複数設置可) と 同じ LAN (レイヤ 2 イーサネット) 内に少なくとも 1 台必要です。また、原理上、常時電源を ON にする必要があります。
+S_7						ユーザーは、「シン・テレワークシステム クライアント」の Wake on LAN 起動機能で、「トリガー PC」 と 「ターゲット PC」 のコンピュータ ID を入力する必要があります。そのため、トリガー PC のコンピュータ ID は、組織ユーザーに周知してください。
+C_WOL_TRIGGER			Wake on LAN トリガー PC として設定(&R)
+IDOK					&OK
+IDCANCEL				キャンセル(&C)
+S_9						職場で Wake on LAN 機能を利用する場合は、必ず、第三のクライアント PC を用いて Wake on LAN が正しく動作するかどうか何度か確かめてください。
+S_10					「トリガー PC」 の 「シン・テレワークシステム サーバー」 は、Wake on LAN トリガー専用に 1 台用意することをお勧めします。トリガー PC を用いて Wake on LAN パケットを送信するユーザーは、トリガー PC にリモートログインできる必要はありません。すなわち、パスワードを共有する必要はありません。
+
+
+PREFIX					D_DU_WOL
+CAPTION					Wake on LAN 機能
+S_PCID					(1) Wake on LAN ターゲット PC のコンピュータ ID:
+S_PCID2					(2) Wake on LAN トリガー PC のコンピュータ ID:
+S_1						「シン・テレワークシステム サーバー」 側の設定で、あらかじめ Wake on LAN 機能が有効になっている必要があります。
+IDOK					&Wake on LAN の実行
+IDCANCEL				閉じる(&C)
+S_2						Wake on LAN 機能を用いてターゲット PC の電源を ON にする
 
 
 
@@ -7767,6 +7934,7 @@ SW_PERFORM_MSG_SVC_UNINSTALL_FAILED			Uninstall of the "%s" service (internal na
 SW_PERFORM_MSG_SVC_INSTALL_FAILED			Install of the "%s" service (internal name: "%S") failed.
 SW_PERFORM_MSG_SVC_USERMODE_EXEC_FAILED		Starting the user-mode service "%s" failed.
 SW_PERFORM_MSG_UPDATING						Updating system settings...
+SW_PERFORM_MSG_INSTALL_URDP					Installing User Mode Remote Desktop programs...
 SW_PERFORM_MSG_DELETE_NIC					Removing the Virtual Network Adapters...
 SW_PERFORM_MSG_FINISHED						Setup progress finished.
 SW_PERFORM_MSG_UNINSTALL_MSI				Windows Installer is uninstalling the older version of %s...
