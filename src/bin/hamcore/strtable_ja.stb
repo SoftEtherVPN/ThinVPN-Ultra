@@ -547,10 +547,10 @@ SVC_$APP_ID_PREFIX$THINSVR_TITLE		$APPSHORT_EN$ Server
 SVC_$APP_ID_PREFIX$THINSVR_DESCRIPT	このサービスは、システムモードで $APPFULL_SERVER$ を常時稼動させるためのプログラムです。このサービスが起動中の場合は、このコンピュータのデスクトップに遠隔地の $APPFULL_CLIENT$ からリモートアクセスすることができます。
 
 
-# WideGate サービス定義
-SVC_WIDEGATE_NAME		WIDEGATE
-SVC_WIDEGATE_TITLE		SoftEther WideGate
-SVC_WIDEGATE_DESCRIPT	ソフトイーサ株式会社特製 WideGate サービス！
+# ThinGate サービス定義
+SVC_THINGATE_NAME		THINGATE
+SVC_THINGATE_TITLE		ThinGate
+SVC_THINGATE_DESCRIPT	ThinGate Relay Service
 
 
 
