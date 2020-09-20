@@ -369,7 +369,7 @@ public class Stb
         }
 
         Console.WriteLine("\nThere are {0} errors.\n\n{1}\n", num,
-            (num == 0 ? "Good work! No problem!" : "You must correct them before sending us Pull Requests!"));
+            (num == 0 ? "Good work! No problem!" : "You must correct them!"));
 
         return num;
     }

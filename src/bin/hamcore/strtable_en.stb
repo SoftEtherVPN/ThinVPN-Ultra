@@ -310,8 +310,19 @@ DESK_ENVSTR_MSTSC_51_REF	mstsc_51_referer_en
 DESK_ENVSTR_MSTSC_51_PROXY_EXE	mstsc_51_url_proxy_en
 
 
+# Bluetooth 関係
+DESK_BLUETOOTH_FOLDER_NAME	%s\\Bluetooth Exchange Directory
+DU_MENU_BLUETOOTH			&Bluetooth 交換フォルダの場所を指定...
+DU_MAIN_DLG_CAPTION			%s - OMS 用特別版 (Bluetooth サポート)
+DU_BLUETOOTH_SELFOL_MSG		[Bluetooth 交換フォルダ] と呼ばれるフォルダの場所を正確に指定してください。このフォルダの位置は、お使いの Bluetooth ドライバの設定ツールで確認できます。通常は、[マイ ドキュメント] の下にあります。
+DU_BLUETOOTH_CONFIRM_MSG	指定されたフォルダ "%s" は、Bluetooth 交換フォルダとして正しいですか?\r\n\r\n注意: Bluetooth 交換用のフォルダ以外は、絶対に指定しないでください。
+DG_MAIN_DLG_CAPTION			%s - OMS 用特別版 (Bluetooth サポート)
+DG_MENU_BLUETOOTH			&Bluetooth 交換フォルダの場所を指定...
+DG_BLUETOOTH_SELFOL_MSG		Bluetooth 対応アプリケーションが Bluetooth デバイスから受信したデータを受け取るための [Bluetooth 交換フォルダ] と呼ばれるフォルダの場所を正確に指定してください。このフォルダの位置は、使用しようとしている Bluetooth 対応アプリケーションの設定ツールで確認できます。アプリケーション側で、データを受信するフォルダを変更することもできます。
+
+
 # PacketiX Desktop VPN Server 関係
-DS_LOG_INFO				Information
+QDS_LOG_INFO				Information
 DS_LOG_WARNING			Warning
 DS_LOG_ERROR			Error
 DS_9823_WARNING			There is a possibility that there is software that compete with $APPSHORT_SERVER$ running.\r\nPlease stop any anti-virus or firewall software.\r\nAnd please stop any process which is using TCP/IP port 9823.\r\n\r\nPress OK to continue executing in User-mode. But you can't use $APPSHORT_SERVER$ Configuration Tool to configure $APPSHORT_SERVER$.
@@ -357,7 +368,7 @@ DSL_IP_NG				Tunnel %u: The IP address control rule denied this IP address %S.
 DSL_AUTH_AN_OK			Tunnel %u: User %S login OK with anonymous authentication.
 DSL_AUTH_PW_OK			Tunnel %u: User %S login OK with standard password authentication.
 DSL_AUTH_PW2_OK			Tunnel %u: User %S login OK with external password authentication.
-DSL_AUTH_PW3_OK			Tunnel %u: login OK with external password authentication. The internal username was the asterisk user "*".
+DSL_AUTH_PW3_OK			Tunnel %u: User %S login OK with external password authentication. The internal username was the asterisk user "*".
 DSL_AUTH_CERT_OK		Tunnel %u: User %S login OK with certificate authentication. The client authentication data: %s
 DSL_USER_EXPIRED		Tunnel %u: User %S is expired then access denied.
 DSL_AUTH_FAILED			Tunnel %u: User authentication failed.
@@ -414,7 +425,7 @@ DU_GOV_FW_MANDATE_CLOSE_BUTTON 	No (Suspend connection)
 DU_GOV_FW_CLOSE_MSG 			Would you like to terminate the fully closed firewall?
 
 DU_FELONY_STR1 					Classified // DO NOT COPY // NO PHOTO
-DU_FELONY_STR2 					$APPSHORT$ Login date and time: %s\r\n%s\r\n%s\r\nServer computer: %s (IP: %r)\r\nClient computer: %s (%s)\r\nClient IP: %r/%r\r\nUser. Name: %s\r\n%s
+DU_FELONY_STR2 					$APPSHORT$ Login date and time: %s\r\n%S\r\nServer computer: %s (IP: %r)\r\nClient computer: %s (%S)\r\nClient IP: %r/%r\r\nUser. Name: %s\r\n%s
 DU_FELONY_FONT_XP 				Tahoma
 DU_FELONY_FONT_7 				Segoe UI
 
@@ -532,7 +543,7 @@ DI_INSTALL_RUDP_UAC_MITIGATE	The $APPSHORT_SERVER$ installer has been adjusted t
 DI_LINK_SERVER_DIRNAME	$APPFULL_SERVER$
 DI_LINK_CLIENT_DIRNAME	$APPFULL_CLIENT$
 
-DI_LINK_SERVER_FILENAME$APPFULL_SERVER$ Configuration Tool
+DI_LINK_SERVER_FILENAME	$APPFULL_SERVER$ Configuration Tool
 DI_LINK_SERVER_COMMENT	Use $APPFULL_SERVER$ Configuration Tool to make configure $APPFULL_SERVER$ which is running on this computer.
 
 DI_LINK_SERVER_UNINSTALL_FILENAME	Uninstall - $APPFULL_SERVER$
@@ -2264,7 +2275,7 @@ LH_MAX_SESSION			Connection "%S": The maximum number of sessions (%u) that can b
 LH_MAX_SESSION_CLIENT	Connection "%S": The maximum number of client sessions (%u) that can be set by the Virtual Hub has been reached. Unable to create a new session.
 LH_MAX_SESSION_BRIDGE	Connection "%S": The maximum number of bridge sessions (%u) that can be set by the Virtual Hub has been reached. Unable to create a new session.
 LH_MAX_SESSION_2		Connection "%S": The maximum number of sessions (%u) that can be managed by a VPN Server has been reached. Unable to create a new session.
-LH_NEW_SESSION			Connection "%S": The new session "%S" has been created. (IP address: %S, Port number: %u, Physical underlying protocol: "%S")
+LH_NEW_SESSION			Connection "%S": The new session "%S" has been created. (IP address: %S, Port number: %u, Physical underlying protocol: "%S", Protocol Details: "%S")
 LH_SET_SESSION			Session "%S": The parameter has been set. Max number of TCP connections: %u, Use of encryption: %s, Use of compression: %s, Use of Half duplex communication: %s, Timeout: %u seconds.
 LH_NODE_INFO			Session "%S": VPN Client details: (%s)
 LH_VLAN_ID				Session "%S": Assigned VLAN ID: %u

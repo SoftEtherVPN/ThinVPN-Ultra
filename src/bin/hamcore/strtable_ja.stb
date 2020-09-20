@@ -423,7 +423,7 @@ DU_GOV_FW_MANDATE_CLOSE_BUTTON	いいえ (接続を中断)
 DU_GOV_FW_CLOSE_MSG		完全閉域化ファイアウォールを終了しますか?
 
 DU_FELONY_STR1			画面撮影・情報持出等の行為禁止！
-DU_FELONY_STR2			シン・テレワーク作業中 ログイン日時: %s\r\n%S\r\nサーバー端末: %s (IP: %r)\r\nクライアント端末: %s (%S)\r\nクライアント IP: %r/%r\r\nユーザー名: %s\r\n%S
+DU_FELONY_STR2			シン・テレワーク作業中 ログイン日時: %s\r\n%S\r\nサーバー端末: %s (IP: %r)\r\nクライアント端末: %s (%S)\r\nクライアント IP: %r/%r\r\nユーザー名: %s\r\n%s
 DU_FELONY_FONT_XP		MS UI Gothic
 DU_FELONY_FONT_7		Meiryo UI
 
@@ -467,57 +467,6 @@ DG_RESET_CERT_DONE		固有 ID の初期化を予約しました。次回のサ�
 
 DG_CHANGE_WOL_TARGET	「Wake on LAN ターゲット PC として設定」 の設定を変更しようとしています。\r\n\r\nこの設定を変更すると、「シン・テレワークシステム サーバー」は、一旦、ネットワーク接続を切断し、再接続します。\r\n\r\nリモート経由でこのコンピュータを操作している場合は、接続が一回途切れる場合があります。その場合は、リモート接続を再接続をしてください。
 DG_DEVMGMT_RUN_ERROR	Windows の「デバイスマネージャ」の起動に失敗しました。\r\n\r\nコントロールパネルから手動で起動してください。
-
-
-# Cedar エンジンからのコピー分
-CM_CERT_INFO			発行先: %s\r\n発行者: %s\r\n有効期限: %s
-CM_CERT_SECURE_INFO		証明書: "%S"\r\n秘密鍵: "%S"
-CM_SELECT_CERT_INCARD	証明書と秘密鍵の指定(&V)
-CM_VIEW_CLIENT_CERT		クライアント証明書の表示(&V)
-CM_CERT_COLUMN_1		発行先
-CM_CERT_COLUMN_2		発行者
-CM_CERT_COLUMN_3		有効期限
-CM_CERT_DELETE_MSG		この証明書をリストから削除しますか?
-CM_PASSWORD_SET			パスワードを設定しました。
-CM_PASSWORD_REMOVE		パスワード設定を解除しました。
-SM_AC_COLUMN_1			ID
-SM_AC_COLUMN_2			優先順位
-SM_AC_COLUMN_3			動作
-SM_AC_COLUMN_4			内容
-SM_AC_PASS				許可
-SM_AC_DENY				拒否
-SM_AUTHTYPE_0			匿名認証
-SM_AUTHTYPE_1			パスワード認証
-SM_AUTHTYPE_2			固有証明書認証
-SM_AUTHTYPE_3			署名済み証明書認証
-SM_AUTHTYPE_4			Radius 認証
-SM_AUTHTYPE_5			NT ドメイン認証
-SM_CRL_COLUMN_1			証明書の概要
-SM_CRL_DELETE_MSG		選択した項目を削除します。よろしいですか?
-SM_CRL_EMPTY_MSG		項目が 1 つも選択されていません。\r\nこの無効な証明書エントリが追加されると、すべての証明書が無効として判断され、証明書認証モードで接続しようとするすべてのクライアントの接続が拒否されます。\r\n\r\nよろしいですか?
-SM_EDIT_USER_CAPTION_1	ユーザーの新規作成
-SM_EDIT_USER_CAPTION_2	ユーザー %S のプロパティ
-SM_EDIT_USER_CERT_INFO	[固有証明書認証] が選択されているユーザーは、接続時に SSL クライアント証明書が予めユーザーごとに設定された証明書と完全に一致するかどうかで接続を許可または拒否されます。
-SM_EDIT_USER_POL_DLG	ユーザー %S のセキュリティポリシー
-SM_NO_GROUP				－
-SM_STATUS_COLUMN_1		項目
-SM_STATUS_COLUMN_2		値
-SM_USER_COLUMN_1		ユーザー名
-SM_USER_COLUMN_2		本名
-SM_USER_COLUMN_3		所属グループ
-SM_USER_COLUMN_4		説明
-SM_USER_COLUMN_5		認証方法
-SM_USER_COLUMN_6		ログイン回数
-SM_USER_COLUMN_7		最終ログイン日時
-SM_USER_DELETE_MSG		ユーザー "%s" を削除します。よろしいですか?
-SM_USERINFO_CAPTION		ユーザー "%S" の情報
-SM_USERINFO_NAME		ユーザー名
-SM_USERINFO_GROUP		グループ名
-SM_USERINFO_CREATE		作成日時
-SM_USERINFO_UPDATE		更新日時
-SM_USERINFO_EXPIRE		有効期限
-SM_USERINFO_NUMLOGIN	ログイン回数
-SM_USER_CREEATE_OK		ユーザー %S を作成しました。
 
 
 

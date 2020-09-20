@@ -993,7 +993,6 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bool wol_mode;
 	bool downloadmode;
 	UINT download_size;
-	bool bluetooth_mode;
 	bool is_share_disabled;
 	UCHAR bluetooth_mode_client_id[SHA1_SIZE];
 	bool first_connection;
@@ -1107,7 +1106,6 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	wol_mode = PackGetBool(p, "WoLMode");
 	downloadmode = PackGetBool(p, "downloadmode");
 	download_size = PackGetInt(p, "download_size");
-	bluetooth_mode = false;//PackGetBool(p, "bluetooth_mode");
 	first_connection = PackGetBool(p, "FirstConnection");
 	has_urdp2_client = PackGetBool(p, "HasURDP2Client");
 	support_otp = PackGetBool(p, "SupportOtp");
@@ -1255,43 +1253,6 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
 			return;
 		}
-	}
-
-	if (bluetooth_mode)
-	{
-		// Bluetooth データ受信モード
-		bool b = false;
-
-		LockList(ds->ClientList);
-		{
-			UINT i;
-			for (i = 0;i < LIST_NUM(ds->ClientList);i++)
-			{
-				DS_CLIENT *c = LIST_DATA(ds->ClientList, i);
-
-				if (Cmp(c->ClientID, bluetooth_mode_client_id, SHA1_SIZE) == 0)
-				{
-					b = true;
-				}
-			}
-		}
-		UnlockList(ds->ClientList);
-
-		if (b == false)
-		{
-			Debug("bluetooth_mode: auth failed.\n");
-			DsSendError(sock, ERR_PROTOCOL_ERROR);
-			return;
-		}
-
-		DsSendError(sock, ERR_NO_ERROR);
-
-		SockIoSetTimeout(sock, INFINITE);
-		Debug("bluetooth_mode: accepted.\n");
-
-		DsBluetoothMain(ds, sock);
-
-		return;
 	}
 
 #if	0
