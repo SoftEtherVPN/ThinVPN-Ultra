@@ -145,8 +145,68 @@ namespace BuildTool
 			return 0;
 		}
 
-		// Set the version of the PE to 4
+		// Check the stb file consistency
 		[ConsoleCommandMethod(
+			"Check the stb file consistency",
+			"CheckStb [dir]",
+			"Check the stb file consistency",
+			"[dir]:Specify the target directory."
+			)]
+        static int CheckStb(ConsoleService c, string cmdName, string str)
+        {
+			ConsoleParam[] args =
+			{
+				new ConsoleParam("[dir]"),
+            };
+            ConsoleParamValueList vl = c.ParseCommandList(cmdName, str, args);
+
+			string hamcore_dir = vl.DefaultParam.StrValue;
+
+			if (Str.IsEmptyStr(hamcore_dir))
+			{
+				hamcore_dir = Path.Combine(Paths.UltraBinDirName, "hamcore");
+			}
+
+			string[] stb_files = Directory.GetFiles(hamcore_dir, "*.stb", SearchOption.TopDirectoryOnly);
+
+            if (stb_files.Length == 0)
+            {
+                Console.WriteLine("Error: There are no .stb files in the directory '" + hamcore_dir + "'.");
+                return -1;
+            }
+
+            int total_num = 0;
+
+            for (int i = 0; i < stb_files.Length; i++)
+            {
+                for (int j = 0; j < stb_files.Length; j++)
+                {
+                    if (i != j)
+                    {
+                        Console.WriteLine("---\nComparing '{1}' to '{0}'...", Path.GetFileName(stb_files[i]), Path.GetFileName(stb_files[j]));
+
+                        total_num += Stb.Compare(stb_files[i], stb_files[j]);
+                    }
+                }
+            }
+
+            Console.WriteLine("--- Results ---");
+            if (total_num == 0)
+            {
+                Console.WriteLine("OK: Excellent! There are no errors between multilanguage stb files.");
+                Console.WriteLine();
+                Console.WriteLine("   - In Jurassic Park: \"It's a UNIX system! I know this!\"");
+                return 0;
+            }
+            else
+            {
+                Console.WriteLine($"ERROR: There are {total_num} errors on multilanguage stb files.");
+                return -3;
+            }
+        }
+
+        // Set the version of the PE to 4
+        [ConsoleCommandMethod(
 			"Set the version of the PE file to 4.",
 			"SetPE4 [filename]",
 			"Set the version of the PE file to 4.",
