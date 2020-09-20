@@ -672,6 +672,7 @@
 #define S_VERSION                       1260
 #define S_LOAD_7                        1261
 #define S_LOGO                          1261
+#define D_ABOUT_BMP_ABOUTBOX            1261
 #define S_PACKET_3                      1262
 #define S_LOAD_8                        1262
 #define S_VERSION2                      1262
@@ -1066,6 +1067,10 @@
 #define B_RESET                         1521
 #define B_DEVMGR                        1522
 #define S_D_DU_MAIN_BANNER_BMP          1524
+#define D_SW_PERFORM_BMP_ABOUTBOX       1525
+#define D_DG_MAIN_BMP_DESKSERVER        1526
+#define D_DG_BMP_OTP                    1527
+#define D_SW_WELCOME_BMP_VPNSERVER_FIGURE 1528
 #define B_ONLINE                        1655
 #define D_NM_CONNECT                    1998
 #define D_NM_MAIN                       1999
@@ -1435,7 +1440,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        251
 #define _APS_NEXT_COMMAND_VALUE         40111
-#define _APS_NEXT_CONTROL_VALUE         1525
+#define _APS_NEXT_CONTROL_VALUE         1529
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

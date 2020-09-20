@@ -3976,11 +3976,11 @@ void InitDialogInternational(HWND hWnd, void *pparam)
 							p->hBitmap = LoadBitmapFromBuf(b);
 
 							FreeBuf(b);
+						}
 
-							if (p->hBitmap != NULL)
-							{
-								SendMessage(hControl, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)p->hBitmap);
-							}
+						if (p->hBitmap != NULL)
+						{
+							SendMessage(hControl, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)p->hBitmap);
 						}
 					}
 				}
