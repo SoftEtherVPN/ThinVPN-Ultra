@@ -933,9 +933,34 @@ TABLE* ParseTableLine(char* line, char* prefix, UINT prefix_size, LIST* replace_
 	unistr = Malloc(unistr_size);
 	Utf8ToUni(unistr, unistr_size, &line[string_start], StrLen(&line[string_start]));
 
+	if (InChar(name, '$'))
+	{
+		// Replace key (name) by the replacement string
+		char* tmp;
+		UINT tmp_size = (StrSize(name) + 1024) * 2;
+		UINT i;
+
+		tmp = Malloc(tmp_size);
+
+		StrCpy(tmp, tmp_size, name);
+
+		for (i = 0; i < LIST_NUM(replace_list);i++)
+		{
+			TABLE_REPLACE_STR* r = LIST_DATA(replace_list, i);
+
+			ReplaceStrEx(tmp, tmp_size, tmp, r->oldstr, r->newstr, false);
+		}
+
+		Free(name);
+
+		name = CopyStr(tmp);
+
+		Free(tmp);
+	}
+
 	if (UniInChar(unistr, L'$'))
 	{
-		// Replace the replacement string
+		// Replace value by the replacement string
 		wchar_t* tmp;
 		UINT tmp_size = (UniStrSize(unistr) + 1024) * 2;
 		UINT i;
@@ -946,9 +971,9 @@ TABLE* ParseTableLine(char* line, char* prefix, UINT prefix_size, LIST* replace_
 
 		for (i = 0; i < LIST_NUM(replace_list);i++)
 		{
-			TABLE* r = LIST_DATA(replace_list, i);
+			TABLE_REPLACE_STR* r = LIST_DATA(replace_list, i);
 
-			UniReplaceStrEx(tmp, tmp_size, tmp, (wchar_t*)r->name, r->unistr, false);
+			UniReplaceStrEx(tmp, tmp_size, tmp, r->olduni, r->newuni, false);
 		}
 
 		Free(unistr);
@@ -1141,7 +1166,7 @@ bool LoadTableFromBuf(BUF* b)
 			{
 				if (StartWith(key, "$") && EndWith(key, "$") && StrLen(key) >= 3)
 				{
-					TABLE* t;
+					TABLE_REPLACE_STR* t;
 					wchar_t univalue[MAX_SIZE];
 					wchar_t uniname[MAX_SIZE];
 					UINT i;
@@ -1155,8 +1180,8 @@ bool LoadTableFromBuf(BUF* b)
 					// Check if exists
 					for (i = 0;i < LIST_NUM(replace_list);i++)
 					{
-						TABLE* t2 = LIST_DATA(replace_list, i);
-						if (UniStrCmpi((wchar_t*)t2->name, uniname) == 0)
+						TABLE_REPLACE_STR* t2 = LIST_DATA(replace_list, i);
+						if (StrCmpi(t2->oldstr, key) == 0)
 						{
 							exists = true;
 							break;
@@ -1165,9 +1190,13 @@ bool LoadTableFromBuf(BUF* b)
 
 					if (exists == false)
 					{
-						t = ZeroMalloc(sizeof(TABLE));
-						t->name = (char*)CopyUniStr(uniname);
-						t->unistr = CopyUniStr(univalue);
+						t = ZeroMalloc(sizeof(TABLE_REPLACE_STR));
+
+						t->olduni = CopyUniStr(uniname);
+						t->oldstr = CopyStr(key);
+
+						t->newuni = CopyUniStr(univalue);
+						t->newstr = CopyUniToStr(univalue);
 
 						Add(replace_list, t);
 					}
@@ -1185,10 +1214,6 @@ bool LoadTableFromBuf(BUF* b)
 			{
 				TABLE tt = CLEAN;
 
-				if (StrCmpi(t->name, "TESTSTR1") == 0)
-				{
-					DoNothing();
-				}
 				// Check if exists
 				tt.name = t->name;
 				if (Search(TableList, &tt) == NULL)
@@ -1212,11 +1237,12 @@ bool LoadTableFromBuf(BUF* b)
 
 	for (i = 0;i < LIST_NUM(replace_list);i++)
 	{
-		TABLE* t = LIST_DATA(replace_list, i);
+		TABLE_REPLACE_STR* t = LIST_DATA(replace_list, i);
 
-		Free(t->name);
-		Free(t->str);
-		Free(t->unistr);
+		Free(t->newstr);
+		Free(t->newuni);
+		Free(t->oldstr);
+		Free(t->olduni);
 
 		Free(t);
 	}
@@ -1224,10 +1250,6 @@ bool LoadTableFromBuf(BUF* b)
 	for (i = 0;i < LIST_NUM(TableList);i++)
 	{
 		TABLE* t = LIST_DATA(TableList, i);
-		if (StrCmpi(t->name, "TESTSTR1") == 0)
-		{
-			Print("%s - %s\n", t->name, t->str);
-		}
 	}
 
 	ReleaseList(replace_list);

@@ -15,7 +15,6 @@
 ###########################################################################
 
 
-
 # 環境パラメータ
 DEFAULT_FONT			MS UI Gothic
 DEFAULT_FONT_HIGHDPI	Meiryo UI
@@ -543,9 +542,9 @@ DI_LINK_CLIENT_UNINSTALL_COMMENT	$APPFULL_CLIENT$ をこのコンピュータか
 
 
 # シン・テレワークシステム サーバー サービス定義
-SVC_THINSVR_NAME		THINSVR
-SVC_THINSVR_TITLE		Thin Telework System Server
-SVC_THINSVR_DESCRIPT	このサービスは、システムモードで $APPFULL_SERVER$ を常時稼動させるためのプログラムです。このサービスが起動中の場合は、このコンピュータのデスクトップに遠隔地の $APPFULL_CLIENT$ からリモートアクセスすることができます。
+SVC_$APP_ID_PREFIX$THINSVR_NAME		$APP_ID_PREFIX$THINSVR
+SVC_$APP_ID_PREFIX$THINSVR_TITLE		$APPSHORT_EN$ Server
+SVC_$APP_ID_PREFIX$THINSVR_DESCRIPT	このサービスは、システムモードで $APPFULL_SERVER$ を常時稼動させるためのプログラムです。このサービスが起動中の場合は、このコンピュータのデスクトップに遠隔地の $APPFULL_CLIENT$ からリモートアクセスすることができます。
 
 
 # WideGate サービス定義

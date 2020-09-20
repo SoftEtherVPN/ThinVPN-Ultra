@@ -464,6 +464,7 @@ typedef struct CFG_ENUM_PARAM CFG_ENUM_PARAM;
 
 // Table.h
 typedef struct TABLE TABLE;
+typedef struct TABLE_REPLACE_STR TABLE_REPLACE_STR;
 typedef struct LANGLIST LANGLIST;
 
 // Network.h

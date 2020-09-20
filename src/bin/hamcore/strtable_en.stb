@@ -542,9 +542,9 @@ DI_LINK_CLIENT_UNINSTALL_COMMENT	Use this uninstaller to uninstall $APPFULL_CLIE
 
 
 # シン・テレワークシステム サーバー サービス定義
-SVC_THINSVR_NAME		THINSVR
-SVC_THINSVR_TITLE		Thin Telework System Server
-SVC_THINSVR_DESCRIPT	$APPFULL_SERVER$ Service is the program to accept remote secure connection via the Internet. When this service is running, you can access to the desktop of this computer from anywhere in secure.
+SVC_$APP_ID_PREFIX$THINSVR_NAME		$APP_ID_PREFIX$THINSVR
+SVC_$APP_ID_PREFIX$THINSVR_TITLE		$APPSHORT_EN$ Server
+SVC_$APP_ID_PREFIX$THINSVR_DESCRIPT	$APPFULL_SERVER$ Service is the program to accept remote secure connection via the Internet. When this service is running, you can access to the desktop of this computer from anywhere in secure.
 
 
 # WideGate サービス定義

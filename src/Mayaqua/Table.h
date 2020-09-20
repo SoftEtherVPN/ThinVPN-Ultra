@@ -127,6 +127,15 @@ struct TABLE
 	wchar_t *unistr;
 };
 
+// String table
+struct TABLE_REPLACE_STR
+{
+	char* oldstr;
+	wchar_t* olduni;
+	char* newstr;
+	wchar_t* newuni;
+};
+
 // Unicode cache structure
 typedef struct UNICODE_CACHE
 {
