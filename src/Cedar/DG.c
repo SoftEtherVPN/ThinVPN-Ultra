@@ -452,51 +452,6 @@ void DgOptDlgOnOk(HWND hWnd, DG *dg)
 	EndDialog(hWnd, 1);
 }
 
-// Bluetooth ディレクトリの指定
-void DgSelectBluetoothDir(HWND hWnd, DG *dg)
-{
-	RPC_DS_CONFIG t;
-	wchar_t default_dir[MAX_PATH];
-	wchar_t *ret;
-	// 引数チェック
-	if (dg == NULL)
-	{
-		return;
-	}
-
-	Zero(&t, sizeof(t));
-
-	if (DtcGetConfig(dg->Rpc, &t) != ERR_NO_ERROR)
-	{
-		return;
-	}
-
-	if (UniIsEmptyStr(t.BluetoothDir) == false)
-	{
-		// 保存されているディレクトリの値
-		UniStrCpy(default_dir, sizeof(default_dir), t.BluetoothDir);
-	}
-	else
-	{
-		// デフォルトで現在のユーザーの My Documents の下
-		UniFormat(default_dir, sizeof(default_dir), _UU("DESK_BLUETOOTH_FOLDER_NAME"),
-			MsGetMyDocumentsDirW());
-	}
-
-	// ダイアログを表示
-	ret = FolderDlgW(hWnd, _UU("DG_BLUETOOTH_SELFOL_MSG"), default_dir);
-
-	if (ret == NULL)
-	{
-		return;
-	}
-
-	UniStrCpy(t.BluetoothDir, sizeof(t.BluetoothDir), ret);
-
-	CALL(hWnd, DtcSetConfig(dg->Rpc, &t));
-
-	Free(ret);
-}
 
 // ダイアログプロシージャ
 UINT DgPassword2DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param)
@@ -1963,23 +1918,7 @@ void DgMainDlgInit(HWND hWnd, DG *dg)
 		MsAppendMenu(hMenu, MF_ENABLED | MF_STRING, CMD_ABOUT, _UU("DU_MENU_ABOUT"));
 		MsAppendMenu(hMenu, MF_ENABLED | MF_STRING, D_DG_HASH, _UU("DG_MENU_HASH_ID"));
 
-		if (dg->DsCaps & DS_CAPS_SUPPORT_BLUETOOTH)
-		{
-			MsAppendMenu(hMenu, MF_ENABLED | MF_STRING, CMD_OPTION, _UU("DG_MENU_BLUETOOTH"));
-		}
-
 		DrawMenuBar(hWnd);
-	}
-
-	if (dg->DsCaps & DS_CAPS_SUPPORT_BLUETOOTH)
-	{
-		wchar_t tmp[MAX_SIZE], tmp2[MAX_SIZE];
-
-		GetTxt(hWnd, 0, tmp, sizeof(tmp));
-
-		UniFormat(tmp2, sizeof(tmp2), _UU("DG_MAIN_DLG_CAPTION"), tmp);
-
-		SetText(hWnd, 0, tmp2);
 	}
 
 	SetIcon(hWnd, 0, ICO_USER_ADMIN);
@@ -2212,28 +2151,6 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 						{
 							DgAuthDlg(hWnd, dg);
 						}
-					}
-				}
-			}
-		}
-
-		if (dg->DsCaps & DS_CAPS_SUPPORT_BLUETOOTH)
-		{
-			if (dg->BluetoothDirFlag == false)
-			{
-				RPC_DS_CONFIG cfg;
-
-				dg->BluetoothDirFlag = true;
-
-				Zero(&cfg, sizeof(cfg));
-
-				if (DtcGetConfig(dg->Rpc, &cfg) == ERR_NO_ERROR)
-				{
-					if (UniIsEmptyStr(cfg.BluetoothDir))
-					{
-						// Bluetooth ディレクトリが指定されていないのでダイアログを
-						// 表示して指定してもらう
-						DgSelectBluetoothDir(hWnd, dg);
 					}
 				}
 			}
@@ -2525,10 +2442,6 @@ UINT DgMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 
 		case D_DG_HASH:
 			DgHashDlg(hWnd, dg);
-			break;
-
-		case CMD_OPTION:
-			DgSelectBluetoothDir(hWnd, dg);
 			break;
 		}
 		break;

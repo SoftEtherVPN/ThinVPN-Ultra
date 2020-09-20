@@ -65,7 +65,7 @@
 #define DS_POLICY_IP_SERVER_NAME		"10.255.255.127"
 
 // caps
-#define DS_CAPS_SUPPORT_BLUETOOTH	1			// Bluetooth サポート
+//#define DS_CAPS_SUPPORT_BLUETOOTH	1			// Bluetooth サポート
 #define	DS_CAPS_SUPPORT_URDP2		2			// URDP2 サポート
 #define DS_CAPS_RUDP_VERY_LIMITED	4			// URDP かつ大変制限が厳しい
 #define DS_CAPS_WIN_RDP_ENABLED		8			// Windows RDP も一応有効である

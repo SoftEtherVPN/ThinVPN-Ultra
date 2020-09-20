@@ -4004,11 +4004,6 @@ UINT DsGetCaps(DS *ds)
 		return 0;
 	}
 
-	if (ds->SupportBluetooth)
-	{
-		ret |= DS_CAPS_SUPPORT_BLUETOOTH;
-	}
-
 	return ret;
 }
 

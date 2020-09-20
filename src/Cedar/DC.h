@@ -88,7 +88,6 @@ struct DC_SESSION
 	QUEUE *SockIoQueue;					// SOCKIO キュー
 	LIST *SockThreadList;				// スレッドリスト
 	UINT DsCaps;						// サーバーの Caps
-	DC_BLUE *Blue;						// Bluetooth セッション
 	bool IsShareDisabled;				// 共有が無効化されているかどうか
 	UINT ProcessIdOfClient;				// クライアントソフトウェアのプロセス ID
 	char OtpTicket[MAX_PATH];			// OTP チケット
@@ -129,7 +128,6 @@ struct DC
 {
 	WIDE *Wide;							// WideClient
 	wchar_t ConfigFilename[MAX_PATH];	// Config ファイル名
-	bool SupportBluetooth;				// Bluetooth をサポート
 
 	// 設定データ
 	UINT MstscLocation;					// mstsc の場所

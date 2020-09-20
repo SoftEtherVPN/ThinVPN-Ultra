@@ -112,7 +112,6 @@ void DuMainDlgOnOk(HWND hWnd, DU_MAIN *t);
 void DuMainDlgOnClose(HWND hWnd, DU_MAIN *t);
 void DuMainDlgSetControlEnabled(HWND hWnd, bool b);
 void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid);
-void DuSelectBluetoothDir(HWND hWnd, DU_MAIN *t);
 
 void DuOptionDlg(HWND hWnd, DU_MAIN *t);
 UINT DuOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);

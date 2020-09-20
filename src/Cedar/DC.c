@@ -999,19 +999,6 @@ void DcNormalizeConfig(DC *dc)
 			dc->MstscLocation = DC_MSTSC_DOWNLOAD;
 		}
 	}
-
-	if (dc->SupportBluetooth)
-	{
-		// Bluetooth に関する設定の確認
-		if (UniIsEmptyStr(dc->BluetoothDir))
-		{
-			UniFormat(dc->BluetoothDir, sizeof(dc->BluetoothDir),
-				_UU("DESK_BLUETOOTH_FOLDER_NAME"),
-				MsGetMyDocumentsDirW());
-
-			dc->BluetoothDirInited = true;
-		}
-	}
 #endif  // OS_WIN32
 }
 
@@ -1554,11 +1541,6 @@ void DcLoadConfig(DC *dc, FOLDER *root)
 	}
 	WideSetDontCheckCert(dc->Wide, CfgGetBool(root, "DontCheckCert"));
 
-	if (dc->SupportBluetooth)
-	{
-		CfgGetUniStr(root, "BluetoothDir", dc->BluetoothDir, sizeof(dc->BluetoothDir));
-	}
-
 	// 候補
 	dc->Candidate = NULL;
 
@@ -1698,11 +1680,6 @@ void DcSaveConfig(DC *dc)
 	CfgAddBool(root, "MstscUseShareCamera", dc->MstscUseShareCamera);
 	CfgAddBool(root, "DisableMultiDisplay", dc->DisableMultiDisplay);
 	CfgAddBool(root, "DisableLimitedFw", dc->DisableLimitedFw);
-
-	if (dc->SupportBluetooth)
-	{
-		CfgAddUniStr(root, "BluetoothDir", dc->BluetoothDir);
-	}
 
 	// Candidate
 	b = CandidateToBuf(dc->Candidate);
@@ -1981,12 +1958,6 @@ void CleanupDcSession(DC_SESSION *s)
 		return;
 	}
 
-	// Bluetooth の停止
-	if (s->Blue)
-	{
-		DcStopBlue(s->Blue);
-	}
-
 	// Connect スレッドの停止
 	s->HaltConnectThread = true;
 	Set(s->EventForConnectThread);
@@ -2132,18 +2103,6 @@ void DcListenedSockThread(THREAD *thread, void *param)
 		char c = 'A';
 
 		SockIoSendAll(io, &c, 1);
-
-		if (s->Blue == NULL)
-		{
-			if (s->DsCaps & DS_CAPS_SUPPORT_BLUETOOTH)
-			{
-				if (s->Dc != NULL && s->Dc->SupportBluetooth)
-				{
-					// Bluetooth 開始
-					s->Blue = DcStartBlue(s);
-				}
-			}
-		}
 
 		Debug("Start DeskRelay.\n");
 		DeskRelay(io, sock);

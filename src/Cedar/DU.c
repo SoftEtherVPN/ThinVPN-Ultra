@@ -2695,24 +2695,7 @@ void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 	{
 		MsAppendMenu(hMenu, MF_ENABLED | MF_STRING, CMD_ABOUT, _UU("DU_MENU_ABOUT"));
 
-		if (t->Du->Dc->SupportBluetooth)
-		{
-			MsAppendMenu(hMenu, MF_ENABLED | MF_STRING, CMD_OPTION, _UU("DU_MENU_BLUETOOTH"));
-		}
-
 		DrawMenuBar(hWnd);
-	}
-
-	if (t->Du->Dc->SupportBluetooth)
-	{
-		wchar_t tmp[MAX_PATH];
-		wchar_t tmp2[MAX_PATH];
-
-		GetTxt(hWnd, 0, tmp, sizeof(tmp));
-
-		UniFormat(tmp2, sizeof(tmp2), _UU("DU_MAIN_DLG_CAPTION"), tmp);
-
-		SetText(hWnd, 0, tmp2);
 	}
 
 	FormatText(hWnd, 0,
@@ -2966,10 +2949,6 @@ UINT DuMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 		{
 		case 1:
 			KillTimer(hWnd, 1);
-			if (t->Du->Dc->SupportBluetooth && t->Du->Dc->BluetoothDirInited)
-			{
-				DuSelectBluetoothDir(hWnd, t);
-			}
 			if (IsEmptyStr(t->Du->AutoConnectPcid) == false)
 			{
 				// 自動接続
@@ -2990,11 +2969,6 @@ UINT DuMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 		case CMD_ABOUT:
 			// バージョン情報
 			AboutEx(hWnd, t->Du->Cedar, _UU("PRODUCT_NAME_DESKCLIENT"), t->Update);
-			break;
-
-		case CMD_OPTION:
-			// Bluetooth のディレクトリを指定してもらう
-			DuSelectBluetoothDir(hWnd, t);
 			break;
 		}
 		break;
@@ -3021,35 +2995,6 @@ void DuMain(DU *du)
 	t.Du = du;
 
 	Dialog(NULL, D_DU_MAIN, DuMainDlgProc, &t);
-}
-
-// Bluetooth のディレクトリを指定してもらうダイアログ
-void DuSelectBluetoothDir(HWND hWnd, DU_MAIN *t)
-{
-	DC *dc;
-	wchar_t *ret;
-	// 引数チェック
-	if (t == NULL)
-	{
-		return;
-	}
-
-	dc = t->Du->Dc;
-
-	ret = FolderDlgW(hWnd, _UU("DU_BLUETOOTH_SELFOL_MSG"), dc->BluetoothDir);
-
-	if (ret != NULL)
-	{
-		if (MsgBoxEx(hWnd, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2,
-			_UU("DU_BLUETOOTH_CONFIRM_MSG"), ret) == IDYES)
-		{
-			UniStrCpy(dc->BluetoothDir, sizeof(dc->BluetoothDir), ret);
-
-			Free(ret);
-
-			DcSaveConfig(dc);
-		}
-	}
 }
 
 // GUI の実行

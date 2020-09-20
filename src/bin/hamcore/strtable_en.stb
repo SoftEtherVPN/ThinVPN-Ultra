@@ -310,17 +310,6 @@ DESK_ENVSTR_MSTSC_51_REF	mstsc_51_referer_en
 DESK_ENVSTR_MSTSC_51_PROXY_EXE	mstsc_51_url_proxy_en
 
 
-# Bluetooth 関係
-DESK_BLUETOOTH_FOLDER_NAME	%s\\Bluetooth Exchange Directory
-DU_MENU_BLUETOOTH			&Bluetooth 交換フォルダの場所を指定...
-DU_MAIN_DLG_CAPTION			%s - OMS 用特別版 (Bluetooth サポート)
-DU_BLUETOOTH_SELFOL_MSG		[Bluetooth 交換フォルダ] と呼ばれるフォルダの場所を正確に指定してください。このフォルダの位置は、お使いの Bluetooth ドライバの設定ツールで確認できます。通常は、[マイ ドキュメント] の下にあります。
-DU_BLUETOOTH_CONFIRM_MSG	指定されたフォルダ "%s" は、Bluetooth 交換フォルダとして正しいですか?\r\n\r\n注意: Bluetooth 交換用のフォルダ以外は、絶対に指定しないでください。
-DG_MAIN_DLG_CAPTION			%s - OMS 用特別版 (Bluetooth サポート)
-DG_MENU_BLUETOOTH			&Bluetooth 交換フォルダの場所を指定...
-DG_BLUETOOTH_SELFOL_MSG		Bluetooth 対応アプリケーションが Bluetooth デバイスから受信したデータを受け取るための [Bluetooth 交換フォルダ] と呼ばれるフォルダの場所を正確に指定してください。このフォルダの位置は、使用しようとしている Bluetooth 対応アプリケーションの設定ツールで確認できます。アプリケーション側で、データを受信するフォルダを変更することもできます。
-
-
 # PacketiX Desktop VPN Server 関係
 QDS_LOG_INFO				Information
 DS_LOG_WARNING			Warning

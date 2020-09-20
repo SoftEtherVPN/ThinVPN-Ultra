@@ -82,7 +82,6 @@ UINT DgPassword2DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void 
 void DgHashDlgInit(HWND hWnd, DG *dg);
 UINT DgHashDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 void DgHashDlg(HWND hWnd, DG *dg);
-void DgSelectBluetoothDir(HWND hWnd, DG *dg);
 void DgInitSmServerAndSmHub(SM_SERVER **ppserver, SM_HUB **pphub, DG *dg);
 void DgFreeSmServerAndSmHub(SM_SERVER *s, SM_HUB *h);
 
