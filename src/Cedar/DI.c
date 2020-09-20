@@ -2171,7 +2171,7 @@ LABEL_RETRY:
 	else if (ret == ERR_DESK_RPC_PROTOCOL_ERROR)
 	{
 		// ポート 9823 が不正である
-		if (MsgBox(di->hWndParent, MB_ICONEXCLAMATION | MB_RETRYCANCEL, _UU("DI_SERVER_9823_ERROR")) == IDCANCEL)
+		if (MsgBoxEx(di->hWndParent, MB_ICONEXCLAMATION | MB_RETRYCANCEL, _UU("DI_SERVER_RPCPORT_ERROR"), DS_RPC_PORT) == IDCANCEL)
 		{
 			return false;
 		}
