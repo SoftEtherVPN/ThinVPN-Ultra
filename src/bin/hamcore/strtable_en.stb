@@ -421,46 +421,80 @@ DU_FELONY_FONT_7 				Segoe UI
 
 
 # PacketiX Desktop VPN サーバー管理ツール関係
-DG_TITLE				Desktop VPN Server Configuration Tool
+DG_TITLE				$APPSHORT_SERVER$ Configuration Tool
 DG_PROXY_FROM_IE		Currently proxy setting from Internet Explorer was loaded.
-DG_INTERNET_CONNECT_OK_1	Excellently connected to the Internet.\r\nComputer ID for this PC is '%S'.\r\n\r\nYou can access remotely to this computer from Desktop VPN Client via the Internet.
+DG_INTERNET_CONNECT_OK_1	Excellently connected to the Internet.\r\nComputer ID for this PC is '%S'.\r\n\r\nYou can access remotely to this computer from $APPSHORT_CLIENT$ via the Internet.
 DG_INTERNET_CONNECT_OK_2	The current configured not to accept new connection.\r\n\r\nYou can't access remotely to this computer via the Internet.
 DG_CURRENT_OK			Status:
 DG_CURRENT_ERROR		Error:
 DG_CHANGE_PCID_OK		Computer ID of this computer is now '%S'.
-DG_PASSWORD2_MSG		When the password is not set, it is dangerous because there is possibility that an unauthorized person can access to this desktop.\r\n\r\nDo you want to continue without setting password?
-DG_OPTION_RDP_ONLY		Because Desktop VPN Server is running as service mode now, only Windows Remote Desktop mode (System-mode) can be used.
-DG_OPTION_URDP_ONLY		Because Windows on this computer doesn't include Remote Desktop function, only User-mode Remote Desktop can be used.
+DG_PASSWORD2_MSG		No password is set. You have to set the password to access to this computer remotely.\r\n\r\nDo you want to continue without setting password?
+DG_OPTION_RDP_ONLY		Because $APPSHORT_SERVER$ is running as service mode now, only Windows Remote Desktop mode (System-mode) can be used.
+DG_OPTION_URDP_ONLY		Because Windows on this computer doesn't include Remote Desktop function, only User-mode Remote Desktop can be used. If you upgrade Windows version to Pro, you will be able to use the Windows-builtin RDP system and you can use the remote desktop with comfortable.
 DG_OPTION_URDP_MSG		Only expert computer user should use detail settings.\r\n\r\nDo you want to continue?
 DG_PCID_KILLFOCUS		Do you want to set Computer ID '%S' for this computer?
 
 
+
+
+
+DG_ADMINUSERNAME_MSG	You can setup the $APPSHORT_CLIENT$ configuration tool to be opened only by the user "%s".\r\n\r\nDo you want to setup the $APPSHORT_CLIENT$ configuration tool to be opened only by the user "%s" ?
+DG_ADMINUSERNAME_MSG2	This $APPSHORT_SERVER$ configuration tool is set up to be opened only by the user "%s".\r\n\r\nYou can change this setting later by clicking the "Password Configuration" button.
+# 共有機能関係 (OPTION ダイアログ上のテキスト)
+DG_FORCE_DISABLE_SHARE	This version of $APPSHORT_SERVER$ is security restricted version.  The harddisk, printer and serial port sharing function is prohitited.
+DG_OPTION_DISABLESHARE_1	You can disable the harddisk, printer and serial port sharing function. After you disable the sharing function you will be unable to use clipboard sharing function.
+DG_OPTION_DISABLESHARE_2	You can disable the harddisk, printer and serial port sharing function. After you disable the sharing function you will be unable to use clipboard sharing function.
+DG_DUMMY_STR_1			11111
+DG_ZERO_USERS			While the advanced user authenticaion is chosen, there are no users created. In this state you can not remotely access to this server.\r\n\r\nDo you want to continue without necessary user creation?
+DG_DUMMY_STR_2			22222
+DG_PASSWORD_POLICY_ERROR	Specified password doesn't comply with the password complexity rule.\r\nA password must comply with one of the following rules at least:\r\n(1) 8 or more letters, and includes at least 3 types of lower case, upper case, digits or symbole.\r\n\r\n(2) 16 or more letters, and includes at least 2 types of lower case, upper case, digits or symbole.\r\n\r\n(3) 24 or more letters.\r\n\r\nYou have to set the password complying with the above rule.\r\n\r\nIf you are handicapped person you can be exempted to the following rule by special registry settings which are described on the $APPFULL$ web site.
+DG_AUTH_NO_PASSWORD		No user authentication password is set. Also no advanced user authenticaon function is enabled.\r\n\r\nUntil the password authentication password is set you cannot access to this server remotely.\r\n\r\nDo you want to set up the user authentication password?
+DG_AUTH_ANONYMOUS_WARNING	Anonymous authenticaion will allow anyone to remotely access to this server. It should be dangerous in the aspect of security.\r\n\r\nDo you really want to enable the anonymous authentication?
+DG_OTP_ENDWITH			The email address must end with "%S".\r\nThe OTP mail will be sent from the domain "@otp.cyber.ipa.go.jp".
+DG_OTP_ENDWITH_ERROR	The email address must end with "%S".
+DG_EMERGENCY_OTP_GENERATED	New "Urgent Alternative OTP Code" is issued.\r\n\r\nOld code is no longer valid.\r\n\\r\nYou must click the "OK" button to apply this setting.
+
+DG_LIMITED_MODE_HELP_TITLE	About Government Systems Level Security Mode
+DG_LIMITED_MODE_HELP	$APPFULL_SERVER$\r\nAbout "Government Systems Level Security Mode"\r\n(Relaying system IP addresses range limitation)\r\n\r\nMore details on\r\nhttps://telework.cyber.ipa.go.jp/government_mode_whitelist/\r\n\r\nNote: This function is originally developed for Japanese government systems users. However you can use this function in general companies. You should read the following cautions.\r\n\r\nNote: This function requires $APPSHORT_SERVER$ installed with Government Systems Level Security Mode enabled. The Government Systems Level Security Mode is available on the Beta 5 or later $APPSHORT_SERVER$ installers.\r\n\r\nBackground\r\n----------\r\nMost of Japanese government systems are protected by local firewalls. The firewall usually prohibits default communication toward Internet. In this system only specially specified Ip address ranges will be allowed.\r\n\r\nThese specially allowed IP addresses are called "White list". You have to send the application to add necessary IP addresses range to your network administrator.\r\n\r\nIn the Normal Mode\r\n------------------\r\nIn the Normal Mode, "$APPSHORT_SERVER$" will be load balanced to very large number of relay servers. In this situation IP addresses cannot be predicted. So you cannot define the white list in advance.\r\n\r\n\r\nIn the Government Systems Level Security Mode\r\n---------------------------------------------\r\nIn the "Government Systems Level Security Mode", the destination IP addresses of the "$APPSHORT_SERVER$" when it connects and communicates with the "$APPSHORT_SERVER$" are a small number of IP addresses (about 30) that are set up, directly operated and managed in the facilities of the Cyber Technology Research Institute, Industrial Cyber Security Center of the Information-technology Promotion Agency (IPA), Japan. The IP address range is fixed. In principle, communication with outside the range is not required. A list of IP addresses and TCP ports that should be communicated with in this mode (a white list) is available on the following web site.\r\n\r\nhttps://telework.cyber.ipa.go.jp/government_mode_whitelist/\r\n\r\nPlease refer to the above website for the list of IP addresses and port numbers (white list) when you send the order for release to the network administrator.\r\n\r\nNotes on using the "Government Systems Level Security Mode".\r\n(1) Although the $APPSHORT$ has more than 100 relay gateway IPs in many networks and IP addresses, only about 30 of them will be used when the "Government Systems Level Security Mode" is enabled. As a result, there are some disadvantages such as reduced communication performance and availability. We ask for your understanding.\r\n\r\n(2) The range of IP addresses is about 30, but this may increase or change in the future if the number of users of the "Government Systems Level Security Mode" increases. In this case, the new range of IP addresses will be announced on the IPA website.\r\n\r\nhttps://telework.cyber.ipa.go.jp/government_mode_whitelist/\r\n
+
+DG_RESET_CERT_MSG		In the next startup of the $APPSHORT_SERVER$ timing, this computer's Unique ID will be erased and initialized. The Computer ID will be reset. You will be unable to reuse the current Computer ID forever. This operation cannot be cancelled.\r\n\r\nDo you want to really continue?
+DG_RESET_CERT_DONE		Unique ID initialization process is reserved. In the next startup of the $APPSHORT_SERVER$ timing, this computer's Unique ID will be erased and initialized. This operation cannot be cancelled.
+DG_CHANGE_WOL_TARGET	You are changing the Wake on LAN target PC settings.\r\n\r\nThe connectivity of $APPSHORT_SERVER$ to the Internet will be disconnected and reconnected to apply this setting.\r\n\r\nIf you are remotely login to this computer, the communcation will be terminated. In this case you have to reconnect to this computer.
+DG_DEVMGMT_RUN_ERROR	Failed to open the Device Manager provided by Windows.\r\n\r\nRun the Device Manager manually from the control panel.
+
+
+
+
+
 # インストーラ関係
-DI_TITLE				Desktop VPN Installer
-DI_TITLE_SERVER			Desktop VPN Server
-DI_TITLE_CLIENT			Desktop VPN Client
+DI_TITLE				$APPFULL$ Installer
+DI_TITLE_SERVER			$APPFULL_SERVER$ (Sharing Function Enabled)
+DI_TITLE_SERVER2		$APPFULL_SERVER$ (Sharing Function Disabled)
+DI_TITLE_CLIENT			$APPFULL_CLIENT$
 DI_HELPER_NOT_CALLED	The helper program can't run alone.
 DI_HELPER_CALL_FAILED	Executing the installer with administration privilege failed.
 DI_HELPER_NOT_ADMIN		To install, you have to execute the installer with administration privilege.\r\nPlease log off current user, log on by Administrators user and re-execute the installer.
-DI_CUSTOM_SELECT_WARNING	You chose installing Desktop VPN as User-mode.\n\r\nWith User-mode Desktop VPN, you cannot use some part of this software.\r\nIf you have administration privilege, it is recommend that to install it as System-mode.\r\n\r\nDo you really want to install as User-mode?
+DI_CUSTOM_SELECT_WARNING	You chose installing $APPFULL$.\n\r\nWith User-mode $APPFULL$, you cannot use some part of this software.\r\nIf you have administration privilege, it is recommend that to install it as System-mode.\r\n\r\nDo you really want to install as User-mode?
 DI_WHY_CANT_SELECT_SYSTEM_1	Because the installer wasn't executed with administration privilege, you can't install this software as System-mode.\r\n\r\nTo install it as System-mode, you have to execute installer with administration privilege.
 DI_WHY_CANT_SELECT_SYSTEM_2	Because you chose the User-mode installation, you can't install this software as System-mode.\r\n\r\nTo install it as system-mode, you have to execute installer with administration privilege.
-DI_WHY_CANT_SELECT_SYSTEM_3	This version of Windows doesn't include Remote Desktop as System-service.\r\nInstallation of Desktop VPN Server can continue as only User-mode.\r\n\r\nSystem-mode installation is supported on Windows XP Professional (or more higher editions), Windows Server 2003, Windows Vista (Business, Enterprise or Ultimate edition) or Windows Server 2008.
-DI_WHY_CANT_SELECT_SYSTEM_4	Desktop VPN Server on this computer is installed and running as User-mode. So if you want to overwrite install, you choose User-mode installation.\r\n\r\nIf you want to install this software as System-mode, please uninstall Desktop VPN Server which is currently installed.
+DI_WHY_CANT_SELECT_SYSTEM_3	This version of Windows doesn't include Remote Desktop as System-service.\r\nInstallation of $APPSHORT_SERVER$ can continue as only User-mode.\r\n\r\nSystem-mode installation is supported on Windows XP Professional (or more higher editions), Windows Server 2003, Windows Vista (Business, Enterprise or Ultimate edition) or Windows Server 2008, or later.
+DI_WHY_CANT_SELECT_SYSTEM_4	$APPSHORT_SERVER$ on this computer is installed and running as User-mode. So if you want to overwrite install, you choose User-mode installation.\r\n\r\nIf you want to install this software as System-mode, please uninstall $APPSHORT_SERVER$ which is currently installed.
 DI_WHY_CANT_SELECT_USER_1	Because the installer is executed as System-mode, you have to install it as System-mode.
-DI_WHY_CANT_SELECT_USER_2	Desktop VPN Server on this computer is installed and running as System-mode. So you have to install it as System-mode.
-DI_BAD_STARTUP			Desktop VPN Installer must be executed from the source directory.\r\n\r\nIf you want to uninstall existing Desktop VPN, please execute the uninstaller from Start Menu.
-DI_ALREADY_RUNNING		Another instance of Desktop VPN Installer is already running.\r\nYou can't execute two or more Desktop VPN Installer at the same time.
-DI_SERVER_9822_ERROR	There is a possibility that there is software that compete with Desktop VPN Server running.\r\nPlease stop any anti-virus or firewall software.\r\nAnd please stop any process which is using TCP/IP port 9822.\r\n\r\nPress OK to continue executing in User-mode. But you can't use Desktop VPN Server Configuration Tool to configure Desktop VPN Server.
-DI_SERVER_MORE_NEWER_INSTALLED	There is newer version of Desktop VPN Server installed on this computer already.\r\n\r\nInstallation will abort.
-DI_SERVER_USERMODE_DIFF_USER	Desktop VPN Server which is running on this computer as User-mode was installed by other user '%s' before.\r\n\r\nPlease execute installer by this user.\r\nInstallation will abort.
-DI_SERVER_IS_SYSTEM_MODE	Desktop VPN Server is already installed on this computer. And it is running as System-mode.\r\n\r\nPlease execute installer as System-mode.
-DI_FIXED_DIR				You cannot change destination directory because there is existing Desktop VPN Server installed on this computer.
+DI_WHY_CANT_SELECT_USER_2	$APPSHORT_SERVER$ on this computer is installed and running as System-mode. So you have to install it as System-mode.
+DI_BAD_STARTUP			$APPSHORT$ Installer must be executed from the source directory.\r\n\r\nIf you want to uninstall existing $APPSHORT$, please execute the uninstaller from Start Menu.
+DI_ALREADY_RUNNING		Another instance of $APPSHORT$ Installer is already running.\r\nYou can't execute two or more $APPSHORT$ Installer at the same time.
+DI_SERVER_9823_ERROR	There is a possibility that there is software that compete with $APPSHORT_SERVER$ running.\r\nPlease stop any anti-virus or firewall software.\r\nAnd please stop any process which is using TCP/IP port 9823.\r\n\r\nPress OK to continue executing in User-mode. But you can't use $APPSHORT_SERVER$ Configuration Tool to configure $APPSHORT_SERVER$.
+DI_SERVER_MORE_NEWER_INSTALLED	There is newer version of$APPSHORT_SERVER$ installed on this computer already.\r\n\r\nInstallation will abort.
+DI_SERVER_DIFF_FORCE_SHARE_1	The already-installed version of $APPSHORT_SERVER$ on this computer is Sharing Function Enabled version.\r\nYou are attempting to install the $APPSHORT_SERVER$ Sharing Function Disabled version.\r\n\r\nAfter you install this version will will be unable to use sharing functions.\r\nIf you want to continue using sharing functions you have to run the Sharing Function Enabled version's installed.\r\n\r\nYou you really want to continue?
+DI_SERVER_DIFF_FORCE_SHARE_2	The already-installed version of $APPSHORT_SERVER$ on this computer is Sharing Function Disabled version.\r\nYou are attempting to install the $APPSHORT_SERVER$ Sharing Function Enabled version.\r\n\r\nYou cannot continue this installation process. You have to uninstall the currently installed Sharing Function Disabled version before continue. After uninstall you can run this $APPSHORT_SERVER$ Sharing Function Enabled version's installed.\r\n\r\nAborting the installer.
+DI_SERVER_USERMODE_DIFF_USER	$APPSHORT_SERVER$ which is running on this computer as User-mode was installed by other user '%s' before.\r\n\r\nPlease execute installer by this user.\r\nInstallation will abort.
+DI_SERVER_IS_SYSTEM_MODE	$APPSHORT_SERVER$ is already installed on this computer. And it is running as System-mode.\r\n\r\nPlease execute installer as System-mode.
+DI_FIXED_DIR				You cannot change destination directory because there is existing $APPSHORT_SERVER$ installed on this computer.
 DI_RECOMMEND				(Recommended)
-DI_SYSTEM_SERVER		If you install as System-mode, Desktop VPN Server program always runs even if no user is logged on. So you can access to this computer anytime from anywhere in secure.
-DI_USER_SERVER			If you install as User-mode, Desktop VPN Server program runs only when this user '%s' is logged on. You cannot access to this computer when this user is not logged on.
-DI_SYSTEM_CLIENT		If you install as System-mode, all users on this computer can execute Desktop VPN Client software.
-DI_USER_CLIENT			If you install as User-mode, only this user '%s' can execute Desktop VPN Client software. If other users wish to use it, he have to install individually.
+DI_SYSTEM_SERVER		If you install as System-mode, $APPSHORT_SERVER$ program always runs even if no user is logged on. So you can access to this computer anytime from anywhere in secure.
+DI_USER_SERVER			If you install as User-mode, $APPSHORT_SERVER$ program runs only when this user '%s' is logged on. You cannot access to this computer when this user is not logged on.
+DI_SYSTEM_CLIENT		If you install as System-mode, all users on this computer can execute $APPSHORT_CLIENT$ software.
+DI_USER_CLIENT			If you install as User-mode, only this user '%s' can execute $APPSHORT_CLIENT$ software. If other users wish to use it, he have to install individually.
 DI_MUST_LOCAL_DRIVE		You must specify the destination directory on the local hard disk drive if you install as System-mode.
 DI_MAKEDIR_FAILED		Creating specified directory '%s' failed.
 DI_PROCESS_INIT			Preparing for installation...
@@ -481,39 +515,40 @@ DI_SVC_START_FAILED		An error occurred when executing system service '%S'. (Erro
 DI_EXEC_FAILED			Executing the program '%s' failed.
 DI_SVC_INSTALL_USERMODE_FAILED	Registering '%S' as a startup item failed.\r\n\r\nCreating the file '%s' failed.
 DI_SHORTCUT_DIR_TAG_FOR_USER	\ (User-mode)
-DI_MSG_EXEC_SERVER_CONFIG	Installation of Desktop VPN Server is completed.\r\n\r\nPress OK to execute Desktop VPN Server Configuration Tool.
-DI_MSG_EXEC_CLIENT_CONFIG	Installation of Desktop VPN Client is completed.\r\nDo you wish to execute Desktop VPN Client now?
+DI_MSG_EXEC_SERVER_CONFIG	Installation of $APPSHORT_SERVER$ is completed.\r\n\r\nPress OK to execute $APPSHORT_SERVER$ Configuration Tool.
+DI_MSG_EXEC_CLIENT_CONFIG	Installation of $APPSHORT_CLIENT$ is completed.\r\nDo you wish to execute $APPSHORT_CLIENT$ now?
 DI_MSG_UNINSTALL_NOT_ADMIN	Please execute the uninstaller as administrative user if you want to uninstall this software.
 DI_REGIST_UNINSTALL_INFO_FAILED	Writing the uninstall information on the registry failed.
-DI_EMPTY_PASSWORD_WARNING_1	The currently logged on user's password is empty. You cannot access to this computer with empty password.\r\n\r\nPlease set any password for this user or you cannot use Desktop VPN Server.\r\n\r\nTo set password, go to "Control Panel", then "User Account" and follow the instruction on the screen.
-DI_EMPTY_PASSWORD_WARNING_2	The currently logged on user's password is empty. You cannot access to this computer with empty password.\r\n\r\nPlease set any password for this user or you cannot use Desktop VPN Server.\r\n\r\nTo set password, press Ctrl + Alt + Del.
+DI_EMPTY_PASSWORD_WARNING_1	The currently logged on user's password is empty. You cannot access to this computer with empty password.\r\n\r\nPlease set any password for this user or you cannot use $APPSHORT_SERVER$.\r\n\r\nTo set password, go to "Control Panel", then "User Account" and follow the instruction on the screen.
+DI_EMPTY_PASSWORD_WARNING_2	The currently logged on user's password is empty. You cannot access to this computer with empty password.\r\n\r\nPlease set any password for this user or you cannot use $APPSHORT_SERVER$.\r\n\r\nTo set password, press Ctrl + Alt + Del.
 DIU_CONFIRM_MSG			You chose uninstalling %s from this computer.\r\nAfter uninstallation, you cannot use %s.\r\n\r\nThe uninstaller will delete the directory '%s' to delete %s.\r\n\r\nDo you want to continue?
 DIU_UNINSTALL_SVC_FAILED	Uninstalling the running service failed.
 DIU_DELETE_FAILED		Deleting the file '%s' failed.
 DIU_FINISH_MSG			%s was uninstalled from this computer.\r\n\r\nPlease note that there are some remaining files on the directory '%s'. These files are your configuration for %s, etc.\r\nIt is no problem if there files are remaining on the computer. But you can delete these files manually.
-
+DI_INSTALL_RUDP_ERROR	Failed to install several necessary files with administrative privileges.\r\n\r\nYou can continue, however in this case some high-privileged screens which requires UAC (User Account Control) poput will be remotely accessed.\r\n\r\nYou want to retry the installation process?
+DI_INSTALL_RUDP_UAC_MITIGATE	The $APPSHORT_SERVER$ installer has been adjusted to automatically prevent the desktop screen from going dark every time the User Account Control (UAC) confirmation screen is displayed, removing the setting that causes the desktop screen to go dark every time the UAC (User Account Control) screen is displayed.\r\nThis tweak ensures that you won't lose control if the UAC screen is activated during remote operation.\r\n\r\nThe automatic adjustment of the UAC settings has already been completed. This should not normally cause any problems, but if for some reason you want to revert to UAC's screen dimming, you can always revert to it from the Windows Control Panel under User Accounts.
 
 # インストーラデータ
-DI_LINK_SERVER_DIRNAME	Desktop VPN Server
-DI_LINK_CLIENT_DIRNAME	Desktop VPN Client
+DI_LINK_SERVER_DIRNAME	$APPFULL_SERVER$
+DI_LINK_CLIENT_DIRNAME	$APPFULL_CLIENT$
 
-DI_LINK_SERVER_FILENAME	Desktop VPN Server Configuration Tool
-DI_LINK_SERVER_COMMENT	Use Desktop VPN Configuration Tool to make configure Desktop VPN Server which is running on this computer.
+DI_LINK_SERVER_FILENAME$APPFULL_SERVER$ Configuration Tool
+DI_LINK_SERVER_COMMENT	Use $APPFULL_SERVER$ Configuration Tool to make configure $APPFULL_SERVER$ which is running on this computer.
 
-DI_LINK_SERVER_UNINSTALL_FILENAME	Uninstall - Desktop VPN Server
-DI_LINK_SERVER_UNINSTALL_COMMENT	Use this uninstaller to uninstall Desktop VPN Server from this computer.
-
-
-DI_LINK_CLIENT_FILENAME	Desktop VPN Client
-DI_LINK_CLIENT_COMMENT	Use Desktop VPN Client to access remotely to the target computer's desktop via the Internet.
-DI_LINK_CLIENT_UNINSTALL_FILENAME	Uninstall - Desktop VPN Client
-DI_LINK_CLIENT_UNINSTALL_COMMENT	Use this uninstaller to uninstall Desktop VPN Client from this computer.
+DI_LINK_SERVER_UNINSTALL_FILENAME	Uninstall - $APPFULL_SERVER$
+DI_LINK_SERVER_UNINSTALL_COMMENT	Use this uninstaller to uninstall $APPFULL_SERVER$ from this computer.
 
 
-# PacketiX Desktop VPN サーバー サービス定義
-SVC_DESKSERVER_NAME		DESKSERVER
-SVC_DESKSERVER_TITLE	Desktop VPN Server
-SVC_DESKSERVER_DESCRIPT	Desktop VPN Server Service is the program to accept remote secure connection via the Internet. When this service is running, you can access to the desktop of this computer from anywhere in secure.
+DI_LINK_CLIENT_FILENAME	$APPFULL_CLIENT$
+DI_LINK_CLIENT_COMMENT	Use $APPFULL_CLIENT$ to access remotely to the target computer's desktop via the Internet.
+DI_LINK_CLIENT_UNINSTALL_FILENAME	Uninstall - $APPFULL_CLIENT$
+DI_LINK_CLIENT_UNINSTALL_COMMENT	Use this uninstaller to uninstall $APPFULL_CLIENT$ from this computer.
+
+
+# シン・テレワークシステム サーバー サービス定義
+SVC_THINSVR_NAME		THINSVR
+SVC_THINSVR_TITLE		Thin Telework System Server
+SVC_THINSVR_DESCRIPT	$APPFULL_SERVER$ Service is the program to accept remote secure connection via the Internet. When this service is running, you can access to the desktop of this computer from anywhere in secure.
 
 
 # WideGate サービス定義
@@ -606,8 +641,7 @@ DLG_STRING_DEFINFO		Enter strings.
 DLG_ABOUT_LEGAL			Legal Notices
 DLG_ABOUT_AUTHORS		List of Authors
 DLG_UPDATE_DATE			\ (Released on %S)
-DLG_UPDATE_HINT			Press OK to view the information of the latest update on the web browser.\r\n\r\nYou have to download and install updates manually. If you want to update software on the other computer you have to log in to the computer by Remote Desktop or SSH to perform the download and update.
-
+DLG_UPDATE_HINT			Once you click OK, your web browser will open and display information about the latest update. You must manually download and install the update.\r\n\r\nThis version upgrade notification function only informs you of the version update of "$APPSHORT_CLIENT$". The version of "$APPSHORT_SERVER$" is not automatically checked for updates. When the update information on the web page displayed by clicking [OK] shows that the function on the server side has been updated, it is recommended that you update the Thin Telework Server side as well.
 
 
 # Concerning competing processes
@@ -643,8 +677,8 @@ SEC_ERROR_OPEN_SESSION	Unable to start security session in device: %S. Make sure
 SEC_ERROR_LOGIN			The entered PIN code is incorrect.
 SEC_ERROR_NOT_FOUND_1	The specified object does not exist in smart card. Make sure the correct smart card is inserted.
 SEC_ERROR_NOT_FOUND_2	The specified object does not exist in USB token hardware. Make sure the correct USB token hardware is connected.
-SEC_ERROR_SIGN_1		Either private key does not exist in smart card or digital signature operation failed. Make sure the correct smart card is inserted.
-SEC_ERROR_SIGN_2		Either private key does not exist in USB token hardware or digital signature operation failed. Make sure the correct USB token hardware is connected.
+SEC_ERROR_SIGN_1		Either private key does not exist in smart card or digital signature operation failed. Make sure the correct smart card is inserted. Error code: %u、Error description: %u
+SEC_ERROR_SIGN_2		Either private key does not exist in USB token hardware or digital signature operation failed. Make sure the correct USB token hardware is connected. Error code: %u、Error description: %u
 SEC_ERROR_WRITE_1		Unable to write object to smart card. There is a possibility that there is insufficient free memory available on smart card.
 SEC_ERROR_WRITE_2		Unable to write object to USB token hardware. There is a possibility that is insufficient free memory available on the USB token.
 SEC_ERROR_ENUM			Enumeration of object stored in token failed.
@@ -677,7 +711,7 @@ SEC_OBJECT_EXPORT_OK	The data read from the smart card has been saved.
 SEC_NEW_CERT_IMPORT_OK	The newly created certificate has been written to the smart card.
 SEC_CURRENT_DEVICE		Currently the device %S is selected.
 SEC_CURRENT_NO_DEVICE	Select which smart card device to use. 
-SEC_NO_SECURE_DEVICE	A SoftEther VPN-compatible smart card or hardware security token device is not installed on the system. \r\n\r\nTo use a smart card or hardware token using SoftEther VPN it is necessary to install a PKCS#11-compatible device driver on Windows. In addition, it is necessary that SoftEther VPN supports the device type. \r\n\r\nMake sure a system-compatible device driver has been installed. \r\nRefer to the SoftEther VPN Project website for the list of SoftEther VPN-compatible devices. Also, it may be possible to increase the compatible devices by updating to the most recent software version.
+SEC_NO_SECURE_DEVICE	A $APPFULL$-compatible smart card or hardware security token device is not installed on the system. \r\n\r\nTo use a smart card or hardware token using $APPFULL$ it is necessary to install a PKCS#11-compatible device driver on Windows. In addition, it is necessary that $APPFULL$ supports the device type. \r\n\r\nMake sure a system-compatible device driver has been installed. \r\n\r\nRefer to the $APPFULL$ website for the list of $APPFULL$-compatible devices.\r\n\r\nAlso, it may be possible to increase the compatible devices by updating to the most recent software version.
 SEC_PIN_DEVICE_OPEN_ERR	Unable to connect the device "%S". Make sure the hardware is correctly connected.
 SEC_PIN_CURRENT_BAD		Current PIN code is incorrect.
 SEC_PIN_CHANGE_FAILED	Changing of PIN code failed.
@@ -1357,7 +1391,7 @@ VGS_START				This will activate the VPN Gate Relay Service function.\r\n\r\nVPN 
 
 
 # Concerning services (Win32)
-SVC_HELP				*** Command Line Arguments of %s (%S) ***\r\n\r\nThis program (%s) is a process runs as a background task. Start the program by specifying the following arguments on the command line. \r\n\r\n\r\n/install : Installs %s service (service name: %S) in Windows. After this, the service will automatically start. \r\n\r\n/uninstall... Uninstalls %s service (service name: %S) from Windows. \r\n\r\n/start : Starts %s service (service name: %S). \r\n\r\n/stop : Stops %s service (service name: %S). \r\n\r\n/test : Starts %s program in test mode. (For debug)\r\n\r\n/usermode : Starts %s program in the user mode. (When possible)\r\n\r\n/usermode_showtray : When starting in the user mode, this is used to display task tray icons when they were set to be hidden on a previous occasion. \r\n\r\n/usermode_hidetray : When starting in the user mode, this sets the task tray icons to be hidden. \r\n\r\n\r\nNote: Commands related to service operation other than /test and /usermode can only be operated on Windows NT / XP / Server 2003 / Vista / Server 2008.
+SVC_HELP				*** Command Line Arguments of %s (%S) ***\r\n\r\nThis program (%s) is a process runs as a background task. Normal users need not to run this command manually.\r\n\r\nIf you are advanced computer enginner, you can start the program by specifying the following arguments on the command line. \r\n\r\n\r\n/install : Installs %s service (service name: %S) in Windows. After this, the service will automatically start. \r\n\r\n/uninstall... Uninstalls %s service (service name: %S) from Windows. \r\n\r\n/start : Starts %s service (service name: %S). \r\n\r\n/stop : Stops %s service (service name: %S). \r\n\r\n/test : Starts %s program in test mode. (For debug)\r\n\r\n/usermode : Starts %s program in the user mode. (When possible)\r\n\r\n/usermode_showtray : When starting in the user mode, this is used to display task tray icons when they were set to be hidden on a previous occasion. \r\n\r\n\r\nNote: Commands related to service operation other than /test and /usermode cannot be operated in Windows 98 / Me.
 SVC_NT_ONLY				The service related operation commands can only operate on Windows NT / 2000 / XP / Server 2003 / Vista / Server 2008. \r\nThey do not operate on Windows 98 / Me.
 SVC_ALREADY_INSTALLED	The "%s" service (service name: %S) is already installed on this computer. Do you want to uninstall it and then re-install?
 SVC_INSTALL_OK			The "%s" service (Service name: %S) has been installed successfully. \r\n\r\n(Execution path: %s)\r\n\r\nThe service has started.
@@ -1375,12 +1409,12 @@ SVC_UNINSTALL_FAILED	The uninstallation of the "%s" service (service name: %S) f
 SVC_NOT_FOUND			Unable to find information related to service %S from the string table.
 SVC_NOT_ADMIN			To install, uninstall, start or stop the service you must have administrator privileges for this computer. \r\n\r\nIf you have an administrators account for this computer, log out and log on as an administrator. \r\nIf you are unclear about administrators accounts, contact your system administrator.
 SVC_TEST_MSG			The "%s" service is started in test mode. \r\n\r\nClick OK to exit the service.
-SVC_TRAY_TOOLTIP		%S (User mode)
+SVC_TRAY_TOOLTIP		$APPFULL_SERVER$ (User mode)
 SVC_TEST_MUTEX			The executable file %s is already started.
 SVC_USERMODE_MUTEX		Another process of %s is already started.
 SVC_SERVICE_MUTEX		Because service %S has process %s that is already started, the service cannot start.
 SVC_USERMODE_MENU_1		&Hide Tasktray Icon
-SVC_USERMODE_MENU_2		E&xit %s
+SVC_USERMODE_MENU_2		E&xit $APPFULL_SERVER$
 SVC_HIDE_TRAY_MSG		This will hide the tasktray icons when starting %S in user mode. \r\nBeginning from next time %S is started in user mode, icons will not be displayed in the tasktray. \r\nThe menu to exit the process will also be hidden. \r\n\r\nTo exit the process in the case of Windows 98 / Me, use the Ctrl + Alt + Del key combination and select to end the process. \r\nWhen using other operating systems, use Task Manager. \r\n\r\nTo redisplay the tasktray icons, use the /usermode_showtray option when starting in user mode next time.
 
 
@@ -2749,13 +2783,13 @@ STATIC7					&Keep Alive Internet Connection Function:
 
 
 PREFIX					D_ABOUT
-S_INFO1					SoftEther VPN %u.0 (Ver %u.%02u, Build %u)
-S_INFO2				Open-Source VPN Software for Academic Purpose, under the Apache License 2.0.\r\nCopyright (c) 2012-%u SoftEther Project at University of Tsukuba, Japan. All Rights Reserved.\r\nWeb Site: https://www.softether.org/\r\n%S
+S_INFO1					$APPFULL$  (Ver %u.%02u, Build %u)
+S_INFO2					Copyright (c) %u 東日本電信電話株式会社. All Rights Reserved.\r\nCopyright (c) %u 独立行政法人情報処理推進機構. All Rights Reserved.\r\n\r\n%S.
 S_INFO3					This product includes the following software components:\r\nBitVisor: Copyright (c) 2007, 2008 University of Tsukuba. Copyright (C) 2007, 2008 National Institute of Information and Communications Technology. All rights reserved. / Microsoft(R) C Runtime Library: (c) 2007 Microsoft Corporation. All Rights Reserved. / PKCS #11 Cryptographic Token Interface (Cryptoki): Copyright (c) RSA Security Inc. / WinPcap: Copyright (c) 2001 - 2003 NetGroup, Politecnico di Torino (Italy). All rights reserved. / libedit: Copyright (c) 1992, 1993 The Regents of the University of California. All rights reserved. / libiconv: Copyright (C) 2007 Free Software Foundation, Inc. / ncurses: Copyright (c) 1998-2005, 2006 Free Software Foundation, Inc. / OpenSSL: Copyright (c) 1998-2011 The OpenSSL Project. All rights reserved. This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/). This product includes cryptographic software written by Eric Young (eay@cryptsoft.com). / zlib: (C) 1995-2004 Jean-loup Gailly and Mark Adler. / libmincrypt: Copyright 2013 The Android Open Source Project / Special Thanks to: Software Laboratory, Academic Computing Communication Center, Industrial Liaison and Cooperative Research Center and Professor Yasushi Shinjo in University of Tsukuba, Japan.
-S_INFO4				THIS SOFTWARE IS FREEWARE DEVELOPED UNDER THE SOFTETHER VPN PROJECT AT UNIVERSITY OF TSUKUBA, WITHOUT WARRANTY OF AND KIND. IN NO EVENT SHALL THE DEVELOPERS, COPYRIGHT OWNERS OR DISTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY IN ANY WAY OUT OF THE USE OF THIS SOFTWARE.\r\n\r\nSoftEther VPN is a work of the research and development project of Japanese Government, subsidized by Ministry of Economy, Trade and Industry of Japan, administrated by Information Promotion Agency.
+S_INFO4					Provided by:\r\nNTT East Japan Special Affairs Bureau\r\nIPA CyberLab of Industrial Cyber Security Center (Japanese-government agency)\r\n\r\nThis telework system is provided on a temporary and emergency basis as an academic and pilot demonstration, with limited resources, combining pilot programs in research and development and a non-guaranteed infrastructure and experimental network to prevent the spread of novel coronavirus infections and to support business continuity.\r\nThe quality, functionality, performance and security levels of the application and relay system are at the experimental stage and not at the finished commercial level. Therefore, the Telework System is provided on an "as is" basis and its usefulness, suitability and commercial viability are not guaranteed.\r\nMalfunctions may result in loss or alteration of data or failure of hardware or network equipment. In no event shall the provider be liable to the user or the organization to which the user belongs for any damages whatsoever, regardless of the type, content, or amount of damages, resulting from the use or inability to use the application or relay system in whole or in part. This is true even if you have been advised of the possibility of these damages.\r\nThis telework system does not provide the same warranties or individual user support as commercial communication services. The provider will not respond to individual inquiries. Users are not permitted to contact the normal commercial services of each of the provider's organizations or the normal business call center or other entities. All problems are the responsibility of the user to resolve.
 IDCANCEL				&OK
-B_WEB					Visit SoftEther VPN &Website...
-B_EULA					&End User License
+B_WEB					Visit $APPSHORT$ &Website...
+B_EULA					&Terms of Use
 B_IMPORTANT				&Important Notices
 B_LEGAL					&Legal Notices
 B_UPDATE_CONFIG			&Configure Updates
@@ -3075,7 +3109,7 @@ IDCANCEL				E&xit
 
 PREFIX					D_SM_USER
 CAPTION					Manage Users
-S_TITLE					Virtual Hub "%S" has the following users.
+S_TITLE					This server has the following users.
 IDOK					&Edit
 B_CREATE				&New
 B_DELETE				&Remove
@@ -3230,7 +3264,7 @@ B_REDIRECT				Set URL Redirect to...
 
 PREFIX					D_SM_RADIUS
 CAPTION					Authentication Server Settings
-S_TITLE					To use an external RADIUS server to verify login attempts to the Virtual Hub "%S", specify an external RADIUS server that verifies the user name and password.
+S_TITLE					To use an external RADIUS server to verify login attempts to this server, specify an external RADIUS server that verifies the user name and password.
 STATIC1					RADIUS Server Settings:
 R_USE_RADIUS			&Use RADIUS Authentication
 S_RADIUS_1				RADIUS &Server Host Name or IP:
@@ -3238,11 +3272,11 @@ S_RADIUS_2				&Port:
 S_RADIUS3				(UDP Port)
 S_RADIUS_4				Shared S&ecret:
 S_RADIUS_5				&Confirm Shared Secret:
-S_RADIUS_6				The RADIUS server must accept requests from IP addresses of this VPN Server. Also, authentication by Password Authentication Protocol (PAP) must be enabled.
+S_RADIUS_6				The RADIUS server must accept requests from IP addresses of this computer. Also, authentication by Password Authentication Protocol (PAP) must be enabled.
 S_RADIUS_7				milliseconds (above %u, below %u)
 S_RADIUS_8				&Retry Interval
 S_RADIUS_9				(use ',' or ';' to split multiple hostnames.)
-STATIC2					When using Windows NT Domain Controller or Windows Server Active Directory Controller as an external authentication server, you must setup the VPN Server computer to join the domain. To use NT Domain Authentication, there are no items to configure here.
+STATIC2					When using Windows NT Domain Controller or Windows Server Active Directory Controller as an external authentication server, you must setup this computer to join the domain. To use NT Domain Authentication, there are no items to configure here.
 IDOK					&OK
 IDCANCEL				Cancel
 
@@ -3311,7 +3345,7 @@ STATIC3					Saving large amounts of packet logs can place a large burden on the 
 
 PREFIX					D_SM_CA
 CAPTION					Manage Trusted CA Certificates
-STATIC1					You can manage the list of certificate authority (CA) certificates that are trusted by this Virtual Hub.\r\n\r\nThe list of CA certificates that is listed here is used to verify certificates when a VPN Client is connected in signed certificate authentication mode.
+STATIC1					You can manage the list of certificate authority (CA) certificates that are trusted by this server.\r\n\r\nThe list of CA certificates that is listed here is used to verify certificates when a client is connected in signed certificate authentication mode.
 B_IMPORT				&Add
 IDOK					&View Certificate
 IDCANCEL				&Close
@@ -3753,7 +3787,7 @@ IDCANCEL				Cancel
 
 PREFIX					D_CM_SELECT_SECURE
 CAPTION					Select Smart Card
-STATIC1					Select the type of smart card device to use. \r\n\r\nThe types of smart cards listed in this list have had their drivers installed on the current computer and are supported by VPN software. \r\nIf there is a type of smart card that is currently being used that does not appear in the list, it may be possible that update of the VPN software to a newer version enable you to use it. \r\n\r\nNote: If a driver is not displayed immediately after installation, restart Windows.
+STATIC1					Select the type of smart card device to use. \r\n\r\nThe types of smart cards listed in this list have had their drivers installed on the current computer and are supported by this software. \r\nIf there is a type of smart card that is currently being used that does not appear in the list, it may be possible that update of this software to a newer version enable you to use it. \r\n\r\nNote: If a driver is not displayed immediately after installation, restart Windows.
 IDOK					&OK
 IDCANCEL				Cancel
 
@@ -3855,19 +3889,19 @@ IDCANCEL				Cancel
 
 PREFIX					D_SM_AC_LIST
 CAPTION					Source IP Address Limit List
-S_TITLE					To allow or deny VPN connections to this VPN Server Virtual Hub "%S" according to the client computer's IP address, you can set the rules to allow or deny the connection below.
+S_TITLE					To allow or deny remote access connections to this server according to the client computer's IP address, you can set the rules to allow or deny the connection below.
 B_ADD					&New Rule
 IDOK					&Edit Rule
 B_DELETE				&Delete Rule
 B_SAVE					&Save
 IDCANCEL				&Cancel
 STATIC1					Items with higher priority appear higher in the list.
-STATIC2					If the client's IP address does not match any item in the list, VPN connection to this Virtual Hub will be allowed.
+STATIC2					If the client's IP address does not match any item in the list, remote connection to this server will be allowed.
 
 
 PREFIX					D_SM_AC
 CAPTION					Edit Rule Entry of Source IP Address Limit List
-STATIC1					Define a rule in the IP Access Control List. The values set here will be used to decide whether to allow or deny connection from a VPN Client when this client attempts connection to the Virtual Hub.
+STATIC1					Define a rule in the IP Access Control List. The values set here will be used to decide whether to allow or deny connection from a client when this client attempts connection to this server.
 STATIC2					Defines of a Rule
 STATIC3					Apply this Rule when the client's IP address matches the following:
 R_SINGLE				&Single IP Address
@@ -4240,23 +4274,23 @@ S_11					The advanced redirection function can provide the VPN Session informati
 
 PREFIX					D_SW_WELCOME
 CAPTION					D_SW_WELCOME
-S_WELCOME				SoftEther VPN is freeware developed at University of Tsukuba, Japan. High-performance VPN with the ultimate compatibilities to many devices. Windows, Mac, smartphones, tablets (iPhone, iPad, Android, Windows RT) and Cisco or other VPN routers are supported. SoftEther VPN also accepts OpenVPN and MS-SSTP VPN clients.
-S_TITLE				Extremely Powerful Open-Source VPN Software.
+S_WELCOME				In response to the declaration of a state of emergency regarding the novel coronavirus by the Japanese government and the social demand for telecommuting, this software was developed by NTT East and IPA to support the prevention of the spread of infection and the continuation of business operations by many people, and has been available immediately, without any contract or user registration, since April 2020. This is a thin client type VPN telework demonstration application. Please note that there is a possibility that there is a problem with this application because we need to release it as soon as possible.
+S_TITLE					$APPFULL$ - Emergency Project against COVID-19
 
 PREFIX					D_SW_MODE
 CAPTION					D_SW_MODE
 R_SYSTEM				&System Mode (Recommended)
 R_USER					&User Mode
-S_1						Install the VPN software to this computer normally. The administrator privilege is required.
-S_USER					Install the VPN software with the normal user privilege. No administrator privilege is required. Some functions such as Local Bridge will be disabled. Runs only the user "%s" is logged on Windows.
-S_2						SoftEther VPN can be installed by one of two methods.\r\n\r\nPlease select the System Mode normally.\r\n\r\nIf you cannot use the administrator privilege for some reasons, you can select the User Mode to continue the installation.
+S_1						Install $APPFULL$ to this computer normally. The administrator privilege is required.
+S_USER					Install $APPFULL$ with the normal user privilege. No administrator privilege is required. Some functions will be disabled. Runs only the user "%s" is logged on Windows.
+S_2						$APPFULL$ can be installed by one of two methods.\r\n\r\nPlease select the System Mode normally.\r\n\r\nIf you cannot use the administrator privilege for some reasons, you can select the User Mode to continue the installation.
 
 
 PREFIX					D_SW_NOT_ADMIN
 CAPTION					D_SW_NOT_ADMIN
 S_INFO					The user "%s" which is logged on Windows does not have the administrator privilege.\r\n\r\nLog off Windows, log on by the user who has the administrator privilege and restart the Setup Wizard if you want to continue the setup.
 S_INFO6					Click Finish to exit the Setup Wizard.
-S_INFO2					If you cannot use the administrator privilege, you can choose the User Mode installation.\r\nTo install the software in the User Mode, click Back.
+S_INFO2					Don't have Windows Administrator passwords?\r\n\r\nYou can install the software in user mode even if you cannot install it with administrator privileges due to restrictions in your organization's security policy.\r\nIf you want to use User Mode installation click the "Back" button.
 
 
 PREFIX					D_SW_COMPONENTS
@@ -4265,13 +4299,13 @@ CAPTION					D_SW_COMPONENTS
 
 PREFIX					D_SW_EULA
 CAPTION					D_SW_EULA
-S_1						Please read the End User License Agreement carefully.
-B_AGREE					I agree to the End User License Agreement.
+S_1						Please read the Terms of Use carefully.
+B_AGREE					I agree to the Terms of Use.
 
 
 PREFIX					D_SW_WARNING
 CAPTION					D_SW_WARNING
-S_1						SoftEther VPN software has extremely powerful communication abilities. Before use please read the Important Notices carefully.
+S_1						$APPFULL$ has extremely powerful communication abilities. Before use please read the Important Notices carefully.
 
 
 PREFIX					D_SW_DIR
@@ -4281,9 +4315,9 @@ R_CUSTOM				&Specify the Directory
 S_DEST					&Directory:
 B_BROWSE				&Browse...
 R_SHOWCUSTOM			&Advanced Install Options for Experts
-R_FOR_SYSTEM			Install on &Windows of this Computer Entirely
+R_FOR_SYSTEM			Install to this Computer as System Service(&Y)
 R_FOR_USER				Install only on the Environment of User "%s"
-S_WARNING				Caution: Not recommended. After the user "%s" logs off Windows, %s will stop. Local Bridge function and L2TP/IPsec Function (supports for Mac and Smartphones) will be unavailabe.
+S_WARNING				Caution: Not recommended. Only while the user "%s" logged on to the Windows, %s accepts remote control. Some remote sharing functions will be disabled.
 
 
 PREFIX					D_SW_READY
@@ -4306,7 +4340,7 @@ S_INFO					An error occureed and the setup of %s is aborted.\r\n\r\nRestart the 
 PREFIX					D_SW_FINISH
 CAPTION					D_SW_FINISH
 S_INFO					The setup process of %s has completed successfully.
-S_INFO8					SoftEther VPN is a work of the research and development project of Japanese Government, subsidized by Ministry of Economy, Trade and Industry of Japan, administrated by Information Promotion Agency.
+S_INFO8					The $APPSHORT$ is a demonstration system that was planned almost simultaneously with the declaration of a state of emergency on April 7, 2020, and was able to be quickly implemented with the cooperation of many people. Our deepest gratitude to all those who have contributed to the success of the system.\r\n\r\nWe hope that this experimental system and the spread of telework will save the lives of as many people as possible.
 
 
 PREFIX					D_SW_UNINST1
@@ -4374,7 +4408,7 @@ S_LATEST_STR			Ver %S%s
 
 PREFIX					D_UPDATE_CONFIG
 CAPTION					Configuration of Update Notification
-S_INFO					Checks the new versions of %s periodically and popup a notification when a new version will be released.\r\n\r\nHTTPS packets will be used between this computer and the SoftEther Update server located in Tsukuba-city, Ibaraki-prefecture, Japan in order to check updates. No personal information will be sent.
+S_INFO					Checks the new versions of %s periodically and popup a notification when a new version will be released.\r\n\r\nHTTPS packets will be used between this computer and the update server in order to check updates. No personal information will be sent.
 S_TITLE					%s Update and Notify Settings
 S_ENABLE				&Enable Update Checks
 S_DISBLE				&Disable Update Checks
@@ -4505,19 +4539,19 @@ IDCANCEL				Cancel
 
 
 PREFIX					D_DG_MAIN
-CAPTION					Desktop VPN Server Configuration Tool
-S1						&Internet Communication Settings
+CAPTION					$APPFULL_SERVER$ Configuration Tool (Version %u.%02u)
+S1						$APPSHORT$ Commun&ication Settings
 S_PCID					Computer I&D:
 IDOK					&Change
 B_RESTORE				&Restore
-S_PCID_2				Computer ID is an identifier for this computer on the Internet. You can arbitrarily decide and change the name.
+S_PCID_2				Computer ID is an identifier for this $APPSHORT_SERVER$ on the Internet. You can arbitrarily decide and change the name.
 S2						Internet Type:
 B_PROXY					&Proxy Settings...
 S3						Please configure Proxy settings if it is necessary to use proxy servers to access to the Internet.
 S_ACCEPT				From the Client:
 B_ACCEPT				&Accept Connection
 B_DENY					D&eny Connection
-S4						Ot&her Settings
+S4						Ot&her $APPSHORT_SERVER$ Settings
 S5						Settings for Security.
 B_AUTH					&Security Settings...
 S6						Display About Box.
@@ -4547,34 +4581,37 @@ S_OPTION2				(Optional)
 B_IE					Use settings from &Internet Explorer
 IDOK					&OK
 IDCANCEL				Cancel
+S_USERAGENT				HTTP User &Agent setings:
+S_USERAGENT2			You can change the User Agent setings for HTTP proxy servers. Change it your proxy server accepts only specified User Agent strings.
 
 
 PREFIX					D_DG_AUTH
 CAPTION					Security Settings
-S1						The security function of Desktop VPN software protects you and your computer from illegal accesses, tapping or falsification.
+S1						The security function of $APPSHORT$ software protects you and your computer from illegal accesses, tapping or falsification.
 S2						User Authentication (Protection from illegal access)
-S3						You can use password authentication function. The server will request the correct password when the client connects.
+S3						You can use password authentication function. Password required when $APPSHORT_CLIENT$ connects.
 C_USE_AUTH				Use &Password Authentication to protect this computer
 S_PASSWORD1				Enable password authentication, then anyone who don't know the correct password cannot access remotely to this computer.
 S_PASSWORD2				Pass&word:
 S_PASSWORD3				&Confirm:
 S4						Encryption (Protection from tapping or falsification)
-S5						Desktop VPN always uses RSA 1024 bit encryption algorithm to encrypt transferred data on the network.\r\nAnd it also uses SSL Protocol Version 3 to verify X.509 Certificate and RSA Private Key to protect from tapping or falsification.
+S5						$APPSHORT$ always uses RSA encryption algorithm to encrypt transferred data on the network.\r\nAnd it also uses TLS Protocol to verify X.509 Certificate and RSA Private Key to protect from tapping or falsification.
 C_CHECK_CERT			Enable Certificate &Verification with SSL Protocol
 S_CHECK_CERT			If certificate errors always occur, turn off this function. Please note when it is turned off, protection from tapping or falsification is disabled.
 IDOK					&OK
 IDCANCEL				Cancel
+B_HASH					Print Unique ID...
 
 
 PREFIX					D_DG_OPTION
 CAPTION					Optional Settings
-S1						You can configure optional settings of Desktop VPN Server.
+S1						You can configure optional settings of $APPSHORT_SERVER$.
 S2						General Settings
-B_ACTIVE				&Accept new connections from Desktop VPN Client
+B_ACTIVE				&Accept new connections from $APPSHORT_CLIENT$
 S3						When this check box is turned off, no Desktop VPN Client can access remotely to this computer.
 B_POWERKEEP				Kee&p the Computer Power On
-S4						When the computer is hibernating, you cannot access to this computer from remote place. So turn on this check box to prevent hibernation or stand-by on this computer.
-S5						Desktop VPN Server provides two internal methods to processing Remote Desktop Access.
+S4						When this computer is hibernating, you cannot access to this computer from remote place. So turn on this check box to prevent hibernation or stand-by on this computer.
+S5						$APPSHORT_SERVER$ provides two internal methods to processing Remote Desktop Access.
 B_RDP					Use Windows &Remote Desktop components internally
 B_URDP					Use &User-mode Remote Desktop components internally
 S_INFO					It is recommended to use Windows Remote Desktop components internally. When Windows Remote Desktop components are disabled, however, please use User-mode Remote Desktop components.
@@ -4582,11 +4619,13 @@ B_URDPCONFIG			&Detail Settings for User-mode Remote Desktop...
 IDOK					&OK
 IDCANCEL				Cancel
 S6						Remote Desktop Settings
-
+S7						Save Logs
+C_LOG					Save &Local logs
+B_LOG					&Open log directory
 
 PREFIX					D_DG_PASSWORD
 CAPTION					Set the Password for Configuration Tool
-S_TITLE					You can set the password to protect this Desktop VPN Server Configuration Tool from other users. After the password was set, you will be requested to input the correct password.
+S_TITLE					You can set the password to protect this $APPSHORT_SERVER$ Configuration Tool from other users. After the password was set, you will be requested to input the correct password.
 S1						Password Setting
 R_USE_PASSWORD			Set the Password (&U)
 S2						&Password:
@@ -4596,8 +4635,8 @@ IDCANCEL				Cancel
 
 
 PREFIX					D_DG_LOGIN
-CAPTION					Desktop VPN Server Configuration Tool
-S_TITLE					The password is required to open Desktop VPN Server Configuration Tool.
+CAPTION					$APPFULL_SERVER$ Configuration Tool
+S_TITLE					The password is required to open $APPSHORT_SERVER$ Configuration Tool.
 S1						&Password:
 S2						Input Password
 IDOK					&OK
@@ -4605,7 +4644,7 @@ IDCANCEL				Cancel
 
 
 PREFIX					D_DU_MAIN
-CAPTION					Desktop VPN Client
+CAPTION					$APPFULL_CLIENT$  Ver %u.%02u
 S_PCID					Target Computer &ID:
 IDOK					Co&nnect
 IDCANCEL				Cancel
@@ -4615,20 +4654,20 @@ B_OPTION				&Options...
 
 
 PREFIX					D_DU_OPTION
-CAPTION					Optional Settings of Desktop VPN Client
-S1						You can configure optional settings of Desktop VPN Client.
+CAPTION					Optional Settings of $APPFULL_CLIENT$
+S1						You can configure optional settings of $APPFULL_CLIENT$.
 S2						&Communication Settings
 S3						Please configure proxy settings if it is necessary to use proxy server to access to the Internet.
 S4						Internet Type:
 B_PROXY					&Proxy Settings...
 S5						Encryption (Protection from tapping or falsification)
-S6						Desktop VPN always uses RSA 1024 bit encryption algorithm to encrypt transferred data on the network.\r\nAnd it also uses SSL Protocol Version 3 to verify X.509 Certificate and RSA Private Key to protect from tapping or falsification.
+S6						$APPSHORT$ always uses RSA encryption algorithm to encrypt transferred data on the network.\r\nAnd it also uses ELS to verify X.509 Certificate and RSA Private Key to protect from tapping or falsification.
 C_CHECK_CERT			Enable Certificate &Verification with SSL Protocol
 S_CHECK_CERT			If certificate errors always occur, turn off this function. Please note when it is turned off, protection from tapping or falsification is disabled.
 S7						Settings to use Microsoft &Remote Desktop Client Software
-S8						Desktop VPN Client Software executes Microsoft Remote Desktop Client Software (mstsc.exe) if necessary. You can configure settings to use Remote Desktop Client Software.\r\n(These settings are for expert users.)
+S8						$APPFULL_CLIENT$ software executes Microsoft Remote Desktop Client Software (mstsc.exe) if necessary. You can configure settings to use Remote Desktop Client Software.\r\n(These settings are for expert users.)
 C_SYSTEM32				Use mstsc.exe which is installed with &Windows XP or later
-C_DOWNLOAD				&Download automatically mstsc.exe from the Microsoft Corporation's Web Site (microsoft.com) and use it
+C_DOWNLOAD				&Download automatically mstsc.exe from the Microsoft Corporation's Web Site (microsoft.com) and use it (Might be unavailable)
 C_USERPATH				&Use the following Executable Files
 S_PATH					File Pat&h:
 B_BROWSE				&Browse...
@@ -4637,7 +4676,10 @@ S_PARAMS				&Parameters (&G):
 C_PUBLIC				With Versio&n 6.0 of mstsc.exe, Use /public Additional Command-Line Parameter to prevent caching password data
 IDOK					&OK
 IDCANCEL				Cancel
-
+S_UX					User experience features aimed at improving telework
+C_ENABLE_RELAX			Enab&le 'relax mode' before starting telework
+C_SHOW_THEEND			When the &telework is completed, the "Thank you for your work" screen is displayed
+C_MULTIDISPLAY			Use the virtual &multi-display feature, if available
 
 PREFIX					D_DU_DOWNLOAD
 CAPTION					Downloading Remote Desktop Client Software
@@ -4653,8 +4695,8 @@ IDCANCEL				&OK
 
 
 PREFIX					D_DU_PASSWORD
-CAPTION					User Authentication by Desktop VPN Server
-S_TITLE					The specified Desktop VPN Server '%S' is configured to verify the password for user authentication.\r\nPlease enter the correct password.
+CAPTION					User Authentication by $APPFULL_SERVER$
+S_TITLE					The destination $APPFULL_SERVER$ '%S' is configured to verify the password for user authentication.\r\nPlease enter the correct password.
 S1						Input Password
 S2						&Password:
 IDOK					&OK
@@ -4668,8 +4710,8 @@ S_INFO5					It is very safe because all communication data will be encrypted wit
 
 
 PREFIX					D_DI_VISTA_SELECT
-CAPTION					Desktop VPN Installer
-S1						This is Desktop VPN Installer.\r\nPlease select one choice from the following list and press OK.
+CAPTION					$APPSHORT$ Installer
+S1						This is $APPSHORT$ Installer.\r\nPlease select one choice from the following list and press OK.
 S2						Installation Type
 C_SYSTEM				Install this software as &System-mode
 C_USER					Install this software as &User-mode individually (for current user only)
@@ -4681,9 +4723,9 @@ IDCANCEL				Cancel
 
 PREFIX					D_DI_SELECT_PRODUCT
 CAPTION					Selection of Software to Install
-S1						There is a couple of Desktop VPN software. Which do you want to install?\r\n\r\n(To install both software, please execute the installer two times in total.)
-C_SERVER				Desktop VPN &Server
-C_CLIENT				Desktop VPN &Client
+S1						There is a couple of $APPSHORT$ software. Which do you want to install?\r\n\r\n(To install both software, please execute the installer two times in total.)
+C_SERVER				$APPSHORT$ &Server
+C_CLIENT				$APPSHORT$ &Client
 S2						Install this in the PC which you want to access remotely (target PC).
 S3						Install this in the PC which you want to use as client for remote accessing (client PC).
 IDOK					&OK
@@ -4691,11 +4733,11 @@ IDCANCEL				Cancel
 
 
 PREFIX					D_DI_EULA
-CAPTION					License Agreement for %s
+CAPTION					%s - Terms of Use
 S_INFO					Please read the following License Agreement for %s.\r\nTo install you must accept this agreement.\r\nPress the PageDown key to see the rest of the agreement.
 IDOK					&Agree
 IDCANCEL				&Don't Agree
-S1						Do you agree this agreement?\r\nIf you agree press Agree button or Enter key.\r\nIf you don't agree press Don't Agree button or Esc key.
+S1						Do you agree this Terms of Use?\r\nIf you agree press Agree button or Enter key.\r\nIf you don't agree press Don't Agree button or Esc key.
 
 PREFIX					D_DI_MAIN
 CAPTION					%s Installer
@@ -4744,7 +4786,7 @@ B_WEB					Product &Web Site...
 
 
 PREFIX					D_DI_NOTICE
-CAPTION					Welcome to Desktop VPN Server
+CAPTION					Welcome to $APPSHORT_SERVER$
 IDOK					&Continue
 IDCANCEL				Cancel
 
@@ -4752,32 +4794,32 @@ IDCANCEL				Cancel
 PREFIX					D_DG_PASSWORD1
 CAPTION					This computer is now protected by very strong security
 S_1						Congratulations!\r\nThis computer is now protected by very strong security.
-S_2						The password for user authentication was set correctly on Desktop VPN Server.\r\nIt is extremely safe because a strict verification of the password is done when accepting new remotely accesses to this computer.\r\n\r\nWhen you access to this computer via the Internet please input the correct  password.\r\nAnyone who don't know the correct password cannot access remotely to this computer.
+S_2						The password for user authentication was set correctly on $APPFULL_SERVER$.\r\nIt is extremely safe because a strict verification of the password is done when accepting new remotely accesses to this computer with $APPSHORT$.\r\n\r\nWhen you access to this computer via the Internet please input the correct password.\r\nAnyone who don't know the correct password cannot access remotely to this computer.
 IDCANCEL				&Close
 
 
 PREFIX					D_DG_PASSWORD2
 CAPTION					It is recommended to set the Password
 S_1						Set the password for protecting this computer for safety.
-S_2						You can use password authentication function.\r\nEnable password authentication, then anyone who don't know the correct password cannot access remotely to this computer.\r\n\r\nIt is recommended to set the password to protect your computer.
+S_2						You can use password authentication function.\r\nEnable password authentication, then anyone who don't know the correct password cannot access remotely to this computer with $APPSHORT$.\r\n\r\nIt is recommended to set the password to protect your computer.
 C_DONTSHOW				&Do not show this message again
 IDOK					Use &Password Authentication to protect Computer
 IDCANCEL				Do not use (Danger)
 
 
 PREFIX					D_DI_THANKS
-CAPTION					About PacketiX Desktop VPN software
+CAPTION					About $APPFULL$
 IDCANCEL				&Close
 
 
 PREFIX					D_DU_SHARE
 CAPTION					Sharing Settings
 S1						If you enable the following sharing functions you can share contents of Clipboard and/or use Hard Disks or Printers on this client computer.\r\n\r\nSo you can copy texts or files between the local PC and the remote PC, and printing documents with the printer connected on the local PC.\r\n\r\nPlease note that contents of files are transferred via the Network.
-S_INFO					Hard Disks Sharing is very useful. But it has possibility of information leaking or accident with computer viruses.\r\n\r\nPlease note policies on your company or do not use this function on your office PC.\r\nIf your company doesn't allow to take-home files do not use Hard Disks Sharing.
+S_INFO					Sharing functions are very useful. But it has possibility of information leaking or accident with computer viruses.\r\n\r\nPlease note policies on your company or do not use this function on your office PC.\r\nIf your company doesn't allow to take-home files do not use Hard Disks Sharing.
 C_SHARE_CLIPBOARD		Use &Clipboard Sharing
 C_SHARE_DISK			Use Hard &Disks Sharing
 C_SHARE_PRINTER			Use &Printers Sharing
-S_INFO_2				These sharing functions can be used when the target computer is running Windows XP (Professional / Media Center / Tablet PC), Windows Server 2003, Windows Vista (Business / Enterprise / Ultimate) and Windows Server 2008. And Windows Remote Desktop (System-mode) must be enabled.
+S_INFO_2				These sharing functions can be used when the target computer is running Windows Pro versions, and Windows Remote Desktop (System-mode) must be enabled.
 S_INFO_3				And also there sharing functions depends on the security policies on the target computer.
 IDOK					&OK
 IDCANCEL				Cancel
@@ -4788,7 +4830,13 @@ PREFIX					D_DG_HASH
 CAPTION					Unique ID
 S_INFO					You can copy and paste the below Unique ID to the clipboard.
 IDCANCEL				E&xit
-
+IDCANCEL2				E&xit
+S_INFO2					SSL-VPN Relay Gateway Server Address
+S1						Initialization of unique IDs when cloning a Windows disk image/ VM in an enterprise system
+S2						Please follow the steps below to clone and sysprep a Windows installed disk image with the $APPSHORT_SERVER$ installed on the enterprise system.
+S3						1. Complete the configuration of $APPSHORT_SERVER$ on the Model PC.\r\n2. Complete the rest of the software configuration on the model PC.\r\n3. Click the "Reset unique ID on next start-up" button just before the last shutdown before the clone (to ensure that no reboot will occur before the clone). \r\n4. Shut down the PC.\r\n5. Clone and extract the disk image.\r\n6. The unique ID of the Thin Telework System Server for each computer (or VM) that booted the disk image extracted in step 5 is initialized to a new, random ID that is different from each other.
+B_RESET					&Reset unique ID on next start-up
+S4						When you press the "Reset unique ID on next start-up" button, the unique ID of this computer will be initialized the next time you start $APPSHORT_SERVER$. The computer ID is also initialized. The computer ID that you are currently using can never be used again.
 
 
 
@@ -7587,8 +7635,8 @@ CHECK_PROC_NETWORK		Network system
 #                                                    #
 ######################################################
 
-SW_TITLE									SoftEther VPN Setup Wizard (Version %S)
-SW_EXIT_CONFIRM								The setup process of SoftEther VPN hasn't been finished yet.\r\n\r\nDo you want to exit the setup?
+SW_TITLE									$APPFULL$ Setup Wizard (Version %S)
+SW_EXIT_CONFIRM								The setup process of $APPFULL$ hasn't been finished yet.\r\n\r\nDo you want to exit the setup?
 SW_UNINSTALL_CONFIRM						Starting the uninstall process of %s.\r\n\r\nDo you want to continue?
 
 
@@ -7607,11 +7655,27 @@ SW_COMPONENT_VPNSMGR_DESCRIPTION			Only the VPN Server Manager will be installed
 SW_COMPONENT_VPNCMGR_TITLE					SoftEther VPN Client Manager (Admin Tools Only)
 SW_COMPONENT_VPNCMGR_DESCRIPTION			Only the VPN Client Manager will be installed. The VPN Client service program will not be installed. You can use the VPN Client Manager to connect and manage remote VPN Clients on other computers which can be run on Windows and Linux.
 
-SW_WELCOME_TITLE							Welcome to the SoftEther VPN Setup Wizard
+
+
+SW_COMPONENT_THINSVR_TITLE				$APPSHORT_SERVER$
+SW_COMPONENT_THINSVR_DESCRIPTION			Install it on the PC that will accept remote access (e.g., your office PC).\r\nYou can use features such as clipboard and drive sharing, file transfer, and remote printing.\r\nNote: Depending on the environment and operating mode, the sharing feature may not be available.
+
+SW_COMPONENT_THINSVR_DESCRIPTION_NS_POSTFIX		Install it on the PC that will accept remote access (e.g., your office PC).\r\n"Sharing Function Disabled version" disables functions such as clipboard and drive sharing, file transfer, and remote printing. Select this if you want to disable these functions for the security policy of your organization.\r\nGeneral note: Even with system protections, malicious users may still take information out of the system using special manipulation methods.
+
+SW_COMPONENT_THINCLIENT_TITLE				$APPSHORT_CLIENT$
+SW_COMPONENT_THINCLIENT_DESCRIPTION			Install it on the PC you want to activate remote access on (e.g. your home PC or mobile PC).
+
+SW_WELCOME_UAC_WARNING						There is a possibility that you are operating the screen of this computer remotely by using $APPFULL_SERVER$.\r\n\r\nIt is recommended that you do not remotely operate the software of $APPFULL_SERVER$, but directly operate the screen of the PC that serves as the server to upgrade the software.\r\n\r\nDo you really want to continue working remotely?\r\n\r\n\r\nOnce you click 'OK', the computer's Windows User Account Control (UAC) pop-up will appear. Since the current mode of operation of $APPSHORT_SERVER$ is User Mode, the screen may be disconnected or rendered inoperable when the UAC pop-up appears. If this happens, wait for about 1 to 2 minutes and then try to reconnect. If the connection does not recover, please operate the screen of the computer that serves as the server directly and perform the update.
+
+
+
+
+
+SW_WELCOME_TITLE							Welcome to the $APPFULL$ Setup Wizard
 SW_MODE_TITLE								Select a Setup Mode
 SW_NOT_ADMIN_TITLE							Not Enough Privileges
 SW_COMPONENTS_TITLE							Select Software Components to Install
-SW_EULA_TITLE								End User License Agreement
+SW_EULA_TITLE								Terms of Use
 SW_WARNING_TITLE							Important Notices
 SW_DIR_TITLE								Directory to Install on
 SW_READY_TITLE								Ready to Install
@@ -7619,16 +7683,16 @@ SW_PERFORM_TITLE							Setup is in Progress
 SW_ERROR_TITLE								Results of Setup
 SW_FINISH_TITLE								Setup Finished
 SW_UNINST1_TITLE							Uninstaller
-SW_LANG1_TITLE								SoftEther VPN: Configure the Display Language
+SW_LANG1_TITLE								Thin Telework System: Configure the Display Language
 SW_EASY1_TITLE								Welcome to SoftEther VPN Client Easy Installer Creator
 SW_EASY2_TITLE								Specify Files
 SW_WEB1_TITLE								Welcome to SoftEther VPN Client Web Installer Creator
 SW_WEB2_TITLE								Specify Files
 
 SW_UNINSTALLINFO_URL						http://selinks.org/
-SW_UNINSTALLINFO_PUBLISHER					SoftEther VPN Project
+SW_UNINSTALLINFO_PUBLISHER					NTT East Japan Special Affairs Bureau and IPA Industrial Cyber Security Center, Cyber Technology Laboratory
 
-SW_KB3033929_REQUIRED						In Windows 7 and Windows Server 2008 R2, some SoftEther VPN functions require the Microsoft's Windows Update module KB3033929 installed.\r\n\r\nIf KB3033929 is not installed in your Windows, please install it from Windows Update or Microsoft website before installing SoftEther VPN.
+SW_KB3033929_REQUIRED						In Windows 7 and Windows Server 2008 R2, some $APPSHORT$ functions require the Microsoft's Windows Update module KB3033929 installed.\r\n\r\nIf KB3033929 is not installed in your Windows, please install it from Windows Update or Microsoft website before installing $APPSHORT$.
 
 
 SW_COMPONENTS_ABOUT_TAG						About %s
@@ -7677,7 +7741,7 @@ SW_VG_CONFIRM_MSG							Do you really want to install and activate the VPN Gate 
 
 
 
-SW_PERFORM_MSG_INIT_TASKS					Preparing the tasks...
+SW_PERFORM_MSG_INIT_TASKS					Preparing the install processes...
 SW_PERFORM_MSG_COPY_PREPARE					Preparing the copying of files...
 SW_PERFORM_MSG_WRITE_ERROR					Failed to write the destination file "%s".\r\n\r\nThere might be another person who has been keeping this file open.\r\nIf programs or services of %s are running, please terminate them and click Retry.
 SW_PERFORM_MSG_COPY_FILE					Copying "%s" ...
@@ -7728,6 +7792,9 @@ SW_RUN_TEXT_VPNCMGR							Start the SoftEther VPN Client Manager.
 
 SW_NIC_UNINSTALL							Virtual Network Adapters of SoftEther VPN Client have been created on the system.\r\nDo you want to delete these Virtual Network Adapters?
 
+SW_RUN_TEXT_THINSVR							Start the $APPFULL_SERVER$ initial configuration program.
+SW_RUN_TEXT_THINCLIENT						Start the $APPFULL_CLIENT$ program.
+
 # --- Do not translate this section !!!  stay them in English !!! ---
 SW_TAG_USERNAME_ENGLISH						\ (User-Mode)
 SW_LINK_NAME_VPNSERVER_SVC					SoftEther VPN Server User-mode Service
@@ -7738,7 +7805,24 @@ SW_LONG_VPNBRIDGE							SoftEther VPN Bridge
 SW_LONG_VPNSMGR								SoftEther VPN Server Manager
 SW_LONG_VPNCMGR								SoftEther VPN Client Manager
 SW_LANG_SET_FAILED							Failed to write the new language setting on lang.config file.
+SW_LINK_NAME_THINSVR_SVC					$APPSHORT_EN$ User-mode Service
 # --- end of "Do not translate this section" ---
+
+
+# ショートカット名 (シン・テレワーク)
+SW_LINK_NAME_THINCONFIG_FULL					$APPFULL_SERVER$ Server Configuration Tool
+SW_LINK_NAME_THINCONFIG_SHORT				$APPVERYSHORT_SERVER$ Config
+SW_LINK_NAME_THINCONFIG_SHORT_UM				$APPVERYSHORT_SERVER$ Config (User)
+SW_LINK_NAME_THINCONFIG_COMMENT				Configure the $APPSHORT_SERVER$ program on this computer.
+SW_LINK_NAME_THINCONFIG_SVC_COMMENT			Start the $APPSHORT_SERVER$ service in the usermode.
+
+SW_LINK_NAME_THINCLIENT_FULL					$APPFULL_CLIENT$
+SW_LINK_NAME_THINCLIENT_SHORT				$APPVERYSHORT_CLIENT$
+SW_LINK_NAME_THINCLIENT_SHORT_UM				$APPVERYSHORT_CLIENT$ (User)
+SW_LINK_NAME_THINCLIENT_COMMENT				You can remotely access to the destination $APPSHORT_SERVER$ with this tool via Internet.
+
+
+
 
 
 # Shortcuts Filenames
