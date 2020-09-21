@@ -975,7 +975,7 @@ DESKTOP_WATERMARK *StartDesktopWatermark(DESKTOP_WATERMARK_SETTING *setting);
 void StopDesktopWatermark(DESKTOP_WATERMARK *d);
 void DesktopWatermarkThread(THREAD *thread, void *param);
 
-void ActivePatch_AddBitmap(UINT control_id, char* new_bitmap_filename);
+void Vars_ActivePatch_AddBitmap(UINT control_id, char* new_bitmap_filename);
 void* LoadBitmapFromBuf(BUF* b);
 
 

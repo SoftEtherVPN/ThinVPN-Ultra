@@ -168,7 +168,7 @@ typedef struct _WINUI_SHSTOCKICONINFO
 	WCHAR szPath[MAX_PATH];
 } WINUI_SHSTOCKICONINFO;
 
-void ActivePatch_AddBitmap(UINT control_id, char* new_bitmap_filename)
+void Vars_ActivePatch_AddBitmap(UINT control_id, char* new_bitmap_filename)
 {
 	UINT i;
 	bool exists = false;
