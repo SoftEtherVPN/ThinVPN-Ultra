@@ -198,6 +198,8 @@ UNI_TOKEN_LIST *NullUniToken();
 bool UniIsNum(wchar_t *str);
 bool IsEmptyUniStr(wchar_t *str);
 bool UniIsEmptyStr(wchar_t *str);
+bool UniIsFilledStr(wchar_t* str);
+bool UniIsFilledUniStr(wchar_t* str);
 void InitInternational();
 void FreeInternational();
 USHORT *WideToUtf16(wchar_t *str);

@@ -197,6 +197,7 @@ void FreeStrList(LIST *o);
 TOKEN_LIST *ListToTokenList(LIST *o);
 LIST *TokenListToList(TOKEN_LIST *t);
 bool IsEmptyStr(char *str);
+bool IsFilledStr(char* str);
 void BinToStrEx(char *str, UINT str_size, void *data, UINT data_size);
 void BinToStrEx2(char *str, UINT str_size, void *data, UINT data_size, char padding_char);
 char *CopyBinToStrEx(void *data, UINT data_size);

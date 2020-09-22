@@ -1230,6 +1230,14 @@ bool IsEmptyUniStr(wchar_t *str)
 
 	return ret;
 }
+bool UniIsFilledStr(wchar_t* str)
+{
+	return !UniIsEmptyStr(str);
+}
+bool UniIsFilledUniStr(wchar_t* str)
+{
+	return !UniIsEmptyStr(str);
+}
 
 // Check whether the specified string is a number
 bool UniIsNum(wchar_t *str)

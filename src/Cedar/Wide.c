@@ -3426,7 +3426,12 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 		UINT a, b, c, d;
 		char tmp[MAX_PATH];
 
-		Add(secondary_str_list, CopyStr(ADDITIONAL_SECONDARY));
+		char* add = Vars_ActivePatch_GetStr("WtClientAdditionalSecondaryUrl");
+
+		if (IsEmptyStr(add) == false)
+		{
+			Add(secondary_str_list, CopyStr(add));
+		}
 
 		a = 163; b = 220; c = 245; d = Rand32() % 15 + 1;
 		Format(tmp, sizeof(tmp), "https://%u.%u.%u.%u/widecontrol/", a, b, c, d);

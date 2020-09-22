@@ -1677,6 +1677,10 @@ bool IsEmptyStr(char *str)
 		return false;
 	}
 }
+bool IsFilledStr(char* str)
+{
+	return !IsEmptyStr(str);
+}
 
 // Convert the token list to a string list
 LIST *TokenListToList(TOKEN_LIST *t)
