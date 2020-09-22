@@ -189,25 +189,29 @@ static char *sfx_vpn_client_files[] =
 
 static char *sfx_ntt_files[] =
 {
-	"thinsetup.exe",
-	"thinsvr.exe",
-	"thinsvrns.exe",
-	"thinclient.exe",
-	"thinconfig.exe",
-	"hamcore.se2",
+	DI_FILENAME_DESKSETUP_ANSI, // thinsetup.exe
+	DI_FILENAME_DESKSERVER_ANSI, // thinsvr.exe
+	DI_FILENAME_DESKSERVER_NOSHARE_SRC_ANSI, // thinsvrns.exe
+	DI_FILENAME_DESKCLIENT_ANSI, // thinclient.exe
+	DI_FILENAME_DESKCONFIG_ANSI, // thinconfig.exe
+	DI_FILENAME_HAMCORE_ANSI, // hamcore.se2
 	"EntryPoint.dat",
+#ifdef VARS_ENABLE_LIMITED_MODE
 	"EntryPoint_LimitedMode.dat",
+#endif // VARS_ENABLE_LIMITED_MODE
 };
 
 static char *sfx_ntt_files_share_disabled[] =
 {
-	"thinsetup.exe",
-	"thinsvrns.exe",
-	"thinclient.exe",
-	"thinconfig.exe",
-	"hamcore.se2",
+	DI_FILENAME_DESKSETUP_ANSI, // thinsetup.exe
+	DI_FILENAME_DESKSERVER_NOSHARE_SRC_ANSI, // thinsvrns.exe
+	DI_FILENAME_DESKCLIENT_ANSI, // thinclient.exe
+	DI_FILENAME_DESKCONFIG_ANSI, // thinconfig.exe
+	DI_FILENAME_HAMCORE_ANSI, // hamcore.se2
 	"EntryPoint.dat",
+#ifdef VARS_ENABLE_LIMITED_MODE
 	"EntryPoint_LimitedMode.dat",
+#endif // VARS_ENABLE_LIMITED_MODE
 };
 
 // Global variables to be used out of necessity
@@ -255,7 +259,7 @@ bool SwCompileSfx(LIST *o, wchar_t *dst_filename)
 	{
 		return false;
 	}
-
+	
 	// Get the API related to the resource editing 
 	_BeginUpdateResourceW = (HANDLE (__stdcall *)(LPCWSTR,UINT))GetProcAddress(hKernel32, "BeginUpdateResourceW");
 	_UpdateResourceA = (UINT (__stdcall *)(HANDLE,LPCSTR,LPCSTR,WORD,LPVOID,DWORD))GetProcAddress(hKernel32, "UpdateResourceA");
@@ -414,7 +418,9 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 	}
 
 	Add(o, SwNewSfxFile("EntryPoint.dat", L"|EntryPoint.dat"));
+#ifdef VARS_ENABLE_LIMITED_MODE
 	Add(o, SwNewSfxFile("EntryPoint_LimitedMode.dat", L"|EntryPoint_LimitedMode.dat"));
+#endif // VARS_ENABLE_LIMITED_MODE
 	Add(o, SwNewSfxFile("install_src.dat", L"|install_src.dat"));
 
 	return true;
@@ -2993,6 +2999,10 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 		SW_TASK_COPY *et = NULL;
 		wchar_t tmp[MAX_PATH];
 
+#ifndef VARS_ENABLE_LIMITED_MODE
+		sw->InstallLimitedMode = false;
+#endif // VARS_ENABLE_LIMITED_MODE
+
 		if (sw->InstallLimitedMode == false)
 		{
 			// 通常モード
@@ -3001,7 +3011,9 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 		else
 		{
 			// 行政情報システム用 IP 特定モード
+#ifdef VARS_ENABLE_LIMITED_MODE
 			Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint_LimitedMode.dat", L"EntryPoint.dat", sw->InstallSrc, sw->InstallDir, true, false));
+#endif // VARS_ENABLE_LIMITED_MODE
 		}
 
 		CombinePathW(tmp, sizeof(tmp), et->DstDir, et->DstFileName);
@@ -6636,23 +6648,23 @@ void SwDefineComponents(SW *sw)
 	SW_COMPONENT *c;
 	char *ntt_server_files[] =
 	{
-		"ThinSvr.exe",
-		"ThinConfig.exe",
-		"hamcore.se2",
+		DI_FILENAME_DESKSERVER_ANSI, // ThinSvr.exe
+		DI_FILENAME_DESKCONFIG_ANSI, // ThinConfig.exe
+		DI_FILENAME_HAMCORE_ANSI, // hamcore.se2
 	};
 
 	char *ntt_server_ns_files[] =
 	{
-		"ThinSvrNS.exe",
-		"ThinConfig.exe",
-		"hamcore.se2",
+		DI_FILENAME_DESKSERVER_NOSHARE_SRC_ANSI, // ThinSvrNS.exe
+		DI_FILENAME_DESKCONFIG_ANSI, // ThinConfig.exe
+		DI_FILENAME_HAMCORE_ANSI, // hamcore.se2
 	};
 
 	char *ntt_client_files[] =
 	{
-		"ThinClient.exe",
-		"ThinConfig.exe",
-		"hamcore.se2",
+		DI_FILENAME_DESKCLIENT_ANSI, // ThinClient.exe
+		DI_FILENAME_DESKCONFIG_ANSI, // ThinConfig.exe
+		DI_FILENAME_HAMCORE_ANSI, // hamcore.se2
 	};
 
 	// Validate arguments

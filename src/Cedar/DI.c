@@ -2420,7 +2420,7 @@ void DiApplyProductFileList(DI *di)
 		// ThinSvr.exe の種類
 		wchar_t exe[MAX_PATH];
 
-		CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), L"thinsvr.exe");
+		CombinePathW(exe, sizeof(exe), MsGetExeDirNameW(), DI_FILENAME_DESKSERVER);
 		di->ForceShareDisabled = DsCheckShareDisableSignature(exe);
 
 		// Server
