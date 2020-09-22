@@ -1774,16 +1774,6 @@ CEDAR *NewCedar(X *server_x, K *server_k)
 
 	c->WebUI = WuNewWebUI(c);
 
-#ifdef	ALPHA_VERSION
-	beta_str = "Alpha";
-#else	// ALPHA_VERSION
-#ifndef	RELEASE_CANDIDATE
-	beta_str = "Beta";
-#else	// RELEASE_CANDIDATE
-	beta_str = "Release Candidate";
-#endif	// RELEASE_CANDIDATE
-#endif	// ALPHA_VERSION
-
 	ToStr(tmp2, c->Beta);
 
 	Format(tmp, sizeof(tmp), "Version %u.%02u Build %u %s %s (%s)",
