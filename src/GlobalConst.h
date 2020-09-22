@@ -1,109 +1,27 @@
-﻿// Desktop VPN Global Const
+﻿// Thin Telework System Global Const
 
 #pragma warning(disable : 4819)
 
 #ifndef	GLOBAL_CONST_H
 #define	GLOBAL_CONST_H
 
-//// Brand
-// (Define it if building SoftEther VPN Project.)
-#define	GC_SOFTETHER_VPN
-#define	GC_SOFTETHER_OSS
-
-
 //// For DeskVPN
-#define	DESK_PRODUCT_NAME_SUITE			"Thin Telework System"
-
-#define DESK_PUBLISHER_NAME_UNICODE		L"Thin Telework System"		// 元: L"SoftEther Corporation"
-#define DESK_PUBLISHER_NAME_ANSI		"Thin Telework System"			// 元: "SoftEther Corporation"
-#define	DESK_SECURE_PACK_NAME			"THIN_SERVER"			// 元: "DESK_SERVER"
-#define DESK_LOCALHOST_DUMMY_FQDN		"%s.secure.cyber.ipa.go.jp"
-
-#define DESK_SETTINGS_DIR_NAME			L"Thin Telework System Settings"
-
 #define DESK_SECURE_PACK_EASY_MODE		// 有効にすると簡易モードになる
-
 #define DU_SHOW_THEEND_KEY_NAME			"ShowTheEndDialog_Ver01"		// お疲れ様でした有効化キー
 #define	DU_ENABLE_RELAX_KEY_NAME		"EnableRelaxMode"				// リラックスモード
-#define DU_GOV_FW2_SINGLE_INSTANCE_NAME	"GovFw2"
-
-
-#define DG_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Server\\Config Tool"
-#define DI_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Server\\Installer"
-
-#define DU_REGKEY	"Software\\" DESK_PUBLISHER_NAME_ANSI "\\Thin Telework System Client\\UI"
-
-#define DI_RUDP_INSTALL_DIR		L"Common Files\\Thin Telework System Server RUDP Helper"
-
-#define DI_PRODUCT_SERVER_NAME	"ThinSvr"
-#define DI_PRODUCT_CLIENT_NAME	"ThinClient"
-
-#define DESK_SERVER_SVC_NAME			"THINSVR"										// Desk Server Windows サービス名
-
 #define	DESK_SVC_NAME					"DESK"	// WideTunnel 内でのサービス名
-#define DS_RPC_PORT						9823	// Server の RPC ポート					// 元: 9822
 
-#define	SW_SINGLE_INSTANCE_NAME				"Thin_Telework_Setup_Wizard"
-
-#define WT_GATE_DISABLE_SSL3		true
-#define WT_GATE_DISABLE_TLS1_0		true
-#define WT_GATE_DISABLE_TLS1_1		true
-
-#define ADDITIONAL_SECONDARY		"https://219.100.94.11/widecontrol/"
-
-
-// ソフトウェア更新チェック
-#define	UPDATE_SERVER_URL_GLOBAL	"https://update-check.dynamic-ip.thin.cyber.ipa.go.jp/update/?family=%s&software=%s&mybuild=%u&lang=%s"
-#define	UPDATE_SERVER_URL_CHINA		UPDATE_SERVER_URL_GLOBAL
-
-// イベントログのソース名
-#define	DS_EVENTLOG_SOURCE_NAME		L"Thin Telework System Server"
-
-// 定数
-#define DS_RPC_VER_SIGNATURE_STR	"Thin Telework System Server Configuration Procotol (localhost only)"
 #define DS_CONFIG_FILENAME			"@ThinSvr.config"
 #define DS_CONFIG_FILENAME2			L"ThinSvr.config"
-
 #define	DC_CONFIG_FILENAME			L"ThinClient.config"
-
-
-#define	GC_REG_COMPANY_NAME			"Thin Telework System"
-
 #define DU_WHITELIST_FILENAME		"|WhiteListRules.txt"
-
-
-// Installer 関係
-#define SW_NAME_THINSVR			"thinsvr"
-#define SW_LONG_THINSVR			L"Thin Telework System Server"
-
-#define SW_NAME_THINCLIENT			"thinclient"
-#define SW_LONG_THINCLIENT			L"Thin Telework System Client"
-
-
-// インストールするファイル名
-#define DI_FILENAME_DESKCLIENT		L"ThinClient.exe"
-#define DI_FILENAME_DESKCONFIG		L"ThinConfig.exe"
-#define DI_FILENAME_DESKSERVER		L"ThinSvr.exe"
-#define DI_FILENAME_DESKSETUP		L"ThinSetup.exe"
-#define	DI_FILENAME_DESKHELPER		L"ThinHelper.exe"
-#define DI_FILENAME_HAMCORE			L"hamcore.se2"
-#define DI_FILENAME_DESKSERVER_NOSHARE_SRC		L"ThinSvrNS.exe"
+#define DI_FILENAME_SETUPINI		L"@ThinSetup.ini"
 
 #define DS_EXE_COPY_FILENAME_FOR_EVENTLOG_RES	L"_EventLogResource.exe"
-
-#define SW_SETUP_NOSIGN_EXESRC		L"|ThinSetup_nosign.exe"
-#define SW_SETUP_EXE_X86			L"ThinSetup.exe"
-#define SW_SETUP_EXE_X64			L"ThinSetup_x64.exe"
 
 // マスター証明書ファイル名。このファイルが同一ディレクトリに置いてあったら、自分自身の証明書は動的生成する
 #define WT_MASTER_CERT_NAME			"@00_Master.cer"
 #define WT_MASTER_KET_NAME			"@00_Master.key"
-
-// 関係するファイル名
-#define DI_FILENAME_SETUPINI		L"@ThinSetup.ini"
-
-
-#define	GC_SVC_NAME_THINSVR		"THINSVR"
 
 //#define WT_TEST_WIDECONTROL_PROXY_CLIENT		// 本家と接続できないことのシミュレーション
 
@@ -116,9 +34,6 @@
 
 
 //// Basic Variables
-
-#define	CEDAR_PRODUCT_STR			"Thin Telework System"
-#define	CEDAR_PRODUCT_STR_W			L"Thin Telework System"
 #define	CEDAR_SERVER_STR			"SoftEther VPN Server"
 #define	CEDAR_BRIDGE_STR			"SoftEther VPN Bridge"
 #define	CEDAR_BETA_SERVER			"SoftEther VPN Server Pre Release"
@@ -164,6 +79,9 @@
 
 #define	GC_UI_APPID_CM				L"SoftEther.SoftEther VPN Client"
 
+
+
+#include "Vars.h"
 
 
 #endif	// GLOBAL_CONST_H

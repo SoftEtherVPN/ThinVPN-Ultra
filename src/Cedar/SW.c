@@ -6540,7 +6540,10 @@ SW_COMPONENT *SwNewComponent(char *name, char *svc_name, UINT id, UINT icon, UIN
 
 	c->SystemModeOnly = system_mode_only;
 	c->Name = CopyStr(name);
+	StrLower(c->Name);
+
 	c->SvcName = CopyStr(svc_name);
+	StrUpper(c->SvcName);
 	c->DefaultDirName = CopyUniStr(long_name);
 	c->LongName = CopyUniStr(long_name);
 

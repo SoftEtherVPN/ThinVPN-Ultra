@@ -901,9 +901,9 @@ void WtgAccept(WT *wt, SOCK *s)
 
 	// SSL 通信の開始
 	// SSL バージョン無効化
-	s->SslAcceptSettings.AcceptOnlyTls = WT_GATE_DISABLE_SSL3;
-	s->SslAcceptSettings.Tls_Disable1_0 = WT_GATE_DISABLE_TLS1_0;
-	s->SslAcceptSettings.Tls_Disable1_1 = WT_GATE_DISABLE_TLS1_1;  
+	s->SslAcceptSettings.AcceptOnlyTls = Vars_ActivePatch_GetBool("WtGateDisableSsl3");
+	s->SslAcceptSettings.Tls_Disable1_0 = Vars_ActivePatch_GetBool("WtGateDisableTls1_0");
+	s->SslAcceptSettings.Tls_Disable1_1 = Vars_ActivePatch_GetBool("WtGateDisableTls1_1"); 
 	if (StartSSLEx(s, wt->GateCert, wt->GateKey, true, 0, NULL) == false)
 	{
 		Debug("StartSSL Failed.\n");

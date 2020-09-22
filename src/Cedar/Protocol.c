@@ -1396,7 +1396,7 @@ void UpdateClientThreadMain(UPDATE_CLIENT *c)
 	}
 
 	// Generate the URL
-	Format(url, sizeof(url), IsUseAlternativeHostname() ? UPDATE_SERVER_URL_CHINA : UPDATE_SERVER_URL_GLOBAL, c->FamilyName, c->SoftwareName, c->MyBuild, c->MyLanguage);
+	Format(url, sizeof(url), UPDATE_SERVER_URL_GLOBAL, c->FamilyName, c->SoftwareName, c->MyBuild, c->MyLanguage);
 
 	if (IsEmptyStr(c->ClientId) == false)
 	{
