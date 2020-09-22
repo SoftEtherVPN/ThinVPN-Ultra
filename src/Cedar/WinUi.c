@@ -4520,8 +4520,9 @@ void AboutDlgInit(HWND hWnd, WINUI_ABOUT *a)
 	SetFontMeiryoEx(hWnd, S_INFO1, 12, true);
 	FormatText(hWnd, S_INFO1, CEDAR_VER / 100, CEDAR_VER % 100, CEDAR_BUILD);
 
-	SetFontMeiryo(hWnd, S_INFO2, 0);
-	FormatText(hWnd, S_INFO2, BUILD_DATE_Y, BUILD_DATE_Y, a->Cedar->BuildInfo);
+	SetFontMeiryo(hWnd, E_INFO2, 0);
+	UniFormat(tmp, sizeof(tmp), _UU("ABOUT_COPYRIGHT_INFO"), BUILD_DATE_Y, BUILD_DATE_Y, a->Cedar->BuildInfo);
+	SetText(hWnd, E_INFO2, tmp);
 
 	SetFont(hWnd, S_INFO3, GetFont("Arial", 7, false, false, false, false));
 

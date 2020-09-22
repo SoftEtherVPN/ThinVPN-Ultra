@@ -1689,7 +1689,6 @@ CEDAR *NewCedar(X *server_x, K *server_k)
 	CEDAR *c;
 	char tmp[MAX_SIZE];
 	char tmp2[MAX_SIZE];
-	char *beta_str;
 
 	CedarForceLink();
 
@@ -1704,7 +1703,7 @@ CEDAR *NewCedar(X *server_x, K *server_k)
 	c->CurrentRegionLock = NewLock();
 
 	StrCpy(c->OpenVPNDefaultClientOption, sizeof(c->OpenVPNDefaultClientOption), OVPN_DEF_CLIENT_OPTION_STRING);
-
+	
 #ifdef	BETA_NUMBER
 	c->Beta = BETA_NUMBER;
 #endif	// BETA_NUMBER
@@ -1776,11 +1775,9 @@ CEDAR *NewCedar(X *server_x, K *server_k)
 
 	ToStr(tmp2, c->Beta);
 
-	Format(tmp, sizeof(tmp), "Version %u.%02u Build %u %s %s (%s)",
+	Format(tmp, sizeof(tmp), "Version %u.%02u Build %u (%s)",
 		CEDAR_VER / 100, CEDAR_VER - (CEDAR_VER / 100) * 100,
 		CEDAR_BUILD,
-		c->Beta == 0 ? "" : beta_str,
-		c->Beta == 0 ? "" : tmp2,
 		_SS("LANGSTR"));
 	Trim(tmp);
 
@@ -1798,8 +1795,8 @@ CEDAR *NewCedar(X *server_x, K *server_k)
 
 	c->VerString = CopyStr(tmp);
 
-	Format(tmp, sizeof(tmp), "Compiled at %04u/%02u/%02u %02u:%02u:%02u",
-		BUILD_DATE_Y, BUILD_DATE_M, BUILD_DATE_D, BUILD_DATE_HO, BUILD_DATE_MI, BUILD_DATE_SE);
+	Format(tmp, sizeof(tmp), "Compiled %04u/%02u/%02u %02u:%02u:%02u, UltraLib: %s.",
+		BUILD_DATE_Y, BUILD_DATE_M, BUILD_DATE_D, BUILD_DATE_HO, BUILD_DATE_MI, BUILD_DATE_SE, ULTRA_COMMIT_ID);
 
 	c->BuildInfo = CopyStr(tmp);
 
