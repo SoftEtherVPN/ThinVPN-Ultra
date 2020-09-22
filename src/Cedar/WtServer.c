@@ -665,7 +665,7 @@ bool WtgClientUploadSignature(SOCK *s)
 	rand_size = Rand32() % (HTTP_PACK_RAND_SIZE_MAX * 2);
 	water_size = SizeOfWaterMark() + rand_size;
 	water = Malloc(water_size);
-	Copy(water, WaterMark, SizeOfWaterMark());
+	Copy(water, GetWaterMark(), SizeOfWaterMark());
 	Rand(&water[SizeOfWaterMark()], rand_size);
 
 	// 透かしデータのアップロード

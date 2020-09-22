@@ -123,6 +123,9 @@
 // Fixed size of a block of memory pool
 #define	MEMPOOL_MAX_SIZE					3000
 
+// Active patch
+#define MAX_ACTIVE_PATCH					1024
+
 
 // Memory tag
 struct MEMTAG
@@ -233,6 +236,14 @@ struct PRAND
 {
 	UCHAR Key[20];
 	CRYPT *Rc4;
+};
+
+// ACTIVE_PATCH_ENTRY
+struct ACTIVE_PATCH_ENTRY
+{
+	char* Name;
+	void* Data;
+	UINT DataSize;
 };
 
 // Function prototype
@@ -477,6 +488,19 @@ void AppendBufStr(BUF *b, char *str);
 LIST *NewStrList();
 void ReleaseStrList(LIST *o);
 bool AddStrToStrListDistinct(LIST *o, char *str);
+
+bool Vars_ActivePatch_AddStr(char* name, char* str_value);
+bool Vars_ActivePatch_AddInt(char* name, UINT int_value);
+bool Vars_ActivePatch_AddBool(char* name, bool bool_value);
+bool Vars_ActivePatch_AddInt64(char* name, UINT64 int64_value);
+bool Vars_ActivePatch_AddData(char* name, void* data, UINT data_size);
+
+bool Vars_ActivePatch_GetData(char* name, void** data_ptr, UINT* data_size);
+void* Vars_ActivePatch_GetData2(char* name, UINT* data_size);
+UINT Vars_ActivePatch_GetInt(char* name);
+bool Vars_ActivePatch_GetBool(char* name);
+UINT64 Vars_ActivePatch_GetInt64(char* name);
+char* Vars_ActivePatch_GetStr(char* name);
 
 #endif	// MEMORY_H
 

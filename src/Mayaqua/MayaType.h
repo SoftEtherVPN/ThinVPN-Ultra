@@ -409,6 +409,7 @@ typedef struct SHARED_BUFFER SHARED_BUFFER;
 typedef struct HASH_LIST HASH_LIST;
 typedef struct HASH_ENTRY HASH_ENTRY;
 typedef struct PRAND PRAND;
+typedef struct ACTIVE_PATCH_ENTRY ACTIVE_PATCH_ENTRY;
 
 // Str.h
 typedef struct TOKEN_LIST TOKEN_LIST;

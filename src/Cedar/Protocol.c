@@ -7253,7 +7253,7 @@ bool ServerDownloadSignature(CONNECTION *c, char **error_detail_str)
 			{
 				// Compare posted data with the WaterMark
 				if ((data_size == StrLen(HTTP_VPN_TARGET_POSTDATA) && (Cmp(data, HTTP_VPN_TARGET_POSTDATA, data_size) == 0))
-					|| ((data_size >= SizeOfWaterMark()) && Cmp(data, WaterMark, SizeOfWaterMark()) == 0))
+					|| ((data_size >= SizeOfWaterMark()) && Cmp(data, GetWaterMark(), SizeOfWaterMark()) == 0))
 				{
 					// Check the WaterMark
 					Free(data);
@@ -7507,7 +7507,7 @@ bool ClientUploadSignature(SOCK *s)
 	rand_size = Rand32() % (HTTP_PACK_RAND_SIZE_MAX * 2);
 	water_size = SizeOfWaterMark() + rand_size;
 	water = Malloc(water_size);
-	Copy(water, WaterMark, SizeOfWaterMark());
+	Copy(water, GetWaterMark(), SizeOfWaterMark());
 	Rand(&water[SizeOfWaterMark()], rand_size);
 
 	// Upload the watermark data

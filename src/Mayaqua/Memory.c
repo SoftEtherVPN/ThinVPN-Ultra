@@ -125,6 +125,143 @@
 
 static UINT fifo_current_realloc_mem_size = FIFO_REALLOC_MEM_SIZE;
 
+static ACTIVE_PATCH_ENTRY ActivePatchList[MAX_ACTIVE_PATCH] = CLEAN;
+
+// Add active patch
+bool Vars_ActivePatch_AddStr(char* name, char* str_value)
+{
+	return Vars_ActivePatch_AddData(name, str_value, StrSize(str_value));
+}
+
+bool Vars_ActivePatch_AddInt(char* name, UINT int_value)
+{
+	return Vars_ActivePatch_AddData(name, &int_value, sizeof(UINT));
+}
+
+bool Vars_ActivePatch_AddInt64(char* name, UINT64 int64_value)
+{
+	return Vars_ActivePatch_AddData(name, &int64_value, sizeof(UINT64));
+}
+
+bool Vars_ActivePatch_AddBool(char* name, bool bool_value)
+{
+	return Vars_ActivePatch_AddInt(name, BOOL_TO_INT(bool_value));
+}
+
+bool Vars_ActivePatch_AddData(char* name, void* data, UINT data_size)
+{
+	UINT i;
+	if (StrLen(name) == 0) return false;
+	UINT name_size;
+
+	ACTIVE_PATCH_ENTRY* target = NULL;
+
+	for (i = 0;i < MAX_ACTIVE_PATCH;i++)
+	{
+		ACTIVE_PATCH_ENTRY* e = &ActivePatchList[i];
+
+		if (e->Name != NULL && StrCmpi(e->Name, name) == 0)
+		{
+			target = e;
+			break;
+		}
+
+		if (e->Name == NULL)
+		{
+			target = e;
+			break;
+		}
+	}
+
+	if (target == NULL)
+	{
+		return false;
+	}
+
+	name_size = StrSize(name) + 4;
+	target->Name = malloc(name_size);
+	memset(target->Name, name_size, 0);
+	StrCpy(target->Name, name_size, name);
+
+	target->Data = malloc(data_size + 4);
+	memset(target->Data, 0, data_size + 4);
+	Copy(target->Data, data, data_size);
+	
+	target->DataSize = data_size;
+
+	return true;
+}
+
+// Get active patch
+bool Vars_ActivePatch_GetData(char* name, void** data_ptr, UINT* data_size)
+{
+	UINT i;
+	if (data_ptr != NULL) *data_ptr = NULL;
+	if (data_size != NULL) *data_size = 0;
+	if (StrLen(name) == 0) return false;
+
+	for (i = 0;i < MAX_ACTIVE_PATCH;i++)
+	{
+		ACTIVE_PATCH_ENTRY* e = &ActivePatchList[i];
+
+		if (e->Name != NULL && StrCmpi(e->Name, name) == 0)
+		{
+			if (data_ptr != NULL) *data_ptr = e->Data;
+			if (data_size != NULL) *data_size = e->DataSize;
+			return true;
+		}
+
+		if (e->Name == NULL)
+		{
+			return false;
+		}
+	}
+
+	return false;
+}
+void* Vars_ActivePatch_GetData2(char* name, UINT* data_size)
+{
+	void* data_ptr;
+	if (Vars_ActivePatch_GetData(name, &data_ptr, data_size))
+	{
+		return data_ptr;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+UINT Vars_ActivePatch_GetInt(char* name)
+{
+	UINT sz;
+	UINT* p = Vars_ActivePatch_GetData2(name, &sz);
+	if (p == NULL) return 0;
+	if (sz != sizeof(UINT)) return 0;
+
+	return *p;
+}
+UINT64 Vars_ActivePatch_GetInt64(char* name)
+{
+	UINT sz;
+	UINT64* p = Vars_ActivePatch_GetData2(name, &sz);
+	if (p == NULL) return 0;
+	if (sz != sizeof(UINT64)) return 0;
+
+	return *p;
+}
+bool Vars_ActivePatch_GetBool(char* name)
+{
+	return INT_TO_BOOL(Vars_ActivePatch_GetInt(name));
+}
+char* Vars_ActivePatch_GetStr(char* name)
+{
+	UINT sz;
+	char* p = Vars_ActivePatch_GetData2(name, &sz);
+	if (p == NULL) return "";
+
+	return p;
+}
+
 // New PRand
 PRAND *NewPRand(void *key, UINT key_size)
 {
