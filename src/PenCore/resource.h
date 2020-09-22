@@ -37,7 +37,6 @@
 #define B_STOP                          9
 #define B_AUTHORS                       9
 #define B_EDIT                          10
-#define B_COPYVER                       10
 #define S_STATUSBAR                     101
 #define ICO_TEST                        103
 #define BMP_TEST                        104
@@ -1073,6 +1072,7 @@
 #define D_DG_BMP_OTP                    1527
 #define D_SW_WELCOME_BMP_VPNSERVER_FIGURE 1528
 #define E_INFO2                         1529
+#define D_DG_PASSWORD2_BMP_PASSWORD2    1530
 #define B_ONLINE                        1655
 #define D_NM_CONNECT                    1998
 #define D_NM_MAIN                       1999
@@ -1294,6 +1294,7 @@
 #define C_SHARE_DISK                    2594
 #define C_SHARE_PRINTER                 2595
 #define S_LANG_JP                       2596
+#define D_DG_PASSWORD1_BMP_PASSWORD1    2596
 #define S_LANG_EN                       2597
 #define S_LANG_JP2                      2598
 #define IDC_CHECK2                      2599
@@ -1442,7 +1443,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        251
 #define _APS_NEXT_COMMAND_VALUE         40111
-#define _APS_NEXT_CONTROL_VALUE         1530
+#define _APS_NEXT_CONTROL_VALUE         1531
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

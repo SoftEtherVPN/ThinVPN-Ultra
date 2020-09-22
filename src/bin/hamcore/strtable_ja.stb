@@ -7888,7 +7888,7 @@ SW_NOTICE_VPNBRIDGE_IS_INSTALLED			コンポーネントとして SoftEther VPN 
 SW_OS_FAILED								%s はこのオペレーティングシステムにはインストールできません。
 SW_LANG_NOT_CHANGED							%s の言語設定は変更されませんでした。
 SW_LANG_LIST_LOAD_FAILED					言語一覧データの読み込みに失敗しました。
-SW_LANG_OK									%s の表示言語の変更が完了しました。\r\n%s のプログラムが起動している場合は、プログラムを一度終了してから再起動すると新しい表示言語が適用されます。表示言語が変化しない場合は、Windows を再起動してみてください。\r\n
+SW_LANG_OK									%s の表示言語の変更が完了しました。%s または Windows を再起動すると適用されます。
 SW_LANG_OK_SERVICE							\r\nサービスが動作している場合は、サービスの出力するログファイルの言語設定はサービスを再起動した後に適用されます。
 SW_LANG_OK_VPNCMGR							\r\nVPN クライアント接続マネージャの表示言語は、VPN クライアント接続マネージャを終了 (タスクトレイに常駐させている場合は完全に終了) してから再起動した後に適用されます。
 SW_CHILD_PROCESS_ERROR						子プロセスを起動できませんでした。
