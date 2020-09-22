@@ -4851,7 +4851,7 @@ CAPTION					It is recommended to set the Password
 S_1						Set the password for protecting this computer for safety.
 S_2						You can use password authentication function.\r\nEnable password authentication, then anyone who don't know the correct password cannot access remotely to this computer with $APPSHORT$.\r\n\r\nIt is recommended to set the password to protect your computer.
 C_DONTSHOW				&Do not show this message again
-IDOK					Use &Password Authentication to protect Computer
+IDOK					Set authentication &password
 IDCANCEL				Do not use (Danger)
 
 
