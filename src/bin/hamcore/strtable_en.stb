@@ -725,7 +725,7 @@ CONNECTDLG_CANCELING	Aborting the connection. Please wait...
 
 
 # About ダイアログ関係
-ABOUT_COPYRIGHT_INFO	Copyright (c) %u NTT East Japan Special Affairs Bureau. All Rights Reserved.\r\nCopyright (c) %u IPA CyberLab of Industrial Cyber Security Center. All Rights Reserved.\r\n\r\n%S
+ABOUT_COPYRIGHT_INFO	Copyright (c) %u NTT East Special Affairs Bureau. All Rights Reserved.\r\nCopyright (c) %u IPA CyberLab of Industrial Cyber Security Center. All Rights Reserved.\r\n\r\n%S
 
 
 # NIC Info Dialog
