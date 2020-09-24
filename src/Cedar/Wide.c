@@ -2789,7 +2789,7 @@ void WideGateLoadCertKey(X **cert, K **key)
 		FreeX(*cert);
 		FreeK(*key);
 
-		Alert("WideGateLoadCertKey failed.", "WideGate");
+		Alert("WideGateLoadCertKey failed.", "ThinGate");
 		AbortExitEx("WideGateLoadCertKey failed.");
 	}
 
