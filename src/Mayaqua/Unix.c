@@ -75,8 +75,6 @@
 
 #include <GlobalConst.h>
 
-#ifdef	UNIX
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -85,6 +83,8 @@
 #include <time.h>
 #include <errno.h>
 #include <Mayaqua/Mayaqua.h>
+
+#ifdef	UNIX
 
 #ifdef	UNIX_MACOS
 #include <mach/clock.h>
