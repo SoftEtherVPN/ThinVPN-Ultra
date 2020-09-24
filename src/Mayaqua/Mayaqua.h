@@ -103,6 +103,7 @@ void InitProcessCallOnce();
 #ifdef	_WIN32
 #include <windows.h>
 #include "../PenCore/resource.h"
+#ifndef VPN_NO_REDEFINE_WINMAIN
 int main(int argc, char *argv[]);
 int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 {
@@ -110,6 +111,7 @@ int PASCAL WinMain(HINSTANCE hInst, HINSTANCE hPrev, char *CmdLine, int CmdShow)
 	InitProcessCallOnceEx(1);
 	return main(1, argv);
 }
+#endif // !VPN_NO_REDEFINE_WINMAIN
 #endif	// _WIN32
 #endif	// VPN_EXE
 
