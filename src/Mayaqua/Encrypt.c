@@ -107,10 +107,6 @@
 #include <openssl/x509v3.h>
 #include <Mayaqua/Mayaqua.h>
 
-#ifdef	USE_INTEL_AESNI_LIBRARY
-#include <intelaes/iaesni.h>
-#endif	// USE_INTEL_AESNI_LIBRARY
-
 LOCK *openssl_lock = NULL;
 
 int ssl_clientcert_index = 0;
@@ -4874,14 +4870,6 @@ void AesEncrypt(void *dest, void *src, UINT size, AES_KEY_VALUE *k, void *ivec)
 		return;
 	}
 
-#ifdef	USE_INTEL_AESNI_LIBRARY
-	if (is_intel_aes_supported)
-	{
-		AesEncryptWithIntel(dest, src, size, k, ivec);
-		return;
-	}
-#endif	// USE_INTEL_AESNI_LIBRARY
-
 	Copy(ivec_copy, ivec, AES_IV_SIZE);
 
 	AES_cbc_encrypt(src, dest, size, k->EncryptKey, ivec, 1);
@@ -4897,14 +4885,6 @@ void AesDecrypt(void *dest, void *src, UINT size, AES_KEY_VALUE *k, void *ivec)
 		return;
 	}
 
-#ifdef	USE_INTEL_AESNI_LIBRARY
-	if (is_intel_aes_supported)
-	{
-		AesDecryptWithIntel(dest, src, size, k, ivec);
-		return;
-	}
-#endif	// USE_INTEL_AESNI_LIBRARY
-
 	Copy(ivec_copy, ivec, AES_IV_SIZE);
 
 	AES_cbc_encrypt(src, dest, size, k->DecryptKey, ivec, 0);
@@ -4917,18 +4897,7 @@ bool IsIntelAesNiSupported()
 }
 void CheckIfIntelAesNiSupportedInit()
 {
-#ifdef	USE_INTEL_AESNI_LIBRARY
-	if (check_for_aes_instructions())
-	{
-		is_intel_aes_supported = true;
-	}
-	else
-	{
-		is_intel_aes_supported = false;
-	}
-#else	// USE_INTEL_AESNI_LIBRARY
 	is_intel_aes_supported = false;
-#endif	// USE_INTEL_AESNI_LIBRARY
 }
 
 // Disable the Intel AES-NI
@@ -4936,66 +4905,6 @@ void DisableIntelAesAccel()
 {
 	is_intel_aes_supported = false;
 }
-
-#ifdef	USE_INTEL_AESNI_LIBRARY
-// Encrypt AES using the Intel AES-NI
-void AesEncryptWithIntel(void *dest, void *src, UINT size, AES_KEY_VALUE *k, void *ivec)
-{
-	UCHAR ivec_copy[AES_IV_SIZE];
-
-	// Validate arguments
-	if (dest == NULL || src == NULL || size == 0 || k == NULL || ivec == NULL)
-	{
-		return;
-	}
-
-	Copy(ivec_copy, ivec, AES_IV_SIZE);
-
-	switch (k->KeySize)
-	{
-	case 16:
-		intel_AES_enc128_CBC(src, dest, k->KeyValue, (size / AES_IV_SIZE), ivec_copy);
-		break;
-
-	case 24:
-		intel_AES_enc192_CBC(src, dest, k->KeyValue, (size / AES_IV_SIZE), ivec_copy);
-		break;
-
-	case 32:
-		intel_AES_enc256_CBC(src, dest, k->KeyValue, (size / AES_IV_SIZE), ivec_copy);
-		break;
-	}
-}
-
-// Decrypt AES using the Intel AES-NI
-void AesDecryptWithIntel(void *dest, void *src, UINT size, AES_KEY_VALUE *k, void *ivec)
-{
-	UCHAR ivec_copy[AES_IV_SIZE];
-
-	// Validate arguments
-	if (dest == NULL || src == NULL || size == 0 || k == NULL || ivec == NULL)
-	{
-		return;
-	}
-
-	Copy(ivec_copy, ivec, AES_IV_SIZE);
-
-	switch (k->KeySize)
-	{
-	case 16:
-		intel_AES_dec128_CBC(src, dest, k->KeyValue, (size / AES_IV_SIZE), ivec_copy);
-		break;
-
-	case 24:
-		intel_AES_dec192_CBC(src, dest, k->KeyValue, (size / AES_IV_SIZE), ivec_copy);
-		break;
-
-	case 32:
-		intel_AES_dec256_CBC(src, dest, k->KeyValue, (size / AES_IV_SIZE), ivec_copy);
-		break;
-	}
-}
-#endif	// USE_INTEL_AESNI_LIBRARY
 
 // Calculation of HMAC-SHA-1-96
 void MacSha196(void *dst, void *key, void *data, UINT data_size)

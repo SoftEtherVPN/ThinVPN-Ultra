@@ -550,11 +550,6 @@ void AesDecrypt(void *dest, void *src, UINT size, AES_KEY_VALUE *k, void *ivec);
 bool IsIntelAesNiSupported();
 void CheckIfIntelAesNiSupportedInit();
 
-#ifdef	USE_INTEL_AESNI_LIBRARY
-void AesEncryptWithIntel(void *dest, void *src, UINT size, AES_KEY_VALUE *k, void *ivec);
-void AesDecryptWithIntel(void *dest, void *src, UINT size, AES_KEY_VALUE *k, void *ivec);
-#endif	// USE_INTEL_AESNI_LIBRARY
-
 void OpenSSL_InitLock();
 void OpenSSL_FreeLock();
 void OpenSSL_Lock(int mode, int n, const char *file, int line);

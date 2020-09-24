@@ -256,7 +256,6 @@
     <ClInclude Include="cryptoki.h" />
     <ClInclude Include="Encrypt.h" />
     <ClInclude Include="FileIO.h" />
-    <ClInclude Include="intelaes\iaesni.h" />
     <ClInclude Include="Internat.h" />
     <ClInclude Include="Kernel.h" />
     <ClInclude Include="Mayaqua.h" />

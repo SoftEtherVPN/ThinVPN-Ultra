@@ -69,9 +69,6 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{1f53c898-7cbe-4543-9109-95f39284c417}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\intelaes">
-      <UniqueIdentifier>{fb1a06f9-6b8a-46ee-ae41-2d42f8d1e6cf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\openssl">
       <UniqueIdentifier>{572a2a5e-ae03-4d1f-890d-a01020b5445b}</UniqueIdentifier>
     </Filter>
@@ -157,9 +154,6 @@
     </ClInclude>
     <ClInclude Include="Win32.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="intelaes\iaesni.h">
-      <Filter>Header Files\intelaes</Filter>
     </ClInclude>
     <ClInclude Include="openssl\aes.h">
       <Filter>Header Files\openssl</Filter>
