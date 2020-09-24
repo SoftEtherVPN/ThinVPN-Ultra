@@ -548,7 +548,7 @@ SVC_$APP_ID_PREFIX$THINSVR_DESCRIPT	このサービスは、システムモー�
 
 
 # ThinGate サービス定義
-SVC_THINGATE_NAME		THINGATE
+SVC_THINGATE_NAME		thingate
 SVC_THINGATE_TITLE		ThinGate
 SVC_THINGATE_DESCRIPT	ThinGate Relay Service
 
