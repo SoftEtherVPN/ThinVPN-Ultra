@@ -7849,7 +7849,7 @@ SW_PERFORM_TITLE							セットアップの進行中
 SW_ERROR_TITLE								セットアップの結果
 SW_FINISH_TITLE								セットアップが完了しました
 SW_UNINST1_TITLE							アンインストールの開始
-SW_LANG1_TITLE								Thin Telework System: Configure the Display Language (言語設定の変更)
+SW_LANG1_TITLE								$APPSHORT_EN$: Configure the Display Language (言語設定の変更)
 SW_EASY1_TITLE								SoftEther VPN Client 簡易インストーラ作成ウィザードへようこそ
 SW_EASY2_TITLE								ファイルの指定
 SW_WEB1_TITLE								SoftEther VPN Client Web インストーラ作成ウィザードへようこそ
@@ -7972,7 +7972,7 @@ SW_LONG_VPNBRIDGE							SoftEther VPN Bridge
 SW_LONG_VPNSMGR								SoftEther VPN Server Manager
 SW_LONG_VPNCMGR								SoftEther VPN Client Manager
 SW_LANG_SET_FAILED							Failed to write the new language setting on lang.config file.
-SW_LINK_NAME_THINSVR_SVC					Thin Telework System User-mode Service
+SW_LINK_NAME_THINSVR_SVC					$APPSHORT_EN$ User-mode Service
 
 
 # ショートカット名 (シン・テレワーク)

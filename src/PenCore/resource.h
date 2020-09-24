@@ -1073,6 +1073,10 @@
 #define D_SW_WELCOME_BMP_VPNSERVER_FIGURE 1528
 #define E_INFO2                         1529
 #define D_DG_PASSWORD2_BMP_PASSWORD2    1530
+#define D_DG_WOL_BMP_WOL                1531
+#define D_DU_WOL_BMP_WOL                1532
+#define D_DU_GOVFW1_BMP_GOVFW1          1533
+#define D_DU_GOVFW2_BMP_GOVFW1          1534
 #define B_ONLINE                        1655
 #define D_NM_CONNECT                    1998
 #define D_NM_MAIN                       1999
@@ -1443,7 +1447,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        251
 #define _APS_NEXT_COMMAND_VALUE         40111
-#define _APS_NEXT_CONTROL_VALUE         1531
+#define _APS_NEXT_CONTROL_VALUE         1535
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
