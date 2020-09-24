@@ -5097,8 +5097,13 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 			sw->IsSystemMode = false;
 		}
 
+#ifdef VARS_ENABLE_LIMITED_MODE
 		Check(hWnd, R_LIMITED, MsRegReadIntEx2(REG_CURRENT_USER, SW_REG_KEY_LIMITED,
 			sw->CurrentComponent->Name, false, true));
+#else  // VARS_ENABLE_LIMITED_MODE
+		Hide(hWnd, R_LIMITED);
+		Hide(hWnd, R_LIMIB_LIMITED_HELPTED);
+#endif // VARS_ENABLE_LIMITED_MODE
 
 		SetIcon(hWnd, S_ICON, sw->CurrentComponent->Icon);
 
