@@ -5102,7 +5102,7 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 			sw->CurrentComponent->Name, false, true));
 #else  // VARS_ENABLE_LIMITED_MODE
 		Hide(hWnd, R_LIMITED);
-		Hide(hWnd, R_LIMIB_LIMITED_HELPTED);
+		Hide(hWnd, B_LIMITED_HELP);
 #endif // VARS_ENABLE_LIMITED_MODE
 
 		SetIcon(hWnd, S_ICON, sw->CurrentComponent->Icon);
