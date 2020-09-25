@@ -414,13 +414,15 @@ DU_FELONY_STR2			$APPVERYSHORT$作業中 ログイン日時: %s\r\n%S\r\nサー�
 DU_FELONY_FONT_XP		MS UI Gothic
 DU_FELONY_FONT_7		Meiryo UI
 
+DU_SOUMU_DISABLE_SHARE	$APPFULL$ では、総務省 「地方公共団体における情報セキュリティポリシーに関するガイドライン」 および 「新型コロナウィルスへの対応等を踏まえた LGWAN 接続系のテレワークセキュリティ要件」 等の指針に基づき、情報漏えいを防止するため、クリップボード、ハードディスク (ファイル)、プリンタ、シリアルポート、Web カメラおよびマイクの共有機能は、利用することができません。
+
 
 
 # シン・テレワークシステム サーバー管理ツール関係
 DG_TITLE				$APPFULL_SERVER$管理ツール
 DG_PROXY_FROM_IE		現在の Internet Explorer のプロキシサーバーの設定を読み込みました。
-DG_INTERNET_CONNECT_OK_1	正常にインターネットに接続されています。\r\nこのコンピュータの ID は 「%S」 です。\r\n\r\n現在、$APPSHORT$ を経由してこのコンピュータにリモートアクセスできる状態となっています。
-DG_INTERNET_CONNECT_OK_2	「クライアントからの接続を禁止する」状態になっています。\r\n\r\n現在はインターネット経由でこのコンピュータにリモートアクセスすることはできません。
+DG_INTERNET_CONNECT_OK_1	正常に中継システムに接続されています。\r\nこのコンピュータの ID は 「%S」 です。\r\n\r\n現在、$APPSHORT$ を経由してこのコンピュータにリモートアクセスできる状態となっています。
+DG_INTERNET_CONNECT_OK_2	「クライアントからの接続を禁止する」状態になっています。\r\n\r\n現在は中継システム経由でこのコンピュータにリモートアクセスすることはできません。
 DG_CURRENT_OK			現在の状態:
 DG_CURRENT_ERROR		エラー発生:
 DG_CHANGE_PCID_OK		このコンピュータのコンピュータ ID を '%S' に設定しました。
@@ -4576,6 +4578,7 @@ S8						この設定ツールを開くためのパスワードを設定します
 B_PASSWORD				設定用パスワードの設定(&W)...
 IDCANCEL				閉じる(&X)
 S9						設定が完了したら、[閉じる] ボタンをクリックしてこの画面を閉じてください。
+S_SYSTEM				中継システム:
 
 
 PREFIX					D_DG_PROXY
@@ -4657,7 +4660,7 @@ B_LOG					ログファイルを開く(&O)
 B_ADDGROUP				以下のユーザーを常に Remote Desktop Users グループに追加(&G)
 S_1						ユーザー名:
 B_CURRENTUSER			現在のユーザーを指定
-B_RDP_OPTIMIZE			Windows の RDP の設定の $APPSHORT$ への最適化を維持(&O)
+B_RDP_OPTIMIZE			Windows の RDP の設定の $APPVERYSHORT$ への最適化を維持(&O)
 S_18					RDP 接続受付時に以下のサービスを停止(&S): (スペース区切りで複数指定可)
 C_EVENTLOG				Windows のイベントログに記録する(&E)
 C_SYSLOG				syslog プロトコルで送信する(&S)
@@ -4703,6 +4706,7 @@ IDCANCEL				キャンセル
 B_ERASE					履歴消去(&E)
 B_SHARE					共有設定(&S)...
 B_OPTION				オプション(&O)...
+S_SYSTEM				接続先中継システム:
 
 
 PREFIX					D_DU_OPTION
@@ -4895,6 +4899,7 @@ S2						情報システムにおいて、$APPSHORT_SERVER$ インストール済
 S3						1. モデル PC における $APPSHORT_SERVER$ の設定を完了します。\r\n2. モデル PC におけるそれ以外のソフトウェアの設定も完了します。\r\n3. クローン前の最後のシャットダウン直前 (クローン前に再起動が発生しないことが確実なタイミング) に、「次回起動時に固有 ID をリセット」ボタンをクリックします。\r\n4. PC をシャットダウンします。\r\n5. ディスクイメージをクローンして展開します。\r\n6. 5 で展開されたディスクイメージを起動した各コンピュータ (または VM) の $APPSHORT_SERVER$ の固有 ID は、それぞれ新しく、互いに異なるランダムな ID に初期化されます。
 B_RESET					次回起動時に固有 ID をリセット(&R)
 S4						「次回起動時に固有 ID をリセット」ボタンを押すと、次回の $APPSHORT_SERVER$ の起動時にこのコンピュータの固有 ID は初期化されます。コンピュータ ID も初期化されます。現在使用しているコンピュータ ID は二度と使用できなくなります。
+S_SYSTEM				中継システム:
 
 
 PREFIX					D_DU_AUTH

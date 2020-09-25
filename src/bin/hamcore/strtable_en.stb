@@ -422,13 +422,15 @@ DU_FELONY_STR2 					$APPVERYSHORT$ Login date and time: %s\r\n%S\r\nServer compu
 DU_FELONY_FONT_XP 				Tahoma
 DU_FELONY_FONT_7 				Segoe UI
 
+DU_SOUMU_DISABLE_SHARE			The Ministry of Internal Affairs and Communications (MIC) guidelines such as "Guidelines for Information Security Policies of Local Governments" and "Telework Security Requirements for LGWAN Connection Systems Based on Countermeasures Against New Corona Viruses" are quite important, and should be respected. To prevent information leakage, the clipboard, hard disk (file), printer, serial port, webcam, and microphone sharing functions have been disabled in $APPFULL$.
+
 
 
 # PacketiX Desktop VPN サーバー管理ツール関係
 DG_TITLE				$APPSHORT_SERVER$ Configuration Tool
 DG_PROXY_FROM_IE		Currently proxy setting from Internet Explorer was loaded.
-DG_INTERNET_CONNECT_OK_1	Excellently connected to the Internet.\r\nComputer ID for this PC is '%S'.\r\n\r\nYou can access remotely to this computer from $APPSHORT_CLIENT$ via the Internet.
-DG_INTERNET_CONNECT_OK_2	The current configured not to accept new connection.\r\n\r\nYou can't access remotely to this computer via the Internet.
+DG_INTERNET_CONNECT_OK_1	Excellently connected to the gateway system.\r\nComputer ID for this PC is '%S'.\r\n\r\nYou can access remotely to this computer from $APPSHORT_CLIENT$ via the Internet.
+DG_INTERNET_CONNECT_OK_2	The current configured not to accept new connection.\r\n\r\nYou can't access remotely to this computer via the gateway system.
 DG_CURRENT_OK			Status:
 DG_CURRENT_ERROR		Error:
 DG_CHANGE_PCID_OK		Computer ID of this computer is now '%S'.
@@ -4570,6 +4572,7 @@ S8						You can set the password to protect this Configuration Tool.
 B_PASSWORD				Set the Pass&word...
 IDCANCEL				Close (&X)
 S9						Please press Close after all settings are completed.
+S_SYSTEM				Gateway System:
 
 
 PREFIX					D_DG_PROXY
@@ -4650,7 +4653,7 @@ B_LOG					&Open log directory
 B_ADDGROUP				Add below user to Remote Desktop Users &group of Windows
 S_1						Username:
 B_CURRENTUSER			Specify current username
-B_RDP_OPTIMIZE			&Optimize Windows RDP internal settings for $APPSHORT$
+B_RDP_OPTIMIZE			&Optimize Windows RDP internal settings for $APPVERYSHORT$
 S_18					&Stop the following service(s) on accepting new RDP: (Delimiter: space letter)
 C_EVENTLOG				Save Windows &Event Log
 C_SYSLOG				Send &syslog protocol
@@ -4696,6 +4699,7 @@ IDCANCEL				Cancel
 B_ERASE					&Erase history
 B_SHARE					&Sharing...
 B_OPTION				&Options...
+S_SYSTEM				Gateway System:
 
 
 PREFIX					D_DU_OPTION
@@ -4888,6 +4892,7 @@ S2						Please follow the steps below to clone and sysprep a Windows installed d
 S3						1. Complete the configuration of $APPSHORT_SERVER$ on the Model PC.\r\n2. Complete the rest of the software configuration on the model PC.\r\n3. Click the "Reset unique ID on next start-up" button just before the last shutdown before the clone (to ensure that no reboot will occur before the clone). \r\n4. Shut down the PC.\r\n5. Clone and extract the disk image.\r\n6. The unique ID of the Thin Telework System Server for each computer (or VM) that booted the disk image extracted in step 5 is initialized to a new, random ID that is different from each other.
 B_RESET					&Reset unique ID on next start-up
 S4						When you press the "Reset unique ID on next start-up" button, the unique ID of this computer will be initialized the next time you start $APPSHORT_SERVER$. The computer ID is also initialized. The computer ID that you are currently using can never be used again.
+S_SYSTEM				Gateway System:
 
 
 

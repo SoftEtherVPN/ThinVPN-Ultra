@@ -1756,7 +1756,7 @@ bool DgAuthDlg(HWND hWnd, DG *dg)
 // 固有 ID ダイアログの初期化
 void DgHashDlgInit(HWND hWnd, DG *dg)
 {
-	HFONT h;
+	HFONT h, h2;
 	RPC_DS_STATUS t;
 	// 引数チェック
 	if (dg == NULL)
@@ -1769,6 +1769,9 @@ void DgHashDlgInit(HWND hWnd, DG *dg)
 
 	h = GetFont("Arial", 10, false, false, false, false);
 	SetFont(hWnd, E_IP, h);
+
+	h2 = GetFont("Arial", 8, true, false, false, false);
+	SetFont(hWnd, E_SYSTEM, h2);
 
 	Zero(&t, sizeof(t));
 
@@ -1798,6 +1801,8 @@ void DgHashDlgInit(HWND hWnd, DG *dg)
 			Hide(hWnd, S_INFO2);
 			Hide(hWnd, E_IP);
 		}
+
+		SetTextA(hWnd, E_SYSTEM, t.System);
 	}
 }
 
