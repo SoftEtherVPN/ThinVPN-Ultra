@@ -36,7 +36,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\hamcore\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(TargetName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
@@ -67,18 +67,18 @@
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
       <OptimizeReferences>false</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
-      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
+      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(TargetName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
-      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res" /PRODUCT:"Thin Telework System by NTT-EAST and IPA"</Command>
+      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res" /PRODUCT:"Thin Telework System by NTT-EAST and IPA"</Command>
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

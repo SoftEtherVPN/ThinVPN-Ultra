@@ -76,32 +76,32 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(TargetName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(TargetName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(TargetName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
-    <TargetName>$(ProjectName)_x64</TargetName>
+    <TargetName>$(TargetName)_x64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)bin\</OutDir>
-    <IntDir>$(SolutionDir)tmp\windows\int\$(ProjectName)\$(PlatformName)_$(Configuration)\</IntDir>
+    <IntDir>$(SolutionDir)tmp\windows\int\$(TargetName)\$(PlatformName)_$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>false</EmbedManifest>
-    <TargetName>$(ProjectName)_x64</TargetName>
+    <TargetName>$(TargetName)_x64</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -129,12 +129,12 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
-      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
+      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(TargetName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
@@ -142,7 +142,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
-      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>
+      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res"</Command>
     </PreLinkEvent>
     <PostBuildEvent>
       <Command>$(SolutionDir)bin\BuildTool.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x86_user.manifest</Command>
@@ -175,18 +175,18 @@
       <OptimizeReferences>false</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
-      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
+      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(TargetName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
-      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>
+      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res"</Command>
     </PreLinkEvent>
     <PostBuildEvent>
       <Command>$(SolutionDir)bin\BuildTool.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x86_user.manifest</Command>
@@ -219,12 +219,12 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
-      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
+      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(TargetName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <OptimizeReferences>false</OptimizeReferences>
       <EnableCOMDATFolding>false</EnableCOMDATFolding>
@@ -232,7 +232,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
-      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>
+      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res"</Command>
     </PreLinkEvent>
     <PostBuildEvent>
       <Command>$(SolutionDir)bin\BuildTool.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x64_user.manifest</Command>
@@ -266,18 +266,18 @@
       <OptimizeReferences>false</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
       <DelayLoadDLLs>setupapi.dll;advapi32.dll;user32.dll;dbghelp.dll;version.dll;netapi32.dll;version.dll;urlmon.dll;winmm.dll</DelayLoadDLLs>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64'  publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
-      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(ProjectName).pdb</ProgramDatabaseFile>
+      <ProgramDatabaseFile>$(SolutionDir)DebugFiles\pdb\$(PlatformName)_$(Configuration)\$(TargetName).pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
-      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(ProjectName).map</MapFileName>
+      <MapFileName>$(SolutionDir)DebugFiles\map\$(PlatformName)_$(Configuration)\$(TargetName).map</MapFileName>
       <StackReserveSize>100000</StackReserveSize>
       <AdditionalOptions>/IGNORE:4199,4221 %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PreLinkEvent>
-      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(ProjectName)_$(PlatformName).res"</Command>
+      <Command>$(SolutionDir)bin\BuildTool.exe /CMD:GenerateVersionResource "$(TargetPath)" /OUT:"$(SolutionDir)tmp\VersionResources\$(TargetName)_$(PlatformName).res"</Command>
     </PreLinkEvent>
     <PostBuildEvent>
       <Command>$(SolutionDir)bin\BuildTool.exe /CMD:SetManifest "$(TargetPath)" /MANIFEST:x64_user.manifest</Command>
