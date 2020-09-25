@@ -279,6 +279,14 @@ UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 			break;
 
 		case IDCANCEL:
+			if (t->Mandate)
+			{
+				if (MsgBox(hWnd, MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION, _UU("DU_GOV_FW_MANDATE_MSG")) == IDNO)
+				{
+					break;
+				}
+			}
+
 			Close(hWnd);
 			break;
 		}
@@ -286,13 +294,6 @@ UINT DuGovFw1DlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		break;
 
 	case WM_CLOSE:
-		if (t->Mandate)
-		{
-			if (MsgBox(hWnd, MB_YESNO | MB_DEFBUTTON2 | MB_ICONEXCLAMATION, _UU("DU_GOV_FW_MANDATE_MSG")) == IDNO)
-			{
-				break;
-			}
-		}
 
 		EndDialog(hWnd, 0);
 		break;
