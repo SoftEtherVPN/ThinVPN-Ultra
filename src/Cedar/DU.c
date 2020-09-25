@@ -2842,7 +2842,7 @@ void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 	SetIcon(hWnd, 0, ICO_THINCLIENT);
 
 	h = GetFont("Arial", 10, true, false, false, false);
-	h2 = GetFont("Arial", 8, true, false, false, false);
+	h2 = GetFont("Arial", 8, false, false, false, false);
 
 	SetFont(hWnd, C_PCID, h);
 
