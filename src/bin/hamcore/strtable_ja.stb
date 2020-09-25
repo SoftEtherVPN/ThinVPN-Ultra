@@ -7829,13 +7829,13 @@ SW_COMPONENT_VPNCMGR_TITLE					SoftEther VPN クライアント接続マネー�
 SW_COMPONENT_VPNCMGR_DESCRIPTION			この PC に VPN クライアント接続マネージャのみをインストールします。VPN Client 本体はインストールしません。別のコンピュータの Windows / Linux で動作している VPN Client をリモート管理することができます。
 
 
-SW_COMPONENT_THINSVR_TITLE				$APPSHORT_SERVER$
-SW_COMPONENT_THINSVR_DESCRIPTION			リモートアクセスを受け付ける側の PC (職場の PC など) にインストールします。\r\nクリップボードやドライブの共有、ファイルの転送、リモート印刷等の機能が利用できます。\r\n※ 環境や動作モードによっては共有機能は利用できない場合があります。
+SW_COMPONENT_$APP_ID_PREFIX$THINSVR_TITLE				$APPSHORT_SERVER$
+SW_COMPONENT_$APP_ID_PREFIX$THINSVR_DESCRIPTION			リモートアクセスを受け付ける側の PC (職場の PC など) にインストールします。\r\nクリップボードやドライブの共有、ファイルの転送、リモート印刷等の機能が利用できます。\r\n※ 環境や動作モードによっては共有機能は利用できない場合があります。
 
-SW_COMPONENT_THINSVR_DESCRIPTION_NS_POSTFIX		リモートアクセスを受け付ける側の PC (職場の PC など) にインストールします。\r\n「共有機能無効版」では、クリップボードやドライブの共有、ファイルの転送、リモート印刷等の機能が利用できなくなります。組織におけるセキュリティポリシーに基づき、これらを無効にしたい場合に選択してください。\r\n※ 本システムに限らず、一般的なシンクライアントシステムに共通することですが、ユーザーによる特殊な操作等やソフトウェアの改造等によるすべての情報持ち出しを遮断できるとは限りません。
+SW_COMPONENT_$APP_ID_PREFIX$THINSVR_DESCRIPTION_NS_POSTFIX		リモートアクセスを受け付ける側の PC (職場の PC など) にインストールします。\r\n「共有機能無効版」では、クリップボードやドライブの共有、ファイルの転送、リモート印刷等の機能が利用できなくなります。組織におけるセキュリティポリシーに基づき、これらを無効にしたい場合に選択してください。\r\n※ 本システムに限らず、一般的なシンクライアントシステムに共通することですが、ユーザーによる特殊な操作等やソフトウェアの改造等によるすべての情報持ち出しを遮断できるとは限りません。
 
-SW_COMPONENT_THINCLIENT_TITLE				$APPSHORT_CLIENT$
-SW_COMPONENT_THINCLIENT_DESCRIPTION			リモートアクセスを始動する側の PC (自宅 PC やモバイル PC など) にインストールします。
+SW_COMPONENT_$APP_ID_PREFIX$THINCLIENT_TITLE				$APPSHORT_CLIENT$
+SW_COMPONENT_$APP_ID_PREFIX$THINCLIENT_DESCRIPTION			リモートアクセスを始動する側の PC (自宅 PC やモバイル PC など) にインストールします。
 
 SW_WELCOME_UAC_WARNING						現在、あなたは $APPFULL$ を用いてリモートでこのコンピュータの画面を操作している可能性があります。\r\n\r\n$APPFULL$ のソフトウェアのバージョンアップ作業は、リモート操作ではなく、サーバーとなっている PC 側のコンピュータの画面を直接操作して行なうことをお勧めします。\r\n\r\n本当にリモート越しでの継続しますか?\r\n\r\n\r\n「OK」をクリックすると、一度コンピュータの Windows のユーザーアカウント制御 (UAC ポップアップ) が表示されます。現在の $APPSHORT$ の動作モードはユーザーモードのため、UAC のポップアップが表示された際に画面が切断されるか、または操作不能になる場合があります。その場合は、約 1 ～ 2 分経過してから再度接続してみてください。接続が復旧しない場合は、サーバーとなっている PC 側のコンピュータの画面を直接操作して更新作業を行なってください。
 
