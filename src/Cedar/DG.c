@@ -1924,7 +1924,7 @@ void DgFormatText(HWND hWnd, UINT id, ...)
 // 初期化
 void DgMainDlgInit(HWND hWnd, DG *dg)
 {
-	HFONT h;
+	HFONT h, h2;
 	HMENU hMenu;
 	bool debug = true;
 	// 引数チェック
@@ -1985,6 +1985,9 @@ void DgMainDlgInit(HWND hWnd, DG *dg)
 
 	h = GetFont("Arial", 12, true, false, false, false);
 	SetFont(hWnd, E_PCID, h);
+
+	h2 = GetFont("Arial", 8, true, false, false, false);
+	SetFont(hWnd, E_SYSTEM, h2);
 
 	Zero(dg->CurrentPcid, sizeof(dg->CurrentPcid));
 	dg->NoAuthWarningFlag = false;
@@ -2138,6 +2141,8 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 		SetText(hWnd, S_STATUS, _E(t.LastError));
 
 	}
+
+	SetTextA(hWnd, E_SYSTEM, t.System);
 
 	if (t.IsConfigured == false)
 	{

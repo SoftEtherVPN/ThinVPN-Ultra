@@ -2672,6 +2672,7 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 	t->IsConnected = WideServerIsConnected(ds->Wide);
 	WideServerGetPcid(ds->Wide, t->Pcid, sizeof(t->Pcid));
 	WideServerGetHash(ds->Wide, t->Hash, sizeof(t->Hash));
+	WideServerGetSystem(ds->Wide, t->System, sizeof(t->System));
 	t->ServiceType = ds->ServiceType;
 	t->IsUserMode = ds->IsUserMode;
 	t->Active = ds->Active;

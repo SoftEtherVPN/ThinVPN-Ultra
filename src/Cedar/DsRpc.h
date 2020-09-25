@@ -85,6 +85,7 @@ struct RPC_DS_STATUS
 	bool IsConnected;
 	char Pcid[MAX_PATH];
 	char Hash[MAX_PATH];
+	char System[MAX_PATH];
 	UINT ServiceType;
 	bool IsUserMode;
 	bool Active;

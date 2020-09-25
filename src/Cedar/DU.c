@@ -2744,7 +2744,7 @@ void DuMainDlgInitPcidCandidate(HWND hWnd, DU_MAIN *t)
 // 初期化
 void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 {
-	HFONT h;
+	HFONT h, h2;
 	HMENU hMenu;
 	// 引数チェック
 	if (hWnd == NULL || t == NULL)
@@ -2771,7 +2771,12 @@ void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 	SetIcon(hWnd, 0, ICO_THINCLIENT);
 
 	h = GetFont("Arial", 10, false, false, false, false);
+	h2 = GetFont("Arial", 8, false, false, false, false);
+
 	SetFont(hWnd, C_PCID, h);
+
+	SetTextA(hWnd, E_SYSTEM, t->Du->Dc->Wide->wt->System);
+	SetFont(hWnd, E_SYSTEM, h2);
 
 	DuMainDlgInitPcidCandidate(hWnd, t);
 

@@ -289,7 +289,7 @@ void WideSessionInfoCacheDel(LIST *o, char *pcid);
 LIST *WideInitSessionInfoCache();
 void WideFreeSessionInfoCache(LIST *o);
 
-void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_list, char *mode, UINT mode_size);
+void WideLoadEntryPoint(X** cert, char* url, UINT url_size, LIST* secondary_str_list, char* mode, UINT mode_size, char* system, UINT system_size);
 
 bool WideVerifyNewEntryPointAndSignature(X *master_x, BUF *ep, BUF *sign);
 BUF *WideTryDownloadAndVerifyNewEntryPoint(X *master_x, INTERNET_SETTING *setting, char *base_url, bool *cancel, WT *wt);
@@ -335,6 +335,7 @@ void WideServerConnectMainThread(THREAD *thread, void *param);
 bool WideServerIsConnected(WIDE *w);
 bool WideServerGetPcid(WIDE *w, char *pcid, UINT size);
 void WideServerGetHash(WIDE *w, char *hash, UINT size);
+void WideServerGetSystem(WIDE* w, char* system, UINT size);
 void WideServerSuppressAutoReconnect(WIDE *w, bool suppress);
 bool WideServerTryAutoReconnect(WIDE *w);
 BUF *WideServerSaveLocalKeyToBuffer(K *k, X *x);
