@@ -76,6 +76,9 @@
 #ifndef	WIDE_H
 #define WIDE_H
 
+#define WIDE_DEBUG_FILE_NAME			"@debug.txt"
+#define WIDE_DEBUG_KEY					"0AF4585B752D1A9D5FDC559B0C923D4A5175923F"
+
 // エラーレベル
 #define DESK_ERRORLEVEL_NETWORK			0		// ネットワークエラー
 #define DESK_ERRORLEVEL_SERVER_SIDE		1		// サーバー側エラー
@@ -370,6 +373,8 @@ void WideGenerateRandomDummyDomain(char *str, UINT size);
 
 void WideGateLoadAggressiveTimeoutSettings(WIDE *wide);
 void WideGateLoadAggressiveTimeoutSettingsWithInterval(WIDE *wide);
+
+bool WideHasDebugFileWithCorrectKey();
 
 #endif	// WIDE_H
 

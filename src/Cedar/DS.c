@@ -1437,17 +1437,6 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		// 透かし文字列を生成
 		PackAddUniStr(p, "WatermarkStr1", ds->WatermarkStr);
 
-		if (DcGetDebugFlag())
-		{
-			UniStrCpy(this_machine_name, sizeof(this_machine_name), L"soumupc-104.corp.example.org");
-			SetIP(&this_machine_ip, 10, 32, 1, 104);
-			UniStrCpy(computer_name, sizeof(computer_name), L"DESKTOP-A46712");
-			StrCpy(client_host, sizeof(client_host), "ppp-222-12-4.isp.open.ad.jp");
-			SetIP(&client_ip, 202, 222, 12, 4);
-			SetIP(&client_local_ip, 192, 168, 0, 8);
-			UniStrCpy(user_name, sizeof(user_name), L"DESKTOP-A46712\\felony-san");
-		}
-
 		UniFormat(tmp, sizeof(tmp), _UU("DU_FELONY_STR2"),
 			dtstr, hash_str, this_machine_name, &this_machine_ip,
 			computer_name, client_host,

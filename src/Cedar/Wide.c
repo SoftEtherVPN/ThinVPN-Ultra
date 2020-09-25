@@ -3410,6 +3410,46 @@ bool WideServerLoadLocalKeyFromBuffer(BUF *buf, K **k, X **x)
 	return true;
 }
 
+// デバッグ用ファイルが EXE ファイルと同一のディレクトリにあり正しいキーが記載されているかどうか確認
+bool WideHasDebugFileWithCorrectKey()
+{
+	bool ret = false;
+	BUF* buf = ReadDump(WIDE_DEBUG_FILE_NAME);
+	char* line = CLEAN;
+	if (buf == NULL)
+	{
+		return false;
+	}
+
+	line = CfgReadNextLine(buf);
+
+	if (line != NULL)
+	{
+		UCHAR hash[SHA1_SIZE];
+		BUF* hash2;
+
+		HashSha1(hash, line, StrLen(line));
+
+		hash2 = StrToBin(WIDE_DEBUG_KEY);
+
+		if (hash2->Size == SHA1_SIZE)
+		{
+			if (Cmp(hash2->Buf, hash, SHA1_SIZE) == 0)
+			{
+				ret = true;
+			}
+		}
+
+		FreeBuf(hash2);
+
+		Free(line);
+	}
+
+	FreeBuf(buf);
+
+	return ret;
+}
+
 // ローカルディレクトリの EnterPoint.txt を読み込む (2020 年改造の新方式)
 void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_list, char *mode, UINT mode_size, char *system, UINT system_size)
 {

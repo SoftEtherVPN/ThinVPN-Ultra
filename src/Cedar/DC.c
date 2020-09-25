@@ -2734,7 +2734,7 @@ void DcSetDebugFlag(bool allow)
 
 bool DcGetDebugFlag()
 {
-	return dc_allow_localhost;
+	return dc_allow_localhost || WideHasDebugFileWithCorrectKey();
 }
 
 // 接続メイン
@@ -2844,7 +2844,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	}
 
 	// MachineKey の比較
-	if (Cmp(machine_key, my_machine_key, SHA1_SIZE) == 0 && dc_allow_localhost == false)
+	if (Cmp(machine_key, my_machine_key, SHA1_SIZE) == 0 && DcGetDebugFlag() == false)
 	{
 		// 同一のマシンである
 		return ERR_DESK_LOCALHOST;
