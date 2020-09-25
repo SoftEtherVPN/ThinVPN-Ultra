@@ -224,6 +224,7 @@ void InRpcDsStatus(RPC_DS_STATUS *t, PACK *p)
 	t->IsConnected = PackGetBool(p, "IsConnected");
 	PackGetStr(p, "Pcid", t->Pcid, sizeof(t->Pcid));
 	PackGetStr(p, "Hash", t->Hash, sizeof(t->Hash));
+	PackGetStr(p, "System", t->System, sizeof(t->System));
 	t->ServiceType = PackGetInt(p, "ServiceType");
 	t->IsUserMode = PackGetBool(p, "IsUserMode");
 	t->Active = PackGetBool(p, "Active");
@@ -268,6 +269,7 @@ void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 	PackAddBool(p, "IsConnected", t->IsConnected);
 	PackAddStr(p, "Pcid", t->Pcid);
 	PackAddStr(p, "Hash", t->Hash);
+	PackAddStr(p, "System", t->System);
 	PackAddInt(p, "ServiceType", t->ServiceType);
 	PackAddBool(p, "IsUserMode", t->IsUserMode);
 	PackAddBool(p, "Active", t->Active);

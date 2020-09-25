@@ -353,9 +353,9 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 		return false;
 	}
 
-	if (StrCmpi(component_name, "Thin_Telework_Server_and_Client_Full") == 0)
+	if (EndWith(component_name, "Server_and_Client_Full"))
 	{
-		// NTT 東日本 - IPA シン・テレワークシステム
+		// 共有機能有効版
 		for (i = 0; i < (sizeof(sfx_ntt_files) / sizeof(char *)); i++)
 		{
 			char *name = sfx_ntt_files[i];
@@ -368,9 +368,9 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 			Add(o, SwNewSfxFile(name, src_file_name));
 		}
 	}
-	else if (StrCmpi(component_name, "Thin_Telework_Server_and_Client_ShareDisabled") == 0)
+	else if (EndWith(component_name, "Server_and_Client_ShareDisabled") || EndWith(component_name, "Server_and_Client"))
 	{
-		// NTT 東日本 - IPA シン・テレワークシステム
+		// 共有機能無効版
 		for (i = 0; i < (sizeof(sfx_ntt_files_share_disabled) / sizeof(char *)); i++)
 		{
 			char *name = sfx_ntt_files_share_disabled[i];
@@ -5097,8 +5097,13 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 			sw->IsSystemMode = false;
 		}
 
+#ifdef VARS_ENABLE_LIMITED_MODE
 		Check(hWnd, R_LIMITED, MsRegReadIntEx2(REG_CURRENT_USER, SW_REG_KEY_LIMITED,
 			sw->CurrentComponent->Name, false, true));
+#else  // VARS_ENABLE_LIMITED_MODE
+		Hide(hWnd, R_LIMITED);
+		Hide(hWnd, B_LIMITED_HELP);
+#endif // VARS_ENABLE_LIMITED_MODE
 
 		SetIcon(hWnd, S_ICON, sw->CurrentComponent->Icon);
 

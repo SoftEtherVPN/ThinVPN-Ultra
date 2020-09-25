@@ -566,6 +566,19 @@ void WideServerGetHash(WIDE *w, char *hash, UINT size)
 	return;
 }
 
+// 現在のシステム名を取得
+void WideServerGetSystem(WIDE* w, char* system, UINT size)
+{
+	// 引数チェック
+	ClearStr(system, size);
+	if (w == NULL || system == NULL)
+	{
+		return;
+	}
+
+	StrCpy(system, size, w->wt->System);
+}
+
 // 現在の PCID を取得
 bool WideServerGetPcid(WIDE *w, char *pcid, UINT size)
 {
@@ -3398,7 +3411,7 @@ bool WideServerLoadLocalKeyFromBuffer(BUF *buf, K **k, X **x)
 }
 
 // ローカルディレクトリの EnterPoint.txt を読み込む (2020 年改造の新方式)
-void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_list, char *mode, UINT mode_size)
+void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_list, char *mode, UINT mode_size, char *system, UINT system_size)
 {
 	char url_tmp[MAX_SIZE];
 	X *cert_tmp;
@@ -3411,6 +3424,7 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 	BUF *buf = ReadDump(LOCAL_ENTRY_POINT_FILENAME);
 
 	StrCpy(mode, mode_size, "Normal");
+	StrCpy(system, system_size, "Unknown System");
 
 	Zero(url_tmp, sizeof(url_tmp));
 
@@ -3436,6 +3450,7 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 	{
 		char *secondary_tag = "SECONDARY:[";
 		char *mode_tag = "MODE:";
+		char* system_tag = "SYSTEM:";
 		char *line = CfgReadNextLine(buf);
 		if (line == NULL)
 		{
@@ -3477,6 +3492,14 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 				StrCpy(tmp, sizeof(tmp), line + StrLen(mode_tag));
 				Trim(tmp);
 				StrCpy(mode, mode_size, tmp);
+			}
+
+			if (StartWith(line, system_tag))
+			{
+				char tmp[MAX_PATH];
+				StrCpy(tmp, sizeof(tmp), line + StrLen(system_tag));
+				Trim(tmp);
+				StrCpy(system, system_size, tmp);
 			}
 		}
 

@@ -1085,12 +1085,19 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	// Config 正規化
 	DsNormalizeConfig(ds, false);
 
-	DsGetPolicy(ds, &pol);
+	if (DsGetPolicy(ds, &pol) == false)
+	{
+		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+		{
+			// 強いセキュリティパッチ適用モード
+			pol.EnforceOtp = true; // OTP が強制されているとみなす
+		}
+	}
 
 	if (IsEmptyStr(pol.ServerAllowedMacListUrl) == false)
 	{
-		// SERVER_ALLOWED_MAC_LIST_URL は行政情報システム適応モードのみ対応
-		if (InStr(ds->Wide->wt->EntranceMode, "limited"))
+		// SERVER_ALLOWED_MAC_LIST_URL は行政情報システム適応モードまたは ThinTelework_EnforceStrongSecurity のみ対応
+		if (InStr(ds->Wide->wt->EntranceMode, "limited") || Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
 		{
 			// SERVER_ALLOWED_MAC_LIST_URL が指定されているのでダウンロードを試みる
 			URL_DATA data;
@@ -2672,6 +2679,7 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 	t->IsConnected = WideServerIsConnected(ds->Wide);
 	WideServerGetPcid(ds->Wide, t->Pcid, sizeof(t->Pcid));
 	WideServerGetHash(ds->Wide, t->Hash, sizeof(t->Hash));
+	WideServerGetSystem(ds->Wide, t->System, sizeof(t->System));
 	t->ServiceType = ds->ServiceType;
 	t->IsUserMode = ds->IsUserMode;
 	t->Active = ds->Active;
@@ -2714,6 +2722,15 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 	}
 	else
 	{
+		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+		{
+			// 強いセキュリティパッチ適用モード
+			// 検疫、MAC、透かし が強制されているものとみなす
+			t->EnforceInspection = true;
+			t->EnforceMacCheck = true;
+			t->EnforceWatermark = true;
+		}
+
 		if (DsIsTryCompleted(ds))
 		{
 			if (UniIsEmptyStr(t->MsgForServer))
@@ -3407,6 +3424,7 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 
 	if (DsGetPolicy(ds, &pol))
 	{
+		// ポリシーサーバーから設定が配信されている
 		if (pol.EnforceInspection)
 		{
 			ds->EnableInspection = true;
@@ -3425,6 +3443,17 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 			{
 				UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), pol.WatermarkMessage);
 			}
+		}
+	}
+	else
+	{
+		// ポリシーサーバーから設定が配信されていない
+		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+		{
+			// 強いセキュリティパッチ適用モード
+			ds->EnableInspection = true;
+			ds->EnableMacCheck = true;
+			ds->ShowWatermark = true;
 		}
 	}
 
@@ -4122,6 +4151,13 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 	K *key;
 	char server_hash[128] = {0};
 
+	// ポリシーサーバーから設定が配信されていない
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+	{
+		// 強いセキュリティパッチ適用モード
+		force_share_disable = true;
+	}
+
 	InitWinUi(_UU("DS_TITLE"), _SS("DEFAULT_FONT"), _II("DEFAULT_FONT_SIZE"));
 
 	ds = ZeroMalloc(sizeof(DS));
@@ -4134,7 +4170,7 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 
 	ds->History = NewList(NULL);
 
-	ds->ForceDisableShare = force_share_disable;//DsCheckShareDisableSignature(NULL);
+	ds->ForceDisableShare = force_share_disable;
 
 	ds->Server = SiNewServer(false);
 

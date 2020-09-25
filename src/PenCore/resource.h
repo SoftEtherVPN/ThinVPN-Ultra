@@ -880,6 +880,7 @@
 #define E_SAMPLE1                       1380
 #define E_CURRENT                       1380
 #define E_OWNER                         1380
+#define E_SYSTEM                        1380
 #define S_15                            1381
 #define S_2                             1381
 #define E_SYSLOG_PORT                   1381
@@ -1073,6 +1074,14 @@
 #define D_SW_WELCOME_BMP_VPNSERVER_FIGURE 1528
 #define E_INFO2                         1529
 #define D_DG_PASSWORD2_BMP_PASSWORD2    1530
+#define D_DG_WOL_BMP_WOL                1531
+#define D_DU_WOL_BMP_WOL                1532
+#define D_DU_GOVFW1_BMP_GOVFW1          1533
+#define D_DU_GOVFW2_BMP_GOVFW1          1534
+#define D_DU_OTP_BMP_OTP                1537
+#define S_UX                            1538
+#define S_UX2                           1539
+#define S_INFO_ICON                     1540
 #define B_ONLINE                        1655
 #define D_NM_CONNECT                    1998
 #define D_NM_MAIN                       1999
@@ -1443,7 +1452,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        251
 #define _APS_NEXT_COMMAND_VALUE         40111
-#define _APS_NEXT_CONTROL_VALUE         1531
+#define _APS_NEXT_CONTROL_VALUE         1541
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

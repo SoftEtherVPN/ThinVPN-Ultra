@@ -802,20 +802,53 @@ UINT DuShareDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *par
 		DlgFont(hWnd, C_SHARE_CAMERA, 0, true);
 		DlgFont(hWnd, C_SHARE_AUDIOREC, 0, true);
 
-		Check(hWnd, C_SHARE_CLIPBOARD, dc->MstscUseShareClipboard);
-		Check(hWnd, C_SHARE_DISK, dc->MstscUseShareDisk);
-		Check(hWnd, C_SHARE_PRINTER, dc->MstscUseSharePrinter);
-		Check(hWnd, C_SHARE_COMPORT, dc->MstscUseShareComPort);
-		Check(hWnd, C_SHARE_CAMERA, dc->MstscUseShareCamera);
-		Check(hWnd, C_SHARE_AUDIOREC, dc->MstscUseShareAudioRec);
-
-		SetEnable(hWnd, C_SHARE_CLIPBOARD, DcGetCurrentMstscVersion(dc) == DC_MSTSC_VER_VISTA);
-		if (IsEnable(hWnd, C_SHARE_CLIPBOARD) == false)
+		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
 		{
-			Check(hWnd, C_SHARE_CLIPBOARD, true);
+			Check(hWnd, C_SHARE_CLIPBOARD, dc->MstscUseShareClipboard);
+			Check(hWnd, C_SHARE_DISK, dc->MstscUseShareDisk);
+			Check(hWnd, C_SHARE_PRINTER, dc->MstscUseSharePrinter);
+			Check(hWnd, C_SHARE_COMPORT, dc->MstscUseShareComPort);
+			Check(hWnd, C_SHARE_CAMERA, dc->MstscUseShareCamera);
+			Check(hWnd, C_SHARE_AUDIOREC, dc->MstscUseShareAudioRec);
+
+			SetEnable(hWnd, C_SHARE_CLIPBOARD, DcGetCurrentMstscVersion(dc) == DC_MSTSC_VER_VISTA);
+			if (IsEnable(hWnd, C_SHARE_CLIPBOARD) == false)
+			{
+				Check(hWnd, C_SHARE_CLIPBOARD, true);
+			}
+		}
+		else
+		{
+			Check(hWnd, C_SHARE_CLIPBOARD, false);
+			Check(hWnd, C_SHARE_DISK, false);
+			Check(hWnd, C_SHARE_PRINTER, false);
+			Check(hWnd, C_SHARE_COMPORT, false);
+			Check(hWnd, C_SHARE_CAMERA, false);
+			Check(hWnd, C_SHARE_AUDIOREC, false);
+
+			Disable(hWnd, C_SHARE_CLIPBOARD);
+			Disable(hWnd, C_SHARE_DISK);
+			Disable(hWnd, C_SHARE_PRINTER);
+			Disable(hWnd, C_SHARE_COMPORT);
+			Disable(hWnd, C_SHARE_CAMERA);
+			Disable(hWnd, C_SHARE_AUDIOREC);
+
+			Disable(hWnd, IDOK);
 		}
 
 		DuShareDlgUpdate(hWnd);
+
+		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+		{
+			// 説教
+			SetText(hWnd, S_S1, _UU("DU_SOUMU_DISABLE_SHARE"));
+			DlgFont(hWnd, S_S1, 0, true);
+			Hide(hWnd, S_INFO_ICON);
+			Hide(hWnd, S_INFO_2);
+			Hide(hWnd, S_INFO_3);
+
+			SetTimer(hWnd, 1, 100, NULL);
+		}
 
 		break;
 
@@ -858,6 +891,18 @@ UINT DuShareDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *par
 
 		case IDCANCEL:
 			Close(hWnd);
+			break;
+		}
+		break;
+
+	case WM_TIMER:
+		switch (wParam)
+		{
+		case 1:
+			KillTimer(hWnd, 1);
+
+			MsgBox(hWnd, MB_ICONEXCLAMATION, _UU("DU_SOUMU_DISABLE_SHARE"));
+
 			break;
 		}
 		break;
@@ -1995,7 +2040,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 		bool gov_fw_ok = true;
 		bool need_to_watch_gov_fw = false;
 
-		if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_ENABLE_RELAX_KEY_NAME))
+		if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_ENABLE_RELAX_KEY_NAME) && Vars_ActivePatch_GetBool("ThinTelework_DisableOmakeFunctions") == false)
 		{
 			Hide(t->hWnd, 0);
 			Hide(t->hWndConnect, 0);
@@ -2004,15 +2049,22 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 			Show(t->hWnd, 0);
 		}
 
-		if (s->IsLimitedMode && (dc->DisableLimitedFw == false || s->IsEnspectionEnabled))
+		if ((s->IsLimitedMode && (dc->DisableLimitedFw == false || s->IsEnspectionEnabled)) || Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
 		{
 			// 接続先サーバーが「行政システム適応モード」の場合はファイアウォールを
 			// 勧める画面を表示する
 			if (MsIsVista())
 			{
-				gov_fw_ok = DuGovFw1Main(s->IsEnspectionEnabled);
+				bool mandate = s->IsEnspectionEnabled;
 
-				need_to_watch_gov_fw = s->IsEnspectionEnabled;
+				if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+				{
+					mandate = true;
+				}
+
+				gov_fw_ok = DuGovFw1Main(mandate);
+
+				need_to_watch_gov_fw = mandate;
 			}
 			else
 			{
@@ -2020,7 +2072,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 				gov_fw_ok = false;
 			}
 
-			if (s->IsEnspectionEnabled == false)
+			if (s->IsEnspectionEnabled == false && Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
 			{
 				// 検疫有効でない場合は、いかなる場合でも gov fw は成功したとみなす
 				gov_fw_ok = true;
@@ -2195,10 +2247,13 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 					if (UniIsEmptyStr(lifetime_msg))
 					{
-						// お疲れ様でした
-						if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME))
+						if (Vars_ActivePatch_GetBool("ThinTelework_DisableOmakeFunctions") == false)
 						{
-							DuTheEndDlg(NULL);
+							// お疲れ様でした
+							if (MsRegReadInt(REG_CURRENT_USER, DU_REGKEY, DU_SHOW_THEEND_KEY_NAME))
+							{
+								DuTheEndDlg(NULL);
+							}
 						}
 					}
 
@@ -2464,7 +2519,23 @@ void DuOptionDlgInit(HWND hWnd, DU_OPTION *t)
 
 	Check(hWnd, C_MULTIDISPLAY, !dc->DisableMultiDisplay);
 
-	Check(hWnd, C_LIMITED_FW, !dc->DisableLimitedFw);
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
+	{
+		Check(hWnd, C_LIMITED_FW, !dc->DisableLimitedFw);
+	}
+	else
+	{
+		Check(hWnd, C_LIMITED_FW, true);
+		Disable(hWnd, C_LIMITED_FW);
+	}
+
+	if (Vars_ActivePatch_GetBool("ThinTelework_DisableOmakeFunctions"))
+	{
+		Hide(hWnd, C_SHOW_THEEND);
+		Hide(hWnd, C_ENABLE_RELAX);
+		Hide(hWnd, S_UX);
+		Hide(hWnd, S_UX2);
+	}
 
 	DuOptionDlgInitProxyStr(hWnd, t);
 
@@ -2744,7 +2815,7 @@ void DuMainDlgInitPcidCandidate(HWND hWnd, DU_MAIN *t)
 // 初期化
 void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 {
-	HFONT h;
+	HFONT h, h2;
 	HMENU hMenu;
 	// 引数チェック
 	if (hWnd == NULL || t == NULL)
@@ -2770,8 +2841,13 @@ void DuMainDlgInit(HWND hWnd, DU_MAIN *t)
 
 	SetIcon(hWnd, 0, ICO_THINCLIENT);
 
-	h = GetFont("Arial", 10, false, false, false, false);
+	h = GetFont("Arial", 10, true, false, false, false);
+	h2 = GetFont("Arial", 8, true, false, false, false);
+
 	SetFont(hWnd, C_PCID, h);
+
+	SetTextA(hWnd, E_SYSTEM, t->Du->Dc->Wide->wt->System);
+	SetFont(hWnd, E_SYSTEM, h2);
 
 	DuMainDlgInitPcidCandidate(hWnd, t);
 

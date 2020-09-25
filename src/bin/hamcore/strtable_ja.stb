@@ -414,13 +414,15 @@ DU_FELONY_STR2			$APPVERYSHORT$作業中 ログイン日時: %s\r\n%S\r\nサー�
 DU_FELONY_FONT_XP		MS UI Gothic
 DU_FELONY_FONT_7		Meiryo UI
 
+DU_SOUMU_DISABLE_SHARE	$APPFULL$ では、総務省 「地方公共団体における情報セキュリティポリシーに関するガイドライン」 および 「新型コロナウィルスへの対応等を踏まえた LGWAN 接続系のテレワークセキュリティ要件」 等の指針に基づき、情報漏えいを防止するため、クリップボード、ハードディスク (ファイル)、プリンタ、シリアルポート、Web カメラおよびマイクの共有機能は、利用することができません。
+
 
 
 # シン・テレワークシステム サーバー管理ツール関係
 DG_TITLE				$APPFULL_SERVER$管理ツール
 DG_PROXY_FROM_IE		現在の Internet Explorer のプロキシサーバーの設定を読み込みました。
-DG_INTERNET_CONNECT_OK_1	正常にインターネットに接続されています。\r\nこのコンピュータの ID は 「%S」 です。\r\n\r\n現在、$APPSHORT$ を経由してこのコンピュータにリモートアクセスできる状態となっています。
-DG_INTERNET_CONNECT_OK_2	「クライアントからの接続を禁止する」状態になっています。\r\n\r\n現在はインターネット経由でこのコンピュータにリモートアクセスすることはできません。
+DG_INTERNET_CONNECT_OK_1	正常に中継システムに接続されています。\r\nこのコンピュータの ID は 「%S」 です。\r\n\r\n現在、$APPSHORT$ を経由してこのコンピュータにリモートアクセスできる状態となっています。
+DG_INTERNET_CONNECT_OK_2	「クライアントからの接続を禁止する」状態になっています。\r\n\r\n現在は中継システム経由でこのコンピュータにリモートアクセスすることはできません。
 DG_CURRENT_OK			現在の状態:
 DG_CURRENT_ERROR		エラー発生:
 DG_CHANGE_PCID_OK		このコンピュータのコンピュータ ID を '%S' に設定しました。
@@ -2793,7 +2795,7 @@ S_INFO1					$APPFULL$  (Ver %u.%02u, Build %u)
 S_INFO3					This product includes the following software components:\r\nBitVisor: Copyright (c) 2007, 2008 University of Tsukuba. Copyright (C) 2007, 2008 National Institute of Information and Communications Technology. All rights reserved. / Microsoft(R) C Runtime Library: (c) 2007 Microsoft Corporation. All Rights Reserved. / PKCS #11 Cryptographic Token Interface (Cryptoki): Copyright (c) RSA Security Inc. / WinPcap: Copyright (c) 2001 - 2003 NetGroup, Politecnico di Torino (Italy). All rights reserved. / libedit: Copyright (c) 1992, 1993 The Regents of the University of California. All rights reserved. / libiconv: Copyright (C) 2007 Free Software Foundation, Inc. / ncurses: Copyright (c) 1998-2005, 2006 Free Software Foundation, Inc. / OpenSSL: Copyright (c) 1998-2011 The OpenSSL Project. All rights reserved. This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (http://www.openssl.org/). This product includes cryptographic software written by Eric Young (eay@cryptsoft.com). / zlib: (C) 1995-2004 Jean-loup Gailly and Mark Adler. / libmincrypt: Copyright 2013 The Android Open Source Project / Special Thanks to: Software Laboratory, Academic Computing Communication Center, Industrial Liaison and Cooperative Research Center and Professor Yasushi Shinjo in University of Tsukuba, Japan.
 S_INFO4					提供元\r\n・ NTT 東日本 新型コロナウイルス対策プロジェクト 特殊局 (仮設)\r\n・ IPA 産業サイバーセキュリティセンター サイバー技術研究室\r\n\r\n本テレワークシステムは、新型コロナウイルス感染症拡大防止と事業継続支援のため、研究開発中の試験的プログラムや無保証のインフラや実験ネットワークを組み合わせ、限られたリソースの元で、学術的・試験的な実証実験として、一時的・緊急的に提供されるものです。\r\nアプリケーションや中継システムの品質・機能・性能・セキュリティレベルは、実験段階のレベルであり、完成された商用レベルではありません。したがって、本テレワークシステムは現状有姿で提供されるものであり、その有用性、合目的性および商業性等は一切保証されません。\r\n不具合によりデータの滅失、改変、ハードウェアやネットワーク装置の故障が発生する可能性もあります。アプリケーションや中継システムの一部または全部を利用されたこと、または利用できなかったことが原因で、何らかの損害がユーザーまたはその所属組織等に発生しても、損害の種類、内容および金額の如何を問わず、提供元は一切責任を負いません。たとえこれらの損害の可能性を知らされていた場合でも同様です。\r\n本テレワークシステムでは、商用の通信サービスと同様の保証や、個別のユーザーサポートが提供されません。提供元は、個別のお問い合わせには応じません。ユーザーは、提供元各組織の通常の商用サービスまたは通常業務用のコールセンター等への問い合わせを行うことはできません。すべての問題はユーザーの責任で解決していただくこととなります。
 IDCANCEL				&OK
-B_WEB					$APPSHORT$ の Web サイト(&W)...
+B_WEB					$APPSHORT$ &Web サイト...
 B_EULA					使用条件(&E)
 B_IMPORTANT				重要なお知らせ(&I)
 B_LEGAL					法律上の通知(&L)
@@ -4560,7 +4562,7 @@ B_RESTORE				元に戻す(&R)
 S_PCID_2				コンピュータ ID は、$APPSHORT$ 上でこのコンピュータを識別するための名前です。英数字およびハイフンを使った好きな名前にいつでも変更できます。
 S2						通信の方法:
 B_PROXY					プロキシサーバーの設定(&P)...
-S3						プロキシサーバーを経由してインターネットに接続する必要がある場合は、プロキシサーバーの設定を行ってください。
+S3						プロキシサーバーを経由して中継システムに接続する必要がある場合は、プロキシサーバーの設定を行ってください。
 S_ACCEPT				クライアントからの
 B_ACCEPT				接続を許可する(&A)
 B_DENY					接続を禁止する(&E)
@@ -4576,11 +4578,12 @@ S8						この設定ツールを開くためのパスワードを設定します
 B_PASSWORD				設定用パスワードの設定(&W)...
 IDCANCEL				閉じる(&X)
 S9						設定が完了したら、[閉じる] ボタンをクリックしてこの画面を閉じてください。
+S_SYSTEM				中継システム:
 
 
 PREFIX					D_DG_PROXY
 CAPTION					プロキシサーバーの設定
-S1						一部の企業や大学のネットワーク (LAN) では、インターネットとの間の通信を行うために、プロキシサーバーを使用する必要がある場合があります。\r\nそのような場合は、使用するプロキシサーバーの設定を行ってください。\r\n\r\nプロキシサーバーの設定方法について不明な場合は、ネットワーク管理者にお問い合わせください。
+S1						一部の組織のネットワーク (LAN) では、インターネットとの間の通信を行うために、プロキシサーバーを使用する必要がある場合があります。\r\nそのような場合は、使用するプロキシサーバーの設定を行ってください。\r\n\r\nプロキシサーバーの設定方法について不明な場合は、ネットワーク管理者にお問い合わせください。
 S2						プロキシサーバー設定
 C_DIRECT				プロキシサーバーを使用せず、直接インターネットに接続する(&N)
 C_HTTP					HTTP プロキシサーバーを使用してインターネットに接続する(&H)
@@ -4657,7 +4660,7 @@ B_LOG					ログファイルを開く(&O)
 B_ADDGROUP				以下のユーザーを常に Remote Desktop Users グループに追加(&G)
 S_1						ユーザー名:
 B_CURRENTUSER			現在のユーザーを指定
-B_RDP_OPTIMIZE			Windows の RDP の設定の $APPSHORT$ への最適化を維持(&O)
+B_RDP_OPTIMIZE			Windows の RDP の設定の $APPVERYSHORT$ への最適化を維持(&O)
 S_18					RDP 接続受付時に以下のサービスを停止(&S): (スペース区切りで複数指定可)
 C_EVENTLOG				Windows のイベントログに記録する(&E)
 C_SYSLOG				syslog プロトコルで送信する(&S)
@@ -4703,6 +4706,7 @@ IDCANCEL				キャンセル
 B_ERASE					履歴消去(&E)
 B_SHARE					共有設定(&S)...
 B_OPTION				オプション(&O)...
+S_SYSTEM				接続先中継システム:
 
 
 PREFIX					D_DU_OPTION
@@ -4890,11 +4894,12 @@ S_INFO					以下の固有 ID を選択して右クリックし、[コピー] �
 IDCANCEL				閉じる(&X)
 IDCANCEL2				閉じる(&X)
 S_INFO2					SSL-VPN 中継ゲートウェイアドレス
-S1						企業システムにおける Windows のディスクイメージ / VM をクローンする際の固有 ID の初期化
-S2						企業システムにおいて、$APPSHORT_SERVER$ インストール済みの Windows のインストール済みディスクイメージをクローン展開される場合は、以下の手順に従ってください。
+S1						情報システムにおける Windows のディスクイメージ / VM をクローンする際の固有 ID の初期化
+S2						情報システムにおいて、$APPSHORT_SERVER$ インストール済みの Windows のインストール済みディスクイメージをクローン展開される場合は、以下の手順に従ってください。
 S3						1. モデル PC における $APPSHORT_SERVER$ の設定を完了します。\r\n2. モデル PC におけるそれ以外のソフトウェアの設定も完了します。\r\n3. クローン前の最後のシャットダウン直前 (クローン前に再起動が発生しないことが確実なタイミング) に、「次回起動時に固有 ID をリセット」ボタンをクリックします。\r\n4. PC をシャットダウンします。\r\n5. ディスクイメージをクローンして展開します。\r\n6. 5 で展開されたディスクイメージを起動した各コンピュータ (または VM) の $APPSHORT_SERVER$ の固有 ID は、それぞれ新しく、互いに異なるランダムな ID に初期化されます。
 B_RESET					次回起動時に固有 ID をリセット(&R)
 S4						「次回起動時に固有 ID をリセット」ボタンを押すと、次回の $APPSHORT_SERVER$ の起動時にこのコンピュータの固有 ID は初期化されます。コンピュータ ID も初期化されます。現在使用しているコンピュータ ID は二度と使用できなくなります。
+S_SYSTEM				中継システム:
 
 
 PREFIX					D_DU_AUTH
@@ -7849,7 +7854,7 @@ SW_PERFORM_TITLE							セットアップの進行中
 SW_ERROR_TITLE								セットアップの結果
 SW_FINISH_TITLE								セットアップが完了しました
 SW_UNINST1_TITLE							アンインストールの開始
-SW_LANG1_TITLE								Thin Telework System: Configure the Display Language (言語設定の変更)
+SW_LANG1_TITLE								$APPSHORT_EN$: Configure the Display Language (言語設定の変更)
 SW_EASY1_TITLE								SoftEther VPN Client 簡易インストーラ作成ウィザードへようこそ
 SW_EASY2_TITLE								ファイルの指定
 SW_WEB1_TITLE								SoftEther VPN Client Web インストーラ作成ウィザードへようこそ
@@ -7972,7 +7977,7 @@ SW_LONG_VPNBRIDGE							SoftEther VPN Bridge
 SW_LONG_VPNSMGR								SoftEther VPN Server Manager
 SW_LONG_VPNCMGR								SoftEther VPN Client Manager
 SW_LANG_SET_FAILED							Failed to write the new language setting on lang.config file.
-SW_LINK_NAME_THINSVR_SVC					Thin Telework System User-mode Service
+SW_LINK_NAME_THINSVR_SVC					$APPSHORT_EN$ User-mode Service
 
 
 # ショートカット名 (シン・テレワーク)

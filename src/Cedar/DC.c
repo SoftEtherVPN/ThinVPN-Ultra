@@ -1057,6 +1057,11 @@ void DcNormalizeConfig(DC *dc)
 			dc->MstscLocation = DC_MSTSC_DOWNLOAD;
 		}
 	}
+
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+	{
+		dc->DisableLimitedFw = false;
+	}
 #endif  // OS_WIN32
 }
 
@@ -1581,14 +1586,28 @@ void DcLoadConfig(DC *dc, FOLDER *root)
 	CfgGetStr(root, "MstscParams", dc->MstscParams, sizeof(dc->MstscParams));
 	dc->MstscUsePublicSwitchForVer6 = CfgGetBool(root, "MstscUsePublicSwitchForVer6");
 	dc->DontShowFullScreenMessage = CfgGetBool(root, "DontShow_FullScreenMessage");
-	dc->MstscUseShareClipboard = CfgIsItem(root, "MstscUseShareClipboard") ? CfgGetBool(root, "MstscUseShareClipboard") : true;
-	dc->MstscUseShareCamera = CfgGetBool(root, "MstscUseShareCamera");
-	dc->MstscUseShareDisk = CfgGetBool(root, "MstscUseShareDisk");
-	dc->MstscUseSharePrinter = CfgGetBool(root, "MstscUseSharePrinter");
-	dc->MstscUseShareComPort = CfgGetBool(root, "MstscUseShareComPort");
-	dc->MstscUseShareAudioRec = CfgGetBool(root, "MstscUseShareAudioRec");
 	dc->DisableMultiDisplay = CfgGetBool(root, "DisableMultiDisplay");
 	dc->DisableLimitedFw = CfgGetBool(root, "DisableLimitedFw");
+
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
+	{
+		dc->MstscUseShareClipboard = CfgIsItem(root, "MstscUseShareClipboard") ? CfgGetBool(root, "MstscUseShareClipboard") : true;
+		dc->MstscUseShareCamera = CfgGetBool(root, "MstscUseShareCamera");
+		dc->MstscUseShareDisk = CfgGetBool(root, "MstscUseShareDisk");
+		dc->MstscUseSharePrinter = CfgGetBool(root, "MstscUseSharePrinter");
+		dc->MstscUseShareComPort = CfgGetBool(root, "MstscUseShareComPort");
+		dc->MstscUseShareAudioRec = CfgGetBool(root, "MstscUseShareAudioRec");
+	}
+	else
+	{
+		dc->MstscUseShareClipboard = false;
+		dc->MstscUseShareCamera = false;
+		dc->MstscUseShareDisk = false;
+		dc->MstscUseSharePrinter = false;
+		dc->MstscUseShareComPort = false;
+		dc->MstscUseShareAudioRec = false;
+	}
+
 	if (CfgIsItem(root, "EnableVersion2"))
 	{
 		dc->EnableVersion2 = CfgGetBool(root, "EnableVersion2");
@@ -1729,15 +1748,19 @@ void DcSaveConfig(DC *dc)
 	CfgAddBool(root, "MstscUsePublicSwitchForVer6", dc->MstscUsePublicSwitchForVer6);
 	CfgAddBool(root, "DontShow_FullScreenMessage", dc->DontShowFullScreenMessage);
 	CfgAddBool(root, "DontCheckCert", WideGetDontCheckCert(dc->Wide));
-	CfgAddBool(root, "MstscUseShareClipboard", dc->MstscUseShareClipboard);
-	CfgAddBool(root, "MstscUseShareDisk", dc->MstscUseShareDisk);
-	CfgAddBool(root, "MstscUseSharePrinter", dc->MstscUseSharePrinter);
-	CfgAddBool(root, "MstscUseShareComPort", dc->MstscUseShareComPort);
 	CfgAddBool(root, "EnableVersion2", dc->EnableVersion2);
-	CfgAddBool(root, "MstscUseShareAudioRec", dc->MstscUseShareAudioRec);
-	CfgAddBool(root, "MstscUseShareCamera", dc->MstscUseShareCamera);
 	CfgAddBool(root, "DisableMultiDisplay", dc->DisableMultiDisplay);
 	CfgAddBool(root, "DisableLimitedFw", dc->DisableLimitedFw);
+
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
+	{
+		CfgAddBool(root, "MstscUseShareClipboard", dc->MstscUseShareClipboard);
+		CfgAddBool(root, "MstscUseShareDisk", dc->MstscUseShareDisk);
+		CfgAddBool(root, "MstscUseSharePrinter", dc->MstscUseSharePrinter);
+		CfgAddBool(root, "MstscUseShareComPort", dc->MstscUseShareComPort);
+		CfgAddBool(root, "MstscUseShareAudioRec", dc->MstscUseShareAudioRec);
+		CfgAddBool(root, "MstscUseShareCamera", dc->MstscUseShareCamera);
+	}
 
 	// Candidate
 	b = CandidateToBuf(dc->Candidate);
@@ -2370,6 +2393,11 @@ UINT DcSessionConnect(DC_SESSION *s)
 	s->DsCaps = io->UserData4;
 	s->IsShareDisabled = ((io->UserData3 == 0) ? false : true);
 	s->IsLimitedMode = io->UserData5;
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+	{
+		// 行政システム適応モードであるとみなす
+		s->IsLimitedMode = true;
+	}
 	s->IsEnspectionEnabled = io->UserData6;
 	Debug("DS_CAPS: %u\n", s->DsCaps);
 

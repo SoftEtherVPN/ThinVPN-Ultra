@@ -966,12 +966,14 @@ WT *NewWtFromHamcore()
 	WT *wt;
 	X *master_cert;
 	char mode[MAX_PATH] = {0};
+	char system[MAX_PATH] = CLEAN;
 
-	WideLoadEntryPoint(&master_cert, NULL, 0, NULL, mode, sizeof(mode));
+	WideLoadEntryPoint(&master_cert, NULL, 0, NULL, mode, sizeof(mode), system, sizeof(system));
 
 	wt = NewWt(master_cert);
 
 	StrCpy(wt->EntranceMode, sizeof(wt->EntranceMode), mode);
+	StrCpy(wt->System, sizeof(wt->System), system);
 
 	FreeX(master_cert);
 
