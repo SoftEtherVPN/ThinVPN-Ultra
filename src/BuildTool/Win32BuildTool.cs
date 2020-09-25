@@ -122,21 +122,22 @@ namespace BuildTool
 			string body = Str.ReadTextFile(templateFileName);
 
 			string exeFileName = Path.GetFileName(targetExeName);
-			string internalName = Path.GetFileNameWithoutExtension(exeFileName);
 
-			if (Str.IsEmptyStr(postfix) == false)
-			{
-				internalName += " " + postfix;
-			}
-
-			internalName += " (Ultra: " + commitId + ")";
+			exeFileName += " (Ultra: " + commitId + ")";
 
 			if (Str.IsEmptyStr(product_name))
 			{
 				product_name = "Unknown Product";
 			}
 
-			body = Str.ReplaceStr(body, "$PRODUCTNAME$", product_name);
+            string internalName = product_name;
+
+            if (Str.IsEmptyStr(postfix) == false)
+            {
+                internalName += " " + postfix;
+            }
+
+            body = Str.ReplaceStr(body, "$PRODUCTNAME$", product_name);
 
 			body = Str.ReplaceStr(body, "$INTERNALNAME$", internalName);
 			body = Str.ReplaceStr(body, "$YEAR$", date.Year.ToString());
