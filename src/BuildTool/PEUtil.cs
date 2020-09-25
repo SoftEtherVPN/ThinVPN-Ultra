@@ -178,7 +178,7 @@ namespace BuildTool
 					try
 					{
 						// Execute
-						Win32BuildTool.ExecCommand(mtFileName, mtArgs, false);
+						Win32BuildTool.ExecCommand(mtFileName, mtArgs, false, true);
 						ex = null;
 
 						break;

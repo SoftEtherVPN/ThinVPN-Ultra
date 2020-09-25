@@ -96,39 +96,39 @@ using CoreUtil;
 
 namespace BuildTool
 {
-	// Build utility for Win32
-	public static class Win32BuildTool
-	{
-		// Generate a version information resource
-		public static void GenerateVersionInfoResource(string targetExeName, string outName, string rc_name, string product_name, string postfix, string commitId)
-		{
-			int build, version;
-			string name;
-			DateTime date;
+    // Build utility for Win32
+    public static class Win32BuildTool
+    {
+        // Generate a version information resource
+        public static void GenerateVersionInfoResource(string targetExeName, string outName, string rc_name, string product_name, string postfix, string commitId)
+        {
+            int build, version;
+            string name;
+            DateTime date;
 
-			if (Str.IsEmptyStr(commitId))
-			{
-				commitId = "unknown";
-			}
+            if (Str.IsEmptyStr(commitId))
+            {
+                commitId = "unknown";
+            }
 
-			ReadBuildInfoFromTextFile(out build, out version, out name, out date);
+            ReadBuildInfoFromTextFile(out build, out version, out name, out date);
 
-			if (Str.IsEmptyStr(rc_name))
-			{
-				rc_name = "ver.rc";
-			}
+            if (Str.IsEmptyStr(rc_name))
+            {
+                rc_name = "ver.rc";
+            }
 
-			string templateFileName = Path.Combine(Paths.UltraBuildFilesDirName, @"VerScript\" + rc_name);
-			string body = Str.ReadTextFile(templateFileName);
+            string templateFileName = Path.Combine(Paths.UltraBuildFilesDirName, @"VerScript\" + rc_name);
+            string body = Str.ReadTextFile(templateFileName);
 
-			string exeFileName = Path.GetFileName(targetExeName);
+            string exeFileName = Path.GetFileName(targetExeName);
 
-			exeFileName += " (Ultra: " + commitId + ")";
+            exeFileName += " (Ultra: " + commitId + ")";
 
-			if (Str.IsEmptyStr(product_name))
-			{
-				product_name = "Unknown Product";
-			}
+            if (Str.IsEmptyStr(product_name))
+            {
+                product_name = "Unknown Product";
+            }
 
             string internalName = product_name;
 
@@ -139,162 +139,173 @@ namespace BuildTool
 
             body = Str.ReplaceStr(body, "$PRODUCTNAME$", product_name);
 
-			body = Str.ReplaceStr(body, "$INTERNALNAME$", internalName);
-			body = Str.ReplaceStr(body, "$YEAR$", date.Year.ToString());
-			body = Str.ReplaceStr(body, "$FILENAME$", exeFileName);
-			body = Str.ReplaceStr(body, "$VER_MAJOR$", (version / 100).ToString());
-			body = Str.ReplaceStr(body, "$VER_MINOR$", (version % 100).ToString());
-			body = Str.ReplaceStr(body, "$VER_BUILD$", build.ToString());
+            body = Str.ReplaceStr(body, "$INTERNALNAME$", internalName);
+            body = Str.ReplaceStr(body, "$YEAR$", date.Year.ToString());
+            body = Str.ReplaceStr(body, "$FILENAME$", exeFileName);
+            body = Str.ReplaceStr(body, "$VER_MAJOR$", (version / 100).ToString());
+            body = Str.ReplaceStr(body, "$VER_MINOR$", (version % 100).ToString());
+            body = Str.ReplaceStr(body, "$VER_BUILD$", build.ToString());
 
-			IO f = IO.CreateTempFileByExt(".rc");
-			string filename = f.Name;
+            IO f = IO.CreateTempFileByExt(".rc");
+            string filename = f.Name;
 
-			f.Write(Str.AsciiEncoding.GetBytes(body));
+            f.Write(Str.AsciiEncoding.GetBytes(body));
 
-			f.Close();
+            f.Close();
 
-			ExecCommand(Paths.RcFilename, "/nologo \"" + filename + "\"");
+            ExecCommand(Paths.RcFilename, "/nologo \"" + filename + "\"");
 
-			string rcDir = Path.GetDirectoryName(filename);
-			string rcFilename = Path.GetFileName(filename);
-			string rcFilename2 = Path.GetFileNameWithoutExtension(rcFilename);
+            string rcDir = Path.GetDirectoryName(filename);
+            string rcFilename = Path.GetFileName(filename);
+            string rcFilename2 = Path.GetFileNameWithoutExtension(rcFilename);
 
-			string resFilename = Path.Combine(rcDir, rcFilename2) + ".res";
+            string resFilename = Path.Combine(rcDir, rcFilename2) + ".res";
 
-			IO.MakeDirIfNotExists(Path.GetDirectoryName(outName));
+            IO.MakeDirIfNotExists(Path.GetDirectoryName(outName));
 
-			IO.FileCopy(resFilename, outName, true, false);
-		}
+            IO.FileCopy(resFilename, outName, true, false);
+        }
 
-		// Flush to disk
-		public static void Flush()
-		{
-			string txt = IO.CreateTempFileNameByExt(".txt");
-			byte[] ret = Secure.Rand(64);
+        // Flush to disk
+        public static void Flush()
+        {
+            string txt = IO.CreateTempFileNameByExt(".txt");
+            byte[] ret = Secure.Rand(64);
 
-			FileStream f = File.Create(txt);
+            FileStream f = File.Create(txt);
 
-			f.Write(ret, 0, ret.Length);
+            f.Write(ret, 0, ret.Length);
 
-			f.Flush();
+            f.Flush();
 
-			f.Close();
+            f.Close();
 
-			File.Delete(txt);
-		}
+            File.Delete(txt);
+        }
 
-		// Write the build number and the version number in the text file
-		public static void WriteBuildInfoToTextFile(int build, int version, string name, DateTime date)
-		{
-			string filename = Path.Combine(Paths.SolutionBaseDirName, "CurrentBuild.txt");
+        // Write the build number and the version number in the text file
+        public static void WriteBuildInfoToTextFile(int build, int version, string name, DateTime date)
+        {
+            string filename = Path.Combine(Paths.SolutionBaseDirName, "CurrentBuild.txt");
 
-			WriteBuildInfoToTextFile(build, version, name, date, filename);
-		}
-		public static void WriteBuildInfoToTextFile(int build, int version, string name, DateTime date, string filename)
-		{
-			using (StreamWriter w = new StreamWriter(filename))
-			{
-				w.WriteLine("BUILD_NUMBER {0}", build);
-				w.WriteLine("VERSION {0}", version);
-				w.WriteLine("BUILD_NAME {0}", name);
-				w.WriteLine("BUILD_DATE {0}", Str.DateTimeToStrShort(date));
+            WriteBuildInfoToTextFile(build, version, name, date, filename);
+        }
+        public static void WriteBuildInfoToTextFile(int build, int version, string name, DateTime date, string filename)
+        {
+            using (StreamWriter w = new StreamWriter(filename))
+            {
+                w.WriteLine("BUILD_NUMBER {0}", build);
+                w.WriteLine("VERSION {0}", version);
+                w.WriteLine("BUILD_NAME {0}", name);
+                w.WriteLine("BUILD_DATE {0}", Str.DateTimeToStrShort(date));
 
-				w.Flush();
-				w.Close();
-			}
-		}
+                w.Flush();
+                w.Close();
+            }
+        }
 
-		// Read the build number and the version number from a text file
-		public static void ReadBuildInfoFromTextFile(out int build, out int version, out string name, out DateTime date)
-		{
-			string filename = Path.Combine(Paths.SolutionBaseDirName, "CurrentBuild.txt");
+        // Read the build number and the version number from a text file
+        public static void ReadBuildInfoFromTextFile(out int build, out int version, out string name, out DateTime date)
+        {
+            string filename = Path.Combine(Paths.SolutionBaseDirName, "CurrentBuild.txt");
 
-			ReadBuildInfoFromTextFile(out build, out version, out name, out date, filename);
-		}
-		public static void ReadBuildInfoFromTextFile(out int build, out int version, out string name, out DateTime date, string filename)
-		{
-			char[] seps = { '\t', ' ', };
-			name = "";
-			date = new DateTime(0);
+            ReadBuildInfoFromTextFile(out build, out version, out name, out date, filename);
+        }
+        public static void ReadBuildInfoFromTextFile(out int build, out int version, out string name, out DateTime date, string filename)
+        {
+            char[] seps = { '\t', ' ', };
+            name = "";
+            date = new DateTime(0);
 
-			using (StreamReader r = new StreamReader(filename))
-			{
-				build = version = 0;
+            using (StreamReader r = new StreamReader(filename))
+            {
+                build = version = 0;
 
-				while (true)
-				{
-					string line = r.ReadLine();
-					if (line == null)
-					{
-						break;
-					}
+                while (true)
+                {
+                    string line = r.ReadLine();
+                    if (line == null)
+                    {
+                        break;
+                    }
 
-					string[] tokens = line.Split(seps, StringSplitOptions.RemoveEmptyEntries);
-					if (tokens.Length == 2)
-					{
-						if (tokens[0].Equals("BUILD_NUMBER", StringComparison.InvariantCultureIgnoreCase))
-						{
-							build = int.Parse(tokens[1]);
-						}
+                    string[] tokens = line.Split(seps, StringSplitOptions.RemoveEmptyEntries);
+                    if (tokens.Length == 2)
+                    {
+                        if (tokens[0].Equals("BUILD_NUMBER", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            build = int.Parse(tokens[1]);
+                        }
 
-						if (tokens[0].Equals("VERSION", StringComparison.InvariantCultureIgnoreCase))
-						{
-							version = int.Parse(tokens[1]);
-						}
+                        if (tokens[0].Equals("VERSION", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            version = int.Parse(tokens[1]);
+                        }
 
-						if (tokens[0].Equals("BUILD_NAME", StringComparison.InvariantCultureIgnoreCase))
-						{
-							name = tokens[1];
+                        if (tokens[0].Equals("BUILD_NAME", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            name = tokens[1];
 
-							name = Str.ReplaceStr(name, "-", "_");
-						}
+                            name = Str.ReplaceStr(name, "-", "_");
+                        }
 
-						if (tokens[0].Equals("BUILD_DATE", StringComparison.InvariantCultureIgnoreCase))
-						{
-							date = Str.StrToDateTime(tokens[1]);
-						}
-					}
-				}
+                        if (tokens[0].Equals("BUILD_DATE", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            date = Str.StrToDateTime(tokens[1]);
+                        }
+                    }
+                }
 
-				r.Close();
+                r.Close();
 
-				if (build == 0 || version == 0 || Str.IsEmptyStr(name) || date.Ticks == 0)
-				{
-					throw new ApplicationException(string.Format("Wrong file data: '{0}'", filename));
-				}
-			}
-		}
+                if (build == 0 || version == 0 || Str.IsEmptyStr(name) || date.Ticks == 0)
+                {
+                    throw new ApplicationException(string.Format("Wrong file data: '{0}'", filename));
+                }
+            }
+        }
 
-		// Command execution
-		public static void ExecCommand(string exe, string arg)
-		{
-			ExecCommand(exe, arg, false);
-		}
-		public static void ExecCommand(string exe, string arg, bool shell_execute)
-		{
-			Process p = new Process();
-			p.StartInfo.FileName = exe;
-			p.StartInfo.Arguments = arg;
-			p.StartInfo.UseShellExecute = shell_execute;
+        // Command execution
+        public static void ExecCommand(string exe, string arg, bool shell_execute = false, bool no_stdout = false)
+        {
+            string outputStr = "";
 
-			if (shell_execute)
-			{
-				p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-			}
+            Process p = new Process();
+            p.StartInfo.FileName = exe;
+            p.StartInfo.Arguments = arg;
+            p.StartInfo.UseShellExecute = shell_execute;
 
-			Con.WriteLine("Executing '{0} {1}'...", exe, arg);
+            if (no_stdout)
+            {
+                p.StartInfo.RedirectStandardError = true;
+                p.StartInfo.RedirectStandardOutput = true;
+            }
 
-			p.Start();
+            if (shell_execute)
+            {
+                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            }
 
-			p.WaitForExit();
+            Con.WriteLine("Executing '{0} {1}'...", exe, arg);
 
-			int ret = p.ExitCode;
-			if (ret != 0)
-			{
-				throw new ApplicationException(string.Format("Child process '{0}' returned error code {1}.", exe, ret));
-			}
+            p.Start();
 
-			Kernel.SleepThread(50);
-		}
-	}
+            p.WaitForExit();
+
+            if (no_stdout)
+            {
+                string s1 = p.StandardOutput.ReadToEnd();
+                string s2 = p.StandardError.ReadToEnd();
+                outputStr = "---\r\n" + s1 + "\r\n" + s2 + "\r\n---\r\n";
+            }
+
+            int ret = p.ExitCode;
+            if (ret != 0)
+            {
+                throw new ApplicationException(string.Format("Child process '{0}' returned error code {1}.\r\n{2}", exe, ret, outputStr));
+            }
+
+            Kernel.SleepThread(50);
+        }
+    }
 }

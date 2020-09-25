@@ -101,6 +101,8 @@ namespace BuildTool
 	{
 		public static void Test()
 		{
+			Win32BuildTool.ExecCommand(@"C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86\mt.exe",
+				"-test", no_stdout: true);
 		}
 	}
 }
