@@ -226,9 +226,20 @@ bool Vars_ActivePatch_GetBool(char* name)
 }
 char* Vars_ActivePatch_GetStr(char* name)
 {
+	return Vars_ActivePatch_GetStrEx(name, NULL);
+}
+char* Vars_ActivePatch_GetStrEx(char* name, char* default_str)
+{
 	UINT sz;
 	char* p = Vars_ActivePatch_GetData2(name, &sz);
-	if (p == NULL) return "";
+	if (p == NULL)
+	{
+		if (default_str == NULL)
+		{
+			return "";
+		}
+		return default_str;
+	}
 
 	return p;
 }

@@ -472,6 +472,7 @@ UINT Vars_ActivePatch_GetInt(char* name);
 bool Vars_ActivePatch_GetBool(char* name);
 UINT64 Vars_ActivePatch_GetInt64(char* name);
 char* Vars_ActivePatch_GetStr(char* name);
+char* Vars_ActivePatch_GetStrEx(char* name, char *default_str);
 
 #endif	// MEMORY_H
 

@@ -3464,7 +3464,7 @@ void WideLoadEntryPoint(X **cert, char *url, UINT url_size, LIST *secondary_str_
 	BUF *buf = ReadDump(LOCAL_ENTRY_POINT_FILENAME);
 
 	StrCpy(mode, mode_size, "Normal");
-	StrCpy(system, system_size, "Unknown System");
+	StrCpy(system, system_size, Vars_ActivePatch_GetStrEx("WtDefaultGatewaySystemName", "Unknown System"));
 
 	Zero(url_tmp, sizeof(url_tmp));
 
