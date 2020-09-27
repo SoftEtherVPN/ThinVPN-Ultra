@@ -380,6 +380,7 @@ typedef struct NT_API
 	HINSTANCE hDbgHelp;
 	HINSTANCE hWcmapi;
 	HINSTANCE hDwmapi;
+	HINSTANCE hUserenv;
 	BOOL (WINAPI *OpenProcessToken)(HANDLE, DWORD, PHANDLE);
 	BOOL (WINAPI *LookupPrivilegeValue)(char *, char *, PLUID);
 	BOOL (WINAPI *AdjustTokenPrivileges)(HANDLE, BOOL, PTOKEN_PRIVILEGES, DWORD, PTOKEN_PRIVILEGES, PDWORD);
@@ -463,6 +464,8 @@ typedef struct NT_API
 	BOOL (WINAPI *GetComputerNameExW)(COMPUTER_NAME_FORMAT, LPWSTR, LPDWORD);
 	LONG (WINAPI *RegLoadKeyW)(HKEY, LPCWSTR, LPCWSTR);
 	LONG (WINAPI *RegUnLoadKeyW)(HKEY, LPCWSTR);
+	BOOL (WINAPI* RefreshPolicy)(BOOL);
+	BOOL (WINAPI* RefreshPolicyEx)(BOOL, DWORD);
 } NT_API;
 
 typedef struct MS_EVENTLOG
@@ -1193,6 +1196,7 @@ void CALLBACK MsScmDispatcher(DWORD argc, LPTSTR *argv);
 LRESULT CALLBACK MsSuspendHandlerWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void MsSuspendHandlerThreadProc(THREAD *thread, void *param);
 
+bool MsApplyGroupPolicy(bool machine);
 
 
 #endif	// MICROSOFT_C

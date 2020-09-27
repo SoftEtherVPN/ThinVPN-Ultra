@@ -295,6 +295,21 @@ void MsInitProcessCallOnce(bool restricted_mode)
 	}
 }
 
+bool MsApplyGroupPolicy(bool machine)
+{
+	if (ms != NULL && ms->nt != NULL && ms->nt->RefreshPolicyEx != NULL)
+	{
+		return ms->nt->RefreshPolicyEx(machine, 1 /* RP_FORCE */);
+	}
+
+	if (ms != NULL && ms->nt != NULL && ms->nt->RefreshPolicy != NULL)
+	{
+		return ms->nt->RefreshPolicy(machine);
+	}
+
+	return false;
+}
+
 LIST *MsGetMacAddressList()
 {
 	MS_ADAPTER_LIST *o;
@@ -13295,6 +13310,8 @@ NT_API *MsLoadNtApiFunctions()
 
 	nt->hDwmapi = LoadLibrary("dwmapi.dll");
 
+	nt->hUserenv = LoadLibrary("Userenv.dll");
+
 	// Read the function
 	nt->GetComputerNameExW =
 		(BOOL (__stdcall *)(COMPUTER_NAME_FORMAT,LPWSTR,LPDWORD))
@@ -13591,6 +13608,17 @@ NT_API *MsLoadNtApiFunctions()
 		(BOOL (__stdcall *)(PLUID))
 		GetProcAddress(nt->hAdvapi32, "AllocateLocallyUniqueId");
 
+	if (nt->hUserenv != NULL)
+	{
+		nt->RefreshPolicy =
+			(BOOL(__stdcall*)(BOOL))
+			GetProcAddress(nt->hUserenv, "RefreshPolicy");
+
+		nt->RefreshPolicyEx =
+			(BOOL(__stdcall*)(BOOL,DWORD))
+			GetProcAddress(nt->hUserenv, "RefreshPolicyEx");
+	}
+
 	// Desktop related API
 	if (nt->hUser32 != NULL)
 	{
@@ -13676,6 +13704,11 @@ void MsFreeNtApiFunctions(NT_API *nt)
 	if (nt->hDwmapi != NULL)
 	{
 		FreeLibrary(nt->hDwmapi);
+	}
+
+	if (nt->hUserenv != NULL)
+	{
+		FreeLibrary(nt->hUserenv);
 	}
 
 	FreeLibrary(nt->hKernel32);
