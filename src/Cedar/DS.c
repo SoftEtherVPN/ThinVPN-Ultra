@@ -2085,6 +2085,20 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 						"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
 						"UserAuthentication", 0);
 				}
+
+				if (MsIsWindows10())
+				{
+					// Windows 10 2004 以降で 「Windows Hello 認証の強制」 が ON になっている場合は、RDP 接続がうまくできなくなる
+					// バグがあるので、OFF に戻す。
+					if (MsRegIsValueEx2(REG_LOCAL_MACHINE,
+						"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\PasswordLess\\Device",
+						"DevicePasswordLessBuildVersion", false, true))
+					{
+						MsRegWriteIntEx2(REG_LOCAL_MACHINE,
+							"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\PasswordLess\\Device",
+							"DevicePasswordLessBuildVersion", 0, false, true);
+					}
+				}
 			}
 		}
 
