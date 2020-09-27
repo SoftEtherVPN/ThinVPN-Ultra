@@ -7686,24 +7686,15 @@ bool MsEnableRemoteDesktop()
 	if (MsIsWindows10())
 	{
 		// Windows 10 2004 以降で 「Windows Hello 認証の強制」 が ON になっている場合は、RDP 接続がうまくできなくなる
-		// バグがあるので、OFF に戻す。(ただし、ユーザーによって元に戻された場合は出さない)
-		if (MsRegReadInt(REG_LOCAL_MACHINE,
-			"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\PasswordLess\\Device",
-			"DevicePasswordLessBuildVersion") != 0)
+		// バグがあるので、OFF に戻す。
+		if (MsRegReadInt(REG_LOCAL_MACHINE, DI_REGKEY, "RDP3") == 0)
 		{
-			if (MsRegReadInt(REG_LOCAL_MACHINE, DI_REGKEY, "RDP3") == 0)
+			if (MsRegWriteInt(REG_LOCAL_MACHINE,
+				"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\PasswordLess\\Device",
+				"DevicePasswordLessBuildVersion", 0))
 			{
-				if (MsRegWriteInt(REG_LOCAL_MACHINE,
-					"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\PasswordLess\\Device",
-					"DevicePasswordLessBuildVersion", 0))
-				{
-					MsRegWriteInt(REG_LOCAL_MACHINE, DI_REGKEY, "RDP3", 1);
-				}
+				MsRegWriteInt(REG_LOCAL_MACHINE, DI_REGKEY, "RDP3", 1);
 			}
-		}
-		else
-		{
-			MsRegWriteInt(REG_LOCAL_MACHINE, DI_REGKEY, "RDP3", 0);
 		}
 	}
 
