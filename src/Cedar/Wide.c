@@ -2814,6 +2814,7 @@ void WideGateLoadCertKey(X **cert, K **key)
 // セッション削除の報告
 void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id)
 {
+	bool global_ip_only = true;
 	WT *wt;
 	// 引数チェック
 	if (wide == NULL)
@@ -2827,6 +2828,11 @@ void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id)
 		return;
 	}
 
+	if (WideGateGetIniEntry("AllowPrivateIp"))
+	{
+		// プライベート IP アドレスに対する Register を許容
+		global_ip_only = false;
+	}
 
 	wt = wide->wt;
 
@@ -2840,7 +2846,7 @@ void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id)
 		PackAddData(p, "SessionId", session_id, WT_SESSION_ID_SIZE);
 		WideGatePackGateInfo(p, wt);
 
-		ret = WtWpcCallWithCertAndKey(wt, "ReportSessionDel", p, wide->GateCert, wide->GateKey, true, false);
+		ret = WtWpcCallWithCertAndKey(wt, "ReportSessionDel", p, wide->GateCert, wide->GateKey, global_ip_only, false);
 
 		if (ret != NULL)
 		{
@@ -2877,6 +2883,7 @@ void WideGateReportSessionAdd(WIDE *wide, TSESSION *s)
 	WT *wt;
 	bool b = true;
 	UINT64 gateway_interval = (UINT64)WideGateGetIniEntry("GatewayInterval");
+	bool global_ip_only = true;
 	// 引数チェック
 	if (wide == NULL)
 	{
@@ -2913,6 +2920,11 @@ void WideGateReportSessionAdd(WIDE *wide, TSESSION *s)
 		return;
 	}
 
+	if (WideGateGetIniEntry("AllowPrivateIp"))
+	{
+		// プライベート IP アドレスに対する Register を許容
+		global_ip_only = false;
+	}
 
 	if (b)
 	{
@@ -2926,7 +2938,7 @@ void WideGateReportSessionAdd(WIDE *wide, TSESSION *s)
 			WideGatePackSession(p, s, 0, 1, NULL);
 			WideGatePackGateInfo(p, wt);
 
-			ret = WtWpcCallWithCertAndKey(wt, "ReportSessionAdd", p, wide->GateCert, wide->GateKey, true, false);
+			ret = WtWpcCallWithCertAndKey(wt, "ReportSessionAdd", p, wide->GateCert, wide->GateKey, global_ip_only, false);
 
 			if (ret != NULL)
 			{
@@ -2945,6 +2957,7 @@ void WideGateReportSessionList(WIDE *wide)
 {
 	WT *wt;
 	LIST *sc_list;
+	bool global_ip_only = true;
 	// 引数チェック
 	if (wide == NULL)
 	{
@@ -2955,6 +2968,12 @@ void WideGateReportSessionList(WIDE *wide)
 	{
 		// 一時的に登録無効化
 		return;
+	}
+
+	if (WideGateGetIniEntry("AllowPrivateIp"))
+	{
+		// プライベート IP アドレスに対する Register を許容
+		global_ip_only = false;
 	}
 
 	wt = wide->wt;
@@ -2987,7 +3006,7 @@ void WideGateReportSessionList(WIDE *wide)
 		}
 		ReleaseList(sc_list);
 
-		ret = WtWpcCallWithCertAndKey(wt, "ReportSessionList", p, wide->GateCert, wide->GateKey, true, false);
+		ret = WtWpcCallWithCertAndKey(wt, "ReportSessionList", p, wide->GateCert, wide->GateKey, global_ip_only, false);
 
 		if (ret != NULL)
 		{
