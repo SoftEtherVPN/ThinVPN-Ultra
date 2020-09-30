@@ -2225,25 +2225,28 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 		}
 	}
 
-	if (t.MsgForServerArrived && UniIsEmptyStr(t.MsgForServer) == false)
+	if (startup == false)
 	{
-		// 新しいメッセージが届いている
-		// 画面に表示する
-		if (dg->MsgForServerDlg == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+		if (t.MsgForServerArrived && UniIsEmptyStr(t.MsgForServer) == false)
 		{
-			dg->MsgForServerDlg = StartAsyncOnceMsg(_UU("DU_SERVER_MSG2"), t.MsgForServer, t.MsgForServerOnce,
-				ICO_VB6, true);
+			// 新しいメッセージが届いている
+			// 画面に表示する
+			if (dg->MsgForServerDlg == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+			{
+				dg->MsgForServerDlg = StartAsyncOnceMsg(_UU("DU_SERVER_MSG2"), t.MsgForServer, t.MsgForServerOnce,
+					ICO_VB6, true);
+			}
 		}
-	}
 
-	if (UniIsEmptyStr(t.MsgForServer2) == false)
-	{
-		// ポリシー関係のメッセージが届いている
-		// 画面に表示する
-		if (dg->MsgForServerDlg2 == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+		if (UniIsEmptyStr(t.MsgForServer2) == false)
 		{
-			dg->MsgForServerDlg2 = StartAsyncOnceMsg(_UU("DS_POLICY_MESSAGE_TITLE"), t.MsgForServer2, true,
-				ICO_INFORMATION, true);
+			// ポリシー関係のメッセージが届いている
+			// 画面に表示する
+			if (dg->MsgForServerDlg2 == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+			{
+				dg->MsgForServerDlg2 = StartAsyncOnceMsg(_UU("DS_POLICY_MESSAGE_TITLE"), t.MsgForServer2, true,
+					ICO_INFORMATION, true);
+			}
 		}
 	}
 
