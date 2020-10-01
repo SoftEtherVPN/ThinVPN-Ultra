@@ -211,6 +211,9 @@ struct WIDE
 	char ControllerGateSecretKey[64];
 	char GateKeyStr[64];
 	char ControllerUrlOverride[MAX_PATH];
+	bool AcceptProxyProtocol;
+	bool NoLookupDnsHostname;
+	bool DisableDoSProtection;
 
 
 	// 2020/4/15 追加 アグレッシブタイムアウト機能

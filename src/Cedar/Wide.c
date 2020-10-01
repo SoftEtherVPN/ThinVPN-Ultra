@@ -3176,6 +3176,10 @@ WIDE *WideGateStart()
 			StrCpy(w->ControllerUrlOverride, sizeof(w->ControllerUrlOverride), tmp);
 		}
 
+		w->NoLookupDnsHostname = INT_TO_BOOL(IniIntValue(o, "NoLookupDnsHostname"));
+		w->AcceptProxyProtocol = INT_TO_BOOL(IniIntValue(o, "AcceptProxyProtocol"));
+		w->DisableDoSProtection = INT_TO_BOOL(IniIntValue(o, "DisableDoSProtection"));
+
 		WideFreeIni(o);
 	}
 

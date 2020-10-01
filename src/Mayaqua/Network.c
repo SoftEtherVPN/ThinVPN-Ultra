@@ -23575,6 +23575,100 @@ bool LinuxGetWanMacAddress(UCHAR *mac)
 	return ret;
 }
 
+// Parse the Proxy Protocol header
+UINT ParseProxyProtocol(PROXY_PROTOCOL* dst, UCHAR* peek_buf, UINT peek_size)
+{
+	UINT ret = 0;
+	BUF* buf = NULL;
+	UINT i;
+	bool ok = false;
+	char* const_startwith = "PROXY TCP";
+	UINT const_startwith_len = StrLen(const_startwith);
+	Zero(dst, sizeof(PROXY_PROTOCOL));
+	if (dst == NULL || peek_buf == NULL || peek_size < 32)
+	{
+		return 0;
+	}
+
+	if (Cmp(peek_buf, const_startwith, const_startwith_len) != 0)
+	{
+		// Not a proxy protocol
+		return 0;
+	}
+
+	buf = NewBuf(buf);
+
+	// Read until new line
+	for (i = 0;i < peek_size;i++)
+	{
+		UCHAR c = peek_buf[i];
+		if (c == 13)
+		{
+			if ((i < (peek_size - 1)) && peek_buf[i + 1] == 10)
+			{
+				ok = true;
+			}
+			break;
+		}
+		else
+		{
+			WriteBufChar(buf, c);
+		}
+	}
+
+	if (ok)
+	{
+		char* src_str;
+		TOKEN_LIST* t;
+
+		ok = false;
+
+		ret = buf->Size;
+
+		WriteBufChar(buf, 0);
+
+		src_str = (char*)buf->Buf;
+
+		t = ParseToken(src_str, " ");
+		if (t != NULL)
+		{
+			// Example: "PROXY TCP4 198.51.100.22 203.0.113.7 35646 80"
+			if (t->NumTokens == 6)
+			{
+				char* proto = t->Token[0];
+				char* tcptype = t->Token[1];
+				char* clientip = t->Token[2];
+				char* proxyip = t->Token[3];
+				char* clientport = t->Token[4];
+				char* proxyport = t->Token[5];
+
+				StrCpy(dst->InetProtocol, sizeof(dst->InetProtocol), tcptype);
+
+				StrToIP(&dst->ClientIp, clientip);
+				StrToIP(&dst->ProxyIp, proxyip);
+				dst->ClientPort = ToInt(clientport);
+				dst->ProxyPort = ToInt(proxyport);
+
+				if (dst->ClientPort >= 1 && dst->ClientPort <= 65535)
+				{
+					ok = true;
+				}
+			}
+
+			FreeToken(t);
+		}
+	}
+
+	FreeBuf(buf);
+
+	if (ok == false)
+	{
+		ret = 0;
+	}
+
+	return ret;
+}
+
 // Get SNI name from the data that has arrived to the TCP connection before accepting an SSL connection
 bool GetSniNameFromPreSslConnection(SOCK *s, char *sni, UINT sni_size)
 {

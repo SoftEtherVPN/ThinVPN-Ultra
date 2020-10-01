@@ -628,8 +628,8 @@ struct IPBLOCK
 struct PROXY_PROTOCOL
 {
 	char InetProtocol[32];
-	char ClientIp[64];
-	char ProxyIp[64];
+	IP ClientIp;
+	IP ProxyIp;
 	UINT ClientPort;
 	UINT ProxyPort;
 };
@@ -1703,6 +1703,8 @@ void GetBroadcastAddress4(IP *dst, IP *addr, IP *mask);
 bool IsInNetwork(UINT uni_addr, UINT network_addr, UINT mask);
 bool IsMacBroadcast(UCHAR *mac);
 bool IsMacInvalid(UCHAR *mac);
+
+UINT ParseProxyProtocol(PROXY_PROTOCOL *dst, UCHAR* peek_buf, UINT peek_size);
 
 
 #endif	// NETWORK_H
