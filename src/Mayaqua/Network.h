@@ -287,6 +287,7 @@ struct SOCK
 	UCHAR Ssl_Init_Async_SendAlert[2];	// Initial state of SSL send_alert
 	SSL_ACCEPT_SETTINGS SslAcceptSettings;	// SSL Accept Settings
 	bool RawIP_HeaderIncludeFlag;
+	bool WithProxyProtocol;
 
 #ifdef	ENABLE_SSL_LOGGING
 	// SSL Logging (for debug)
@@ -1373,6 +1374,7 @@ bool UnixGetDomainName(char *name, UINT size);
 void RenewDhcp();
 void AcceptInit(SOCK *s);
 void AcceptInitEx(SOCK *s, bool no_lookup_hostname);
+void AcceptInitEx2(SOCK* s, bool no_lookup_hostname, bool accept_proxy_protocol);
 void DisableGetHostNameWhenAcceptInit();
 bool CheckCipherListName(char *name);
 TOKEN_LIST *GetCipherList();

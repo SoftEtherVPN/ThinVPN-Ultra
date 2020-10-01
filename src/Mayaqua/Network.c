@@ -14413,13 +14413,55 @@ void AcceptInit(SOCK *s)
 {
 	AcceptInitEx(s, false);
 }
-void AcceptInitEx(SOCK *s, bool no_lookup_hostname)
+void AcceptInitEx(SOCK* s, bool no_lookup_hostname)
+{
+	AcceptInitEx2(s, no_lookup_hostname, false);
+}
+void AcceptInitEx2(SOCK* s, bool no_lookup_hostname, bool accept_proxy_protocol) 
 {
 	char tmp[MAX_SIZE];
 	// Validate arguments
 	if (s == NULL)
 	{
 		return;
+	}
+
+	if (accept_proxy_protocol)
+	{
+		UINT peek_buf_size = 1500;
+		UCHAR* peek_buf = ZeroMalloc(peek_buf_size + 2);
+		UINT peek_size;
+
+		peek_size = Peek(s, peek_buf, peek_buf_size);
+		if (peek_size >= 1)
+		{
+			PROXY_PROTOCOL proxy = CLEAN;
+
+			UINT skip_bytes = ParseProxyProtocol(&proxy, peek_buf, peek_buf_size);
+
+			if (skip_bytes != 0)
+			{
+				Debug("skip_bytes = %u\n", skip_bytes);
+				if (RecvAll(s, peek_buf, skip_bytes, false) == false)
+				{
+					WHERE;
+					Disconnect(s);
+				}
+
+				if ((s->IPv6 && IsIP6(&proxy.ClientIp)) ||
+					(s->IPv6 == false && IsIP4(&proxy.ClientIp)))
+				{
+					if (IsZeroIp(&proxy.ClientIp) == false)
+					{
+						s->WithProxyProtocol = true;
+						CopyIP(&s->RemoteIP, &proxy.ClientIp);
+						s->RemotePort = proxy.ClientPort;
+					}
+				}
+			}
+		}
+
+		Free(peek_buf);
 	}
 
 	Zero(tmp, sizeof(tmp));
@@ -23623,7 +23665,7 @@ UINT ParseProxyProtocol(PROXY_PROTOCOL* dst, UCHAR* peek_buf, UINT peek_size)
 
 		ok = false;
 
-		ret = buf->Size;
+		ret = buf->Size + 2;
 
 		WriteBufChar(buf, 0);
 

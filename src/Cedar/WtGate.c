@@ -1910,7 +1910,7 @@ void WtgAcceptThread(THREAD *thread, void *param)
 	AddSockThread(wt->SockThreadList, s, thread);
 
 	NoticeThreadInit(thread);
-	AcceptInitEx(s, wt->Wide->NoLookupDnsHostname);
+	AcceptInitEx2(s, wt->Wide->NoLookupDnsHostname, wt->Wide->AcceptProxyProtocol);
 
 	WtgAccept(wt, s);
 
