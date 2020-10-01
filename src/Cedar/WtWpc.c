@@ -477,6 +477,13 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 		goto L_CLEANUP;
 	}
 
+	if (IsEmptyStr(wt->Wide->ControllerUrlOverride) == false)
+	{
+		// コントローラ URL を WideGate.ini 設定で上書き
+		StrCpy(url, sizeof(url), wt->Wide->ControllerUrlOverride);
+		try_secondary = false;
+	}
+
 	if (try_secondary == false)
 	{
 		// SECONDARY ホストを試さない。普通の URL のみ。従来どおり。

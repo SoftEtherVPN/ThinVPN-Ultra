@@ -210,6 +210,7 @@ struct WIDE
 	LOCK *SecretKeyLock;
 	char ControllerGateSecretKey[64];
 	char GateKeyStr[64];
+	char ControllerUrlOverride[MAX_PATH];
 
 
 	// 2020/4/15 追加 アグレッシブタイムアウト機能

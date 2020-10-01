@@ -3164,11 +3164,16 @@ WIDE *WideGateStart()
 	o = WideGateLoadIni();
 	if (o != NULL)
 	{
-		char *gate_key = IniStrValue(o, "GateKey");
-
-		if (IsEmptyStr(gate_key) == false)
+		char *tmp = IniStrValue(o, "GateKey");
+		if (IsEmptyStr(tmp) == false)
 		{
-			StrCpy(w->GateKeyStr, sizeof(w->GateKeyStr), gate_key);
+			StrCpy(w->GateKeyStr, sizeof(w->GateKeyStr), tmp);
+		}
+
+		tmp = IniStrValue(o, "ControllerUrlOverride");
+		if (IsEmptyStr(tmp) == false)
+		{
+			StrCpy(w->ControllerUrlOverride, sizeof(w->ControllerUrlOverride), tmp);
 		}
 
 		WideFreeIni(o);
