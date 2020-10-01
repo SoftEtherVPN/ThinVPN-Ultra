@@ -3081,6 +3081,14 @@ void ConnectionAccept(CONNECTION *c)
 	initial_timeout += GetMachineRand() % (CONNECTING_TIMEOUT / 2);
 	SetTimeout(s, initial_timeout);
 
+	// Peek for Proxy Protocol
+	if (true)
+	{
+		peek_size = Peek(s, peek_buf, peek_buf_size);
+		if (peek_size >= 1)
+		{
+		}
+	}
 
 	// Peek whether OpenSSL packet
 	if (s->IsReverseAcceptedSocket == false)

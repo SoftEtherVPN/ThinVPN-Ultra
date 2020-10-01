@@ -624,6 +624,16 @@ struct IPBLOCK
 	IP Mask;						// Subnet mask
 };
 
+// Proxy Protocol headers
+struct PROXY_PROTOCOL
+{
+	char InetProtocol[32];
+	char ClientIp[64];
+	char ProxyIp[64];
+	UINT ClientPort;
+	UINT ProxyPort;
+};
+
 
 // R-UDP related constants
 #define	RUDP_RESEND_TIMER				200			// Retransmission timer (initial value)
