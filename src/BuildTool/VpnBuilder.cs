@@ -162,6 +162,23 @@ namespace BuildTool
 
             Paths.MicrosoftSDKBinDir = Path.Combine(Paths.MicrosoftSDKDir, @"bin\x86");
 
+            if (File.Exists(Path.Combine(Paths.MicrosoftSDKBinDir, "rc.exe")) == false)
+            {
+                // rc.exe not found. Enum alternative sub directories
+                string tmp = Path.GetDirectoryName(Paths.MicrosoftSDKBinDir);
+
+                foreach (string subDir in Directory.EnumerateDirectories(tmp).OrderByDescending(x => x))
+                {
+                    string tmp2 = Path.Combine(tmp, subDir, "x86");
+
+                    if (File.Exists(Path.Combine(tmp2, "rc.exe")))
+                    {
+                        Paths.MicrosoftSDKBinDir = tmp2;
+                        break;
+                    }
+                }
+            }
+
             // Get makecat.exe file name
             Paths.MakeCatFilename = Path.Combine(Paths.MicrosoftSDKBinDir, "makecat.exe");
 
