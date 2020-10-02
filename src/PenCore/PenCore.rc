@@ -5516,6 +5516,9 @@ BEGIN
     ICON            ICO_PASS,S_LOCK,45,185,20,20
     RTEXT           "@S_SYSTEM",S_SYSTEM,8,77,57,13
     EDITTEXT        E_SYSTEM,68,77,225,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+    ICON            ICO_KEY,S_REG_ICON,29,91,18,18
+    LTEXT           "最初に「初期登録パスワード」を入力する必要があります。「初期パスワードの設定」ボタンをクリックして、設定を行なってください。",S_REG_1,54,91,144,25
+    PUSHBUTTON      "初期パスワードの設定(&W)",B_REG,203,91,90,18
 END
 
 D_DU_THEEND DIALOGEX 0, 0, 306, 221

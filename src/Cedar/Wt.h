@@ -115,6 +115,8 @@
 #define ERR_WOL_TARGET_NOT_ENABLED			252	// WoL ターゲット機能無効
 #define ERR_WOL_TRIGGER_NOT_ENABLED			253	// WoL トリガー機能無効
 #define ERR_WOL_TRIGGER_NOT_SUPPORTED		254	// WoL トリガー機能がサポートされていない
+#define ERR_REG_PASSWORD_EMPTY				255	// 登録用パスワードが未設定である
+#define	ERR_REG_PASSWORD_INCORRECT			256 // 登録用パスワードが誤っている
 
 
 

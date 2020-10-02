@@ -2000,6 +2000,9 @@ void DgMainDlgInit(HWND hWnd, DG *dg)
 	DgMainDlgRefresh(hWnd, dg, true);
 
 	SetTimer(hWnd, 1, DG_MAIN_DLG_TIMER_INTERVAL, NULL);
+
+	DlgFont(hWnd, S_REG_1, 0, true);
+	DlgFont(hWnd, B_REG, 0, true);
 }
 
 // コントロールの更新
@@ -2076,6 +2079,19 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 		Disable(hWnd, S_ACCEPT);
 		Disable(hWnd, B_ACCEPT);
 		Disable(hWnd, B_DENY);
+
+		if (t.LastError == ERR_REG_PASSWORD_EMPTY || t.LastError == ERR_REG_PASSWORD_INCORRECT)
+		{
+			Show(hWnd, S_REG_ICON);
+			Show(hWnd, S_REG_1);
+			Show(hWnd, B_REG);
+		}
+		else
+		{
+			Hide(hWnd, S_REG_ICON);
+			Hide(hWnd, S_REG_1);
+			Hide(hWnd, B_REG);
+		}
 	}
 	else
 	{
@@ -2086,6 +2102,9 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 		Show(hWnd, S_PCID_2);
 		Show(hWnd, S_PCID_3);
 		Show(hWnd, S_PCID_4);
+		Hide(hWnd, S_REG_ICON);
+		Hide(hWnd, S_REG_1);
+		Hide(hWnd, B_REG);
 
 		Enable(hWnd, S_ACCEPT);
 		SetEnable(hWnd, B_ACCEPT, t.Active == false);

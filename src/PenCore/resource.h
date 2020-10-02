@@ -725,6 +725,8 @@
 #define B_PACKET_7_1                    1280
 #define S_TSUKUBA1                      1280
 #define B_LICENSE                       1280
+#define B_PROXY2                        1280
+#define B_REG                           1280
 #define B_PACKET_7_2                    1281
 #define S_TSUKUBA2                      1281
 #define IDC_CHECK1                      1285
@@ -1268,6 +1270,7 @@
 #define S_PROXY_CONFIG                  2562
 #define C_PCID2                         2562
 #define C_DIRECT                        2563
+#define S_REG_1                         2563
 #define S_ADDRESS                       2564
 #define C_HTTP                          2565
 #define S_OPTION1                       2566
@@ -1282,6 +1285,7 @@
 #define S_PCID_3                        2573
 #define S_PCID_4                        2574
 #define C_SYSTEM32                      2575
+#define S_REG_ICON                      2575
 #define B_URDPCONFIG                    2576
 #define C_DOWNLOAD                      2577
 #define C_USERPATH                      2578
