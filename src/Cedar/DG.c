@@ -171,6 +171,14 @@ void DgRegDlgOnOk(HWND hWnd, DG* dg)
 	GetTxtA(hWnd, E_PASSWORD, t.RegistrationPassword, sizeof(t.RegistrationPassword));
 	GetTxtA(hWnd, E_MAIL, t.RegistrationEmail, sizeof(t.RegistrationEmail));
 
+	if (IsEmptyStr(t.RegistrationEmail))
+	{
+		if (MsgBox(hWnd, MB_ICONEXCLAMATION | MB_YESNO | MB_DEFBUTTON2, _UU("DG_REG_NO_EMAIL")) == IDNO)
+		{
+			return;
+		}
+	}
+
 	if (CALL(hWnd, DtcSetConfig(dg->Rpc, &t)) == false)
 	{
 		return;
@@ -204,7 +212,6 @@ void DgRegDlgInit(HWND hWnd, DG* dg)
 void DgRegDlgUpdate(HWND hWnd, DG* dg)
 {
 	char password[MAX_PATH] = CLEAN;
-	char mail[MAX_PATH] = CLEAN;
 	bool ok = true;
 	if (hWnd == NULL || dg == NULL)
 	{
@@ -212,14 +219,8 @@ void DgRegDlgUpdate(HWND hWnd, DG* dg)
 	}
 
 	GetTxtA(hWnd, E_PASSWORD, password, sizeof(password));
-	GetTxtA(hWnd, E_MAIL, mail, sizeof(mail));
 
-	if (IsEmptyStr(password) || IsEmptyStr(mail))
-	{
-		ok = false;
-	}
-
-	if (InStr(mail, "@") == false || InStr(mail, ".") == false)
+	if (IsEmptyStr(password))
 	{
 		ok = false;
 	}
@@ -2157,6 +2158,7 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 	UINT ret;
 	wchar_t *proxy_string;
 	wchar_t status_string[MAX_PATH * 4];
+	bool no_message_popup = false;
 	// 引数チェック
 	if (hWnd == NULL || dg == NULL)
 	{
@@ -2203,6 +2205,8 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 			Show(hWnd, S_REG_ICON);
 			Show(hWnd, S_REG_1);
 			Show(hWnd, B_REG);
+
+			no_message_popup = true;
 		}
 		else
 		{
@@ -2309,36 +2313,6 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 		if (dg->Hello == false)
 		{
 			dg->Hello = true;
-
-			if (t.NumConfigures == 1)
-			{
-				// 2012.10.18 これはもういらん!
-				// SGI による不要な要求!!
-
-				// このユーザー以外で設定ツールを開けないようにするかどうか聞く
-/*				wchar_t *username = MsGetUserNameW();
-
-				if (UniIsEmptyStr(c.AdminUsername))
-				{
-					if (MsgBoxEx(hWnd, MB_YESNO	| MB_DEFBUTTON2 | MB_ICONQUESTION,
-						_UU("DG_ADMINUSERNAME_MSG"), username, username) == IDYES)
-					{
-						RPC_DS_CONFIG t;
-
-						Zero(&t, sizeof(t));
-
-						// そのように設定する
-						if (DtcGetConfig(dg->Rpc, &t) == ERR_NO_ERROR)
-						{
-							UniStrCpy(t.AdminUsername, sizeof(t.AdminUsername), username);
-
-							DtcSetConfig(dg->Rpc, &t);
-
-							MsgBoxEx(hWnd, MB_ICONINFORMATION, _UU("DG_ADMINUSERNAME_MSG2"), username);
-						}
-					}
-				}*/
-			}
 		}
 
 		if (startup == false)
@@ -2364,25 +2338,28 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 
 	if (startup == false)
 	{
-		if (t.MsgForServerArrived && UniIsEmptyStr(t.MsgForServer) == false)
+		if (no_message_popup == false)
 		{
-			// 新しいメッセージが届いている
-			// 画面に表示する
-			if (dg->MsgForServerDlg == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+			if (t.MsgForServerArrived && UniIsEmptyStr(t.MsgForServer) == false)
 			{
-				dg->MsgForServerDlg = StartAsyncOnceMsg(_UU("DU_SERVER_MSG2"), t.MsgForServer, t.MsgForServerOnce,
-					ICO_VB6, true);
+				// 新しいメッセージが届いている
+				// 画面に表示する
+				if (dg->MsgForServerDlg == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+				{
+					dg->MsgForServerDlg = StartAsyncOnceMsg(_UU("DU_SERVER_MSG2"), t.MsgForServer, t.MsgForServerOnce,
+						ICO_VB6, true);
+				}
 			}
-		}
 
-		if (UniIsEmptyStr(t.MsgForServer2) == false)
-		{
-			// ポリシー関係のメッセージが届いている
-			// 画面に表示する
-			if (dg->MsgForServerDlg2 == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+			if (UniIsEmptyStr(t.MsgForServer2) == false)
 			{
-				dg->MsgForServerDlg2 = StartAsyncOnceMsg(_UU("DS_POLICY_MESSAGE_TITLE"), t.MsgForServer2, true,
-					ICO_INFORMATION, true);
+				// ポリシー関係のメッセージが届いている
+				// 画面に表示する
+				if (dg->MsgForServerDlg2 == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+				{
+					dg->MsgForServerDlg2 = StartAsyncOnceMsg(_UU("DS_POLICY_MESSAGE_TITLE"), t.MsgForServer2, true,
+						ICO_INFORMATION, true);
+				}
 			}
 		}
 	}
