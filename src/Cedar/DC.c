@@ -1057,11 +1057,6 @@ void DcNormalizeConfig(DC *dc)
 			dc->MstscLocation = DC_MSTSC_DOWNLOAD;
 		}
 	}
-
-	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
-	{
-		dc->DisableLimitedFw = false;
-	}
 #endif  // OS_WIN32
 }
 

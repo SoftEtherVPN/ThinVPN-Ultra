@@ -2052,15 +2052,17 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 		if ((s->IsLimitedMode && (dc->DisableLimitedFw == false || s->IsEnspectionEnabled)) || Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
 		{
+			bool mandate = s->IsEnspectionEnabled;
+
 			// 接続先サーバーが「行政システム適応モード」の場合はファイアウォールを
 			// 勧める画面を表示する
 			if (MsIsVista())
 			{
-				bool mandate = s->IsEnspectionEnabled;
-
 				if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
 				{
-					mandate = true;
+					// 2020/10/02 ThinTelework_EnforceStrongSecurity が ON の場合は
+					// mandate をしないようにする
+					mandate = false;
 				}
 
 				gov_fw_ok = DuGovFw1Main(mandate);
@@ -2073,9 +2075,9 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 				gov_fw_ok = false;
 			}
 
-			if (s->IsEnspectionEnabled == false && Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
+			if (mandate == false)
 			{
-				// 検疫有効でない場合は、いかなる場合でも gov fw は成功したとみなす
+				// 検疫有効でない場合等、mandate == false の場合は、いかなる場合でも gov fw は成功したとみなす
 				gov_fw_ok = true;
 			}
 		}
