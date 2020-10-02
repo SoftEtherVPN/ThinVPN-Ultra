@@ -162,5 +162,9 @@ UINT DgMacDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 bool DgWoLDlg(HWND hWnd, DG *dg);
 UINT DgWoLDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param);
 
-
+bool DgRegDlg(HWND hWnd, DG* dg);
+UINT DgRegDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void* param);
+void DgRegDlgInit(HWND hWnd, DG* dg);
+void DgRegDlgOnOk(HWND hWnd, DG* dg);
+void DgRegDlgUpdate(HWND hWnd, DG* dg);
 

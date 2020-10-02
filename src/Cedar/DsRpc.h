@@ -146,6 +146,9 @@ struct RPC_DS_CONFIG
 
 	bool EnableWoLTarget;
 	bool EnableWoLTrigger;
+
+	char RegistrationPassword[MAX_PATH];
+	char RegistrationEmail[MAX_PATH];
 };
 
 void InInternetSetting(INTERNET_SETTING *t, PACK *p);

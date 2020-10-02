@@ -253,6 +253,10 @@ struct WIDE
 	wchar_t SessionLifeTimeMsg[MAX_PATH];
 
 	wchar_t MsgForServer2[MAX_SIZE * 2];		// ポリシー関係
+
+	// 2020/10/02 追加
+	char RegistrationPassword[MAX_PATH];
+	char RegistrationEmail[MAX_PATH];
 };
 
 // 関数プロトタイプ

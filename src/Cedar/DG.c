@@ -115,6 +115,124 @@
 
 bool MsAppendMenu(HMENU hMenu, UINT flags, UINT_PTR id, wchar_t *str);
 
+// 登録ダイアログプロシージャ
+UINT DgRegDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void* param)
+{
+	DG* dg = (DG*)param;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		DgRegDlgInit(hWnd, dg);
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+			DgRegDlgOnOk(hWnd, dg);
+			break;
+
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+
+		switch (LOWORD(wParam))
+		{
+		case E_PASSWORD:
+		case E_MAIL:
+			DgRegDlgUpdate(hWnd, dg);
+			break;
+		}
+		break;
+
+	case WM_CLOSE:
+		EndDialog(hWnd, 0);
+		break;
+	}
+
+	return 0;
+}
+
+void DgRegDlgOnOk(HWND hWnd, DG* dg)
+{
+	RPC_DS_CONFIG t = CLEAN;
+	if (hWnd == NULL || dg == NULL)
+	{
+		return;
+	}
+
+	if (CALL(hWnd, DtcGetConfig(dg->Rpc, &t)) == false)
+	{
+		return;
+	}
+
+	GetTxtA(hWnd, E_PASSWORD, t.RegistrationPassword, sizeof(t.RegistrationPassword));
+	GetTxtA(hWnd, E_MAIL, t.RegistrationEmail, sizeof(t.RegistrationEmail));
+
+	if (CALL(hWnd, DtcSetConfig(dg->Rpc, &t)) == false)
+	{
+		return;
+	}
+
+	EndDialog(hWnd, 1);
+}
+
+void DgRegDlgInit(HWND hWnd, DG* dg)
+{
+	RPC_DS_CONFIG t = CLEAN;
+	if (hWnd == NULL || dg == NULL)
+	{
+		return;
+	}
+
+	if (CALL(hWnd, DtcGetConfig(dg->Rpc, &t)) == false)
+	{
+		EndDialog(hWnd, 0);
+		return;
+	}
+
+	SetIcon(hWnd, 0, ICO_KEY);
+
+	SetTextA(hWnd, E_PASSWORD, t.RegistrationPassword);
+	SetTextA(hWnd, E_MAIL, t.RegistrationEmail);
+
+	DgRegDlgUpdate(hWnd, dg);
+}
+
+void DgRegDlgUpdate(HWND hWnd, DG* dg)
+{
+	char password[MAX_PATH] = CLEAN;
+	char mail[MAX_PATH] = CLEAN;
+	bool ok = true;
+	if (hWnd == NULL || dg == NULL)
+	{
+		return;
+	}
+
+	GetTxtA(hWnd, E_PASSWORD, password, sizeof(password));
+	GetTxtA(hWnd, E_MAIL, mail, sizeof(mail));
+
+	if (IsEmptyStr(password) || IsEmptyStr(mail))
+	{
+		ok = false;
+	}
+
+	if (InStr(mail, "@") == false || InStr(mail, ".") == false)
+	{
+		ok = false;
+	}
+
+	SetEnable(hWnd, IDOK, ok);
+}
+
+// 登録ダイアログ
+bool DgRegDlg(HWND hWnd, DG* dg)
+{
+	return INT_TO_BOOL(Dialog(hWnd, D_DG_REG, DgRegDlgProc, dg));
+}
+
 // WoL 設定ダイアログ
 bool DgWoLDlg(HWND hWnd, DG *dg)
 {
@@ -2514,6 +2632,15 @@ UINT DgMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 				{
 					DgMainDlgRefresh(hWnd, dg, false);
 				}
+			}
+			break;
+
+		case B_REG:
+			// 初期パスワード類
+			if (DgRegDlg(hWnd, dg))
+			{
+				// 変更があった場合は再試行をいたします
+				DgMainDlgRefresh(hWnd, dg, false);
 			}
 			break;
 

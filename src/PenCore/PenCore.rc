@@ -1563,6 +1563,14 @@ BEGIN
         TOPMARGIN, 5
         BOTTOMMARGIN, 257
     END
+
+    D_DG_REG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 320
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 157
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -5479,6 +5487,7 @@ BEGIN
     EDITTEXT        E_PCID,69,56,129,15,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "@IDOK",IDOK,203,56,38,16
     PUSHBUTTON      "@B_RESTORE",B_RESTORE,244,56,48,16
+    PUSHBUTTON      "@B_REG",B_REG,203,91,90,18
     LTEXT           "@S_PCID_2",S_PCID_2,32,91,239,25
     ICON            ICO_DISPLAY,S_PCID_3,275,90,20,20
     CONTROL         "",S_PCID_4,"Static",SS_ETCHEDHORZ,14,118,279,1
@@ -5517,8 +5526,7 @@ BEGIN
     RTEXT           "@S_SYSTEM",S_SYSTEM,8,77,57,13
     EDITTEXT        E_SYSTEM,68,77,225,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
     ICON            ICO_KEY,S_REG_ICON,29,91,18,18
-    LTEXT           "最初に「初期登録パスワード」を入力する必要があります。「初期パスワードの設定」ボタンをクリックして、設定を行なってください。",S_REG_1,54,91,144,25
-    PUSHBUTTON      "初期パスワードの設定(&W)",B_REG,203,91,90,18
+    LTEXT           "@S_REG_1",S_REG_1,54,91,144,25
 END
 
 D_DU_THEEND DIALOGEX 0, 0, 306, 221
@@ -5678,6 +5686,24 @@ BEGIN
     DEFPUSHBUTTON   "@IDOK",IDOK,199,240,106,17
     PUSHBUTTON      "@IDCANCEL",IDCANCEL,312,240,64,17
     GROUPBOX        "@S_2",IDC_STATIC,7,133,369,99
+END
+
+D_DG_REG DIALOGEX 0, 0, 327, 162
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "システム初期登録"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    ICON            ICO_KEY,S_ICON1,7,5,18,18
+    LTEXT           "本システムを利用するには、初期登録作業を実施する必要があります。",S_1,31,5,289,18
+    RTEXT           "初期登録パスワード(&P):",S_18,7,35,85,13
+    EDITTEXT        E_PASSWORD,96,33,164,12,ES_PASSWORD | ES_AUTOHSCROLL
+    RTEXT           "連絡先メールアドレス(&M):",S_26,7,58,85,13
+    EDITTEXT        E_MAIL,96,57,164,12,ES_AUTOHSCROLL
+    ICON            ICO_INFORMATION,S_ICON3,25,78,18,18
+    LTEXT           "「初期登録パスワード」 は、中継システムの管理者からユーザーの皆様に事前に電子メール等で伝達されています。不明な場合は、システム管理者にお問い合わせください。",S_19,51,79,269,26
+    LTEXT           "「連絡先メールアドレス」 は、本システムの運営者からの本システムに関する連絡等の際に利用いたします。",S_20,51,107,269,26
+    DEFPUSHBUTTON   "&OK",IDOK,208,141,52,16
+    PUSHBUTTON      "キャンセル(&C)",IDCANCEL,268,141,52,16
 END
 
 

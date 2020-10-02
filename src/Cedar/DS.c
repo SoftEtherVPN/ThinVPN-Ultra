@@ -2620,6 +2620,15 @@ UINT DtResetCertOnNextBoot(DS *ds, RPC_TEST *t)
 
 	DsResetCertOnNextBoot();
 
+	// RegistrationEmail と RegistrationPassword も初期化
+	if (ds->Wide != NULL)
+	{
+		ClearStr(ds->Wide->RegistrationEmail, sizeof(ds->Wide->RegistrationEmail));
+		ClearStr(ds->Wide->RegistrationPassword, sizeof(ds->Wide->RegistrationPassword));
+
+		DsSaveConfig(ds);
+	}
+
 	return ERR_NO_ERROR;
 }
 
@@ -2842,6 +2851,7 @@ UINT DtChangePcid(DS *ds, RPC_PCID *t)
 UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 {
 	bool wol_target_old = ds->EnableWoLTarget;
+	bool reg_password_changed = false;
 
 	ds->Active = t->Active;
 	ds->PowerKeep = t->PowerKeep;
@@ -2870,6 +2880,15 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 		StrCpy(ds->EmergencyOtp, sizeof(ds->EmergencyOtp), t->EmergencyOtp);
 	}
 
+	if (StrCmp(ds->Wide->RegistrationPassword, t->RegistrationPassword) != 0 ||
+		StrCmp(ds->Wide->RegistrationEmail, t->RegistrationEmail) != 0)
+	{
+		reg_password_changed = true;
+	}
+
+	StrCpy(ds->Wide->RegistrationPassword, sizeof(ds->Wide->RegistrationPassword), t->RegistrationPassword);
+	StrCpy(ds->Wide->RegistrationEmail, sizeof(ds->Wide->RegistrationEmail), t->RegistrationEmail);
+
 	ds->RdpEnableGroupKeeper = t->RdpEnableGroupKeeper;
 	UniStrCpy(ds->RdpGroupKeepUserName, sizeof(ds->RdpGroupKeepUserName), t->RdpGroupKeepUserName);
 	ds->RdpEnableOptimizer = t->RdpEnableOptimizer;
@@ -2890,6 +2909,15 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 		ds->Wide->SendMacList = ds->EnableWoLTarget;
 
 		// WoL ターゲットの設定が変更された場合は再接続をする
+		if (WideServerTryAutoReconnect(ds->Wide))
+		{
+			WideServerReconnect(ds->Wide);
+		}
+	}
+
+	if (reg_password_changed)
+	{
+		// 初期ユーザー登録パスワードが変更になった場合は再接続する
 		if (WideServerTryAutoReconnect(ds->Wide))
 		{
 			WideServerReconnect(ds->Wide);
@@ -2940,6 +2968,9 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 
 	t->EnableWoLTarget = ds->EnableWoLTarget;
 	t->EnableWoLTrigger = ds->EnableWoLTrigger;
+
+	StrCpy(t->RegistrationPassword, sizeof(t->RegistrationPassword), ds->Wide->RegistrationPassword);
+	StrCpy(t->RegistrationEmail, sizeof(t->RegistrationEmail), ds->Wide->RegistrationEmail);
 
 	return ERR_NO_ERROR;
 }
@@ -3589,6 +3620,9 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 	ds->EnableOtp = CfgGetBool(root, "EnableOtp");
 	CfgGetStr(root, "OtpEmail", ds->OtpEmail, sizeof(ds->OtpEmail));
 
+	CfgGetStr(root, "RegistrationPassword", ds->Wide->RegistrationPassword, sizeof(ds->Wide->RegistrationPassword));
+	CfgGetStr(root, "RegistrationEmail", ds->Wide->RegistrationEmail, sizeof(ds->Wide->RegistrationEmail));
+
 	ds->EnableInspection = CfgGetBool(root, "EnableInspection");
 	ds->EnableMacCheck = CfgGetBool(root, "EnableMacCheck");
 	CfgGetStr(root, "MacAddressList", ds->MacAddressList, sizeof(ds->MacAddressList));
@@ -3688,6 +3722,16 @@ FOLDER *DsSaveConfigMain(DS *ds)
 	CfgAddBool(root, "EnableOtp", ds->EnableOtp);
 
 	CfgAddStr(root, "OtpEmail", ds->OtpEmail);
+
+	if (IsEmptyStr(ds->Wide->RegistrationPassword) == false)
+	{
+		CfgAddStr(root, "RegistrationPassword", ds->Wide->RegistrationPassword);
+	}
+
+	if (IsEmptyStr(ds->Wide->RegistrationEmail) == false)
+	{
+		CfgAddStr(root, "RegistrationEmail", ds->Wide->RegistrationEmail);
+	}
 
 	CfgAddStr(root, "EmergencyOtp", ds->EmergencyOtp);
 

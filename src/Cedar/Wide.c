@@ -1295,6 +1295,8 @@ UINT WideServerRegistMachine(WIDE *w, char *pcid, X *cert, K *key)
 	r = NewPack();
 	PackAddStr(r, "SvcName", w->SvcName);
 	PackAddStr(r, "Pcid", pcid);
+	PackAddStr(r, "RegistrationPassword", w->RegistrationPassword);
+	PackAddStr(r, "RegistrationEmail", w->RegistrationEmail);
 
 	p = WtWpcCallWithCertAndKey(wt, "RegistMachine", r, cert, key, false, true);
 	FreePack(r);
@@ -1349,8 +1351,9 @@ UINT WideServerGetPcidCandidate(WIDE *w, char *name, UINT size, char *current_us
 {
 #ifdef	OS_WIN32
 	PACK *r, *p;
-	char machine_name[MAX_PATH];
-	char computer_name[MAX_PATH];
+	char machine_name[MAX_PATH] = CLEAN;
+	char computer_name[MAX_PATH] = CLEAN;
+	char user_name[MAX_PATH] = CLEAN;
 	UINT ret;
 	// 引数チェック
 	if (w == NULL || name == NULL)
@@ -1362,14 +1365,23 @@ UINT WideServerGetPcidCandidate(WIDE *w, char *name, UINT size, char *current_us
 		current_username = "";
 	}
 
+	StrCpy(user_name, sizeof(user_name), current_username);
+
 	GetMachineName(machine_name, sizeof(machine_name));
 	MsGetComputerName(computer_name, sizeof(computer_name));
+
+	if (DcGetDebugFlag())
+	{
+		StrCpy(machine_name, sizeof(machine_name), "debug");
+		StrCpy(computer_name, sizeof(computer_name), "debug");
+		StrCpy(user_name, sizeof(user_name), "debug");
+	}
 
 	r = NewPack();
 	PackAddStr(r, "SvcName", w->SvcName);
 	PackAddStr(r, "MachineName", machine_name);
 	PackAddStr(r, "ComputerName", computer_name);
-	PackAddStr(r, "UserName", current_username);
+	PackAddStr(r, "UserName", user_name);
 
 	p = WideCall(w, "GetPcidCandidate", r, false, true);
 	FreePack(r);

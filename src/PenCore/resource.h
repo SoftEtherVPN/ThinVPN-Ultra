@@ -725,7 +725,6 @@
 #define B_PACKET_7_1                    1280
 #define S_TSUKUBA1                      1280
 #define B_LICENSE                       1280
-#define B_PROXY2                        1280
 #define B_REG                           1280
 #define B_PACKET_7_2                    1281
 #define S_TSUKUBA2                      1281
@@ -843,6 +842,7 @@
 #define S_1                             1359
 #define S_18                            1360
 #define S_3                             1361
+#define S_26                            1361
 #define R_SERVER                        1362
 #define S_19                            1362
 #define R_CLIENT                        1363
@@ -1384,6 +1384,7 @@
 #define D_DU_GOVFW2                     2653
 #define D_DG_WOL                        2654
 #define D_DU_WOL                        2655
+#define D_DG_REG                        2656
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021
