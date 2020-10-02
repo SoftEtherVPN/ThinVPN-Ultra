@@ -5026,6 +5026,17 @@ IDCANCEL				&Close
 S_2						Power-on the Target PC by Wake on LAN function
 
 
+PREFIX					D_DG_REG
+CAPTION					Initial Registration
+S_1						You have to specify the following initial registration items.
+S_18					Unlock &Key:
+S_26					E&mail Address:
+S_19					Your system administrator should have the Unlock Key. The Unlock Key should be distributed to users of your organization. If you don't have the Unlock Key please contact to your administrator.
+S_20					The specified email address will receive maintenance and news about this system. You can specifya free email address (e.g. Gmail).
+IDOK					&OK
+IDCANCEL				&Cancel
+
+
 
 
 
