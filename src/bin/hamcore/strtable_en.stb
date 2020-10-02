@@ -466,6 +466,7 @@ DG_RESET_CERT_DONE		Unique ID initialization process is reserved. In the next st
 DG_CHANGE_WOL_TARGET	You are changing the Wake on LAN Target PC settings.\r\n\r\nThe connectivity of $APPSHORT_SERVER$ to the Internet will be disconnected and reconnected to apply this setting.\r\n\r\nIf you are remotely login to this computer, the communcation will be terminated. In this case you have to reconnect to this computer.
 DG_DEVMGMT_RUN_ERROR	Failed to open the Device Manager provided by Windows.\r\n\r\nRun the Device Manager manually from the control panel.
 
+DG_REG_NO_EMAIL			No email address is specified.\r\n\r\nDo you want to continue without email address?
 
 
 
@@ -4575,7 +4576,8 @@ B_PASSWORD				Set the Pass&word...
 IDCANCEL				Close (&X)
 S9						Please press Close after all settings are completed.
 S_SYSTEM				Gateway System:
-
+S_REG_1					You have to enter the Unlock Key before using this system. Click the Unlock Key button to configure.
+B_REG					&Unlock Key
 
 PREFIX					D_DG_PROXY
 CAPTION					Proxy Server Settings
