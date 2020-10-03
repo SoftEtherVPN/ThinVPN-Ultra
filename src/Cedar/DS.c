@@ -92,6 +92,73 @@
 #include "..\PenCore\resource.h"
 #endif // _WIN32
 
+// Windows RDP Policy GET
+void DsWin32GetRdpPolicy(DS_WIN32_RDP_POLICY* pol)
+{
+	if (pol == NULL)
+	{
+		return;
+	}
+
+	Zero(pol, sizeof(DS_WIN32_RDP_POLICY));
+
+#ifdef OS_WIN32
+	if (MsIsRemoteDesktopAvailable())
+	{
+		pol->fDisableCdm = Win32ReadLocalGroupPolicyValueInt32(true,
+			"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+			"fDisableCdm");
+
+		pol->fDisableClip = Win32ReadLocalGroupPolicyValueInt32(true,
+			"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+			"fDisableClip");
+
+		pol->HasValidValue = true;
+	}
+#endif // OS_WIN32
+
+}
+
+// Windows RDP Policy SET
+bool DsWin32SetRdpPolicy(DS_WIN32_RDP_POLICY* pol)
+{
+	bool ret = false;
+	if (pol == NULL || pol->HasValidValue == false)
+	{
+		return false;
+	}
+
+	if (MsIsRemoteDesktopAvailable() == false)
+	{
+		return false;
+	}
+
+	if (MsIsAdmin() == false)
+	{
+		return false;
+	}
+
+#ifdef OS_WIN32
+	if (Win32WriteLocalGroupPolicyValueInt32(true,
+		"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+		"fDisableCdm",
+		pol->fDisableCdm))
+	{
+		ret = true;
+	}
+
+	if (Win32WriteLocalGroupPolicyValueInt32(true,
+		"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+		"fDisableClip",
+		pol->fDisableClip))
+	{
+		ret = true;
+	}
+#endif // OS_WIN32
+
+	return ret;
+}
+
 // 適用されるポリシーメッセージの表示
 void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
 {
@@ -2181,6 +2248,50 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		}
 	}
 
+	if (svc_type == DESK_SERVICE_RDP)
+	{
+		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+		{
+			if (MsIsAdmin())
+			{
+				Lock(ds->RDPSessionIncDecLock);
+				{
+					if (Inc(ds->CurrentNumRDPSessions) == 1)
+					{
+						Debug("*** DsWin32GetRdpPolicy()\n");
+
+						DsWin32GetRdpPolicy(&ds->Win32RdpPolicy);
+
+						Debug("HasValidValue: %u\n", ds->Win32RdpPolicy.HasValidValue);
+						if (ds->Win32RdpPolicy.HasValidValue)
+						{
+							DS_WIN32_RDP_POLICY new_policy = CLEAN;
+
+							Debug("fDisableCdm: %u\n", ds->Win32RdpPolicy.fDisableCdm);
+							Debug("fDisableClip: %u\n", ds->Win32RdpPolicy.fDisableClip);
+
+							new_policy.HasValidValue = true;
+							new_policy.fDisableCdm = 1;
+							new_policy.fDisableClip = 1;
+
+							if (DsWin32SetRdpPolicy(&new_policy) == false)
+							{
+								Zero(&ds->Win32RdpPolicy, sizeof(DS_WIN32_RDP_POLICY));
+
+								Debug("DsWin32SetRdpPolocy error\n");
+							}
+							else
+							{
+								Debug("DsWin32SetRdpPolocy ok\n");
+							}
+						}
+					}
+				}
+				Unlock(ds->RDPSessionIncDecLock);
+			}
+		}
+	}
+
 	// 接続
 	s = NULL;
 	if (check_port)
@@ -2304,6 +2415,38 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 	Disconnect(s);
 	ReleaseSock(s);
+
+	if (svc_type == DESK_SERVICE_RDP)
+	{
+		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+		{
+			if (MsIsAdmin())
+			{
+				Lock(ds->RDPSessionIncDecLock);
+				{
+					if (Dec(ds->CurrentNumRDPSessions) == 0)
+					{
+						if (ds->Win32RdpPolicy.HasValidValue)
+						{
+							Debug("*** DsWin32SetRdpPolicy() -- restore\n");
+
+							if (DsWin32SetRdpPolicy(&ds->Win32RdpPolicy) == false)
+							{
+								Debug("DsWin32SetRdpPolicy() restore error\n");
+							}
+							else
+							{
+								Debug("DsWin32SetRdpPolicy() restore OK\n");
+							}
+						}
+
+						Zero(&ds->Win32RdpPolicy, sizeof(DS_WIN32_RDP_POLICY));
+					}
+				}
+				Unlock(ds->RDPSessionIncDecLock);
+			}
+		}
+	}
 
 LABEL_END:
 
@@ -3019,6 +3162,7 @@ void DsAcceptProc(THREAD* thread, SOCKIO* sock, void* param)
 
 			Debug("this_is_first_session = 1\n");
 
+			Rand(ds->SmartCardTicket, SHA1_SIZE);
 			DsGenerateNewOtp(ds->OtpTicket, sizeof(ds->OtpTicket), 128);
 			DsGenerateNewOtp(ds->InspectionTicket, sizeof(ds->InspectionTicket), 48);
 		}
@@ -4255,8 +4399,10 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 	ds = ZeroMalloc(sizeof(DS));
 
 	ds->CurrentNumSessions = NewCounter();
+	ds->CurrentNumRDPSessions = NewCounter();
 
 	ds->SessionIncDecLock = NewLock();
+	ds->RDPSessionIncDecLock = NewLock();
 
 	Rand(ds->SmartCardTicket, SHA1_SIZE);
 
@@ -4556,7 +4702,10 @@ void FreeDs(DS *ds)
 	DsFreePolicyClient(ds->PolicyClient);
 
 	DeleteCounter(ds->CurrentNumSessions);
+	DeleteCounter(ds->CurrentNumRDPSessions);
+
 	DeleteLock(ds->SessionIncDecLock);
+	DeleteLock(ds->RDPSessionIncDecLock);
 
 	Free(ds);
 

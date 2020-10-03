@@ -92,6 +92,9 @@ extern "C"
 {
 #endif
 
+	UINT Win32ReadLocalGroupPolicyValueInt32(bool machine, char* key, char* value);
+	bool Win32WriteLocalGroupPolicyValueInt32(bool machine, char* key, char* value, UINT data);
+
 	void ShowHtml(HWND hWnd, char *url, wchar_t *option);
 	bool CreateLink(wchar_t *filename, wchar_t *target, wchar_t *workdir, wchar_t *args,
 		wchar_t *comment, wchar_t *icon, UINT icon_index);

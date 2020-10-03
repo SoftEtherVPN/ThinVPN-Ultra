@@ -104,6 +104,7 @@
 #include <tchar.h>
 #include <objbase.h>
 #include <Setupapi.h>
+#include <GPEdit.h>
 #include "netcfgn.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -118,16 +119,227 @@ extern "C"
 #include <Cedar/Cedar.h>
 }
 #include "../PenCore/resource.h"
+// {48CBD93D-513E-4e49-907D-B4179040374D}
+
+static GUID ThisToolGuid =
+{ 0x48cbd93d, 0x513e, 0x4e49, { 0x90, 0x7d, 0xb4, 0x17, 0x90, 0x40, 0x37, 0x4d } };
+
+// Write the local group policy DWORD value
+bool Win32WriteLocalGroupPolicyValueInt32(bool machine, char* key, char* value, UINT data)
+{
+	IGroupPolicyObject* p = NULL;
+	HRESULT hr;
+	GUID registry_guid = REGISTRY_EXTENSION_GUID;
+	bool ret = false;
+
+	// Write to local group policy
+	hr = CoCreateInstance(CLSID_GroupPolicyObject, NULL, CLSCTX_ALL, IID_IGroupPolicyObject, (LPVOID*)&p);
+	if (SUCCEEDED(hr))
+	{
+		//Debug("Create Ok\n");
+
+		hr = p->OpenLocalMachineGPO(GPO_OPEN_LOAD_REGISTRY);
+
+		if (SUCCEEDED(hr))
+		{
+			//Debug("OpenLocalMachineGPO Ok\n");
+
+			HKEY hKey = NULL;
+
+			hr = p->GetRegistryKey(machine ? GPO_SECTION_MACHINE : GPO_SECTION_USER, &hKey);
+
+			if (SUCCEEDED(hr))
+			{
+				//Debug("GetRegistryKey Ok\n");
+
+				// Set
+				HKEY hSubKey = NULL;
+				UINT err = RegCreateKeyEx(hKey,
+					key,
+					0, NULL, REG_OPTION_NON_VOLATILE,
+					KEY_ALL_ACCESS | MsRegAccessMaskFor64BitEx(false, true), NULL, &hSubKey, NULL);
+
+				if (err == ERROR_SUCCESS)
+				{
+					//Debug("RegOpenKeyExA Ok\n");
+
+					if (data != INFINITE)
+					{
+						DWORD dwData = BOOL_TO_INT(data);
+
+						err = RegSetValueExA(hSubKey, value, NULL, REG_DWORD, (BYTE*)(&dwData), sizeof(DWORD));
+
+						if (err == 0)
+						{
+							//Debug("RegSetValueExA Ok\n");
+							ret = true;
+						}
+						else
+						{
+							//Debug("RegSetValueExA Error: 0x%x\n", err);
+						}
+					}
+					else
+					{
+						RegDeleteValueA(hSubKey, value);
+						ret = true;
+					}
+
+					hr = p->Save(true, true, &registry_guid, &ThisToolGuid);
+
+					if (SUCCEEDED(hr))
+					{
+						//Debug("Save OK\n");
+					}
+					else
+					{
+						//Debug("Save Error 0x%x\n", hr);
+					}
+
+					RegCloseKey(hSubKey);
+				}
+				else
+				{
+					//Debug("RegOpenKeyExA Error: 0x%x\n", err);
+				}
+
+				RegCloseKey(hKey);
+			}
+			else
+			{
+				//Debug("GetRegistryKey Error 0x%x\n", hr);
+			}
+		}
+		else
+		{
+			//Debug("OpenLocalMachineGPO Error 0x%x\n", hr);
+		}
+
+		p->Release();
+	}
+	else
+	{
+		//Debug("Create Error 0x%x\n", hr);
+	}
+
+	// Write to the registry
+	if (data != INFINITE)
+	{
+		if (MsRegWriteIntEx2(machine ? REG_LOCAL_MACHINE : REG_CURRENT_USER,
+			key, value, data, false, true))
+		{
+			ret = true;
+		}
+	}
+	else
+	{
+		MsRegDeleteValueEx2(machine ? REG_LOCAL_MACHINE : REG_CURRENT_USER,
+			key, value, false, true);
+
+		ret = true;
+	}
+
+	return ret;
+}
+
+// Read the local group policy DWORD value
+UINT Win32ReadLocalGroupPolicyValueInt32(bool machine, char* key, char* value)
+{
+	IGroupPolicyObject* p = NULL;
+	HRESULT hr;
+	GUID registry_guid = REGISTRY_EXTENSION_GUID;
+	UINT ret = INFINITE;
+
+	// Try registry first
+	if (MsRegIsValueEx2(machine ? REG_LOCAL_MACHINE : REG_CURRENT_USER, key, value, false, true))
+	{
+		ret = MsRegReadIntEx2(machine ? REG_LOCAL_MACHINE : REG_CURRENT_USER, key, value, false, true);
+	}
+
+	if (ret != INFINITE)
+	{
+		return ret;
+	}
+
+	// Try local group policy second
+	hr = CoCreateInstance(CLSID_GroupPolicyObject, NULL, CLSCTX_ALL, IID_IGroupPolicyObject, (LPVOID*)&p);
+	if (SUCCEEDED(hr))
+	{
+		//Debug("Create Ok\n");
+
+		hr = p->OpenLocalMachineGPO(GPO_OPEN_LOAD_REGISTRY);
+
+		if (SUCCEEDED(hr))
+		{
+			//Debug("OpenLocalMachineGPO Ok\n");
+
+			HKEY hKey = NULL;
+
+			hr = p->GetRegistryKey(machine ? GPO_SECTION_MACHINE : GPO_SECTION_USER, &hKey);
+
+			if (SUCCEEDED(hr))
+			{
+				//Debug("GetRegistryKey Ok\n");
+				// Get
+				HKEY hSubKey = NULL;
+				UINT err = RegOpenKeyExA(hKey,
+					key,
+					0, KEY_READ | MsRegAccessMaskFor64BitEx(false, true), &hSubKey);
+
+				if (err == ERROR_SUCCESS)
+				{
+					//Debug("RegOpenKeyExA Ok\n");
+
+					DWORD type = REG_DWORD;
+					DWORD data = 0;
+					DWORD data_size = sizeof(DWORD);
+
+					if (RegQueryValueEx(hSubKey, value, NULL, &type, (LPBYTE)&data, &data_size) == 0)
+					{
+						if (type == REG_DWORD && data_size == sizeof(DWORD))
+						{
+							ret = data;
+						}
+					}
+
+					RegCloseKey(hSubKey);
+				}
+				else
+				{
+					//Debug("RegOpenKeyExA Error: 0x%x\n", err);
+				}
+
+				RegCloseKey(hKey);
+			}
+			else
+			{
+				//Debug("GetRegistryKey Error 0x%x\n", hr);
+			}
+		}
+		else
+		{
+			//Debug("OpenLocalMachineGPO Error 0x%x\n", hr);
+		}
+
+		p->Release();
+	}
+	else
+	{
+		//Debug("Create Error 0x%x\n", hr);
+	}
+
+	return ret;
+}
 
 // Add a UPnP port
-bool Win32UPnPAddPort(UINT outside_port, UINT inside_port, bool udp, char *local_ip, wchar_t *description, bool remove_before_add)
+bool Win32UPnPAddPort(UINT outside_port, UINT inside_port, bool udp, char* local_ip, wchar_t* description, bool remove_before_add)
 {
 	bool ret = false;
 	HRESULT hr;
-	IUPnPNAT *nat = NULL;
+	IUPnPNAT* nat = NULL;
 	wchar_t ip_str[MAX_SIZE];
 	BSTR bstr_ip, bstr_description, bstr_protocol;
-	wchar_t *protocol_str = (udp ? L"UDP" : L"TCP");
+	wchar_t* protocol_str = (udp ? L"UDP" : L"TCP");
 	// Validate arguments
 	if (outside_port == 0 || outside_port >= 65536 || inside_port == 0 || inside_port >= 65536 ||
 		IsEmptyStr(local_ip) || UniIsEmptyStr(description))
@@ -140,20 +352,20 @@ bool Win32UPnPAddPort(UINT outside_port, UINT inside_port, bool udp, char *local
 	bstr_description = SysAllocString(description);
 	bstr_protocol = SysAllocString(protocol_str);
 
-	hr = CoCreateInstance(CLSID_UPnPNAT, NULL, CLSCTX_INPROC_SERVER, IID_IUPnPNAT, (void **)&nat);
+	hr = CoCreateInstance(CLSID_UPnPNAT, NULL, CLSCTX_INPROC_SERVER, IID_IUPnPNAT, (void**)&nat);
 
 	if (SUCCEEDED(hr))
 	{
 		if (nat != NULL)
 		{
-			IStaticPortMappingCollection *collection = NULL;
+			IStaticPortMappingCollection* collection = NULL;
 			hr = nat->get_StaticPortMappingCollection(&collection);
 
 			if (SUCCEEDED(hr))
 			{
 				if (collection != NULL)
 				{
-					IStaticPortMapping *mapping = NULL;
+					IStaticPortMapping* mapping = NULL;
 
 					if (remove_before_add)
 					{
@@ -205,22 +417,22 @@ bool Win32UPnPAddPort(UINT outside_port, UINT inside_port, bool udp, char *local
 }
 
 // Install the NDIS protocol driver
-bool UninstallNdisProtocolDriver(wchar_t *id, UINT lock_timeout)
+bool UninstallNdisProtocolDriver(wchar_t* id, UINT lock_timeout)
 {
 	bool ret = false;
 	HRESULT hr;
-	INetCfg *pNetCfg;
+	INetCfg* pNetCfg;
 	// Validate arguments
 	if (id == NULL)
 	{
 		return false;
 	}
 
-	hr = CoCreateInstance(CLSID_CNetCfg, NULL, CLSCTX_INPROC_SERVER, IID_INetCfg, (void **)&pNetCfg);
+	hr = CoCreateInstance(CLSID_CNetCfg, NULL, CLSCTX_INPROC_SERVER, IID_INetCfg, (void**)&pNetCfg);
 
 	if (SUCCEEDED(hr))
 	{
-		INetCfgLock *pLock;
+		INetCfgLock* pLock;
 
 		hr = pNetCfg->QueryInterface(IID_INetCfgLock, (PVOID*)&pLock);
 
@@ -236,7 +448,7 @@ bool UninstallNdisProtocolDriver(wchar_t *id, UINT lock_timeout)
 
 				if (SUCCEEDED(hr))
 				{
-					INetCfgComponent *pncc = NULL;
+					INetCfgComponent* pncc = NULL;
 
 					hr = pNetCfg->FindComponent(id, &pncc);
 
@@ -247,18 +459,18 @@ bool UninstallNdisProtocolDriver(wchar_t *id, UINT lock_timeout)
 
 					if (SUCCEEDED(hr))
 					{
-						INetCfgClass *pncClass;
+						INetCfgClass* pncClass;
 
-						hr = pNetCfg->QueryNetCfgClass(&GUID_DEVCLASS_NETTRANS, IID_INetCfgClass, (void **)&pncClass);
+						hr = pNetCfg->QueryNetCfgClass(&GUID_DEVCLASS_NETTRANS, IID_INetCfgClass, (void**)&pncClass);
 						if (SUCCEEDED(hr))
 						{
-							INetCfgClassSetup *pncClassSetup;
+							INetCfgClassSetup* pncClassSetup;
 
-							hr = pncClass->QueryInterface(IID_INetCfgClassSetup, (void **)&pncClassSetup);
+							hr = pncClass->QueryInterface(IID_INetCfgClassSetup, (void**)&pncClassSetup);
 							if (SUCCEEDED(hr))
 							{
 								OBO_TOKEN obo;
-								wchar_t *c = NULL;
+								wchar_t* c = NULL;
 
 								Zero(&obo, sizeof(obo));
 
@@ -333,14 +545,14 @@ bool UninstallNdisProtocolDriver(wchar_t *id, UINT lock_timeout)
 }
 
 // Install the NDIS protocol driver
-bool InstallNdisProtocolDriver(wchar_t *inf_path, wchar_t *id, UINT lock_timeout)
+bool InstallNdisProtocolDriver(wchar_t* inf_path, wchar_t* id, UINT lock_timeout)
 {
 	bool ret = false;
 	HRESULT hr;
-	INetCfg *pNetCfg;
+	INetCfg* pNetCfg;
 	HINSTANCE hSetupApiDll = NULL;
-	BOOL (WINAPI *_SetupCopyOEMInfW)(PCWSTR, PCWSTR, DWORD, DWORD, PWSTR, DWORD, PDWORD, PWSTR *) = NULL;
-	BOOL (WINAPI *_SetupUninstallOEMInfW)(PCWSTR, DWORD, PVOID) = NULL;
+	BOOL(WINAPI * _SetupCopyOEMInfW)(PCWSTR, PCWSTR, DWORD, DWORD, PWSTR, DWORD, PDWORD, PWSTR*) = NULL;
+	BOOL(WINAPI * _SetupUninstallOEMInfW)(PCWSTR, DWORD, PVOID) = NULL;
 	// Validate arguments
 	if (inf_path == NULL || id == NULL)
 	{
@@ -355,11 +567,11 @@ bool InstallNdisProtocolDriver(wchar_t *inf_path, wchar_t *id, UINT lock_timeout
 	}
 
 	_SetupCopyOEMInfW =
-		(UINT (__stdcall *)(PCWSTR,PCWSTR,DWORD,DWORD,PWSTR,DWORD,PDWORD,PWSTR *))
+		(UINT(__stdcall*)(PCWSTR, PCWSTR, DWORD, DWORD, PWSTR, DWORD, PDWORD, PWSTR*))
 		GetProcAddress(hSetupApiDll, "SetupCopyOEMInfW");
 
 	_SetupUninstallOEMInfW =
-		(UINT (__stdcall *)(PCWSTR,DWORD,PVOID))
+		(UINT(__stdcall*)(PCWSTR, DWORD, PVOID))
 		GetProcAddress(hSetupApiDll, "SetupUninstallOEMInfW");
 
 	if (_SetupCopyOEMInfW == NULL || _SetupUninstallOEMInfW == NULL)
@@ -368,11 +580,11 @@ bool InstallNdisProtocolDriver(wchar_t *inf_path, wchar_t *id, UINT lock_timeout
 		goto LABEL_CLEANUP;
 	}
 
-	hr = CoCreateInstance(CLSID_CNetCfg, NULL, CLSCTX_INPROC_SERVER, IID_INetCfg, (void **)&pNetCfg);
+	hr = CoCreateInstance(CLSID_CNetCfg, NULL, CLSCTX_INPROC_SERVER, IID_INetCfg, (void**)&pNetCfg);
 
 	if (SUCCEEDED(hr))
 	{
-		INetCfgLock *pLock;
+		INetCfgLock* pLock;
 
 		hr = pNetCfg->QueryInterface(IID_INetCfgLock, (PVOID*)&pLock);
 
@@ -394,14 +606,14 @@ bool InstallNdisProtocolDriver(wchar_t *inf_path, wchar_t *id, UINT lock_timeout
 
 					if (_SetupCopyOEMInfW(inf_path, inf_dir, SPOST_PATH, 0, NULL, 0, NULL, 0))
 					{
-						INetCfgClassSetup *pSetup;
+						INetCfgClassSetup* pSetup;
 
-						hr = pNetCfg->QueryNetCfgClass(&GUID_DEVCLASS_NETTRANS, IID_INetCfgClassSetup, (void **)&pSetup);
+						hr = pNetCfg->QueryNetCfgClass(&GUID_DEVCLASS_NETTRANS, IID_INetCfgClassSetup, (void**)&pSetup);
 
 						if (SUCCEEDED(hr))
 						{
 							OBO_TOKEN token;
-							INetCfgComponent *pComponent;
+							INetCfgComponent* pComponent;
 
 							Zero(&token, sizeof(token));
 
@@ -480,12 +692,12 @@ LABEL_CLEANUP:
 
 typedef struct FOLDER_DLG_INNER_DATA
 {
-	wchar_t *default_dir;
+	wchar_t* default_dir;
 } FOLDER_DLG_INNER_DATA;
 
 int CALLBACK FolderDlgInnerCallbackA(HWND hWnd, UINT msg, LPARAM lParam, LPARAM lData)
 {
-	FOLDER_DLG_INNER_DATA *data = (FOLDER_DLG_INNER_DATA *)lData;
+	FOLDER_DLG_INNER_DATA* data = (FOLDER_DLG_INNER_DATA*)lData;
 	LPITEMIDLIST pidl;
 
 	switch (msg)
@@ -493,7 +705,7 @@ int CALLBACK FolderDlgInnerCallbackA(HWND hWnd, UINT msg, LPARAM lParam, LPARAM 
 	case BFFM_INITIALIZED:
 		if (data->default_dir != NULL)
 		{
-			char *default_dir_a = CopyUniToStr(data->default_dir);
+			char* default_dir_a = CopyUniToStr(data->default_dir);
 
 			SendMessage(hWnd, BFFM_SETSELECTIONA, true, (LPARAM)default_dir_a);
 
@@ -524,14 +736,14 @@ int CALLBACK FolderDlgInnerCallbackA(HWND hWnd, UINT msg, LPARAM lParam, LPARAM 
 	return 0;
 }
 
-char *FolderDlgInnerA(HWND hWnd, wchar_t *title, char *default_dir)
+char* FolderDlgInnerA(HWND hWnd, wchar_t* title, char* default_dir)
 {
 	BROWSEINFOA info;
 	char display_name[MAX_PATH];
 	FOLDER_DLG_INNER_DATA data;
 	LPMALLOC pMalloc;
-	char *ret = NULL;
-	char *title_a;
+	char* ret = NULL;
+	char* title_a;
 	if (UniIsEmptyStr(title))
 	{
 		title = NULL;
@@ -584,7 +796,7 @@ char *FolderDlgInnerA(HWND hWnd, wchar_t *title, char *default_dir)
 
 int CALLBACK FolderDlgInnerCallbackW(HWND hWnd, UINT msg, LPARAM lParam, LPARAM lData)
 {
-	FOLDER_DLG_INNER_DATA *data = (FOLDER_DLG_INNER_DATA *)lData;
+	FOLDER_DLG_INNER_DATA* data = (FOLDER_DLG_INNER_DATA*)lData;
 	LPITEMIDLIST pidl;
 
 	switch (msg)
@@ -619,13 +831,13 @@ int CALLBACK FolderDlgInnerCallbackW(HWND hWnd, UINT msg, LPARAM lParam, LPARAM 
 	return 0;
 }
 
-wchar_t *FolderDlgInnerW(HWND hWnd, wchar_t *title, wchar_t *default_dir)
+wchar_t* FolderDlgInnerW(HWND hWnd, wchar_t* title, wchar_t* default_dir)
 {
 	BROWSEINFOW info;
 	wchar_t display_name[MAX_PATH];
 	FOLDER_DLG_INNER_DATA data;
 	LPMALLOC pMalloc;
-	wchar_t *ret = NULL;
+	wchar_t* ret = NULL;
 	if (UniIsEmptyStr(title))
 	{
 		title = NULL;
@@ -676,184 +888,184 @@ wchar_t *FolderDlgInnerW(HWND hWnd, wchar_t *title, wchar_t *default_dir)
 class CModule
 {
 public:
-    CModule()
-    {
-        m_hInstLib = NULL;
-    }
-    CModule( HINSTANCE hInstLib )
-    {
-        m_hInstLib = NULL;
-        this->Attach( hInstLib );
-    }
-    CModule( LPCTSTR pszModuleName )
-    {
-        m_hInstLib = NULL;
-        this->LoadLibrary( pszModuleName );
-    }
-    virtual ~CModule()
-    {
-        this->FreeLibrary();
-    }
+	CModule()
+	{
+		m_hInstLib = NULL;
+	}
+	CModule(HINSTANCE hInstLib)
+	{
+		m_hInstLib = NULL;
+		this->Attach(hInstLib);
+	}
+	CModule(LPCTSTR pszModuleName)
+	{
+		m_hInstLib = NULL;
+		this->LoadLibrary(pszModuleName);
+	}
+	virtual ~CModule()
+	{
+		this->FreeLibrary();
+	}
 
 public:
-    BOOL Attach( HINSTANCE hInstLib )
-    {
-        this->FreeLibrary();
-        m_hInstLib = hInstLib;
-       
-        return TRUE;
-    }
-    BOOL Detach()
-    {
-        m_hInstLib = NULL;
-       
-        return TRUE;
-    }
+	BOOL Attach(HINSTANCE hInstLib)
+	{
+		this->FreeLibrary();
+		m_hInstLib = hInstLib;
+
+		return TRUE;
+	}
+	BOOL Detach()
+	{
+		m_hInstLib = NULL;
+
+		return TRUE;
+	}
 
 public:
-    HMODULE GetHandle()
-    {
-        return m_hInstLib;
-    }
-    // Load the DLL
-    HINSTANCE LoadLibrary( LPCTSTR pszModuleName )
-    {
-        this->FreeLibrary();
-        m_hInstLib = ::LoadLibrary( pszModuleName );
-       
-        return m_hInstLib;
-    }
-    // Release the DLL
-    BOOL FreeLibrary()
-    {
-        if (m_hInstLib == NULL)
-        {
-            return FALSE;
-        }
-       
-        BOOL bResult = ::FreeLibrary( m_hInstLib );
-        m_hInstLib = NULL;
-       
-        return bResult;
-    }
-    // Get the address of the function
-    FARPROC GetProcAddress( LPCTSTR pszProcName )
-    {
-        if (m_hInstLib == NULL)
-        {
-            return NULL;
-        }
-       
-        return ::GetProcAddress(m_hInstLib, pszProcName);
-    }
-    // Get a handle to the information block of resource with the specified name and the type
-    HRSRC FindResource(LPCTSTR lpName, LPCTSTR lpType)
-    {
-        if (m_hInstLib == NULL)
-        {
-            return NULL;
-        }
-       
-        return ::FindResource(m_hInstLib, lpName, lpType);
-    }
-    // Load the specified resource
-    HGLOBAL LoadResource(HRSRC hResInfo)
-    {
-        if (m_hInstLib == NULL)
-        {
-            return NULL;
-        }
-       
-        return ::LoadResource(m_hInstLib, hResInfo);
-    }
+	HMODULE GetHandle()
+	{
+		return m_hInstLib;
+	}
+	// Load the DLL
+	HINSTANCE LoadLibrary(LPCTSTR pszModuleName)
+	{
+		this->FreeLibrary();
+		m_hInstLib = ::LoadLibrary(pszModuleName);
+
+		return m_hInstLib;
+	}
+	// Release the DLL
+	BOOL FreeLibrary()
+	{
+		if (m_hInstLib == NULL)
+		{
+			return FALSE;
+		}
+
+		BOOL bResult = ::FreeLibrary(m_hInstLib);
+		m_hInstLib = NULL;
+
+		return bResult;
+	}
+	// Get the address of the function
+	FARPROC GetProcAddress(LPCTSTR pszProcName)
+	{
+		if (m_hInstLib == NULL)
+		{
+			return NULL;
+		}
+
+		return ::GetProcAddress(m_hInstLib, pszProcName);
+	}
+	// Get a handle to the information block of resource with the specified name and the type
+	HRSRC FindResource(LPCTSTR lpName, LPCTSTR lpType)
+	{
+		if (m_hInstLib == NULL)
+		{
+			return NULL;
+		}
+
+		return ::FindResource(m_hInstLib, lpName, lpType);
+	}
+	// Load the specified resource
+	HGLOBAL LoadResource(HRSRC hResInfo)
+	{
+		if (m_hInstLib == NULL)
+		{
+			return NULL;
+		}
+
+		return ::LoadResource(m_hInstLib, hResInfo);
+	}
 
 protected:
-    HINSTANCE m_hInstLib;
+	HINSTANCE m_hInstLib;
 };
 
 
 
 static HRESULT _ShowHTMLDialog(
-    HWND hwndParent,
-    IMoniker* pMk,
-    VARIANT* pvarArgIn = NULL,
-    WCHAR* pchOptions = NULL,
-    VARIANT* pvarArgOut = NULL)
+	HWND hwndParent,
+	IMoniker* pMk,
+	VARIANT* pvarArgIn = NULL,
+	WCHAR* pchOptions = NULL,
+	VARIANT* pvarArgOut = NULL)
 {
-    HRESULT hr = S_OK;
-   
-    try
-    {
-        CModule Module("MSHTML.DLL");
-        if (Module.GetHandle() == NULL)
-        {
-            return E_FAIL;
-        }
-       
-        SHOWHTMLDIALOGFN* fnShowHTMLDialog =
-            (SHOWHTMLDIALOGFN*)Module.GetProcAddress("ShowHTMLDialog");
-        if (fnShowHTMLDialog == NULL)
-        {
-            return E_FAIL;
-        }
-       
-        hr = (*fnShowHTMLDialog)(hwndParent, pMk, pvarArgIn, pchOptions, pvarArgOut);
-        if (FAILED(hr))
-        {
-            return hr;
-        }
-    }
-    catch (...)
-    {
-        return E_FAIL;
-    }
-   
-    return hr;
+	HRESULT hr = S_OK;
+
+	try
+	{
+		CModule Module("MSHTML.DLL");
+		if (Module.GetHandle() == NULL)
+		{
+			return E_FAIL;
+		}
+
+		SHOWHTMLDIALOGFN* fnShowHTMLDialog =
+			(SHOWHTMLDIALOGFN*)Module.GetProcAddress("ShowHTMLDialog");
+		if (fnShowHTMLDialog == NULL)
+		{
+			return E_FAIL;
+		}
+
+		hr = (*fnShowHTMLDialog)(hwndParent, pMk, pvarArgIn, pchOptions, pvarArgOut);
+		if (FAILED(hr))
+		{
+			return hr;
+		}
+	}
+	catch (...)
+	{
+		return E_FAIL;
+	}
+
+	return hr;
 }
 
-HRESULT ShowHTMLDialogFromURL(HWND hwndParent,wchar_t *szURL,VARIANT* pvarArgIn,WCHAR* pchOptions,VARIANT* pvarArgOut)
+HRESULT ShowHTMLDialogFromURL(HWND hwndParent, wchar_t* szURL, VARIANT* pvarArgIn, WCHAR* pchOptions, VARIANT* pvarArgOut)
 {
-    HRESULT hr = S_OK;
-   
-    try
-    {
-        IMonikerPtr spMoniker;
-        hr = ::CreateURLMoniker(NULL, szURL, &spMoniker);
-        if (FAILED(hr))
-        {
-            return hr;
-        }
-       
-        hr = ::_ShowHTMLDialog(hwndParent, spMoniker, pvarArgIn, pchOptions, pvarArgOut);
-        if (FAILED(hr))
-        {
-            return hr;
-        }
-    }
-    catch (...)
-    {
-        return E_FAIL;
-    }
-   
-    return hr;
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IMonikerPtr spMoniker;
+		hr = ::CreateURLMoniker(NULL, szURL, &spMoniker);
+		if (FAILED(hr))
+		{
+			return hr;
+		}
+
+		hr = ::_ShowHTMLDialog(hwndParent, spMoniker, pvarArgIn, pchOptions, pvarArgOut);
+		if (FAILED(hr))
+		{
+			return hr;
+		}
+	}
+	catch (...)
+	{
+		return E_FAIL;
+	}
+
+	return hr;
 }
 
 // Create a shortcut
-bool CreateLinkInnerA(char *filename, char *target, char *workdir, char *args,
-				     char *comment, char *icon, UINT icon_index)
+bool CreateLinkInnerA(char* filename, char* target, char* workdir, char* args,
+	char* comment, char* icon, UINT icon_index)
 {
 	HRESULT r;
 	wchar_t tmp[MAX_SIZE];
 	IShellLinkA* pShellLink;
 	IPersistFile* pPersistFile;
 
-	r = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkA, (void **)&pShellLink);
+	r = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkA, (void**)&pShellLink);
 	if (FAILED(r))
 	{
 		return false;
 	}
 
-	r = pShellLink->QueryInterface(IID_IPersistFile,(void **)&pPersistFile);
+	r = pShellLink->QueryInterface(IID_IPersistFile, (void**)&pPersistFile);
 	if (FAILED(r))
 	{
 		pShellLink->Release();
@@ -925,8 +1137,8 @@ bool CreateLinkInnerA(char *filename, char *target, char *workdir, char *args,
 	pPersistFile->Release();
 	return true;
 }
-bool CreateLinkInner(wchar_t *filename, wchar_t *target, wchar_t *workdir, wchar_t *args,
-				     wchar_t *comment, wchar_t *icon, UINT icon_index)
+bool CreateLinkInner(wchar_t* filename, wchar_t* target, wchar_t* workdir, wchar_t* args,
+	wchar_t* comment, wchar_t* icon, UINT icon_index)
 {
 	HRESULT r;
 	bool ret;
@@ -935,7 +1147,7 @@ bool CreateLinkInner(wchar_t *filename, wchar_t *target, wchar_t *workdir, wchar
 
 	if (OS_IS_WINDOWS_9X(GetOsInfo()->OsType))
 	{
-		char *a1, *a2, *a3, *a4, *a5, *a6;
+		char* a1, * a2, * a3, * a4, * a5, * a6;
 		a1 = CopyUniToStr(filename);
 		a2 = CopyUniToStr(target);
 		a3 = CopyUniToStr(workdir);
@@ -955,13 +1167,13 @@ bool CreateLinkInner(wchar_t *filename, wchar_t *target, wchar_t *workdir, wchar
 		return ret;
 	}
 
-	r = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkW, (void **)&pShellLink);
+	r = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLinkW, (void**)&pShellLink);
 	if (FAILED(r))
 	{
 		return false;
 	}
 
-	r = pShellLink->QueryInterface(IID_IPersistFile,(void **)&pPersistFile);
+	r = pShellLink->QueryInterface(IID_IPersistFile, (void**)&pPersistFile);
 	if (FAILED(r))
 	{
 		pShellLink->Release();
@@ -1036,62 +1248,62 @@ bool CreateLinkInner(wchar_t *filename, wchar_t *target, wchar_t *workdir, wchar
 extern "C"
 {
 
-// Show the folder selection dialog
-wchar_t *FolderDlgW(HWND hWnd, wchar_t *title, wchar_t *default_dir)
-{
-	wchar_t *ret;
-
-	if (MsIsNt() == false)
+	// Show the folder selection dialog
+	wchar_t* FolderDlgW(HWND hWnd, wchar_t* title, wchar_t* default_dir)
 	{
-		char *default_dir_a = CopyUniToStr(default_dir);
-		char *ret_a = FolderDlgA(hWnd, title, default_dir_a);
+		wchar_t* ret;
 
-		ret = CopyStrToUni(ret_a);
-		Free(ret_a);
-		Free(default_dir_a);
+		if (MsIsNt() == false)
+		{
+			char* default_dir_a = CopyUniToStr(default_dir);
+			char* ret_a = FolderDlgA(hWnd, title, default_dir_a);
+
+			ret = CopyStrToUni(ret_a);
+			Free(ret_a);
+			Free(default_dir_a);
+
+			return ret;
+		}
+
+		ret = FolderDlgInnerW(hWnd, title, default_dir);
+
+		return ret;
+	}
+	char* FolderDlgA(HWND hWnd, wchar_t* title, char* default_dir)
+	{
+		char* ret;
+
+		ret = FolderDlgInnerA(hWnd, title, default_dir);
 
 		return ret;
 	}
 
-	ret = FolderDlgInnerW(hWnd, title, default_dir);
-
-	return ret;
-}
-char *FolderDlgA(HWND hWnd, wchar_t *title, char *default_dir)
-{
-	char *ret;
-
-	ret = FolderDlgInnerA(hWnd, title, default_dir);
-
-	return ret;
-}
-
-// Create a shortcut
-bool CreateLink(wchar_t *filename, wchar_t *target, wchar_t *workdir, wchar_t *args,
-				wchar_t *comment, wchar_t *icon, UINT icon_index)
-{
-	if (filename == NULL || target == NULL)
+	// Create a shortcut
+	bool CreateLink(wchar_t* filename, wchar_t* target, wchar_t* workdir, wchar_t* args,
+		wchar_t* comment, wchar_t* icon, UINT icon_index)
 	{
-		return false;
+		if (filename == NULL || target == NULL)
+		{
+			return false;
+		}
+
+		return CreateLinkInner(filename, target, workdir, args, comment, icon, icon_index);
 	}
 
-	return CreateLinkInner(filename, target, workdir, args, comment, icon, icon_index);
-}
-
-// Show the HTML
-void ShowHtml(HWND hWnd, char *url, wchar_t *option)
-{
-	wchar_t tmp[MAX_SIZE];
-	// Validate arguments
-	if (url == NULL || option == NULL)
+	// Show the HTML
+	void ShowHtml(HWND hWnd, char* url, wchar_t* option)
 	{
-		return;
+		wchar_t tmp[MAX_SIZE];
+		// Validate arguments
+		if (url == NULL || option == NULL)
+		{
+			return;
+		}
+
+		StrToUni(tmp, sizeof(tmp), url);
+
+		ShowHTMLDialogFromURL(hWnd, tmp, NULL, option, NULL);
 	}
-
-	StrToUni(tmp, sizeof(tmp), url);
-
-	ShowHTMLDialogFromURL(hWnd, tmp, NULL, option, NULL);
-}
 
 }
 

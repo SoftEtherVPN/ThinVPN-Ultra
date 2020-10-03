@@ -156,6 +156,13 @@ struct DS_CLIENT
 	UINT TunnelID;						// トンネル ID
 };
 
+struct DS_WIN32_RDP_POLICY
+{
+	bool HasValidValue;
+	UINT fDisableCdm;
+	UINT fDisableClip;
+};
+
 struct DS
 {
 	WIDE *Wide;							// WideServer
@@ -181,6 +188,11 @@ struct DS
 	COUNTER* CurrentNumSessions;		// 現在接続されているセッション数
 	UINT64 LastSessionDisconnectedTick;	// 最後のセッションが切断された時刻
 	LOCK* SessionIncDecLock;			// セッションが増えたり減ったりする際のロック
+
+	COUNTER* CurrentNumRDPSessions;		// Current RDP sessions
+	LOCK* RDPSessionIncDecLock;
+
+	DS_WIN32_RDP_POLICY Win32RdpPolicy;
 
 #ifdef OS_WIN32
 	MS_ISLOCKED *IsLocked;				// ロックされているかどうかの状態管理
@@ -359,6 +371,9 @@ bool DsPolicyClientGetPolicy(DS_POLICY_CLIENT *c, DS_POLICY_BODY *pol);
 bool DsGetPolicy(DS *ds, DS_POLICY_BODY *pol);
 bool DsIsTryCompleted(DS *ds);
 void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol);
+
+void DsWin32GetRdpPolicy(DS_WIN32_RDP_POLICY* pol);
+bool DsWin32SetRdpPolicy(DS_WIN32_RDP_POLICY* pol);
 
 // RPC Procedures (Server Side)
 UINT DtGetInternetSetting(DS *ds, INTERNET_SETTING *t);
