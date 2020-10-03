@@ -93,6 +93,8 @@
 
 #define	DS_CFG_SECURITY_SETTINGS	"AdvancedSecurity"
 
+#define DS_SESSION_INC_DEC_THRESHOLD	(5 * 60 * 1000)
+
 // OTP 有効期限
 #define DS_OTP_EXPIRES				(5 * 60 * 1000)
 
@@ -175,6 +177,10 @@ struct DS
 	bool SupportEventLog;				// イベントログをサポートしているかどうか
 	LIST *History;						// 接続受付履歴
 	LIST *RadiusCacheList;				// Radius キャッシュリスト
+
+	COUNTER* CurrentNumSessions;		// 現在接続されているセッション数
+	UINT64 LastSessionDisconnectedTick;	// 最後のセッションが切断された時刻
+	LOCK* SessionIncDecLock;			// セッションが増えたり減ったりする際のロック
 
 #ifdef OS_WIN32
 	MS_ISLOCKED *IsLocked;				// ロックされているかどうかの状態管理

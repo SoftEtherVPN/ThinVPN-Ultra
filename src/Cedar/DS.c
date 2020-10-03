@@ -2976,22 +2976,65 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 }
 
 // Accept プロシージャ
-void DsAcceptProc(THREAD *thread, SOCKIO *sock, void *param)
+void DsAcceptProc(THREAD* thread, SOCKIO* sock, void* param)
 {
-	DS *ds;
+	DS* ds;
+	UINT64 now;
 	// 引数チェック
 	if (thread == NULL || sock == NULL || param == NULL)
 	{
 		return;
 	}
 
-	ds = (DS *)param;
+	ds = (DS*)param;
 
 	Debug("Tunnel Accepted.\n");
+
+	Lock(ds->SessionIncDecLock);
+	{
+		bool this_is_first_session = false;
+
+		if (Inc(ds->CurrentNumSessions) == 1)
+		{
+			// 前回の最後のセッションが切断されてからしばらく経過した最初のセッションかどうか判定
+			now = Tick64();
+			if (ds->LastSessionDisconnectedTick == 0)
+			{
+				this_is_first_session = true;
+			}
+
+			if (ds->LastSessionDisconnectedTick != 0 && now > ds->LastSessionDisconnectedTick)
+			{
+				if ((now - ds->LastSessionDisconnectedTick) >= DS_SESSION_INC_DEC_THRESHOLD)
+				{
+					this_is_first_session = true;
+				}
+			}
+		}
+
+		if (this_is_first_session)
+		{
+			// 初回の接続であるか、または、前回のすべてのセッションが切断されてから随分時間
+			// が経過した後のセッションである場合は、ワンタイムチケットを消去する。
+
+			Debug("this_is_first_session = 1\n");
+
+			DsGenerateNewOtp(ds->OtpTicket, sizeof(ds->OtpTicket), 128);
+			DsGenerateNewOtp(ds->InspectionTicket, sizeof(ds->InspectionTicket), 48);
+		}
+	}
+	Unlock(ds->SessionIncDecLock);
 
 	DsServerMain(ds, sock);
 
 	Debug("Tunnel Disconnected.\n");
+
+	Lock(ds->SessionIncDecLock);
+	{
+		ds->LastSessionDisconnectedTick = Tick64();
+		Dec(ds->CurrentNumSessions);
+	}
+	Unlock(ds->SessionIncDecLock);
 }
 
 // RPC 接続
@@ -4211,6 +4254,10 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 
 	ds = ZeroMalloc(sizeof(DS));
 
+	ds->CurrentNumSessions = NewCounter();
+
+	ds->SessionIncDecLock = NewLock();
+
 	Rand(ds->SmartCardTicket, SHA1_SIZE);
 
 	DsGenerateNewOtp(ds->OtpTicket, sizeof(ds->OtpTicket), 128);
@@ -4507,6 +4554,9 @@ void FreeDs(DS *ds)
 	}
 
 	DsFreePolicyClient(ds->PolicyClient);
+
+	DeleteCounter(ds->CurrentNumSessions);
+	DeleteLock(ds->SessionIncDecLock);
 
 	Free(ds);
 
