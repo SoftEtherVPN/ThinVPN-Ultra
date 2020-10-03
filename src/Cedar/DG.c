@@ -2651,6 +2651,44 @@ UINT DgMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 
 	case WM_CLOSE:
 		DgMainDlgOnKillFocusPcid(hWnd, dg);
+
+		{
+			// Necessary settings message box
+			RPC_DS_CONFIG cfg = CLEAN;
+			RPC_DS_STATUS st = CLEAN;
+
+			if (DtcGetStatus(dg->Rpc, &st) == ERR_NO_ERROR)
+			{
+				if (DtcGetConfig(dg->Rpc, &cfg) == ERR_NO_ERROR)
+				{
+					if (st.EnforceOtp && (cfg.EnableOtp == false || IsEmptyStr(cfg.OtpEmail)))
+					{
+						// OTP
+						if (MsgBox(hWnd, MB_ICONQUESTION | MB_YESNO, _UU("DG_OTP_SETTINGS_REQUIRED")) == IDYES)
+						{
+							DgOtpDlg(hWnd, dg);
+						}
+					}
+				}
+			}
+
+			if (DtcGetStatus(dg->Rpc, &st) == ERR_NO_ERROR)
+			{
+				if (DtcGetConfig(dg->Rpc, &cfg) == ERR_NO_ERROR)
+				{
+					if ((st.EnforceMacCheck || cfg.EnableMacCheck) && IsEmptyStr(cfg.MacAddressList))
+					{
+						// MAC Address Auth
+						if (MsgBox(hWnd, MB_ICONQUESTION | MB_YESNO, _UU("DG_MAC_SETTINGS_REQUIRED")) == IDYES)
+						{
+							DgMacDlg(hWnd, dg);
+						}
+					}
+				}
+			}
+
+		}
+
 		EndDialog(hWnd, 0);
 		break;
 	}

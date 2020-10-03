@@ -2870,6 +2870,7 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 			StrCpy(t->OtpEndWith, sizeof(t->OtpEndWith), pol.EnforceOtpEndWith);
 		}
 
+		t->EnforceOtp = pol.EnforceOtp;
 		t->EnforceInspection = pol.EnforceInspection;
 		t->EnforceMacCheck = pol.EnforceMacCheck;
 
@@ -2884,6 +2885,7 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 			t->EnforceInspection = true;
 			t->EnforceMacCheck = true;
 			t->EnforceWatermark = true;
+			t->EnforceOtp = true;
 		}
 
 		if (DsIsTryCompleted(ds))
