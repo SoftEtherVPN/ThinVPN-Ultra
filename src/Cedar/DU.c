@@ -2522,15 +2522,7 @@ void DuOptionDlgInit(HWND hWnd, DU_OPTION *t)
 
 	Check(hWnd, C_MULTIDISPLAY, !dc->DisableMultiDisplay);
 
-	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
-	{
-		Check(hWnd, C_LIMITED_FW, !dc->DisableLimitedFw);
-	}
-	else
-	{
-		Check(hWnd, C_LIMITED_FW, true);
-		Disable(hWnd, C_LIMITED_FW);
-	}
+	Check(hWnd, C_LIMITED_FW, !dc->DisableLimitedFw);
 
 	if (Vars_ActivePatch_GetBool("ThinTelework_DisableOmakeFunctions"))
 	{
