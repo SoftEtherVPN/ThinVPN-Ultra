@@ -3620,7 +3620,8 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 	ds->EnableOtp = CfgGetBool(root, "EnableOtp");
 	CfgGetStr(root, "OtpEmail", ds->OtpEmail, sizeof(ds->OtpEmail));
 
-	CfgGetStr(root, "RegistrationPassword", ds->Wide->RegistrationPassword, sizeof(ds->Wide->RegistrationPassword));
+	// 2020/10/3 保存不要!?
+	//CfgGetStr(root, "RegistrationPassword", ds->Wide->RegistrationPassword, sizeof(ds->Wide->RegistrationPassword));
 	CfgGetStr(root, "RegistrationEmail", ds->Wide->RegistrationEmail, sizeof(ds->Wide->RegistrationEmail));
 
 	ds->EnableInspection = CfgGetBool(root, "EnableInspection");
@@ -3723,10 +3724,11 @@ FOLDER *DsSaveConfigMain(DS *ds)
 
 	CfgAddStr(root, "OtpEmail", ds->OtpEmail);
 
-	if (IsEmptyStr(ds->Wide->RegistrationPassword) == false)
-	{
-		CfgAddStr(root, "RegistrationPassword", ds->Wide->RegistrationPassword);
-	}
+	// 2020/10/3 保存不要!?
+	//if (IsEmptyStr(ds->Wide->RegistrationPassword) == false)
+	//{
+	//	CfgAddStr(root, "RegistrationPassword", ds->Wide->RegistrationPassword);
+	//}
 
 	if (IsEmptyStr(ds->Wide->RegistrationEmail) == false)
 	{

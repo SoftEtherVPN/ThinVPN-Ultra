@@ -1146,6 +1146,8 @@ UINT WideServerConnect(WIDE *w, WT_CONNECT *c)
 	}
 
 	PackAddInt64(r, "ServerMask64", w->ServerMask64);
+	PackAddStr(r, "RegistrationPassword", w->RegistrationPassword);
+	PackAddStr(r, "RegistrationEmail", w->RegistrationEmail);
 	p = WideCall(w, "ServerConnect", r, false, true);
 	FreePack(r);
 
