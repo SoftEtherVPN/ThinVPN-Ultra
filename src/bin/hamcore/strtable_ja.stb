@@ -414,7 +414,7 @@ DU_GOV_FW_MANDATE_CLOSE_BUTTON	いいえ (接続を中断)
 DU_GOV_FW_CLOSE_MSG		完全閉域化ファイアウォールを終了しますか?
 
 DU_FELONY_STR1			画面撮影・情報持出等の行為禁止！
-DU_FELONY_STR2			$APPVERYSHORT$作業中 ログイン日時: %s\r\n%S\r\nサーバー端末: %s (IP: %r)\r\nクライアント端末: %s (%S)\r\nクライアント IP: %r/%r\r\nユーザー名: %s\r\n%s
+DU_FELONY_STR2			$APPVERYSHORT$作業中 ログイン日時: %s\r\n%S\r\nサーバー端末: %s (IP: %r)\r\nクライアント端末: %s (%S)\r\nクライアント IP: %r/%r\r\nユーザー名: %s\r\n%S
 DU_FELONY_FONT_XP		MS UI Gothic
 DU_FELONY_FONT_7		Meiryo UI
 

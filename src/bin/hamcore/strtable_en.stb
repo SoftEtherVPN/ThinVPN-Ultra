@@ -420,7 +420,7 @@ DU_GOV_FW_MANDATE_CLOSE_BUTTON 	No (Suspend connection)
 DU_GOV_FW_CLOSE_MSG 			Would you like to terminate the fully closed firewall?
 
 DU_FELONY_STR1 					Classified // DO NOT COPY // NO PHOTO
-DU_FELONY_STR2 					$APPVERYSHORT$ Login date and time: %s\r\n%S\r\nServer computer: %s (IP: %r)\r\nClient computer: %s (%S)\r\nClient IP: %r/%r\r\nUser. Name: %s\r\n%s
+DU_FELONY_STR2 					$APPVERYSHORT$ Login date and time: %s\r\n%S\r\nServer computer: %s (IP: %r)\r\nClient computer: %s (%S)\r\nClient IP: %r/%r\r\nUser. Name: %s\r\n%S
 DU_FELONY_FONT_XP 				Tahoma
 DU_FELONY_FONT_7 				Segoe UI
 
