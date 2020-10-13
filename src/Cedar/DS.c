@@ -128,6 +128,7 @@ bool DsWin32SetRdpPolicy(DS_WIN32_RDP_POLICY* pol)
 		return false;
 	}
 
+#ifdef OS_WIN32
 	if (MsIsRemoteDesktopAvailable() == false)
 	{
 		return false;
@@ -138,7 +139,6 @@ bool DsWin32SetRdpPolicy(DS_WIN32_RDP_POLICY* pol)
 		return false;
 	}
 
-#ifdef OS_WIN32
 	if (Win32WriteLocalGroupPolicyValueInt32(true,
 		"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
 		"fDisableCdm",
