@@ -3308,11 +3308,16 @@ void WideFreeIni(LIST *o)
 // WideGate.ini の読み込み
 LIST *WideGateLoadIni()
 {
-	BUF *b = ReadDump("@WideGate.ini");
+	BUF *b = ReadDump("@ThinGate.ini");
 	LIST *ini;
 	if (b == NULL)
 	{
-		return NULL;
+		b = ReadDump("@WideGate.ini");
+
+		if (b == NULL)
+		{
+			return NULL;
+		}
 	}
 
 	ini = ReadIni(b);
