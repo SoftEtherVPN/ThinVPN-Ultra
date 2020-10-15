@@ -2208,6 +2208,12 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 						set.TextColor2 = RGB(2, 200, 81);
 						set.Alpha = 20;//192;//128;//9;
 
+						if (DcGetDebugFlag())
+						{
+							// デバッグのときは少し濃くする
+							set.Alpha = 70;
+						}
+
 						//set.Alpha = 70;
 
 						set.Margin = 15;
