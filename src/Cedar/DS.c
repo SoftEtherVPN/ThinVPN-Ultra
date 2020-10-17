@@ -1656,7 +1656,16 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 			if (ds->EnableMacCheck)
 			{
-				if (CheckStrListIncludedInOtherStrMac(ds->MacAddressList, ins.MacAddressList) == false)
+				bool check_ret = false;
+
+				Lock(ds->ConfigLock);
+				{
+					// サーバーに登録されている MAC アドレス一覧に一致するものがあるかどうか検査
+					check_ret = CheckStrListIncludedInOtherStrMac(ds->MacAddressList, ins.MacAddressList);
+				}
+				Unlock(ds->ConfigLock);
+
+				if (check_ret == false)
 				{
 					bool policy_server_based_mac_ok = false;
 

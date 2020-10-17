@@ -218,6 +218,8 @@ bool NormalizeMacAddressListStr(char *dst, UINT size, char *src)
 	bool ret = false;
 	LIST *o = NULL;
 	UINT i;
+	char* tmp = NULL;
+	UINT tmp_size = 0;
 
 	if (dst == NULL || src == NULL)
 	{
@@ -270,19 +272,25 @@ bool NormalizeMacAddressListStr(char *dst, UINT size, char *src)
 
 	FreeBuf(buf);
 
-	ClearStr(dst, size);
+	tmp_size = StrSize(src) * 2 + 4096;
+
+	tmp = ZeroMalloc(tmp_size);
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
 		char *mac = LIST_DATA(o, i);
 
-		StrCat(dst, size, mac);
-		StrCat(dst, size, "\r\n");
+		StrCat(tmp, size, mac);
+		StrCat(tmp, size, "\r\n");
 
 		ret = true;
 	}
 
 	ReleaseStrList(o);
+
+	StrCpy(dst, size, tmp);
+
+	Free(tmp);
 
 	return ret;
 }
