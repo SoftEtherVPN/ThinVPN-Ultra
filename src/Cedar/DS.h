@@ -242,6 +242,8 @@ struct DS
 
 	bool EnableWoLTarget;
 	bool EnableWoLTrigger;
+
+	LOCK* ConfigLock;
 };
 
 struct DS_INFO

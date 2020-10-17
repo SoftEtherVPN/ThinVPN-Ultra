@@ -2998,52 +2998,56 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 	bool wol_target_old = ds->EnableWoLTarget;
 	bool reg_password_changed = false;
 
-	ds->Active = t->Active;
-	ds->PowerKeep = t->PowerKeep;
-	Copy(ds->HashedPassword, t->HashedPassword, sizeof(ds->HashedPassword));
-	ds->AuthType = t->AuthType;
-	Copy(ds->AuthPassword, t->AuthPassword, sizeof(ds->AuthPassword));
-	ds->ServiceType = t->ServiceType;
-	WideSetDontCheckCert(ds->Wide, t->DontCheckCert);
-	ds->IsConfigured = true;
-	ds->SaveLogFile = t->SaveLogFile;
-	UniStrCpy(ds->BluetoothDir, sizeof(ds->BluetoothDir), t->BluetoothDir);
-	ds->UseAdvancedSecurity = t->UseAdvancedSecurity;
-	ds->SaveEventLog = t->SaveEventLog;
-	ds->DisableShare = t->DisableShare;
-	UniStrCpy(ds->AdminUsername, sizeof(ds->AdminUsername), t->AdminUsername);
-
-	ds->EnableOtp = t->EnableOtp;
-	StrCpy(ds->OtpEmail, sizeof(ds->OtpEmail), t->OtpEmail);
-
-	ds->EnableInspection = t->EnableInspection;
-	ds->EnableMacCheck = t->EnableMacCheck;
-	StrCpy(ds->MacAddressList, sizeof(ds->MacAddressList), t->MacAddressList);
-
-	if (StrLen(t->EmergencyOtp) >= DS_EMERGENCY_OTP_LENGTH)
+	Lock(ds->ConfigLock);
 	{
-		StrCpy(ds->EmergencyOtp, sizeof(ds->EmergencyOtp), t->EmergencyOtp);
+		ds->Active = t->Active;
+		ds->PowerKeep = t->PowerKeep;
+		Copy(ds->HashedPassword, t->HashedPassword, sizeof(ds->HashedPassword));
+		ds->AuthType = t->AuthType;
+		Copy(ds->AuthPassword, t->AuthPassword, sizeof(ds->AuthPassword));
+		ds->ServiceType = t->ServiceType;
+		WideSetDontCheckCert(ds->Wide, t->DontCheckCert);
+		ds->IsConfigured = true;
+		ds->SaveLogFile = t->SaveLogFile;
+		UniStrCpy(ds->BluetoothDir, sizeof(ds->BluetoothDir), t->BluetoothDir);
+		ds->UseAdvancedSecurity = t->UseAdvancedSecurity;
+		ds->SaveEventLog = t->SaveEventLog;
+		ds->DisableShare = t->DisableShare;
+		UniStrCpy(ds->AdminUsername, sizeof(ds->AdminUsername), t->AdminUsername);
+
+		ds->EnableOtp = t->EnableOtp;
+		StrCpy(ds->OtpEmail, sizeof(ds->OtpEmail), t->OtpEmail);
+
+		ds->EnableInspection = t->EnableInspection;
+		ds->EnableMacCheck = t->EnableMacCheck;
+		StrCpy(ds->MacAddressList, sizeof(ds->MacAddressList), t->MacAddressList);
+
+		if (StrLen(t->EmergencyOtp) >= DS_EMERGENCY_OTP_LENGTH)
+		{
+			StrCpy(ds->EmergencyOtp, sizeof(ds->EmergencyOtp), t->EmergencyOtp);
+		}
+
+		if (StrCmp(ds->Wide->RegistrationPassword, t->RegistrationPassword) != 0 ||
+			StrCmp(ds->Wide->RegistrationEmail, t->RegistrationEmail) != 0)
+		{
+			reg_password_changed = true;
+		}
+
+		StrCpy(ds->Wide->RegistrationPassword, sizeof(ds->Wide->RegistrationPassword), t->RegistrationPassword);
+		StrCpy(ds->Wide->RegistrationEmail, sizeof(ds->Wide->RegistrationEmail), t->RegistrationEmail);
+
+		ds->RdpEnableGroupKeeper = t->RdpEnableGroupKeeper;
+		UniStrCpy(ds->RdpGroupKeepUserName, sizeof(ds->RdpGroupKeepUserName), t->RdpGroupKeepUserName);
+		ds->RdpEnableOptimizer = t->RdpEnableOptimizer;
+		StrCpy(ds->RdpStopServicesList, sizeof(ds->RdpStopServicesList), t->RdpStopServicesList);
+
+		ds->ShowWatermark = t->ShowWatermark;
+		UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), t->WatermarkStr);
+
+		ds->EnableWoLTarget = t->EnableWoLTarget;
+		ds->EnableWoLTrigger = t->EnableWoLTrigger;
 	}
-
-	if (StrCmp(ds->Wide->RegistrationPassword, t->RegistrationPassword) != 0 ||
-		StrCmp(ds->Wide->RegistrationEmail, t->RegistrationEmail) != 0)
-	{
-		reg_password_changed = true;
-	}
-
-	StrCpy(ds->Wide->RegistrationPassword, sizeof(ds->Wide->RegistrationPassword), t->RegistrationPassword);
-	StrCpy(ds->Wide->RegistrationEmail, sizeof(ds->Wide->RegistrationEmail), t->RegistrationEmail);
-
-	ds->RdpEnableGroupKeeper = t->RdpEnableGroupKeeper;
-	UniStrCpy(ds->RdpGroupKeepUserName, sizeof(ds->RdpGroupKeepUserName), t->RdpGroupKeepUserName);
-	ds->RdpEnableOptimizer = t->RdpEnableOptimizer;
-	StrCpy(ds->RdpStopServicesList, sizeof(ds->RdpStopServicesList), t->RdpStopServicesList);
-
-	ds->ShowWatermark = t->ShowWatermark;
-	UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), t->WatermarkStr);
-
-	ds->EnableWoLTarget = t->EnableWoLTarget;
-	ds->EnableWoLTrigger = t->EnableWoLTrigger;
+	Unlock(ds->ConfigLock);
 
 	DsNormalizeConfig(ds, true);
 	DsSaveConfig(ds);
@@ -3637,58 +3641,62 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 		}
 	}
 
-	if (IsEmptyStr(ds->OtpEmail))
+	Lock(ds->ConfigLock);
 	{
-		// OTP メールアドレス未設定の場合は EnableOtp を false にする
-		ds->EnableOtp = false;
-	}
-
-	NormalizeMacAddressListStr(ds->MacAddressList, sizeof(ds->MacAddressList), ds->MacAddressList);
-
-	if (DsGetPolicy(ds, &pol))
-	{
-		// ポリシーサーバーから設定が配信されている
-		if (pol.EnforceInspection)
+		if (IsEmptyStr(ds->OtpEmail))
 		{
-			ds->EnableInspection = true;
+			// OTP メールアドレス未設定の場合は EnableOtp を false にする
+			ds->EnableOtp = false;
 		}
 
-		if (pol.EnforceMacCheck)
-		{
-			ds->EnableMacCheck = true;
-		}
+		NormalizeMacAddressListStr(ds->MacAddressList, sizeof(ds->MacAddressList), ds->MacAddressList);
 
-		if (pol.EnforceWatermark)
+		if (DsGetPolicy(ds, &pol))
 		{
-			ds->ShowWatermark = true;
-
-			if (UniIsEmptyStr(pol.WatermarkMessage) == false)
+			// ポリシーサーバーから設定が配信されている
+			if (pol.EnforceInspection)
 			{
-				UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), pol.WatermarkMessage);
+				ds->EnableInspection = true;
+			}
+
+			if (pol.EnforceMacCheck)
+			{
+				ds->EnableMacCheck = true;
+			}
+
+			if (pol.EnforceWatermark)
+			{
+				ds->ShowWatermark = true;
+
+				if (UniIsEmptyStr(pol.WatermarkMessage) == false)
+				{
+					UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), pol.WatermarkMessage);
+				}
 			}
 		}
-	}
-	else
-	{
-		// ポリシーサーバーから設定が配信されていない
-		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+		else
 		{
-			// 強いセキュリティパッチ適用モード
-			ds->EnableInspection = true;
-			ds->EnableMacCheck = true;
-			ds->ShowWatermark = true;
+			// ポリシーサーバーから設定が配信されていない
+			if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+			{
+				// 強いセキュリティパッチ適用モード
+				ds->EnableInspection = true;
+				ds->EnableMacCheck = true;
+				ds->ShowWatermark = true;
+			}
+		}
+
+		if (StrLen(ds->EmergencyOtp) < DS_EMERGENCY_OTP_LENGTH)
+		{
+			DsGenerateNewOtp(ds->EmergencyOtp, sizeof(ds->EmergencyOtp), DS_EMERGENCY_OTP_LENGTH);
+		}
+
+		if (UniIsEmptyStr(ds->WatermarkStr))
+		{
+			UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), _UU("DU_FELONY_STR1"));
 		}
 	}
-
-	if (StrLen(ds->EmergencyOtp) < DS_EMERGENCY_OTP_LENGTH)
-	{
-		DsGenerateNewOtp(ds->EmergencyOtp, sizeof(ds->EmergencyOtp), DS_EMERGENCY_OTP_LENGTH);
-	}
-
-	if (UniIsEmptyStr(ds->WatermarkStr))
-	{
-		UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), _UU("DU_FELONY_STR1"));
-	}
+	Unlock(ds->ConfigLock);
 
 #endif  // OS_WIN32
 }
@@ -3899,126 +3907,130 @@ FOLDER *DsSaveConfigMain(DS *ds)
 
 	root = CfgCreateFolder(NULL, TAG_ROOT);
 
-	CfgAddBool(root, "PowerKeep", ds->PowerKeep);
+	Lock(ds->ConfigLock);
+	{
+		CfgAddBool(root, "PowerKeep", ds->PowerKeep);
 
-	CfgAddBool(root, "DontSaveLogFile", ds->SaveLogFile ? false : true);
+		CfgAddBool(root, "DontSaveLogFile", ds->SaveLogFile ? false : true);
 
 #ifndef	DESK_DISABLE_NEW_FEATURE
-	CfgAddBool(root, "SaveEventLog", ds->SaveEventLog);
+		CfgAddBool(root, "SaveEventLog", ds->SaveEventLog);
 #endif	// DESK_DISABLE_NEW_FEATURE
 
-	CfgAddBool(root, "DisableShare", ds->DisableShare);
+		CfgAddBool(root, "DisableShare", ds->DisableShare);
 
-	CfgAddBool(root, "EnableOtp", ds->EnableOtp);
+		CfgAddBool(root, "EnableOtp", ds->EnableOtp);
 
-	CfgAddStr(root, "OtpEmail", ds->OtpEmail);
+		CfgAddStr(root, "OtpEmail", ds->OtpEmail);
 
-	// 2020/10/3 保存不要!?
-	//if (IsEmptyStr(ds->Wide->RegistrationPassword) == false)
-	//{
-	//	CfgAddStr(root, "RegistrationPassword", ds->Wide->RegistrationPassword);
-	//}
+		// 2020/10/3 保存不要!?
+		//if (IsEmptyStr(ds->Wide->RegistrationPassword) == false)
+		//{
+		//	CfgAddStr(root, "RegistrationPassword", ds->Wide->RegistrationPassword);
+		//}
 
-	if (IsEmptyStr(ds->Wide->RegistrationEmail) == false)
-	{
-		CfgAddStr(root, "RegistrationEmail", ds->Wide->RegistrationEmail);
-	}
+		if (IsEmptyStr(ds->Wide->RegistrationEmail) == false)
+		{
+			CfgAddStr(root, "RegistrationEmail", ds->Wide->RegistrationEmail);
+		}
 
-	CfgAddStr(root, "EmergencyOtp", ds->EmergencyOtp);
+		CfgAddStr(root, "EmergencyOtp", ds->EmergencyOtp);
 
-	CfgAddBool(root, "EnableInspection", ds->EnableInspection);
-	CfgAddBool(root, "EnableMacCheck", ds->EnableMacCheck);
-	CfgAddStr(root, "MacAddressList", ds->MacAddressList);
+		CfgAddBool(root, "EnableInspection", ds->EnableInspection);
+		CfgAddBool(root, "EnableMacCheck", ds->EnableMacCheck);
+		CfgAddStr(root, "MacAddressList", ds->MacAddressList);
 
-	CfgAddBool(root, "IsConfigured", ds->IsConfigured);
+		CfgAddBool(root, "IsConfigured", ds->IsConfigured);
 
-	CfgAddBool(root, "Active", ds->Active);
+		CfgAddBool(root, "Active", ds->Active);
 
-	CfgAddBool(root, "RdpEnableGroupKeeper", ds->RdpEnableGroupKeeper);
-	CfgAddUniStr(root, "RdpGroupKeepUserName", ds->RdpGroupKeepUserName);
-	CfgAddBool(root, "RdpEnableOptimizer", ds->RdpEnableOptimizer);
-	CfgAddStr(root, "RdpStopServicesList", ds->RdpStopServicesList);
+		CfgAddBool(root, "RdpEnableGroupKeeper", ds->RdpEnableGroupKeeper);
+		CfgAddUniStr(root, "RdpGroupKeepUserName", ds->RdpGroupKeepUserName);
+		CfgAddBool(root, "RdpEnableOptimizer", ds->RdpEnableOptimizer);
+		CfgAddStr(root, "RdpStopServicesList", ds->RdpStopServicesList);
 
-	CfgAddBool(root, "ShowWatermark", ds->ShowWatermark);
-	CfgAddUniStr(root, "WatermarkStr", ds->WatermarkStr);
+		CfgAddBool(root, "ShowWatermark", ds->ShowWatermark);
+		CfgAddUniStr(root, "WatermarkStr", ds->WatermarkStr);
 
-	CfgAddUniStr(root, "AdminUsername", ds->AdminUsername);
+		CfgAddUniStr(root, "AdminUsername", ds->AdminUsername);
 
-	CfgAddBool(root, "EnableWoLTarget", ds->EnableWoLTarget);
-	CfgAddBool(root, "EnableWoLTrigger", ds->EnableWoLTrigger);
+		CfgAddBool(root, "EnableWoLTarget", ds->EnableWoLTarget);
+		CfgAddBool(root, "EnableWoLTrigger", ds->EnableWoLTrigger);
 
-	if (ds->SupportBluetooth)
-	{
-		CfgAddUniStr(root, "BluetoothDir", ds->BluetoothDir);
-	}
+		if (ds->SupportBluetooth)
+		{
+			CfgAddUniStr(root, "BluetoothDir", ds->BluetoothDir);
+		}
 
 #ifndef	DESK_DISABLE_NEW_FEATURE
-	CfgAddBool(root, "UseAdvancedSecurity", ds->UseAdvancedSecurity);
+		CfgAddBool(root, "UseAdvancedSecurity", ds->UseAdvancedSecurity);
 #endif	// DESK_DISABLE_NEW_FEATURE
 
-	if (IsZero(ds->HashedPassword, SHA1_SIZE) == false)
-	{
-		CfgAddByte(root, "HashedPassword", ds->HashedPassword, SHA1_SIZE);
-	}
+		if (IsZero(ds->HashedPassword, SHA1_SIZE) == false)
+		{
+			CfgAddByte(root, "HashedPassword", ds->HashedPassword, SHA1_SIZE);
+		}
 
-	CfgAddInt(root, "AuthType", ds->AuthType);
+		CfgAddInt(root, "AuthType", ds->AuthType);
 
-	CfgAddInt(root, "NumConfigures", ds->NumConfigures);
+		CfgAddInt(root, "NumConfigures", ds->NumConfigures);
 
-	switch (ds->AuthType)
-	{
-	case DESK_AUTH_PASSWORD:
-		CfgAddByte(root, "AuthPassword", ds->AuthPassword, SHA1_SIZE);
-		break;
-	}
+		switch (ds->AuthType)
+		{
+		case DESK_AUTH_PASSWORD:
+			CfgAddByte(root, "AuthPassword", ds->AuthPassword, SHA1_SIZE);
+			break;
+		}
 
-	CfgAddInt(root, "ServiceType", ds->ServiceType);
+		CfgAddInt(root, "ServiceType", ds->ServiceType);
 
 #if	0
-	f = CfgCreateFolder(root, "CommSetting");
-	DsSaveConfigCommSetting(f);
+		f = CfgCreateFolder(root, "CommSetting");
+		DsSaveConfigCommSetting(f);
 #endif
 
-	WideGetInternetSetting(ds->Wide, &setting);
+		WideGetInternetSetting(ds->Wide, &setting);
 
-	CfgAddBool(root, "DontCheckCert", WideGetDontCheckCert(ds->Wide));
+		CfgAddBool(root, "DontCheckCert", WideGetDontCheckCert(ds->Wide));
 
-	f = CfgCreateFolder(root, "ProxySetting");
+		f = CfgCreateFolder(root, "ProxySetting");
 
-	DsSaveInternetSetting(f, &setting);
+		DsSaveInternetSetting(f, &setting);
 
-	f = CfgCreateFolder(root, DS_CFG_SECURITY_SETTINGS);
+		f = CfgCreateFolder(root, DS_CFG_SECURITY_SETTINGS);
 
-	h = GetHub(ds->Server->Cedar, CEDAR_DESKVPN_HUBNAME);
-	if (h != NULL)
-	{
-		Lock(h->lock);
+		h = GetHub(ds->Server->Cedar, CEDAR_DESKVPN_HUBNAME);
+		if (h != NULL)
 		{
-			bool b = false;
+			Lock(h->lock);
+			{
+				bool b = false;
 #ifdef	DESK_DISABLE_NEW_FEATURE
-			b = true;
+				b = true;
 #endif	// DESK_DISABLE_NEW_FEATURE
-			SiWriteHubCfg(f, h);
+				SiWriteHubCfg(f, h);
+			}
+			Unlock(h->lock);
+
+			ReleaseHub(h);
 		}
-		Unlock(h->lock);
 
-		ReleaseHub(h);
-	}
-
-	// syslog
+		// syslog
 #ifndef	DESK_DISABLE_NEW_FEATURE
-	syslog_f = CfgCreateFolder(f, "SyslogSettings");
-	if (syslog_f != NULL)
-	{
-		SYSLOG_SETTING set;
+		syslog_f = CfgCreateFolder(f, "SyslogSettings");
+		if (syslog_f != NULL)
+		{
+			SYSLOG_SETTING set;
 
-		SiGetSysLogSetting(ds->Server, &set);
+			SiGetSysLogSetting(ds->Server, &set);
 
-		CfgAddInt(syslog_f, "SaveType", set.SaveType);
-		CfgAddStr(syslog_f, "HostName", set.Hostname);
-		CfgAddInt(syslog_f, "Port", set.Port);
-	}
+			CfgAddInt(syslog_f, "SaveType", set.SaveType);
+			CfgAddStr(syslog_f, "HostName", set.Hostname);
+			CfgAddInt(syslog_f, "Port", set.Port);
+		}
 #endif	// DESK_DISABLE_NEW_FEATURE
+	}
+	Unlock(ds->ConfigLock);
 
 	return root;
 }
@@ -4400,6 +4412,8 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 
 	ds = ZeroMalloc(sizeof(DS));
 
+	ds->ConfigLock = NewLock();
+
 	ds->CurrentNumSessions = NewCounter();
 	ds->CurrentNumRDPSessions = NewCounter();
 
@@ -4708,6 +4722,8 @@ void FreeDs(DS *ds)
 
 	DeleteLock(ds->SessionIncDecLock);
 	DeleteLock(ds->RDPSessionIncDecLock);
+
+	DeleteLock(ds->ConfigLock);
 
 	Free(ds);
 
