@@ -3241,6 +3241,7 @@ WIDE *WideGateStart()
 
 	w->AggressiveTimeoutLock = NewLock();
 
+	// Timeout 設定の読み込み
 	w->GateTunnelTimeout = WT_TUNNEL_TIMEOUT;
 	w->GateTunnelKeepAlive = WT_TUNNEL_KEEPALIVE;
 	w->GateTunnelUseAggressiveTimeout = false;
@@ -3251,7 +3252,11 @@ WIDE *WideGateStart()
 	// 証明書の読み込み
 	WideGateLoadCertKey(&w->GateCert, &w->GateKey);
 
-	// Timeout 設定の読み込み
+	// DoS 攻撃検知無効
+	if (w->DisableDoSProtection)
+	{
+		DisableDosProtect();
+	}
 
 	// Gate の開始
 	WtgStart(w->wt, w->GateCert, w->GateKey, WT_PORT);
