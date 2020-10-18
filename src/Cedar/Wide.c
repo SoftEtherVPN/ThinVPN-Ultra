@@ -3031,7 +3031,9 @@ void WideGateReportSessionList(WIDE *wide)
 			if (err == ERR_GATE_SYSTEM_INTERNAL_PROXY)
 			{
 				if (proxy_error_check_interval_for_reboot != 0)
-				is_proxy_error = true;
+				{
+					is_proxy_error = true;
+				}
 			}
 
 			WideGateSetControllerGateSecretKeyFromPack(wide, ret);
@@ -3048,6 +3050,7 @@ void WideGateReportSessionList(WIDE *wide)
 	}
 	else
 	{
+		Debug("is_proxy_error = true\n");
 		// ゲートウェイ <--> 中間プロキシサーバー <--> コントローラ 間の通信が不良である
 		if (proxy_error_check_interval_for_reboot != 0)
 		{
@@ -3064,6 +3067,7 @@ void WideGateReportSessionList(WIDE *wide)
 				if (now >= wide->ProxyErrorRebootStartTick)
 				{
 					// 一定時間経過しましたので reboot いたします
+					Debug("now >= wide->ProxyErrorRebootStartTick. Rebboting...\n");
 					AbortExitEx("now >= wide->ProxyErrorRebootStartTick");
 				}
 			}
