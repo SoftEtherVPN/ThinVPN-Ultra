@@ -3057,7 +3057,7 @@ void WideGateReportSessionList(WIDE *wide)
 			// 接続してきているすべてのセッションを削除する。
 			if (wide->ProxyErrorRebootStartTick == 0)
 			{
-				wide->ProxyErrorRebootStartTick = now;
+				wide->ProxyErrorRebootStartTick = now + (UINT64)proxy_error_check_interval_for_reboot;
 			}
 			else
 			{
