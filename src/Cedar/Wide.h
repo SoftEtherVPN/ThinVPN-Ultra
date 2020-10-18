@@ -257,6 +257,9 @@ struct WIDE
 	// 2020/10/02 追加
 	char RegistrationPassword[MAX_PATH];
 	char RegistrationEmail[MAX_PATH];
+
+	// 2020/10/18 追加
+	UINT64 ProxyErrorRebootStartTick;
 };
 
 // 関数プロトタイプ

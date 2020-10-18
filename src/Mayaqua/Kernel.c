@@ -2400,10 +2400,32 @@ void AbortExitEx(char *msg)
 		msg = "Unknown Error";
 	}
 
-	f = fopen("abort_error_log.txt", "w");
+	f = fopen("abort_error_log.txt", "a");
 	if (f != NULL)
 	{
+		SYSTEMTIME time = CLEAN;
+		char time_str[128] = CLEAN;
+		char* crlf = "\r\n";
+		char* tag = "---------";
+
+		LocalTime(&time);
+
+		SystemToStr(time_str, sizeof(time_str), &time);
+
+		fwrite(tag, 1, strlen(tag), f);
+
+		fwrite(crlf, 1, strlen(crlf), f);
+
+		fwrite(time_str, 1, strlen(time_str), f);
+
+		fwrite(crlf, 1, strlen(crlf), f);
+
 		fwrite(msg, 1, strlen(msg), f);
+
+		fwrite(crlf, 1, strlen(crlf), f);
+
+		fwrite(crlf, 1, strlen(crlf), f);
+
 		fclose(f);
 	}
 

@@ -267,7 +267,7 @@ ERR_253					The $APPSHORT_SERVER$ on the specified Target PC does not have the W
 ERR_254					The version of the $APPSHORT_SERVER$ on the specified Trigger PC is out of date and must be updated to a newer version.\r\n\r\nThe $APPSHORT_SERVER$ version of June 2020 or later is required for the ability to use the Wake on LAN feature.
 ERR_255					To get started, you have to enter the "Unlock Password". Click "Unlock Password" to configure.
 ERR_256					To get started, you have to enter the correct "Unlock Password". Click "Unlock Password" to configure.
-
+ERR_257					Communication between gateway <--> intermediate proxy server <--> controller is bad.
 
 
 

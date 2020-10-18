@@ -117,7 +117,7 @@
 #define ERR_WOL_TRIGGER_NOT_SUPPORTED		254	// WoL トリガー機能がサポートされていない
 #define ERR_REG_PASSWORD_EMPTY				255	// 登録用パスワードが未設定である
 #define	ERR_REG_PASSWORD_INCORRECT			256 // 登録用パスワードが誤っている
-
+#define ERR_GATE_SYSTEM_INTERNAL_PROXY		257	// ゲートウェイ <--> 中間プロキシサーバー <--> コントローラ 間の通信が不良である
 
 
 // SNI 文字列

@@ -2972,6 +2972,8 @@ void WideGateReportSessionList(WIDE *wide)
 	WT *wt;
 	LIST *sc_list;
 	bool global_ip_only = true;
+	UINT proxy_error_check_interval_for_reboot = WideGateGetIniEntry("ProxyErrorCheckIntervalForReboot");
+	bool is_proxy_error = false;
 	// 引数チェック
 	if (wide == NULL)
 	{
@@ -3024,6 +3026,14 @@ void WideGateReportSessionList(WIDE *wide)
 
 		if (ret != NULL)
 		{
+			UINT err = GetErrorFromPack(ret);
+
+			if (err == ERR_GATE_SYSTEM_INTERNAL_PROXY)
+			{
+				if (proxy_error_check_interval_for_reboot != 0)
+				is_proxy_error = true;
+			}
+
 			WideGateSetControllerGateSecretKeyFromPack(wide, ret);
 			FreePack(ret);
 		}
@@ -3031,6 +3041,34 @@ void WideGateReportSessionList(WIDE *wide)
 		FreePack(p);
 	}
 	Unlock(wide->LockReport);
+
+	if (is_proxy_error == false)
+	{
+		wide->ProxyErrorRebootStartTick = 0;
+	}
+	else
+	{
+		// ゲートウェイ <--> 中間プロキシサーバー <--> コントローラ 間の通信が不良である
+		if (proxy_error_check_interval_for_reboot != 0)
+		{
+			UINT64 now = Tick64();
+			// ProxyErrorCheckIntervalForReboot が設定されているとき、
+			// エラー状態が指定された秒数以上継続したらプロセスを再起動し、
+			// 接続してきているすべてのセッションを削除する。
+			if (wide->ProxyErrorRebootStartTick == 0)
+			{
+				wide->ProxyErrorRebootStartTick = now;
+			}
+			else
+			{
+				if (now >= wide->ProxyErrorRebootStartTick)
+				{
+					// 一定時間経過しましたので reboot いたします
+					AbortExitEx("now >= wide->ProxyErrorRebootStartTick");
+				}
+			}
+		}
+	}
 }
 
 // 報告スレッド
