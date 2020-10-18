@@ -240,8 +240,14 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 	o = ReadIni(buf);
 
 	b->EnforceOtp = IniIntValue(o, "ENFORCE_OTP");
+	b->DisableOtp = IniIntValue(o, "DISABLE_OTP") && (!b->EnforceOtp);
+
 	b->EnforceInspection = IniIntValue(o, "ENFORCE_INSPECTION");
+	b->DisableInspection = IniIntValue(o, "DISABLE_INSPECTION") && (!b->EnforceInspection);
+
 	b->EnforceMacCheck = IniIntValue(o, "ENFORCE_MACCHECK");
+	b->DisableMacCheck = IniIntValue(o, "DISABLE_MACCHECK") && (!b->EnforceMacCheck);
+
 	b->DisableShare = IniIntValue(o, "DISABLE_SHARE");
 
 	s = IniStrValue(o, "SERVER_ALLOWED_MAC_LIST_URL");
@@ -269,6 +275,8 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 	}
 
 	b->EnforceWatermark = IniIntValue(o, "ENFORCE_WATERMARK");
+	b->DisableWatermark = IniIntValue(o, "DISABLE_WATERMARK") && (!b->EnforceWatermark);
+
 	if (b->EnforceWatermark)
 	{
 		ws = IniUniStrValue(o, "WATERMARK_MESSAGE");
@@ -1671,7 +1679,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 					if (IsEmptyStr(pol.ClientAllowedMacListUrl) == false)
 					{
-						// SERVER_ALLOWED_MAC_LIST_URL が指定されているのでダウンロードを試みる
+						// CLIENT_ALLOWED_MAC_LIST_URL が指定されているのでダウンロードを試みる
 						URL_DATA data;
 						if (ParseUrl(&data, pol.ClientAllowedMacListUrl, false, NULL))
 						{
@@ -3667,10 +3675,18 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 			{
 				ds->EnableInspection = true;
 			}
+			else if (pol.DisableInspection)
+			{
+				ds->EnableInspection = false;
+			}
 
 			if (pol.EnforceMacCheck)
 			{
 				ds->EnableMacCheck = true;
+			}
+			else if (pol.DisableMacCheck)
+			{
+				ds->EnableMacCheck = false;
 			}
 
 			if (pol.EnforceWatermark)
@@ -3681,6 +3697,15 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 				{
 					UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), pol.WatermarkMessage);
 				}
+			}
+			else if (pol.DisableWatermark)
+			{
+				ds->ShowWatermark = false;
+			}
+
+			if (pol.DisableOtp)
+			{
+				ds->EnableOtp = false;
 			}
 		}
 		else

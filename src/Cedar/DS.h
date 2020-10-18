@@ -278,12 +278,23 @@ struct DS_POLICY_BODY
 {
 	char SrcUrl[MAX_PATH];
 	wchar_t ServerMessage[MAX_SIZE];
+
 	bool EnforceOtp;
+	bool DisableOtp;
+
 	bool DisableShare;
+
 	bool EnforceInspection;
+	bool DisableInspection;
+
 	bool EnforceMacCheck;
+	bool DisableMacCheck;
+
 	char EnforceOtpEndWith[64];
+
 	bool EnforceWatermark;
+	bool DisableWatermark;
+
 	wchar_t WatermarkMessage[MAX_SIZE];
 	char SyslogHostname[MAX_PATH];
 	UINT SyslogPort;
