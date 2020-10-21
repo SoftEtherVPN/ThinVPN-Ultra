@@ -146,6 +146,173 @@ static void Debug(char *fmt, ...)
 }
 #endif
 
+// ネットワーク種類検出を終了し、結果を取得する
+void DcFreeNwDetect(DC_NWDETECT* t, DC_NWDETECT_RESULT* result)
+{
+	Zero(result, sizeof(DC_NWDETECT_RESULT));
+
+	if (t == NULL || result == NULL)
+	{
+		return;
+	}
+
+	t->Halt = true;
+
+	WaitThread(t->Thread, INFINITE);
+
+	ReleaseThread(t->Thread);
+
+	result->IsDetectedByUrl = t->IsDetectedByUrl;
+	result->IsFinished = t->IsFinished;
+
+	Free(t);
+}
+
+// 1 つの URL を用いてネットワーク種類検出を試みる
+bool DcNwDetectProcessOneUrl(DC_NWDETECT* t, char* url, char* expect)
+{
+	bool ret = false;
+	URL_DATA url_data = CLEAN;
+	BUF* buf = CLEAN;
+	if (t == NULL || url == NULL || expect == NULL)
+	{
+		return false;
+	}
+
+	if (ParseUrl(&url_data, url, false, NULL) == false)
+	{
+		goto L_CLEAN;
+	}
+
+	buf = HttpRequestEx5(&url_data, NULL, t->Settings.TimeoutMsecs, t->Settings.TimeoutMsecs,
+		NULL, false, NULL, NULL, NULL, NULL, 0, (bool *)&t->Halt, 65536, NULL, NULL, NULL, false, false);
+
+	if (buf == NULL)
+	{
+		goto L_CLEAN;
+	}
+
+	SeekBufToEnd(buf);
+	WriteBufChar(buf, 0);
+
+	ret = InStrEx(buf->Buf, expect, false);
+
+L_CLEAN:
+	FreeBuf(buf);
+	return ret;
+}
+
+// ネットワーク種類検出スレッド
+void DcNwDetectThread(THREAD* thread, void* param)
+{
+	DC_NWDETECT* t = CLEAN;
+	UINT i, j;
+	if (thread == NULL || param == NULL)
+	{
+		return;
+	}
+
+	t = (DC_NWDETECT*)param;
+
+	// 複数回トライする
+	for (j = 0;j < MAX(t->Settings.NumTry, 1);j++)
+	{
+		// 各 URL に対してトライする
+		for (i = 0;i < MAX_NWDETECT_URLS;i++)
+		{
+			if (t->Halt)
+			{
+				goto L_CLEAN;
+			}
+
+			char* url = t->Settings.NwDetectUrls[i];
+			char* expect = t->Settings.NwDetectExpectStrs[i];
+
+			if (IsEmptyStr(url) == false)
+			{
+				// HTTP 取得試行
+				if (DcNwDetectProcessOneUrl(t, url, expect))
+				{
+					// 成功
+					t->IsDetectedByUrl = true;
+					t->IsFinished = true;
+					goto L_CLEAN;
+				}
+			}
+		}
+	}
+
+	t->IsFinished = true;
+
+L_CLEAN:
+	if (t->Settings.Callback != NULL)
+	{
+		t->Settings.Callback(t);
+	}
+}
+
+// ネットワーク種類検出 (パラメータはパッチから自動設定)
+DC_NWDETECT* DcNewNwDetectAuto(DC_NWDETECT_SETTINGS* settings)
+{
+	DC_NWDETECT_SETTINGS s2 = CLEAN;
+	if (settings == NULL)
+	{
+		return NULL;
+	}
+
+	Copy(&s2, settings, sizeof(DC_NWDETECT_SETTINGS));
+
+	StrCpy(s2.NwDetectUrls[0], sizeof(s2.NwDetectUrls[0]),
+		Vars_ActivePatch_GetStr("ThinTelework_Installer_DetectUrl0"));
+	StrCpy(s2.NwDetectExpectStrs[0], sizeof(s2.NwDetectExpectStrs[0]),
+		Vars_ActivePatch_GetStr("ThinTelework_Installer_DetectExpect0"));
+
+	StrCpy(s2.NwDetectUrls[1], sizeof(s2.NwDetectUrls[1]),
+		Vars_ActivePatch_GetStr("ThinTelework_Installer_DetectUrl1"));
+	StrCpy(s2.NwDetectExpectStrs[1], sizeof(s2.NwDetectExpectStrs[1]),
+		Vars_ActivePatch_GetStr("ThinTelework_Installer_DetectExpect1"));
+
+	StrCpy(s2.NwDetectUrls[2], sizeof(s2.NwDetectUrls[2]),
+		Vars_ActivePatch_GetStr("ThinTelework_Installer_DetectUrl2"));
+	StrCpy(s2.NwDetectExpectStrs[2], sizeof(s2.NwDetectExpectStrs[2]),
+		Vars_ActivePatch_GetStr("ThinTelework_Installer_DetectExpect2"));
+
+	StrCpy(s2.NwDetectUrls[3], sizeof(s2.NwDetectUrls[3]),
+		Vars_ActivePatch_GetStr("ThinTelework_Installer_DetectUrl3"));
+	StrCpy(s2.NwDetectExpectStrs[3], sizeof(s2.NwDetectExpectStrs[3]),
+		Vars_ActivePatch_GetStr("ThinTelework_Installer_DetectExpect3"));
+
+	return DcNewNwDetect(&s2);
+}
+
+// ネットワーク種類検出
+DC_NWDETECT* DcNewNwDetect(DC_NWDETECT_SETTINGS *settings)
+{
+	DC_NWDETECT* t = CLEAN;
+	if (settings == NULL)
+	{
+		return NULL;
+	}
+
+	t = ZeroMalloc(sizeof(DC_NWDETECT));
+
+	Copy(&t->Settings, settings, sizeof(DC_NWDETECT_SETTINGS));
+
+	if (t->Settings.TimeoutMsecs == 0)
+	{
+		t->Settings.TimeoutMsecs = NWDETECT_TIMEOUT;
+	}
+
+	if (t->Settings.NumTry == 0)
+	{
+		t->Settings.NumTry = NWDETECT_DEFAULT_NUMTRY;
+	}
+
+	t->Thread = NewThread(DcNwDetectThread, t);
+
+	return t;
+}
+
 // mstsc の引数が .rdp ファイルを含んでいるかどうかチェックする
 bool DcIsMstscParamsContainsRdpFile(char *cmdline)
 {

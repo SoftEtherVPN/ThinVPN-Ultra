@@ -129,7 +129,7 @@ static SW_OLD_MSI old_msi_vpnbridge[] =
 };
 
 // List of file names needed to SFX
-static char *sfx_vpn_server_bridge_files[] =
+static char* sfx_vpn_server_bridge_files[] =
 {
 	"vpnsetup.exe",
 	"vpnsetup_x64.exe",
@@ -143,7 +143,7 @@ static char *sfx_vpn_server_bridge_files[] =
 	"vpncmd_x64.exe",
 	"hamcore.se2",
 };
-static char *sfx_vpn_client_files[] =
+static char* sfx_vpn_client_files[] =
 {
 	"vpnsetup.exe",
 	"vpnsetup_x64.exe",
@@ -158,7 +158,7 @@ static char *sfx_vpn_client_files[] =
 	"hamcore.se2",
 };
 
-static char *sfx_ntt_files[] =
+static char* sfx_ntt_files[] =
 {
 	DI_FILENAME_DESKSETUP_ANSI, // thinsetup.exe
 	DI_FILENAME_DESKSERVER_ANSI, // thinsvr.exe
@@ -172,7 +172,7 @@ static char *sfx_ntt_files[] =
 #endif // VARS_ENABLE_LIMITED_MODE
 };
 
-static char *sfx_ntt_files_share_disabled[] =
+static char* sfx_ntt_files_share_disabled[] =
 {
 	DI_FILENAME_DESKSETUP_ANSI, // thinsetup.exe
 	DI_FILENAME_DESKSERVER_NOSHARE_SRC_ANSI, // thinsvrns.exe
@@ -190,10 +190,88 @@ static bool g_stop_flag = false;
 static HANDLE g_wait_process_handle = NULL;
 
 
-// SFX generation main
-bool SwGenSfxModeMain(char *mode, wchar_t *dst)
+// NW detection dialog
+void SwNwDetectDlg(HWND hWnd, DC_NWDETECT_RESULT* result)
 {
-	LIST *o;
+	SW_NW_DETECT_DLG_PARAM t = CLEAN;
+
+	t.hWndParent = hWnd;
+
+	DialogEx2(hWnd, D_SW_NWDETECT, SwNwDetectDlgProc, &t, true, true);
+
+	Copy(result, &t.Result, sizeof(DC_NWDETECT_RESULT));
+}
+
+void SwNwDetectDlgAsynCallbackProc(DC_NWDETECT* d)
+{
+	SW_NW_DETECT_DLG_PARAM* t = (SW_NW_DETECT_DLG_PARAM*)d->Settings.Param;
+
+	PostMessage(t->hWnd, WM_APP + 123, 0, 0);
+}
+
+// NW detection dialog proc
+UINT SwNwDetectDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void* param)
+{
+	SW_NW_DETECT_DLG_PARAM* t = (SW_NW_DETECT_DLG_PARAM*)param;
+	DC_NWDETECT_SETTINGS settings = CLEAN;
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		SetIcon(hWnd, 0, ICO_FARM);
+		DlgFont(hWnd, S_BOLD, 12, true);
+		DlgFont(hWnd, IDCANCEL, 10, true);
+		t->hWnd = hWnd;
+
+		//if (MsIsWinXPOrWinVista())
+		//{
+		//	// Show a progress bar for Windows XP or later
+		//	SendMsg(hWnd, S_PROG, PBM_SETMARQUEE, TRUE, 50);
+		//	SetStyle(hWnd, S_PROG, PBS_MARQUEE);
+		//}
+
+		OpenAvi(hWnd, A_PROGRESS, AVI_PROGRESS);
+		PlayAvi(hWnd, A_PROGRESS, true);
+
+		settings.Callback = SwNwDetectDlgAsynCallbackProc;
+		settings.Param = t;
+		t->Detect = DcNewNwDetectAuto(&settings);
+
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case IDOK:
+		case IDCANCEL:
+			Close(hWnd);
+			break;
+		}
+		break;
+
+	case WM_APP + 123:
+	case WM_CLOSE:
+		if (t->IsClosing == false)
+		{
+			t->IsClosing = true;
+
+			DoEvents(hWnd);
+
+			DcFreeNwDetect(t->Detect, &t->Result);
+			t->Detect = NULL;
+
+			EndDialog(hWnd, 0);
+		}
+		break;
+	}
+
+	return 0;
+}
+
+// SFX generation main
+bool SwGenSfxModeMain(char* mode, wchar_t* dst)
+{
+	LIST* o;
 	bool ret = false;
 	// Validate arguments
 	if (mode == NULL || dst == NULL)
@@ -217,24 +295,24 @@ bool SwGenSfxModeMain(char *mode, wchar_t *dst)
 }
 
 // Compile the SFX files
-bool SwCompileSfx(LIST *o, wchar_t *dst_filename)
+bool SwCompileSfx(LIST* o, wchar_t* dst_filename)
 {
 	bool ret = false;
 	wchar_t exe_filename[MAX_PATH];
 	HINSTANCE hKernel32 = LoadLibraryA("kernel32.dll");
-	HANDLE (WINAPI *_BeginUpdateResourceW)(LPCWSTR, BOOL) = NULL;
-	BOOL (WINAPI *_UpdateResourceA)(HANDLE, LPCSTR, LPCSTR, WORD, LPVOID, DWORD) = NULL;
-	BOOL (WINAPI *_EndUpdateResourceW)(HANDLE, BOOL) = NULL;
+	HANDLE(WINAPI * _BeginUpdateResourceW)(LPCWSTR, BOOL) = NULL;
+	BOOL(WINAPI * _UpdateResourceA)(HANDLE, LPCSTR, LPCSTR, WORD, LPVOID, DWORD) = NULL;
+	BOOL(WINAPI * _EndUpdateResourceW)(HANDLE, BOOL) = NULL;
 	// Validate arguments
 	if (o == NULL || dst_filename == NULL || hKernel32 == NULL)
 	{
 		return false;
 	}
-	
+
 	// Get the API related to the resource editing 
-	_BeginUpdateResourceW = (HANDLE (__stdcall *)(LPCWSTR,UINT))GetProcAddress(hKernel32, "BeginUpdateResourceW");
-	_UpdateResourceA = (UINT (__stdcall *)(HANDLE,LPCSTR,LPCSTR,WORD,LPVOID,DWORD))GetProcAddress(hKernel32, "UpdateResourceA");
-	_EndUpdateResourceW = (UINT (__stdcall *)(HANDLE,UINT))GetProcAddress(hKernel32, "EndUpdateResourceW");
+	_BeginUpdateResourceW = (HANDLE(__stdcall*)(LPCWSTR, UINT))GetProcAddress(hKernel32, "BeginUpdateResourceW");
+	_UpdateResourceA = (UINT(__stdcall*)(HANDLE, LPCSTR, LPCSTR, WORD, LPVOID, DWORD))GetProcAddress(hKernel32, "UpdateResourceA");
+	_EndUpdateResourceW = (UINT(__stdcall*)(HANDLE, UINT))GetProcAddress(hKernel32, "EndUpdateResourceW");
 
 	if (_BeginUpdateResourceW != NULL && _UpdateResourceA != NULL && _EndUpdateResourceW != NULL)
 	{
@@ -252,8 +330,8 @@ bool SwCompileSfx(LIST *o, wchar_t *dst_filename)
 
 				for (i = 0;i < LIST_NUM(o);i++)
 				{
-					SW_SFX_FILE *f = LIST_DATA(o, i);
-					BUF *b;
+					SW_SFX_FILE* f = LIST_DATA(o, i);
+					BUF* b;
 
 					// Read the original file
 					b = ReadDumpW(f->DiskFileName);
@@ -261,7 +339,7 @@ bool SwCompileSfx(LIST *o, wchar_t *dst_filename)
 					{
 						// Add resources
 						char inner_name[MAX_PATH];
-						BUF *b2;
+						BUF* b2;
 						StrCpy(inner_name, sizeof(inner_name), f->InnerFileName);
 						StrUpper(inner_name);
 
@@ -333,9 +411,9 @@ bool SwCompileSfx(LIST *o, wchar_t *dst_filename)
 }
 
 // Create new item in the SFX compression list
-SW_SFX_FILE *SwNewSfxFile(char *inner_file_name, wchar_t *disk_file_name)
+SW_SFX_FILE* SwNewSfxFile(char* inner_file_name, wchar_t* disk_file_name)
 {
-	SW_SFX_FILE *f = ZeroMalloc(sizeof(SW_SFX_FILE));
+	SW_SFX_FILE* f = ZeroMalloc(sizeof(SW_SFX_FILE));
 
 	StrCpy(f->InnerFileName, sizeof(f->InnerFileName), inner_file_name);
 	UniStrCpy(f->DiskFileName, sizeof(f->DiskFileName), disk_file_name);
@@ -344,7 +422,7 @@ SW_SFX_FILE *SwNewSfxFile(char *inner_file_name, wchar_t *disk_file_name)
 }
 
 // Add the basically required files for the components to SFX compressed files list
-bool SwAddBasicFilesToList(LIST *o, char *component_name)
+bool SwAddBasicFilesToList(LIST* o, char* component_name)
 {
 	UINT i;
 	// Validate arguments
@@ -356,9 +434,9 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 	if (EndWith(component_name, "Server_and_Client_Full"))
 	{
 		// 共有機能有効版
-		for (i = 0; i < (sizeof(sfx_ntt_files) / sizeof(char *)); i++)
+		for (i = 0; i < (sizeof(sfx_ntt_files) / sizeof(char*)); i++)
 		{
-			char *name = sfx_ntt_files[i];
+			char* name = sfx_ntt_files[i];
 			wchar_t name_w[MAX_PATH];
 			wchar_t src_file_name[MAX_PATH];
 
@@ -371,9 +449,9 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 	else if (EndWith(component_name, "Server_and_Client_ShareDisabled") || EndWith(component_name, "Server_and_Client"))
 	{
 		// 共有機能無効版
-		for (i = 0; i < (sizeof(sfx_ntt_files_share_disabled) / sizeof(char *)); i++)
+		for (i = 0; i < (sizeof(sfx_ntt_files_share_disabled) / sizeof(char*)); i++)
 		{
-			char *name = sfx_ntt_files_share_disabled[i];
+			char* name = sfx_ntt_files_share_disabled[i];
 			wchar_t name_w[MAX_PATH];
 			wchar_t src_file_name[MAX_PATH];
 
@@ -398,7 +476,7 @@ bool SwAddBasicFilesToList(LIST *o, char *component_name)
 }
 
 // Release the SFX file list
-void SwFreeSfxFileList(LIST *o)
+void SwFreeSfxFileList(LIST* o)
 {
 	UINT i;
 	// Validate arguments
@@ -409,7 +487,7 @@ void SwFreeSfxFileList(LIST *o)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		SW_SFX_FILE *f = LIST_DATA(o, i);
+		SW_SFX_FILE* f = LIST_DATA(o, i);
 
 		Free(f);
 	}
@@ -418,17 +496,17 @@ void SwFreeSfxFileList(LIST *o)
 }
 
 // Generate the SFX file list
-LIST *SwNewSfxFileList()
+LIST* SwNewSfxFileList()
 {
-	LIST *o = NewListFast(NULL);
+	LIST* o = NewListFast(NULL);
 
 	return o;
 }
 
 // Extract from the SFX files
-bool SwSfxExtractFile(HWND hWnd, void *data, UINT size, wchar_t *dst, bool compressed)
+bool SwSfxExtractFile(HWND hWnd, void* data, UINT size, wchar_t* dst, bool compressed)
 {
-	IO *io;
+	IO* io;
 	bool ret = false;
 	// Validate arguments
 	if (data == NULL || size == 0 || dst == NULL)
@@ -446,8 +524,8 @@ bool SwSfxExtractFile(HWND hWnd, void *data, UINT size, wchar_t *dst, bool compr
 	else
 	{
 		// Unzip when the files are compressed
-		BUF *src = NewBuf();
-		BUF *dst;
+		BUF* src = NewBuf();
+		BUF* dst;
 
 		WriteBuf(src, data, size);
 
@@ -471,9 +549,9 @@ bool SwSfxExtractFile(HWND hWnd, void *data, UINT size, wchar_t *dst, bool compr
 }
 
 // SFX extraction process
-bool SwSfxExtractProcess(HWND hWnd, bool *hide_error_msg)
+bool SwSfxExtractProcess(HWND hWnd, bool* hide_error_msg)
 {
-	TOKEN_LIST *t;
+	TOKEN_LIST* t;
 	UINT i;
 	bool ret = true;
 	wchar_t exec_filename[MAX_SIZE];
@@ -494,7 +572,7 @@ bool SwSfxExtractProcess(HWND hWnd, bool *hide_error_msg)
 
 	for (i = 0;i < t->NumTokens;i++)
 	{
-		char *resource_name = t->Token[i];
+		char* resource_name = t->Token[i];
 		char filename[MAX_PATH];
 		wchar_t filename_w[MAX_PATH];
 		wchar_t tmp_filename[MAX_PATH];
@@ -546,7 +624,7 @@ bool SwSfxExtractProcess(HWND hWnd, bool *hide_error_msg)
 			if (hg != NULL)
 			{
 				UINT size = SizeofResource(MsGetCurrentModuleHandle(), hr);
-				void *ptr = LockResource(hg);
+				void* ptr = LockResource(hg);
 
 				if (size != 0 && ptr != NULL)
 				{
@@ -573,7 +651,7 @@ bool SwSfxExtractProcess(HWND hWnd, bool *hide_error_msg)
 	if (ret)
 	{
 		wchar_t exe_name[MAX_PATH];
-		wchar_t *exe_dir = MsGetExeFileDirW();
+		wchar_t* exe_dir = MsGetExeFileDirW();
 
 		GetFileNameFromFilePathW(exe_name, sizeof(exe_name), MsGetExeFileNameW());
 
@@ -588,11 +666,11 @@ bool SwSfxExtractProcess(HWND hWnd, bool *hide_error_msg)
 		}
 		else
 		{
-			void *handle = NULL;
+			void* handle = NULL;
 			wchar_t params[MAX_SIZE];
-			wchar_t *current_params = GetCommandLineUniStr();
+			wchar_t* current_params = GetCommandLineUniStr();
 			wchar_t tmp[MAX_SIZE];
-			char *last_lang;
+			char* last_lang;
 			wchar_t copy_of_me[MAX_PATH];
 
 			UniStrCpy(params, sizeof(params), current_params);
@@ -619,7 +697,7 @@ bool SwSfxExtractProcess(HWND hWnd, bool *hide_error_msg)
 			if (IsEmptyStr(last_lang) == false)
 			{
 				wchar_t lang_filename[MAX_PATH];
-				BUF *buf;
+				BUF* buf;
 
 				CombinePathW(lang_filename, sizeof(lang_filename), MsGetMyTempDirW(), L"lang.config");
 
@@ -647,9 +725,9 @@ bool SwSfxExtractProcess(HWND hWnd, bool *hide_error_msg)
 }
 
 // Copy the files of VPN Gate
-bool SwSfxCopyVgFiles(HWND hWnd, wchar_t *src, wchar_t *dst)
+bool SwSfxCopyVgFiles(HWND hWnd, wchar_t* src, wchar_t* dst)
 {
-	wchar_t *msg;
+	wchar_t* msg;
 	wchar_t srcfilename[MAX_PATH];
 	wchar_t exefilename[MAX_PATH];
 
@@ -751,9 +829,9 @@ UINT SwSfxModeMain()
 }
 
 // Resource name enumeration procedure
-bool CALLBACK SwEnumResourceNamesProc(HMODULE hModule, const char *type, char *name, LONG_PTR lParam)
+bool CALLBACK SwEnumResourceNamesProc(HMODULE hModule, const char* type, char* name, LONG_PTR lParam)
 {
-	bool *b = (bool *)lParam;
+	bool* b = (bool*)lParam;
 	// Validate arguments
 	if (type == NULL || name == NULL || lParam == 0)
 	{
@@ -801,9 +879,9 @@ UINT SWExec()
 }
 
 // Dialog procedure (for copy and paste)
-UINT SwDefaultDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwDefaultDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -842,7 +920,7 @@ UINT SwDefaultDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wiz
 }
 
 // Update the file specification dialog
-void SwWeb2Update(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
+void SwWeb2Update(HWND hWnd, SW* sw, WIZARD* wizard, WIZARD_PAGE* wizard_page)
 {
 	bool ok = true;
 	// Validate arguments
@@ -863,7 +941,7 @@ void SwWeb2Update(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
 }
 
 // Update the file specification dialog
-void SwEasy2Update(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
+void SwEasy2Update(HWND hWnd, SW* sw, WIZARD* wizard, WIZARD_PAGE* wizard_page)
 {
 	bool ok = true;
 	// Validate arguments
@@ -884,7 +962,7 @@ void SwEasy2Update(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
 }
 
 // Generate a SFX file name of the default
-void SwGenerateDefaultSfxFileName(wchar_t *name, UINT size)
+void SwGenerateDefaultSfxFileName(wchar_t* name, UINT size)
 {
 	// Validate arguments
 	if (name == NULL)
@@ -900,7 +978,7 @@ void SwGenerateDefaultSfxFileName(wchar_t *name, UINT size)
 }
 
 // Generate a ZIP file name of the default
-void SwGenerateDefaultZipFileName(wchar_t *name, UINT size)
+void SwGenerateDefaultZipFileName(wchar_t* name, UINT size)
 {
 	// Validate arguments
 	if (name == NULL)
@@ -916,10 +994,10 @@ void SwGenerateDefaultZipFileName(wchar_t *name, UINT size)
 }
 
 // Specify a file
-UINT SwEasy2(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwEasy2(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
-	wchar_t *fn;
+	SW* sw = (SW*)param;
+	wchar_t* fn;
 	wchar_t tmp[MAX_SIZE];
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
@@ -1014,10 +1092,10 @@ UINT SwEasy2(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, 
 }
 
 // Specify a file
-UINT SwWeb2(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwWeb2(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
-	wchar_t *fn;
+	SW* sw = (SW*)param;
+	wchar_t* fn;
 	wchar_t tmp[MAX_SIZE];
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
@@ -1112,9 +1190,9 @@ UINT SwWeb2(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, W
 }
 
 // Start screen of the Web Installer Creation Wizard
-UINT SwWeb1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwWeb1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -1155,9 +1233,9 @@ UINT SwWeb1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, W
 }
 
 // Start screen of the Simple installer creation wizard
-UINT SwEasy1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwEasy1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -1198,7 +1276,7 @@ UINT SwEasy1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, 
 }
 
 // Get the icon for the language
-UINT SwGetLangIcon(char *name)
+UINT SwGetLangIcon(char* name)
 {
 	UINT ret = ICO_NULL;
 	// Validate arguments
@@ -1224,12 +1302,12 @@ UINT SwGetLangIcon(char *name)
 }
 
 // Initialize the language list
-void SwLang1Init(HWND hWnd, SW *sw)
+void SwLang1Init(HWND hWnd, SW* sw)
 {
-	LVB *b;
+	LVB* b;
 	UINT i;
-	SW_COMPONENT *default_select = NULL;
-	LIST *o;
+	SW_COMPONENT* default_select = NULL;
+	LIST* o;
 	UINT current_lang = GetCurrentLangId();
 	UINT select_index = INFINITE;
 	// Validate arguments
@@ -1246,14 +1324,14 @@ void SwLang1Init(HWND hWnd, SW *sw)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		LANGLIST *t = LIST_DATA(o, i);
+		LANGLIST* t = LIST_DATA(o, i);
 		wchar_t tmp[MAX_SIZE];
 		wchar_t tmp2[MAX_SIZE];
 
 		UniFormat(tmp, sizeof(tmp), L"(%s)", t->TitleLocal);
 		UniFormat(tmp2, sizeof(tmp2), L" %s", t->TitleEnglish);
 
-		LvInsertAdd(b, SwGetLangIcon(t->Name), (void *)UINT32_TO_POINTER(t->Id + 1), 2, tmp2, tmp);
+		LvInsertAdd(b, SwGetLangIcon(t->Name), (void*)UINT32_TO_POINTER(t->Id + 1), 2, tmp2, tmp);
 
 		if (t->Id == current_lang)
 		{
@@ -1310,7 +1388,7 @@ void SwLang1Init(HWND hWnd, SW *sw)
 }
 
 // Update of control
-void SwLang1Update(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
+void SwLang1Update(HWND hWnd, SW* sw, WIZARD* wizard, WIZARD_PAGE* wizard_page)
 {
 	UINT id;
 	// Validate arguments
@@ -1332,10 +1410,10 @@ void SwLang1Update(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
 }
 
 // Language setting screen
-UINT SwLang1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwLang1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
-	NMHDR *n;
+	SW* sw = (SW*)param;
+	NMHDR* n;
 	UINT id;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
@@ -1411,8 +1489,8 @@ UINT SwLang1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, 
 			else
 			{
 				wchar_t add_param[MAX_SIZE];
-				LIST *o;
-				LANGLIST *new_lang;
+				LIST* o;
+				LANGLIST* new_lang;
 				LANGLIST old_lang;
 				char new_lang_name[MAX_SIZE];
 				char old_lang_name[MAX_SIZE];
@@ -1454,7 +1532,7 @@ UINT SwLang1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, 
 
 				if (sw->IsSystemMode == false)
 				{
-LABEL_RUN_CHILD_PROCESS:
+				LABEL_RUN_CHILD_PROCESS:
 					// Start the process immediately in the case of user mode
 					if (SaveLangConfigCurrentDir(new_lang_name) == false)
 					{
@@ -1535,7 +1613,7 @@ LABEL_RUN_CHILD_PROCESS:
 		break;
 
 	case WM_NOTIFY:
-		n = (NMHDR *)lParam;
+		n = (NMHDR*)lParam;
 
 		switch (n->idFrom)
 		{
@@ -1556,9 +1634,9 @@ LABEL_RUN_CHILD_PROCESS:
 }
 
 // Start the uninstallation
-UINT SwUninst1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwUninst1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -1666,9 +1744,9 @@ UINT SwUninst1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 }
 
 // Completion screen
-UINT SwFinish(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwFinish(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	char tmp[MAX_SIZE];
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
@@ -1755,9 +1833,9 @@ UINT SwFinish(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard,
 }
 
 // Error occuring screen
-UINT SwError(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwError(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -1835,11 +1913,11 @@ UINT SwError(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, 
 }
 
 // Execution thread of the setup process
-void SwPerformThread(THREAD *thread, void *param)
+void SwPerformThread(THREAD* thread, void* param)
 {
-	WIZARD_PAGE *wp = (WIZARD_PAGE *)param;
-	SW *sw;
-	SW_COMPONENT *c;
+	WIZARD_PAGE* wp = (WIZARD_PAGE*)param;
+	SW* sw;
+	SW_COMPONENT* c;
 	bool ret;
 	SW_UI ui;
 	// Validate arguments
@@ -1848,7 +1926,7 @@ void SwPerformThread(THREAD *thread, void *param)
 		return;
 	}
 
-	sw = (SW *)wp->Wizard->Param;
+	sw = (SW*)wp->Wizard->Param;
 
 	sw->ExitCode = SW_EXIT_CODE_INTERNAL_ERROR;
 
@@ -1883,9 +1961,9 @@ void SwPerformThread(THREAD *thread, void *param)
 }
 
 // Create a file copy task
-SW_TASK_COPY *SwNewCopyTask(wchar_t *srcfilename, wchar_t *dstfilename, wchar_t *srcdir, wchar_t *dstdir, bool overwrite, bool setup_file)
+SW_TASK_COPY* SwNewCopyTask(wchar_t* srcfilename, wchar_t* dstfilename, wchar_t* srcdir, wchar_t* dstdir, bool overwrite, bool setup_file)
 {
-	SW_TASK_COPY *ct;
+	SW_TASK_COPY* ct;
 	// Validate arguments
 	if (srcfilename == NULL || srcdir == NULL || dstdir == NULL)
 	{
@@ -1915,7 +1993,7 @@ SW_TASK_COPY *SwNewCopyTask(wchar_t *srcfilename, wchar_t *dstfilename, wchar_t 
 }
 
 // Release the file copy task
-void SwFreeCopyTask(SW_TASK_COPY *ct)
+void SwFreeCopyTask(SW_TASK_COPY* ct)
 {
 	// Validate arguments
 	if (ct == NULL)
@@ -1927,12 +2005,12 @@ void SwFreeCopyTask(SW_TASK_COPY *ct)
 }
 
 // Create a link creation task
-SW_TASK_LINK *SwNewLinkTask(wchar_t *target_dir, wchar_t *target_exe, wchar_t *target_arg,
-							wchar_t *icon_exe, UINT icon_index,
-							wchar_t *dest_dir, wchar_t *dest_name, wchar_t *dest_desc,
-							bool no_delete_dir)
+SW_TASK_LINK* SwNewLinkTask(wchar_t* target_dir, wchar_t* target_exe, wchar_t* target_arg,
+	wchar_t* icon_exe, UINT icon_index,
+	wchar_t* dest_dir, wchar_t* dest_name, wchar_t* dest_desc,
+	bool no_delete_dir)
 {
-	SW_TASK_LINK *lt;
+	SW_TASK_LINK* lt;
 	// Validate arguments
 	if (target_dir == NULL || target_exe == NULL || dest_dir == NULL || dest_name == NULL)
 	{
@@ -1966,7 +2044,7 @@ SW_TASK_LINK *SwNewLinkTask(wchar_t *target_dir, wchar_t *target_exe, wchar_t *t
 }
 
 // Release the link creation task
-void SwFreeLinkTask(SW_TASK_LINK *lt)
+void SwFreeLinkTask(SW_TASK_LINK* lt)
 {
 	// Validate arguments
 	if (lt == NULL)
@@ -1978,9 +2056,9 @@ void SwFreeLinkTask(SW_TASK_LINK *lt)
 }
 
 // Create a Setup task
-SW_TASK *SwNewTask()
+SW_TASK* SwNewTask()
 {
-	SW_TASK *t = ZeroMalloc(sizeof(SW_TASK));
+	SW_TASK* t = ZeroMalloc(sizeof(SW_TASK));
 
 	t->CopyTasks = NewListFast(NULL);
 
@@ -1994,7 +2072,7 @@ SW_TASK *SwNewTask()
 }
 
 // Release the Setup Tasks
-void SwFreeTask(SW_TASK *t)
+void SwFreeTask(SW_TASK* t)
 {
 	UINT i;
 	// Validate arguments
@@ -2005,7 +2083,7 @@ void SwFreeTask(SW_TASK *t)
 
 	for (i = 0;i < LIST_NUM(t->CopyTasks);i++)
 	{
-		SW_TASK_COPY *ct = LIST_DATA(t->CopyTasks, i);
+		SW_TASK_COPY* ct = LIST_DATA(t->CopyTasks, i);
 
 		SwFreeCopyTask(ct);
 	}
@@ -2018,7 +2096,7 @@ void SwFreeTask(SW_TASK *t)
 
 	for (i = 0;i < LIST_NUM(t->LinkTasks);i++)
 	{
-		SW_TASK_LINK *lt = LIST_DATA(t->LinkTasks, i);
+		SW_TASK_LINK* lt = LIST_DATA(t->LinkTasks, i);
 
 		SwFreeLinkTask(lt);
 	}
@@ -2029,10 +2107,10 @@ void SwFreeTask(SW_TASK *t)
 }
 
 // Delete the shortcut file
-void SwDeleteShortcuts(SW_LOGFILE *logfile)
+void SwDeleteShortcuts(SW_LOGFILE* logfile)
 {
 	UINT i;
-	LIST *o;
+	LIST* o;
 	// Validate arguments
 	if (logfile == NULL)
 	{
@@ -2043,7 +2121,7 @@ void SwDeleteShortcuts(SW_LOGFILE *logfile)
 
 	for (i = 0;i < LIST_NUM(logfile->LogList);i++)
 	{
-		SW_LOG *g = LIST_DATA(logfile->LogList, LIST_NUM(logfile->LogList) - i - 1);
+		SW_LOG* g = LIST_DATA(logfile->LogList, LIST_NUM(logfile->LogList) - i - 1);
 
 		switch (g->Type)
 		{
@@ -2062,7 +2140,7 @@ void SwDeleteShortcuts(SW_LOGFILE *logfile)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		SW_LOG *g = LIST_DATA(o, i);
+		SW_LOG* g = LIST_DATA(o, i);
 
 		Delete(logfile->LogList, g);
 
@@ -2073,7 +2151,7 @@ void SwDeleteShortcuts(SW_LOGFILE *logfile)
 }
 
 // Uninstall main
-bool SwUninstallMain(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c)
+bool SwUninstallMain(SW* sw, WIZARD_PAGE* wp, SW_COMPONENT* c)
 {
 	bool x64 = MsIs64BitWindows();
 	bool ok;
@@ -2093,7 +2171,7 @@ bool SwUninstallMain(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c)
 	if (c->InstallService)
 	{
 		char svc_title_name[MAX_SIZE];
-		wchar_t *svc_title;
+		wchar_t* svc_title;
 
 		Format(svc_title_name, sizeof(svc_title_name), "SVC_%s_TITLE", c->SvcName);
 
@@ -2111,7 +2189,7 @@ bool SwUninstallMain(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c)
 					UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_STOP_SVC"), svc_title);
 					SwPerformPrint(wp, tmp);
 
-LABEL_RETRY_3:
+				LABEL_RETRY_3:
 					if (MsStopService(c->SvcName) == false)
 					{
 						UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_STOP_SVC_ERROR"), svc_title, c->SvcName);
@@ -2192,16 +2270,16 @@ LABEL_RETRY_3:
 
 	for (i = 0;i < LIST_NUM(sw->LogFile->LogList);i++)
 	{
-		SW_LOG *g = LIST_DATA(sw->LogFile->LogList, i);
+		SW_LOG* g = LIST_DATA(sw->LogFile->LogList, i);
 
 		if (g->Type == SW_LOG_TYPE_FILE)
 		{
 			wchar_t fullpath[MAX_SIZE];
-			IO *io;
+			IO* io;
 			bool write_ok;
 			bool new_file;
 
-LABEL_RETRY_1:
+		LABEL_RETRY_1:
 			write_ok = new_file = false;
 
 			UniStrCpy(fullpath, sizeof(fullpath), g->Path);
@@ -2262,7 +2340,7 @@ LABEL_RETRY_1:
 	{
 		char svc_title_name[MAX_SIZE];
 		char svc_description_name[MAX_SIZE];
-		wchar_t *svc_title;
+		wchar_t* svc_title;
 
 		Format(svc_title_name, sizeof(svc_title_name), "SVC_%s_TITLE", c->SvcName);
 		Format(svc_description_name, sizeof(svc_description_name), "SVC_%s_DESCRIPT", c->SvcName);
@@ -2287,7 +2365,7 @@ LABEL_RETRY_1:
 				UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_UNINSTALL_SVC"), svc_title);
 				SwPerformPrint(wp, tmp);
 
-LABEL_RETRY_4:
+			LABEL_RETRY_4:
 
 				if (MsIsServiceInstalled(c->SvcName))
 				{
@@ -2325,7 +2403,7 @@ LABEL_RETRY_4:
 	// Delete the registry, files, and directories
 	for (i = 0;i < LIST_NUM(sw->LogFile->LogList);i++)
 	{
-		SW_LOG *g = LIST_DATA(sw->LogFile->LogList, LIST_NUM(sw->LogFile->LogList) - i - 1);
+		SW_LOG* g = LIST_DATA(sw->LogFile->LogList, LIST_NUM(sw->LogFile->LogList) - i - 1);
 		char tmpa[MAX_SIZE];
 
 		UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_DELETE"), g->Path);
@@ -2401,7 +2479,7 @@ LABEL_RETRY_4:
 			if (!(MsIs64BitWindows() && Is32()))
 			{
 				UINT i;
-				TOKEN_LIST *t;
+				TOKEN_LIST* t;
 
 				SwPerformPrint(wp, _UU("SW_PERFORM_MSG_DELETE_NIC"));
 
@@ -2415,7 +2493,7 @@ LABEL_RETRY_4:
 						{
 							for (i = 0;i < t->NumTokens;i++)
 							{
-								char *name = t->Token[i];
+								char* name = t->Token[i];
 
 								MsUninstallVLan(name);
 							}
@@ -2448,7 +2526,7 @@ LABEL_CLEANUP:
 }
 
 // Create a Task List
-void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
+void SwDefineTasks(SW* sw, SW_TASK* t, SW_COMPONENT* c)
 {
 	wchar_t tmp[MAX_SIZE];
 	bool x64 = MsIs64BitWindows();
@@ -2464,7 +2542,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	wchar_t dir_config_language[MAX_PATH];
 	wchar_t dir_startup[MAX_PATH];
 	wchar_t tmp1[MAX_SIZE], tmp2[MAX_SIZE];
-	SW_TASK_COPY *setup_exe;
+	SW_TASK_COPY* setup_exe;
 	//SW_TASK_COPY *setup_exe_x64;
 	// Validate arguments
 	if (sw == NULL || t == NULL || c == NULL)
@@ -2512,8 +2590,8 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	if (c->Id == SW_CMP_VPN_SERVER)
 	{
 		// VPN Server
-		SW_TASK_COPY *ct;
-		SW_TASK_COPY *vpnserver, *vpncmd, *vpnsmgr;
+		SW_TASK_COPY* ct;
+		SW_TASK_COPY* vpnserver, * vpncmd, * vpnsmgr;
 
 		CombinePathW(tmp, sizeof(tmp), sw->InstallDir, L"backup.vpn_server.config");
 		Add(t->SetSecurityPaths, CopyUniStr(tmp));
@@ -2592,8 +2670,8 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	else if (c->Id == SW_CMP_VPN_BRIDGE)
 	{
 		// VPN Bridge
-		SW_TASK_COPY *ct;
-		SW_TASK_COPY *vpnbridge, *vpncmd, *vpnsmgr;
+		SW_TASK_COPY* ct;
+		SW_TASK_COPY* vpnbridge, * vpncmd, * vpnsmgr;
 
 		CombinePathW(tmp, sizeof(tmp), sw->InstallDir, L"backup.vpn_bridge.config");
 		Add(t->SetSecurityPaths, CopyUniStr(tmp));
@@ -2672,13 +2750,13 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	else if (c->Id == SW_CMP_VPN_CLIENT)
 	{
 		// VPN Client
-		SW_TASK_COPY *ct;
-		SW_TASK_COPY *vpnclient, *vpncmd, *vpncmgr;
-		SW_TASK_COPY *vpnclient_gomi, *vpncmd_gomi, *vpncmgr_gomi;
-		SW_TASK_COPY *sfx_cache = NULL;
-		SW_TASK_COPY *vpnweb;
-		SW_TASK_COPY *vpninstall;
-		wchar_t *src_config_filename;
+		SW_TASK_COPY* ct;
+		SW_TASK_COPY* vpnclient, * vpncmd, * vpncmgr;
+		SW_TASK_COPY* vpnclient_gomi, * vpncmd_gomi, * vpncmgr_gomi;
+		SW_TASK_COPY* sfx_cache = NULL;
+		SW_TASK_COPY* vpnweb;
+		SW_TASK_COPY* vpninstall;
+		wchar_t* src_config_filename;
 
 		CombinePathW(tmp, sizeof(tmp), sw->InstallDir, L"backup.vpn_client.config");
 		Add(t->SetSecurityPaths, CopyUniStr(tmp));
@@ -2813,7 +2891,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	else if (c->Id == SW_CMP_VPN_SMGR)
 	{
 		// VPN Server Manager (Tools Only)
-		SW_TASK_COPY *vpncmd, *vpnsmgr;
+		SW_TASK_COPY* vpncmd, * vpnsmgr;
 
 		if (x64 == false)
 		{
@@ -2849,7 +2927,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	else if (c->Id == SW_CMP_VPN_CMGR)
 	{
 		// VPN Client Manager (Tools Only)
-		SW_TASK_COPY *vpncmd, *vpncmgr;
+		SW_TASK_COPY* vpncmd, * vpncmgr;
 
 		if (x64 == false)
 		{
@@ -2885,8 +2963,8 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	else if (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS)
 	{
 		// シン・テレワーク サーバー
-		SW_TASK_COPY *ct;
-		SW_TASK_COPY *thinsvr, *thinconfig;
+		SW_TASK_COPY* ct;
+		SW_TASK_COPY* thinsvr, * thinconfig;
 
 		thinsvr = SwNewCopyTask((c->Id == SW_CMP_THIN_SERVER ? DI_FILENAME_DESKSERVER : DI_FILENAME_DESKSERVER_NOSHARE_SRC),
 			DI_FILENAME_DESKSERVER,
@@ -2926,7 +3004,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 	else if (c->Id == SW_CMP_THIN_CLIENT)
 	{
 		// シン・テレワーク クライアント
-		SW_TASK_COPY *thinclient;
+		SW_TASK_COPY* thinclient;
 
 		thinclient = SwNewCopyTask(DI_FILENAME_DESKCLIENT, NULL, sw->InstallSrc, sw->InstallDir, true, false);
 
@@ -2967,7 +3045,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 
 	// EntryPoint.dat
 	{
-		SW_TASK_COPY *et = NULL;
+		SW_TASK_COPY* et = NULL;
 		wchar_t tmp[MAX_PATH];
 
 #ifndef VARS_ENABLE_LIMITED_MODE
@@ -2996,7 +3074,7 @@ void SwDefineTasks(SW *sw, SW_TASK *t, SW_COMPONENT *c)
 }
 
 // Build the Web installer
-bool SwWebMain(SW *sw, WIZARD_PAGE *wp)
+bool SwWebMain(SW* sw, WIZARD_PAGE* wp)
 {
 	bool ret = false;
 	wchar_t tmp[MAX_SIZE];
@@ -3016,19 +3094,19 @@ bool SwWebMain(SW *sw, WIZARD_PAGE *wp)
 		char inf_path[MAX_PATH];
 		char htm_path[MAX_PATH];
 		LANGLIST current_lang;
-		BUF *inf_buf = NULL;
-		BUF *htm_buf = NULL;
-		BUF *setting_buf = NULL;
-		char *inf_data = NULL;
+		BUF* inf_buf = NULL;
+		BUF* htm_buf = NULL;
+		BUF* setting_buf = NULL;
+		char* inf_data = NULL;
 		UINT inf_data_size;
-		char *htm_data = NULL;
+		char* htm_data = NULL;
 		UINT htm_data_size;
 		char ver_major[64];
 		char ver_minor[64];
 		char ver_build[64];
-		char *normal_mode = (sw->Web_EasyMode ? "false" : "true");
+		char* normal_mode = (sw->Web_EasyMode ? "false" : "true");
 		char package_name[MAX_SIZE];
-		ZIP_PACKER *z = NULL;
+		ZIP_PACKER* z = NULL;
 
 		ToStr(ver_major, CEDAR_VER / 100);
 		ToStr(ver_minor, CEDAR_VER % 100);
@@ -3153,7 +3231,7 @@ bool SwWebMain(SW *sw, WIZARD_PAGE *wp)
 				sw->Web_OutFile);
 		}
 
-LABEL_CLEANUP:
+	LABEL_CLEANUP:
 		FreeZipPacker(z);
 		FreeBuf(setting_buf);
 		FreeBuf(inf_buf);
@@ -3167,10 +3245,10 @@ LABEL_CLEANUP:
 }
 
 // Build a simple installer
-bool SwEasyMain(SW *sw, WIZARD_PAGE *wp)
+bool SwEasyMain(SW* sw, WIZARD_PAGE* wp)
 {
-	LIST *o;
-	BUF *b;
+	LIST* o;
+	BUF* b;
 	bool ret = false;
 	wchar_t account_tmp[MAX_PATH];
 	// Validate arguments
@@ -3231,9 +3309,9 @@ bool SwEasyMain(SW *sw, WIZARD_PAGE *wp)
 }
 
 // Installation main
-bool SwInstallMain(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c)
+bool SwInstallMain(SW* sw, WIZARD_PAGE* wp, SW_COMPONENT* c)
 {
-	SW_TASK *t;
+	SW_TASK* t;
 	bool ret = false;
 	UINT i;
 	wchar_t tmp[MAX_SIZE * 2];
@@ -3340,7 +3418,7 @@ bool SwInstallMain(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c)
 	if (c->InstallService)
 	{
 		char svc_title_name[MAX_SIZE];
-		wchar_t *svc_title;
+		wchar_t* svc_title;
 
 		Format(svc_title_name, sizeof(svc_title_name), "SVC_%s_TITLE", c->SvcName);
 
@@ -3358,7 +3436,7 @@ bool SwInstallMain(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c)
 					UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_STOP_SVC"), svc_title);
 					SwPerformPrint(wp, tmp);
 
-LABEL_RETRY_3:
+				LABEL_RETRY_3:
 					if (MsStopService(c->SvcName) == false)
 					{
 						UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_STOP_SVC_ERROR"), svc_title, c->SvcName);
@@ -3449,16 +3527,16 @@ LABEL_RETRY_3:
 
 	for (i = 0;i < LIST_NUM(t->CopyTasks);i++)
 	{
-		SW_TASK_COPY *ct = LIST_DATA(t->CopyTasks, i);
+		SW_TASK_COPY* ct = LIST_DATA(t->CopyTasks, i);
 
 		wchar_t fullpath[MAX_SIZE];
-		IO *io;
+		IO* io;
 		bool write_ok;
 		bool new_file;
 		bool new_dir;
 		UINT64 giveup_tick = Tick64() + 30000ULL;
 
-LABEL_RETRY_1:
+	LABEL_RETRY_1:
 		new_dir = write_ok = new_file = false;
 
 		CombinePathW(fullpath, sizeof(fullpath), ct->DstDir, ct->DstFileName);
@@ -3540,12 +3618,12 @@ LABEL_RETRY_1:
 
 	for (i = 0;i < LIST_NUM(t->CopyTasks);i++)
 	{
-		SW_TASK_COPY *ct = LIST_DATA(t->CopyTasks, i);
+		SW_TASK_COPY* ct = LIST_DATA(t->CopyTasks, i);
 		wchar_t fullpath_src[MAX_SIZE];
 		wchar_t fullpath_dst[MAX_SIZE];
 		bool skip;
 
-LABEL_RETRY_2:
+	LABEL_RETRY_2:
 
 		if (UniStartWith(ct->SrcFileName, L"|") == false)
 		{
@@ -3619,7 +3697,7 @@ LABEL_RETRY_2:
 		for (i = 0;i < LIST_NUM(t->SetSecurityPathsEveryone);i++)
 		{
 			// Security Settings
-			wchar_t *path = LIST_DATA(t->SetSecurityPathsEveryone, i);
+			wchar_t* path = LIST_DATA(t->SetSecurityPathsEveryone, i);
 
 			UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_SET_SECURITY"), path);
 			SwPerformPrint(wp, tmp);
@@ -3631,7 +3709,7 @@ LABEL_RETRY_2:
 		for (i = 0;i < LIST_NUM(t->SetSecurityPaths);i++)
 		{
 			// Security Settings
-			wchar_t *path = LIST_DATA(t->SetSecurityPaths, i);
+			wchar_t* path = LIST_DATA(t->SetSecurityPaths, i);
 
 			UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_SET_SECURITY"), path);
 			SwPerformPrint(wp, tmp);
@@ -3677,7 +3755,7 @@ LABEL_RETRY_2:
 	{
 		char svc_title_name[MAX_SIZE];
 		char svc_description_name[MAX_SIZE];
-		wchar_t *svc_title;
+		wchar_t* svc_title;
 
 		Format(svc_title_name, sizeof(svc_title_name), "SVC_%s_TITLE", c->SvcName);
 		Format(svc_description_name, sizeof(svc_description_name), "SVC_%s_DESCRIPT", c->SvcName);
@@ -3691,7 +3769,7 @@ LABEL_RETRY_2:
 				// Just simply start in user mode or Win9x mode
 				wchar_t fullpath[MAX_SIZE];
 
-LABEL_RETRY_USERMODE_EXEC:
+			LABEL_RETRY_USERMODE_EXEC:
 
 				CombinePathW(fullpath, sizeof(fullpath), sw->InstallDir, c->SvcFileName);
 
@@ -3730,7 +3808,7 @@ LABEL_RETRY_USERMODE_EXEC:
 				UniFormat(tmp, sizeof(tmp), _UU("SW_PERFORM_MSG_INSTALL_SVC"), svc_title);
 				SwPerformPrint(wp, tmp);
 
-LABEL_RETRY_4:
+			LABEL_RETRY_4:
 
 				if (MsIsServiceInstalled(c->SvcName))
 				{
@@ -3798,7 +3876,7 @@ LABEL_RETRY_4:
 
 					MsRegWriteIntEx2(REG_LOCAL_MACHINE, "Software\\" GC_REG_COMPANY_NAME "\\Update Service Config", c->SvcName, 0, false, true);
 
-LABEL_RETRY_5:
+				LABEL_RETRY_5:
 					// Start the service
 					if (MsStartService(c->SvcName) == false)
 					{
@@ -3866,7 +3944,7 @@ LABEL_CREATE_SHORTCUT:
 		if (c->InstallService)
 		{
 			char svc_description_name[MAX_SIZE];
-			wchar_t *svc_description;
+			wchar_t* svc_description;
 
 			Format(svc_description_name, sizeof(svc_description_name), "SVC_%s_DESCRIPT", c->SvcName);
 
@@ -3959,7 +4037,7 @@ LABEL_IMPORT_SETTING:
 				{
 					wchar_t tmp_setting_path[MAX_PATH];
 					wchar_t arg[MAX_PATH];
-					void *handle;
+					void* handle;
 					bool easy_mode = IsFileExists(SW_FLAG_EASY_MODE_2);
 					// Run the vpncmgr, and start a connection by importing the connection configuration file
 					// Store a connection setting file to stable temporally directory
@@ -4042,7 +4120,7 @@ LABEL_REGISTER_UNINSTALL:
 		MsRegWriteStrEx2(REG_LOCAL_MACHINE, uninstall_keyname, "URLUpdateInfo", _SS("SW_UNINSTALLINFO_URL"),
 			false, true);*/
 
-		// Publisher
+			// Publisher
 		MsRegWriteStrEx2W(REG_LOCAL_MACHINE, uninstall_keyname, "Publisher", _UU("SW_UNINSTALLINFO_PUBLISHER"),
 			false, true);
 
@@ -4066,7 +4144,7 @@ LABEL_REGISTER_UNINSTALL:
 	{
 		wchar_t log_filename[MAX_SIZE];
 
-L_RETRY_LOG:
+	L_RETRY_LOG:
 
 		SwPerformPrint(wp, _UU("SW_PERFORM_MSG_WRITE_LOG"));
 
@@ -4155,7 +4233,7 @@ L_RETRY_LOG:
 		bool old_strict = false;
 		SwPerformPrint(wp, _UU("SW_PERFORM_MSG_INSTALL_URDP"));
 
-LABEL_RETRY_EXEC:
+	LABEL_RETRY_EXEC:
 		old_strict = DeskIsUacSettingStrict();
 
 		// RUDP を Program Files 配下にインストールする
@@ -4218,9 +4296,9 @@ LABEL_CLEANUP:
 }
 
 // ヘルパーの起動 (URDP を Program Files 下にインストールする)
-bool SwThinTeleworkInstallUrdpToProgramFiles(SW *sw)
+bool SwThinTeleworkInstallUrdpToProgramFiles(SW* sw)
 {
-	void *h;
+	void* h;
 	// 引数チェック
 	if (sw == NULL)
 	{
@@ -4267,13 +4345,13 @@ bool SwWaitForVpnClientPortReady(UINT timeout)
 }
 
 // Create a Shortcut file (Delete the old one)
-void SwInstallShortcuts(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c, SW_TASK *t)
+void SwInstallShortcuts(SW* sw, WIZARD_PAGE* wp, SW_COMPONENT* c, SW_TASK* t)
 {
 	UINT i;
 	wchar_t tmp[MAX_SIZE];
 	wchar_t setuplog[MAX_PATH];
-	LIST *o;
-	SW_LOGFILE *oldlog;
+	LIST* o;
+	SW_LOGFILE* oldlog;
 	// Validate arguments
 	if (sw == NULL || wp == NULL || c == NULL || t == NULL)
 	{
@@ -4297,7 +4375,7 @@ void SwInstallShortcuts(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c, SW_TASK *t)
 
 	for (i = 0;i < LIST_NUM(sw->LogFile->LogList);i++)
 	{
-		SW_LOG *g = LIST_DATA(sw->LogFile->LogList, i);
+		SW_LOG* g = LIST_DATA(sw->LogFile->LogList, i);
 
 		if (g->Type == SW_LOG_TYPE_LNK || g->Type == SW_LOG_TYPE_LNK_DIR)
 		{
@@ -4307,7 +4385,7 @@ void SwInstallShortcuts(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c, SW_TASK *t)
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
-		SW_LOG *g = LIST_DATA(o, i);
+		SW_LOG* g = LIST_DATA(o, i);
 
 		Delete(sw->LogFile->LogList, g);
 
@@ -4318,14 +4396,14 @@ void SwInstallShortcuts(SW *sw, WIZARD_PAGE *wp, SW_COMPONENT *c, SW_TASK *t)
 
 	for (i = 0;i < LIST_NUM(t->LinkTasks);i++)
 	{
-		SW_TASK_LINK *lt = LIST_DATA(t->LinkTasks, i);
+		SW_TASK_LINK* lt = LIST_DATA(t->LinkTasks, i);
 		wchar_t lnk_fullpath[MAX_SIZE];
 		wchar_t lnk_dirname[MAX_SIZE];
 		wchar_t target_fullpath[MAX_SIZE];
 		wchar_t target_dirname[MAX_SIZE];
 		wchar_t icon_fullpath[MAX_SIZE];
 
-L_RETRY_LINK:
+	L_RETRY_LINK:
 
 		SwPerformPrint(wp, _UU("SW_PERFORM_MSG_CREATE_LINKS"));
 
@@ -4375,7 +4453,7 @@ L_RETRY_LINK:
 }
 
 // Search component
-SW_COMPONENT *SwFindComponent(SW *sw, char *name)
+SW_COMPONENT* SwFindComponent(SW* sw, char* name)
 {
 	UINT i;
 	// Validate arguments
@@ -4386,7 +4464,7 @@ SW_COMPONENT *SwFindComponent(SW *sw, char *name)
 
 	for (i = 0;i < LIST_NUM(sw->ComponentList);i++)
 	{
-		SW_COMPONENT *c = LIST_DATA(sw->ComponentList, i);
+		SW_COMPONENT* c = LIST_DATA(sw->ComponentList, i);
 
 		if (StrCmpi(c->Name, name) == 0)
 		{
@@ -4398,7 +4476,7 @@ SW_COMPONENT *SwFindComponent(SW *sw, char *name)
 }
 
 // Release the log file
-void SwFreeLogFile(SW_LOGFILE *logfile)
+void SwFreeLogFile(SW_LOGFILE* logfile)
 {
 	UINT i;
 	// Validate arguments
@@ -4409,7 +4487,7 @@ void SwFreeLogFile(SW_LOGFILE *logfile)
 
 	for (i = 0;i < LIST_NUM(logfile->LogList);i++)
 	{
-		SW_LOG *g = LIST_DATA(logfile->LogList, i);
+		SW_LOG* g = LIST_DATA(logfile->LogList, i);
 
 		Free(g);
 	}
@@ -4420,9 +4498,9 @@ void SwFreeLogFile(SW_LOGFILE *logfile)
 }
 
 // Create a new log file
-SW_LOGFILE *SwNewLogFile()
+SW_LOGFILE* SwNewLogFile()
 {
-	SW_LOGFILE *logfile = ZeroMalloc(sizeof(SW_LOGFILE));
+	SW_LOGFILE* logfile = ZeroMalloc(sizeof(SW_LOGFILE));
 
 	logfile->LogList = NewListFast(NULL);
 
@@ -4430,18 +4508,18 @@ SW_LOGFILE *SwNewLogFile()
 }
 
 // Read the log file
-SW_LOGFILE *SwLoadLogFile(SW *sw, wchar_t *filename)
+SW_LOGFILE* SwLoadLogFile(SW* sw, wchar_t* filename)
 {
-	FOLDER *r = NULL;
-	FOLDER *items = NULL;
-	FOLDER *info = NULL;
+	FOLDER* r = NULL;
+	FOLDER* items = NULL;
+	FOLDER* info = NULL;
 	UINT i;
-	TOKEN_LIST *t = NULL;
+	TOKEN_LIST* t = NULL;
 	bool is_system_mode = false;
 	char component_name[MAX_SIZE] = { 0 };
 	UINT build;
-	SW_COMPONENT *c = NULL;
-	SW_LOGFILE *ret = NULL;
+	SW_COMPONENT* c = NULL;
+	SW_LOGFILE* ret = NULL;
 	// Validate arguments
 	if (sw == NULL || filename == NULL)
 	{
@@ -4492,8 +4570,8 @@ SW_LOGFILE *SwLoadLogFile(SW *sw, wchar_t *filename)
 	// Item List
 	for (i = 0;i < t->NumTokens;i++)
 	{
-		char *name = t->Token[i];
-		FOLDER *f = CfgGetFolder(items, name);
+		char* name = t->Token[i];
+		FOLDER* f = CfgGetFolder(items, name);
 
 		if (f != NULL)
 		{
@@ -4504,7 +4582,7 @@ SW_LOGFILE *SwLoadLogFile(SW *sw, wchar_t *filename)
 			{
 				if (IsEmptyUniStr(value) == false && type != 0)
 				{
-					SW_LOG *g = ZeroMalloc(sizeof(SW_LOG));
+					SW_LOG* g = ZeroMalloc(sizeof(SW_LOG));
 
 					g->Type = type;
 					UniStrCpy(g->Path, sizeof(g->Path), value);
@@ -4530,11 +4608,11 @@ LABEL_CLEANUP:
 }
 
 // Save the log file
-bool SwSaveLogFile(SW *sw, wchar_t *dst_name, SW_LOGFILE *logfile)
+bool SwSaveLogFile(SW* sw, wchar_t* dst_name, SW_LOGFILE* logfile)
 {
-	FOLDER *r;
-	FOLDER *items;
-	FOLDER *info;
+	FOLDER* r;
+	FOLDER* items;
+	FOLDER* info;
 	UINT i;
 	bool ret;
 	// Validate arguments
@@ -4555,8 +4633,8 @@ bool SwSaveLogFile(SW *sw, wchar_t *dst_name, SW_LOGFILE *logfile)
 
 	for (i = 0;i < LIST_NUM(logfile->LogList);i++)
 	{
-		FOLDER *f;
-		SW_LOG *g = LIST_DATA(logfile->LogList, i);
+		FOLDER* f;
+		SW_LOG* g = LIST_DATA(logfile->LogList, i);
 		char name[MAX_PATH];
 
 		Format(name, sizeof(name), "Item%04u", i);
@@ -4575,7 +4653,7 @@ bool SwSaveLogFile(SW *sw, wchar_t *dst_name, SW_LOGFILE *logfile)
 }
 
 // Display the string to the status screen
-void SwPerformPrint(WIZARD_PAGE *wp, wchar_t *str)
+void SwPerformPrint(WIZARD_PAGE* wp, wchar_t* str)
 {
 	SW_UI ui;
 	// Validate arguments
@@ -4592,7 +4670,7 @@ void SwPerformPrint(WIZARD_PAGE *wp, wchar_t *str)
 }
 
 // Show a message box on the screen
-UINT SwPerformMsgBox(WIZARD_PAGE *wp, UINT flags, wchar_t *msg)
+UINT SwPerformMsgBox(WIZARD_PAGE* wp, UINT flags, wchar_t* msg)
 {
 	SW_UI ui;
 	// Validate arguments
@@ -4610,7 +4688,7 @@ UINT SwPerformMsgBox(WIZARD_PAGE *wp, UINT flags, wchar_t *msg)
 }
 
 // Call the UI interaction
-UINT SwInteractUi(WIZARD_PAGE *wp, SW_UI *ui)
+UINT SwInteractUi(WIZARD_PAGE* wp, SW_UI* ui)
 {
 	// Validate arguments
 	if (wp == NULL || ui == NULL)
@@ -4626,7 +4704,7 @@ UINT SwInteractUi(WIZARD_PAGE *wp, SW_UI *ui)
 }
 
 // UI interaction is called
-void SwInteractUiCalled(HWND hWnd, SW *sw, WIZARD_PAGE *wp, SW_UI *ui)
+void SwInteractUiCalled(HWND hWnd, SW* sw, WIZARD_PAGE* wp, SW_UI* ui)
 {
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL || wp == NULL || ui == NULL)
@@ -4655,7 +4733,7 @@ void SwInteractUiCalled(HWND hWnd, SW *sw, WIZARD_PAGE *wp, SW_UI *ui)
 }
 
 // Initialize the setup process screen
-void SwPerformInit(HWND hWnd, SW *sw, WIZARD_PAGE *wp)
+void SwPerformInit(HWND hWnd, SW* sw, WIZARD_PAGE* wp)
 {
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL || wp == NULL)
@@ -4700,9 +4778,9 @@ void SwPerformInit(HWND hWnd, SW *sw, WIZARD_PAGE *wp)
 }
 
 // Do the set-up process
-UINT SwPerform(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwPerform(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -4747,7 +4825,7 @@ UINT SwPerform(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 		// UI interaction is called
 		if (wParam == 0xCAFE)
 		{
-			SwInteractUiCalled(hWnd, sw, wizard_page, (SW_UI *)lParam);
+			SwInteractUiCalled(hWnd, sw, wizard_page, (SW_UI*)lParam);
 		}
 		break;
 
@@ -4776,10 +4854,121 @@ UINT SwPerform(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 	return 0;
 }
 
-// Final confirmation screen
-UINT SwReady(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+// ネットワーク選択
+UINT SwNwSelect(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
+	// Validate arguments
+	if (hWnd == NULL || sw == NULL)
+	{
+		return 0;
+	}
+
+	switch (msg)
+	{
+	case WM_INITDIALOG:
+		DlgFont(hWnd, C_NW1, 10, true);
+		DlgFont(hWnd, C_NW2, 10, true);
+		break;
+
+	case WM_WIZ_SHOW:
+		if (sw->NwDetectResult.IsFinished)
+		{
+			// NW 自動検出済み
+			Check(hWnd, C_NW1, !sw->NwDetectResult.IsDetectedByUrl);
+			Check(hWnd, C_NW2, sw->NwDetectResult.IsDetectedByUrl);
+			if (sw->NwDetectResult.IsDetectedByUrl)
+			{
+				Focus(hWnd, C_NW2);
+			}
+			else
+			{
+				Focus(hWnd, C_NW1);
+			}
+
+			SetWizardButton(wizard_page, true, true, true, false);
+		}
+		else
+		{
+			// NW 自動検出まだ
+			SetWizardButton(wizard_page, false, false, false, false);
+
+			// 検出開始
+			SetTimer(hWnd, 931, 100, NULL);
+		}
+		break;
+
+	case WM_WIZ_HIDE:
+		break;
+
+	case WM_CLOSE:
+		break;
+
+	case WM_WIZ_NEXT:
+	case WM_WIZ_BACK:
+		if (IsChecked(hWnd, C_NW1) || IsChecked(hWnd, C_NW2))
+		{
+			sw->NwDetectResult.IsFinished = true;
+			sw->NwDetectResult.IsDetectedByUrl = IsChecked(hWnd, C_NW2);
+		}
+
+		switch (msg)
+		{
+		case WM_WIZ_NEXT:
+			return D_SW_READY;
+
+		case WM_WIZ_BACK:
+			return D_SW_DIR;
+		}
+		break;
+
+	case WM_TIMER:
+		switch (wParam)
+		{
+		case 931:
+			KillTimer(hWnd, 931);
+
+			SwNwDetectDlg(hWnd, &sw->NwDetectResult);
+
+			if (sw->NwDetectResult.IsFinished)
+			{
+				Check(hWnd, C_NW1, !sw->NwDetectResult.IsDetectedByUrl);
+				Check(hWnd, C_NW2, sw->NwDetectResult.IsDetectedByUrl);
+				if (sw->NwDetectResult.IsDetectedByUrl)
+				{
+					Focus(hWnd, C_NW2);
+				}
+				else
+				{
+					Focus(hWnd, C_NW1);
+				}
+			}
+
+			SetWizardButton(wizard_page, IsChecked(hWnd, C_NW1) || IsChecked(hWnd, C_NW2),
+				true, true, false);
+			break;
+		}
+		break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case C_NW1:
+		case C_NW2:
+			SetWizardButton(wizard_page, IsChecked(hWnd, C_NW1) || IsChecked(hWnd, C_NW2),
+				true, true, false);
+			break;
+		}
+		break;
+	}
+
+	return 0;
+}
+
+// Final confirmation screen
+UINT SwReady(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
+{
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -4806,7 +4995,17 @@ UINT SwReady(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, 
 		return D_SW_PERFORM;
 
 	case WM_WIZ_BACK:
-		return D_SW_DIR;
+		if (Vars_ActivePatch_GetBool("ThinTelework_Installer_NetworkSelect") == false)
+		{
+			// ネットワーク選択なしの場合 ディレクトリ一覧に戻る
+			return D_SW_DIR;
+		}
+		else
+		{
+			// ネットワーク選択ありの場合 ネットワーク選択に戻る
+			return D_SW_NWSELECT;
+		}
+		break;
 
 	case WM_COMMAND:
 		switch (wParam)
@@ -4819,7 +5018,7 @@ UINT SwReady(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, 
 }
 
 // Uninstall all the old MSI products
-bool SwUninstallOldMsiInstalled(HWND hWnd, WIZARD_PAGE *wp, SW_COMPONENT *c, bool *reboot_required)
+bool SwUninstallOldMsiInstalled(HWND hWnd, WIZARD_PAGE* wp, SW_COMPONENT* c, bool* reboot_required)
 {
 	UINT i;
 	bool dummy_bool = false;
@@ -4842,7 +5041,7 @@ bool SwUninstallOldMsiInstalled(HWND hWnd, WIZARD_PAGE *wp, SW_COMPONENT *c, boo
 
 	for (i = 0;i < c->NumOldMsi;i++)
 	{
-		SW_OLD_MSI *m = &c->OldMsiList[i];
+		SW_OLD_MSI* m = &c->OldMsiList[i];
 		wchar_t tmp[MAX_SIZE];
 
 		if (MsGetMsiInstalledDir(m->ComponentCode, tmp, sizeof(tmp)))
@@ -4850,7 +5049,7 @@ bool SwUninstallOldMsiInstalled(HWND hWnd, WIZARD_PAGE *wp, SW_COMPONENT *c, boo
 			bool rr = false;
 			wchar_t msg[MAX_SIZE];
 
-LABEL_RETRY:
+		LABEL_RETRY:
 
 			UniFormat(msg, sizeof(msg), _UU("SW_PERFORM_MSG_UNINSTALL_MSI"), c->Title);
 			SwPerformPrint(wp, msg);
@@ -4881,7 +5080,7 @@ LABEL_RETRY:
 }
 
 // Get the directory where the old MSI products are installed
-wchar_t *SwGetOldMsiInstalledDir(SW_COMPONENT *c)
+wchar_t* SwGetOldMsiInstalledDir(SW_COMPONENT* c)
 {
 	UINT i;
 	// Validate arguments
@@ -4897,7 +5096,7 @@ wchar_t *SwGetOldMsiInstalledDir(SW_COMPONENT *c)
 
 	for (i = 0;i < c->NumOldMsi;i++)
 	{
-		SW_OLD_MSI *m = &c->OldMsiList[i];
+		SW_OLD_MSI* m = &c->OldMsiList[i];
 		wchar_t tmp[MAX_SIZE];
 
 		if (MsGetMsiInstalledDir(m->ComponentCode, tmp, sizeof(tmp)))
@@ -4910,12 +5109,12 @@ wchar_t *SwGetOldMsiInstalledDir(SW_COMPONENT *c)
 }
 
 // Initialize the default installation directory
-void SwInitDefaultInstallDir(SW *sw)
+void SwInitDefaultInstallDir(SW* sw)
 {
 	char keyname[MAX_SIZE];
-	wchar_t *reg_dir_system;
-	wchar_t *reg_dir_user;
-	wchar_t *msi_dir_system = NULL;
+	wchar_t* reg_dir_system;
+	wchar_t* reg_dir_user;
+	wchar_t* msi_dir_system = NULL;
 	// Validate arguments
 	if (sw == NULL)
 	{
@@ -4987,7 +5186,7 @@ void SwInitDefaultInstallDir(SW *sw)
 }
 
 // Update the installation directory setting screen
-void SwDirUpdate(HWND hWnd, SW *sw, WIZARD_PAGE *wizard_page)
+void SwDirUpdate(HWND hWnd, SW* sw, WIZARD_PAGE* wizard_page)
 {
 	bool user_mode_selected;
 	bool show_custom;
@@ -5030,12 +5229,12 @@ void SwDirUpdate(HWND hWnd, SW *sw, WIZARD_PAGE *wizard_page)
 }
 
 // Check the directory name planned to be created newly
-bool SwCheckNewDirName(wchar_t *name)
+bool SwCheckNewDirName(wchar_t* name)
 {
 	char tmp[MAX_SIZE];
 	UCHAR rand[16];
 	wchar_t testname[MAX_SIZE];
-	IO *io;
+	IO* io;
 	bool new_dir;
 	// Validate arguments
 	if (name == NULL)
@@ -5071,13 +5270,13 @@ bool SwCheckNewDirName(wchar_t *name)
 }
 
 // Set the installation directory
-UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	wchar_t tmp[MAX_SIZE];
 	wchar_t setuplog[MAX_SIZE];
-	wchar_t *s;
-	SW_LOGFILE *logfile;
+	wchar_t* s;
+	SW_LOGFILE* logfile;
 	bool is_system_mode;
 	bool is_limited_mode;
 	bool skip_ver_check = false;
@@ -5284,7 +5483,7 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 
 		if (logfile != NULL)
 		{
-			wchar_t *errmsg = NULL;
+			wchar_t* errmsg = NULL;
 			if (logfile->Component != sw->CurrentComponent && StrCmpi(logfile->Component->Name, sw->CurrentComponent->Name) != 0)
 			{
 				errmsg = _UU("SW_DIR_DST_IS_OTHER_PRODUCT");
@@ -5327,7 +5526,16 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 
 		sw->OnlyAutoSettingMode = skip_ver_check;
 
-		return D_SW_READY;
+		if (Vars_ActivePatch_GetBool("ThinTelework_Installer_NetworkSelect") == false)
+		{
+			// ネットワーク選択なしの場合 Ready に進む
+			return D_SW_READY;
+		}
+		else
+		{
+			// ネットワーク選択ありの場合 NwSelect に進む
+			return D_SW_NWSELECT;
+		}
 
 	case WM_WIZ_BACK:
 		break;
@@ -5383,18 +5591,18 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WI
 		}
 
 		break;
-	}
+		}
 
 	return 0;
-}
+	}
 
 // Warning screen
-UINT SwWarning(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwWarning(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
-	BUF *b;
+	SW* sw = (SW*)param;
+	BUF* b;
 	UCHAR c = 0;
-	wchar_t *str;
+	wchar_t* str;
 	char warning_filename[MAX_PATH];
 	LANGLIST t;
 	// Validate arguments
@@ -5413,7 +5621,7 @@ UINT SwWarning(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 
 		GetCurrentLang(&t);
 
-		SetFont(hWnd, E_TEXT, GetFont((t.Id == SE_LANG_JAPANESE && MsIsWindows7()) ? "Meiryo UI" : NULL, 10, false , false, false, false));
+		SetFont(hWnd, E_TEXT, GetFont((t.Id == SE_LANG_JAPANESE && MsIsWindows7()) ? "Meiryo UI" : NULL, 10, false, false, false, false));
 
 		Format(warning_filename, sizeof(warning_filename), "|warning_%s.txt", t.Name);
 		b = ReadDump(warning_filename);
@@ -5472,7 +5680,7 @@ UINT SwWarning(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 
 			// シン・テレワークサーバーの場合、すでにインストールされているものが
 			// ないかどうか確認をする
-L_PORT_CHECK_RETRY:
+		L_PORT_CHECK_RETRY:
 
 			ret = DsGetServiceInfo(&info);
 
@@ -5564,7 +5772,7 @@ L_PORT_CHECK_RETRY:
 }
 
 // Update the license agreement screen
-void SwEulaUpdate(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
+void SwEulaUpdate(HWND hWnd, SW* sw, WIZARD* wizard, WIZARD_PAGE* wizard_page)
 {
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL || wizard == NULL || wizard_page == NULL)
@@ -5584,12 +5792,12 @@ void SwEulaUpdate(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
 }
 
 // License Agreement
-UINT SwEula(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwEula(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
-	BUF *b;
+	SW* sw = (SW*)param;
+	BUF* b;
 	UCHAR c = 0;
-	wchar_t *str;
+	wchar_t* str;
 	LANGLIST t;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
@@ -5605,7 +5813,7 @@ UINT SwEula(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, W
 	case WM_WIZ_SHOW:
 		GetCurrentLang(&t);
 
-		SetFont(hWnd, E_TEXT, GetFont((t.Id == SE_LANG_JAPANESE && MsIsWindows7()) ? "Meiryo UI" : NULL, 10, false , false, false, false));
+		SetFont(hWnd, E_TEXT, GetFont((t.Id == SE_LANG_JAPANESE && MsIsWindows7()) ? "Meiryo UI" : NULL, 10, false, false, false, false));
 		//DlgFont(hWnd, B_AGREE, 10, true);
 
 		b = ReadDump("|eula.txt");
@@ -5675,11 +5883,11 @@ UINT SwEula(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, W
 }
 
 // Initialize a component list
-void SwComponentsInit(HWND hWnd, SW *sw)
+void SwComponentsInit(HWND hWnd, SW* sw)
 {
-	LVB *b;
+	LVB* b;
 	UINT i;
-	SW_COMPONENT *default_select = NULL;
+	SW_COMPONENT* default_select = NULL;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -5692,7 +5900,7 @@ void SwComponentsInit(HWND hWnd, SW *sw)
 
 	for (i = 0;i < LIST_NUM(sw->ComponentList);i++)
 	{
-		SW_COMPONENT *c = LIST_DATA(sw->ComponentList, i);
+		SW_COMPONENT* c = LIST_DATA(sw->ComponentList, i);
 
 		if (c->Detected)
 		{
@@ -5727,16 +5935,16 @@ void SwComponentsInit(HWND hWnd, SW *sw)
 }
 
 // Update the Component Selection screen
-void SwComponentsUpdate(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page)
+void SwComponentsUpdate(HWND hWnd, SW* sw, WIZARD* wizard, WIZARD_PAGE* wizard_page)
 {
-	SW_COMPONENT *c;
+	SW_COMPONENT* c;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL || wizard == NULL || wizard_page == NULL)
 	{
 		return;
 	}
 
-	c = (SW_COMPONENT *)LvGetSelectedParam(hWnd, L_LIST);
+	c = (SW_COMPONENT*)LvGetSelectedParam(hWnd, L_LIST);
 
 	if (c == NULL)
 	{
@@ -5778,11 +5986,11 @@ void SwComponentsUpdate(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_p
 }
 
 // Component selection screen
-UINT SwComponents(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwComponents(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
-	NMHDR *n;
-	SW_COMPONENT *c;
+	SW* sw = (SW*)param;
+	NMHDR* n;
+	SW_COMPONENT* c;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -5824,7 +6032,7 @@ UINT SwComponents(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wiz
 		break;
 
 	case WM_WIZ_NEXT:
-		c = (SW_COMPONENT *)LvGetSelectedParam(hWnd, L_LIST);
+		c = (SW_COMPONENT*)LvGetSelectedParam(hWnd, L_LIST);
 
 		if (c != NULL)
 		{
@@ -5880,7 +6088,7 @@ UINT SwComponents(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wiz
 		break;
 
 	case WM_NOTIFY:
-		n = (NMHDR *)lParam;
+		n = (NMHDR*)lParam;
 
 		switch (n->idFrom)
 		{
@@ -5901,9 +6109,9 @@ UINT SwComponents(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wiz
 }
 
 // Screen that is displayed when the user don't have administrative privileges
-UINT SwNotAdminDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwNotAdminDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -5956,9 +6164,9 @@ UINT SwNotAdminDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wi
 }
 
 // Choose the setup mode
-UINT SwModeDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwModeDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -6055,9 +6263,9 @@ UINT SwModeDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard
 }
 
 // Welcome screen
-UINT SwWelcomeDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param)
+UINT SwWelcomeDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param)
 {
-	SW *sw = (SW *)param;
+	SW* sw = (SW*)param;
 	// Validate arguments
 	if (hWnd == NULL || sw == NULL)
 	{
@@ -6177,11 +6385,11 @@ UINT SwWelcomeDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wiz
 }
 
 // Restart itself
-bool SwReExecMyself(SW *sw, wchar_t *additional_params, bool as_admin)
+bool SwReExecMyself(SW* sw, wchar_t* additional_params, bool as_admin)
 {
-	wchar_t *current_params;
+	wchar_t* current_params;
 	wchar_t new_param[MAX_SIZE];
-	void *handle;
+	void* handle;
 	bool ret = false;
 	// Validate arguments
 	if (sw == NULL)
@@ -6220,9 +6428,9 @@ bool SwReExecMyself(SW *sw, wchar_t *additional_params, bool as_admin)
 }
 
 // Restart itself
-HANDLE *SwReExecMyselfWithNewParam(SW *sw, wchar_t *new_param, bool as_admin)
+HANDLE* SwReExecMyselfWithNewParam(SW* sw, wchar_t* new_param, bool as_admin)
 {
-	void *handle;
+	void* handle;
 	bool ret = false;
 	// Validate arguments
 	if (sw == NULL)
@@ -6247,9 +6455,9 @@ HANDLE *SwReExecMyselfWithNewParam(SW *sw, wchar_t *new_param, bool as_admin)
 
 
 // Show the UI
-void SwUiMain(SW *sw)
+void SwUiMain(SW* sw)
 {
-	WIZARD *w;
+	WIZARD* w;
 	wchar_t verstr[MAX_SIZE];
 	char ver[MAX_SIZE];
 	// Validate arguments
@@ -6273,6 +6481,7 @@ void SwUiMain(SW *sw)
 	AddWizardPage(w, NewWizardPage(D_SW_EULA, SwEula, _UU("SW_EULA_TITLE")));
 	AddWizardPage(w, NewWizardPage(D_SW_WARNING, SwWarning, _UU("SW_WARNING_TITLE")));
 	AddWizardPage(w, NewWizardPage(D_SW_DIR, SwDir, _UU("SW_DIR_TITLE")));
+	AddWizardPage(w, NewWizardPage(D_SW_NWSELECT, SwNwSelect, _UU("SW_NWSELECT_TITLE")));
 	AddWizardPage(w, NewWizardPage(D_SW_READY, SwReady, _UU("SW_READY_TITLE")));
 	AddWizardPage(w, NewWizardPage(D_SW_PERFORM, SwPerform, _UU("SW_PERFORM_TITLE")));
 	AddWizardPage(w, NewWizardPage(D_SW_ERROR, SwError, _UU("SW_ERROR_TITLE")));
@@ -6358,7 +6567,7 @@ void SwUiMain(SW *sw)
 		if (sw->SetLangAndReboot && sw->LangNow == false)
 		{
 			// Restart myself immediately by changing the lang.config
-			LIST *o = LoadLangList();
+			LIST* o = LoadLangList();
 
 			if (o == NULL)
 			{
@@ -6366,7 +6575,7 @@ void SwUiMain(SW *sw)
 			}
 			else
 			{
-				LANGLIST *new_lang = GetLangById(o, sw->LangId);
+				LANGLIST* new_lang = GetLangById(o, sw->LangId);
 				LANGLIST old_lang;
 
 				Zero(&old_lang, sizeof(old_lang));
@@ -6432,7 +6641,7 @@ void SwUiMain(SW *sw)
 			// Auto run the app
 			wchar_t tmp[MAX_PATH];
 			HANDLE h;
-			UNI_TOKEN_LIST *t;
+			UNI_TOKEN_LIST* t;
 
 			t = UniParseToken(sw->CurrentComponent->StartExeName, L" ");
 
@@ -6473,7 +6682,7 @@ void SwUiMain(SW *sw)
 }
 
 // Release the component
-void SwFreeComponent(SW_COMPONENT *c)
+void SwFreeComponent(SW_COMPONENT* c)
 {
 	// Validate arguments
 	if (c == NULL)
@@ -6496,13 +6705,13 @@ void SwFreeComponent(SW_COMPONENT *c)
 }
 
 // Create a component
-SW_COMPONENT *SwNewComponent(char *name, char *svc_name, UINT id, UINT icon, UINT icon_index, wchar_t *svc_filename,
-							 wchar_t *long_name, bool system_mode_only, UINT num_files, char *files[],
-							 wchar_t *start_exe_name, wchar_t *start_description,
-							 SW_OLD_MSI *old_msis, UINT num_old_msis,
-							 wchar_t *select_screen_postfix, char *description_id_override)
+SW_COMPONENT* SwNewComponent(char* name, char* svc_name, UINT id, UINT icon, UINT icon_index, wchar_t* svc_filename,
+	wchar_t* long_name, bool system_mode_only, UINT num_files, char* files[],
+	wchar_t* start_exe_name, wchar_t* start_description,
+	SW_OLD_MSI* old_msis, UINT num_old_msis,
+	wchar_t* select_screen_postfix, char* description_id_override)
 {
-	SW_COMPONENT *c;
+	SW_COMPONENT* c;
 	UINT i;
 	char tmp[MAX_SIZE];
 	// Validate arguments
@@ -6577,7 +6786,7 @@ SW_COMPONENT *SwNewComponent(char *name, char *svc_name, UINT id, UINT icon, UIN
 }
 
 // Examine the OS requirements
-bool SwCheckOs(SW *sw, SW_COMPONENT *c)
+bool SwCheckOs(SW* sw, SW_COMPONENT* c)
 {
 	// Validate arguments
 	if (sw == NULL || c == NULL)
@@ -6587,7 +6796,7 @@ bool SwCheckOs(SW *sw, SW_COMPONENT *c)
 
 	if (c->Id == SW_CMP_VPN_CLIENT)
 	{
-		OS_INFO *info = GetOsInfo();
+		OS_INFO* info = GetOsInfo();
 
 		if (OS_IS_WINDOWS_NT(info->OsType))
 		{
@@ -6619,24 +6828,24 @@ bool SwCheckOs(SW *sw, SW_COMPONENT *c)
 }
 
 // Define the component
-void SwDefineComponents(SW *sw)
+void SwDefineComponents(SW* sw)
 {
-	SW_COMPONENT *c;
-	char *ntt_server_files[] =
+	SW_COMPONENT* c;
+	char* ntt_server_files[] =
 	{
 		DI_FILENAME_DESKSERVER_ANSI, // ThinSvr.exe
 		DI_FILENAME_DESKCONFIG_ANSI, // ThinConfig.exe
 		DI_FILENAME_HAMCORE_ANSI, // hamcore.se2
 	};
 
-	char *ntt_server_ns_files[] =
+	char* ntt_server_ns_files[] =
 	{
 		DI_FILENAME_DESKSERVER_NOSHARE_SRC_ANSI, // ThinSvrNS.exe
 		DI_FILENAME_DESKCONFIG_ANSI, // ThinConfig.exe
 		DI_FILENAME_HAMCORE_ANSI, // hamcore.se2
 	};
 
-	char *ntt_client_files[] =
+	char* ntt_client_files[] =
 	{
 		DI_FILENAME_DESKCLIENT_ANSI, // ThinClient.exe
 		DI_FILENAME_DESKCONFIG_ANSI, // ThinConfig.exe
@@ -6651,21 +6860,21 @@ void SwDefineComponents(SW *sw)
 
 	// NTT Server (共有機能有効版)
 	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER, ICO_USER_ADMIN, 14, DI_FILENAME_DESKSERVER,
-		SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char *), ntt_server_files,
+		SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char*), ntt_server_files,
 		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
 		NULL, 0, NULL, NULL);
 	Add(sw->ComponentList, c);
 
 	// NTT Server (共有機能無効版)
 	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER_NS, ICO_USER_ADMIN, 14, DI_FILENAME_DESKSERVER,
-		SW_LONG_THINSVR, false, sizeof(ntt_server_ns_files) / sizeof(char *), ntt_server_ns_files,
+		SW_LONG_THINSVR, false, sizeof(ntt_server_ns_files) / sizeof(char*), ntt_server_ns_files,
 		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
 		NULL, 0, _UU("PRODUCT_NAME_NOSHARE_POSTFIX"), "SW_COMPONENT_" APP_ID_PREFIX "THINSVR_DESCRIPTION_NS_POSTFIX");
 	Add(sw->ComponentList, c);
 
 	// NTT Client
 	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_THIN_CLIENT, ICO_THINCLIENT, 13, DI_FILENAME_DESKCLIENT,
-		SW_LONG_THINCLIENT, false, sizeof(ntt_client_files) / sizeof(char *), ntt_client_files,
+		SW_LONG_THINCLIENT, false, sizeof(ntt_client_files) / sizeof(char*), ntt_client_files,
 		DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_THINCLIENT"),
 		NULL, 0, NULL, NULL);
 
@@ -6673,7 +6882,7 @@ void SwDefineComponents(SW *sw)
 }
 
 // Detect the available components
-void SwDetectComponents(SW *sw)
+void SwDetectComponents(SW* sw)
 {
 	UINT i;
 	// Validate arguments
@@ -6684,7 +6893,7 @@ void SwDetectComponents(SW *sw)
 
 	for (i = 0;i < LIST_NUM(sw->ComponentList);i++)
 	{
-		SW_COMPONENT *c = LIST_DATA(sw->ComponentList, i);
+		SW_COMPONENT* c = LIST_DATA(sw->ComponentList, i);
 
 		c->Detected = SwIsComponentDetected(sw, c);
 	}
@@ -6705,7 +6914,7 @@ void SwDetectComponents(SW *sw)
 }
 
 // Determine whether detection of the component is successful
-bool SwIsComponentDetected(SW *sw, SW_COMPONENT *c)
+bool SwIsComponentDetected(SW* sw, SW_COMPONENT* c)
 {
 	UINT i;
 	bool ret = true;
@@ -6717,7 +6926,7 @@ bool SwIsComponentDetected(SW *sw, SW_COMPONENT *c)
 
 	for (i = 0;i < LIST_NUM(c->NeedFiles);i++)
 	{
-		char *name = LIST_DATA(c->NeedFiles, i);
+		char* name = LIST_DATA(c->NeedFiles, i);
 		wchar_t name_w[MAX_SIZE];
 		wchar_t fullpath[MAX_SIZE];
 
@@ -6746,9 +6955,9 @@ bool SwIsComponentDetected(SW *sw, SW_COMPONENT *c)
 }
 
 // Add a new log
-void SwAddLog(SW *sw, SW_LOGFILE *logfile, UINT type, wchar_t *path)
+void SwAddLog(SW* sw, SW_LOGFILE* logfile, UINT type, wchar_t* path)
 {
-	SW_LOG *g;
+	SW_LOG* g;
 	// Validate arguments
 	if (sw == NULL || path == NULL || logfile == NULL)
 	{
@@ -6761,9 +6970,9 @@ void SwAddLog(SW *sw, SW_LOGFILE *logfile, UINT type, wchar_t *path)
 
 	Add(logfile->LogList, g);
 }
-void SwAddLogA(SW *sw, SW_LOGFILE *logfile, UINT type, char *path)
+void SwAddLogA(SW* sw, SW_LOGFILE* logfile, UINT type, char* path)
 {
-	wchar_t *w;
+	wchar_t* w;
 	// Validate arguments
 	if (sw == NULL || path == NULL || logfile == NULL)
 	{
@@ -6778,9 +6987,9 @@ void SwAddLogA(SW *sw, SW_LOGFILE *logfile, UINT type, char *path)
 }
 
 // Create a SW
-SW *NewSw()
+SW* NewSw()
 {
-	SW *sw = ZeroMalloc(sizeof(SW));
+	SW* sw = ZeroMalloc(sizeof(SW));
 
 	sw->IsSystemMode = true;
 
@@ -6796,7 +7005,7 @@ SW *NewSw()
 }
 
 // Release the SW
-UINT FreeSw(SW *sw)
+UINT FreeSw(SW* sw)
 {
 	UINT i;
 	UINT ret;
@@ -6810,7 +7019,7 @@ UINT FreeSw(SW *sw)
 
 	for (i = 0;i < LIST_NUM(sw->ComponentList);i++)
 	{
-		SW_COMPONENT *c = LIST_DATA(sw->ComponentList, i);
+		SW_COMPONENT* c = LIST_DATA(sw->ComponentList, i);
 
 		SwFreeComponent(c);
 	}
@@ -6833,7 +7042,7 @@ UINT FreeSw(SW *sw)
 }
 
 // Exit the multi-starts prevention mode
-void SwLeaveSingle(SW *sw)
+void SwLeaveSingle(SW* sw)
 {
 	// Validate arguments
 	if (sw == NULL)
@@ -6849,7 +7058,7 @@ void SwLeaveSingle(SW *sw)
 }
 
 // Enter multiple-starts prevention mode
-bool SwEnterSingle(SW *sw)
+bool SwEnterSingle(SW* sw)
 {
 	// Validate arguments
 	if (sw == NULL)
@@ -6873,11 +7082,11 @@ bool SwEnterSingle(SW *sw)
 }
 
 // Parse the command line
-void SwParseCommandLine(SW *sw)
+void SwParseCommandLine(SW* sw)
 {
-	CONSOLE *c;
-	wchar_t *cmdline;
-	LIST *o;
+	CONSOLE* c;
+	wchar_t* cmdline;
+	LIST* o;
 	PARAM args[] =
 	{
 		{"UAC", NULL, NULL, NULL, NULL, },
@@ -6945,9 +7154,9 @@ void SwParseCommandLine(SW *sw)
 // Start the Setup Wizard
 UINT SWExecMain()
 {
-	SW *sw;
+	SW* sw;
 	UINT ret;
-	SW_LOGFILE *logfile = NULL;
+	SW_LOGFILE* logfile = NULL;
 	wchar_t verstr[MAX_SIZE];
 	char ver[MAX_SIZE];
 

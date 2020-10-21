@@ -186,6 +186,40 @@ struct DC_INSPECT
 	char Ticket[64];
 };
 
+#define MAX_NWDETECT_URLS	4
+
+#define	NWDETECT_TIMEOUT	(2 * 1000)
+#define NWDETECT_DEFAULT_NUMTRY		2
+
+// ネットワーク種類検出設定
+struct DC_NWDETECT_SETTINGS
+{
+	UINT NumTry;
+	UINT TimeoutMsecs;
+	char NwDetectUrls[MAX_NWDETECT_URLS][64];
+	char NwDetectExpectStrs[MAX_NWDETECT_URLS][64];
+	DC_NWDETECT_CALLBACK* Callback;
+	void* Param;
+};
+
+// ネットワーク種類検出結果
+struct DC_NWDETECT_RESULT
+{
+	bool IsDetectedByUrl;
+	bool IsFinished;
+};
+
+// ネットワーク種類検出
+struct DC_NWDETECT
+{
+	DC_NWDETECT_SETTINGS Settings;
+
+	THREAD* Thread;
+	volatile bool Halt;
+	volatile bool IsDetectedByUrl;
+	volatile bool IsFinished;
+};
+
 // DC
 struct DC
 {
@@ -280,6 +314,12 @@ DC_ADVAUTH *DcGetAdvAuth(DC *dc, char *pcid);
 void DcSetAdvAuth(DC *dc, DC_ADVAUTH *advauth);
 void DcClearAdvAuthList(DC *dc);
 bool DcIsMstscParamsContainsRdpFile(char *cmdline);
+DC_NWDETECT* DcNewNwDetectAuto(DC_NWDETECT_SETTINGS* settings);
+DC_NWDETECT* DcNewNwDetect(DC_NWDETECT_SETTINGS* settings);
+void DcNwDetectThread(THREAD* thread, void* param);
+bool DcNwDetectProcessOneUrl(DC_NWDETECT* t, char* url, char* expect);
+void DcFreeNwDetect(DC_NWDETECT* t, DC_NWDETECT_RESULT *result);
+
 
 #endif	// DC_H
 

@@ -260,6 +260,15 @@ typedef struct SW_SFX_FILE
 	wchar_t DiskFileName[MAX_PATH];				// File name of the disk
 } SW_SFX_FILE;
 
+typedef struct SW_NW_DETECT_DLG_PARAM
+{
+	HWND hWndParent;
+	HWND hWnd;
+	DC_NWDETECT* Detect;
+	DC_NWDETECT_RESULT Result;
+	bool IsClosing;
+} SW_NW_DETECT_DLG_PARAM;
+
 // SW instance
 typedef struct SW
 {
@@ -322,6 +331,8 @@ typedef struct SW
 	bool OverwriteFlag_DisableSystemMode;
 	bool OverwriteFlag_DisableUserMode;
 	bool DisableDirectoryChange;
+
+	DC_NWDETECT_RESULT NwDetectResult;	// ネットワーク自動検出の結果
 } SW;
 
 
@@ -386,6 +397,7 @@ UINT SwEula(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, W
 void SwEulaUpdate(HWND hWnd, SW *sw, WIZARD *wizard, WIZARD_PAGE *wizard_page);
 UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param);
 void SwDirUpdate(HWND hWnd, SW *sw, WIZARD_PAGE *wizard_page);
+UINT SwNwSelect(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WIZARD_PAGE* wizard_page, void* param);
 UINT SwReady(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param);
 UINT SwPerform(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD *wizard, WIZARD_PAGE *wizard_page, void *param);
 void SwPerformInit(HWND hWnd, SW *sw, WIZARD_PAGE *wp);
@@ -426,6 +438,13 @@ SW_SFX_FILE *SwNewSfxFile(char *inner_file_name, wchar_t *disk_file_name);
 bool SwSfxCopyVgFiles(HWND hWnd, wchar_t *src, wchar_t *dst);
 
 bool SwThinTeleworkInstallUrdpToProgramFiles(SW *sw);
+
+void SwNwDetectDlg(HWND hWnd, DC_NWDETECT_RESULT *result);
+UINT SwNwDetectDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void* param);
+void SwNwDetectDlgAsynCallbackProc(DC_NWDETECT* d);
+
+
+
 
 #endif	// SW_INNER_H
 

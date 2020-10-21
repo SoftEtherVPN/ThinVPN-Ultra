@@ -231,6 +231,9 @@
 #define BMP_OTP                         247
 #define ICO_SHIELD                      248
 #define BMP_WOL                         250
+#define BMP_NWSELECT1                   251
+#define BMP_NWSELECT2                   252
+#define BMP_NWDETECT                    253
 #define S_TITLE                         1007
 #define S_INSERT_SECURE                 1008
 #define S_TITLE2                        1008
@@ -962,12 +965,15 @@
 #define R_DEFAULT                       1434
 #define S_ENABLE                        1434
 #define R_2WEEKS                        1434
+#define C_NW1                           1434
 #define IDC_RADIO2                      1435
 #define R_UNESTABLISHED                 1435
 #define R_USER                          1435
 #define R_CUSTOM                        1435
 #define S_DISBLE                        1435
 #define R_PERMANENT                     1435
+#define C_INTERNET2                     1435
+#define C_NW2                           1435
 #define R_FOR_SYSTEM                    1436
 #define IDC_NETADDRESS1                 1437
 #define R_FOR_USER                      1437
@@ -1084,6 +1090,10 @@
 #define S_UX                            1538
 #define S_UX2                           1539
 #define S_INFO_ICON                     1540
+#define D_SW_NWSELECT_BMP_NWSELECT1     1543
+#define D_SW_NWSELECT_BMP_NWSELECT2     1544
+#define BMP_NWDETECT_D_SW_NWDETECT      1545
+#define D_SW_NWDETECT_BMP_NWDETECT      1545
 #define B_ONLINE                        1655
 #define D_NM_CONNECT                    1998
 #define D_NM_MAIN                       1999
@@ -1385,6 +1395,8 @@
 #define D_DG_WOL                        2654
 #define D_DU_WOL                        2655
 #define D_DG_REG                        2656
+#define D_SW_NWSELECT                   2657
+#define D_SW_NWDETECT                   2658
 #define ID_Menu40011                    40011
 #define CMD_CONNECT                     40020
 #define CMD_STATUS                      40021
@@ -1455,9 +1467,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        251
+#define _APS_NEXT_RESOURCE_VALUE        254
 #define _APS_NEXT_COMMAND_VALUE         40111
-#define _APS_NEXT_CONTROL_VALUE         1541
+#define _APS_NEXT_CONTROL_VALUE         1546
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

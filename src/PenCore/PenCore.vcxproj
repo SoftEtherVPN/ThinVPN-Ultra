@@ -162,6 +162,9 @@
     <Image Include="NormalUser.ico" />
     <Image Include="Notice.bmp" />
     <Image Include="Null.ico" />
+    <Image Include="nwdetect.bmp" />
+    <Image Include="nwselect1.bmp" />
+    <Image Include="nwselect2.bmp" />
     <Image Include="OpenVPN.bmp" />
     <Image Include="OpenVPN.ico" />
     <Image Include="Otp.bmp" />

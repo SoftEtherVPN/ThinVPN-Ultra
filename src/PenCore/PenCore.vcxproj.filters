@@ -494,5 +494,8 @@
     <Image Include="Zurukko.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="nwselect1.bmp" />
+    <Image Include="nwselect2.bmp" />
+    <Image Include="nwdetect.bmp" />
   </ItemGroup>
 </Project>

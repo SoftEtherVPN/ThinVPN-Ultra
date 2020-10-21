@@ -118,6 +118,7 @@
 #define ERR_REG_PASSWORD_EMPTY				255	// 登録用パスワードが未設定である
 #define	ERR_REG_PASSWORD_INCORRECT			256 // 登録用パスワードが誤っている
 #define ERR_GATE_SYSTEM_INTERNAL_PROXY		257	// ゲートウェイ <--> 中間プロキシサーバー <--> コントローラ 間の通信が不良である
+#define ERR_NOT_LGWAN						258	// LGWAN 上の PC でない
 
 
 // SNI 文字列
