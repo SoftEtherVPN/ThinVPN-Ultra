@@ -170,6 +170,9 @@ static char* sfx_ntt_files[] =
 #ifdef VARS_ENABLE_LIMITED_MODE
 	"EntryPoint_LimitedMode.dat",
 #endif // VARS_ENABLE_LIMITED_MODE
+#ifdef VARS_ENABLE_LGWAN_MODE
+	"EntryPoint_LgwanMode.dat",
+#endif // VARS_ENABLE_LGWAN_MODE
 };
 
 static char* sfx_ntt_files_share_disabled[] =
@@ -183,6 +186,9 @@ static char* sfx_ntt_files_share_disabled[] =
 #ifdef VARS_ENABLE_LIMITED_MODE
 	"EntryPoint_LimitedMode.dat",
 #endif // VARS_ENABLE_LIMITED_MODE
+#ifdef VARS_ENABLE_LGWAN_MODE
+	"EntryPoint_LgwanMode.dat",
+#endif // VARS_ENABLE_LGWAN_MODE
 };
 
 // Global variables to be used out of necessity
@@ -467,9 +473,15 @@ bool SwAddBasicFilesToList(LIST* o, char* component_name)
 	}
 
 	Add(o, SwNewSfxFile("EntryPoint.dat", L"|EntryPoint.dat"));
+
 #ifdef VARS_ENABLE_LIMITED_MODE
 	Add(o, SwNewSfxFile("EntryPoint_LimitedMode.dat", L"|EntryPoint_LimitedMode.dat"));
 #endif // VARS_ENABLE_LIMITED_MODE
+
+#ifdef VARS_ENABLE_LGWAN_MODE
+	Add(o, SwNewSfxFile("EntryPoint_LgwanMode.dat", L"|EntryPoint_LgwanMode.dat"));
+#endif // VARS_ENABLE_LGWAN_MODE
+
 	Add(o, SwNewSfxFile("install_src.dat", L"|install_src.dat"));
 
 	return true;
@@ -3052,18 +3064,33 @@ void SwDefineTasks(SW* sw, SW_TASK* t, SW_COMPONENT* c)
 		sw->InstallLimitedMode = false;
 #endif // VARS_ENABLE_LIMITED_MODE
 
-		if (sw->InstallLimitedMode == false)
+#ifdef VARS_ENABLE_LGWAN_MODE
+		if (sw->NwDetectResult.IsDetectedByUrl == false)
 		{
-			// 通常モード
-			Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint.dat", NULL, sw->InstallSrc, sw->InstallDir, true, false));
+			// LGWAN Mode
+			Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint_LgwanMode.dat", L"EntryPoint.dat", sw->InstallSrc, sw->InstallDir, true, false));
 		}
 		else
 		{
-			// 行政情報システム用 IP 特定モード
+#endif // VARS_ENABLE_LGWAN_MODE
+
+			if (sw->InstallLimitedMode == false)
+			{
+				// 通常モード
+				Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint.dat", NULL, sw->InstallSrc, sw->InstallDir, true, false));
+			}
+			else
+			{
+				// 行政情報システム用 IP 特定モード
 #ifdef VARS_ENABLE_LIMITED_MODE
-			Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint_LimitedMode.dat", L"EntryPoint.dat", sw->InstallSrc, sw->InstallDir, true, false));
+				Add(t->CopyTasks, et = SwNewCopyTask(L"EntryPoint_LimitedMode.dat", L"EntryPoint.dat", sw->InstallSrc, sw->InstallDir, true, false));
 #endif // VARS_ENABLE_LIMITED_MODE
+			}
+
+#ifdef VARS_ENABLE_LGWAN_MODE
 		}
+#endif // VARS_ENABLE_LGWAN_MODE
+
 
 		CombinePathW(tmp, sizeof(tmp), et->DstDir, et->DstFileName);
 		Add(t->SetSecurityPathsEveryone, CopyUniStr(tmp));
