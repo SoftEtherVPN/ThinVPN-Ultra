@@ -5725,14 +5725,14 @@ END
 
 D_SW_NWSELECT DIALOGEX 0, 0, 323, 155
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "NW Select"
+CAPTION "@D_SW_NWSELECT"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    CONTROL         "(&1) これは、LGWAN 側 (庁舎側) の PC です。庁内 LAN に設置されております。",C_NW1,
+    CONTROL         "@C_NW1",C_NW1,
                     "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,36,22,286,16
-    CONTROL         "(&2) これは、インターネット側 (自宅側) の PC です。自宅に設置されております。",C_NW2,
+    CONTROL         "@C_NW2",C_NW2,
                     "Button",BS_AUTORADIOBUTTON,36,88,286,17
-    LTEXT           "この PC 端末は、庁舎側 / 自宅側どちら側の PC でしょうか?\r\n(後から選択を変更するには、再度このインストーラを実行する必要があります。)",IDC_STATIC,36,5,280,16
+    LTEXT           "@S_1",IDC_STATIC,36,5,280,16
     ICON            ICO_FARM,IDC_STATIC,7,3,20,20
     CONTROL         BMP_NWSELECT1,D_SW_NWSELECT_BMP_NWSELECT1,"Static",SS_BITMAP,36,40,253,46
     CONTROL         BMP_NWSELECT2,D_SW_NWSELECT_BMP_NWSELECT2,"Static",SS_BITMAP,36,105,253,46
@@ -5740,13 +5740,13 @@ END
 
 D_SW_NWDETECT DIALOGEX 0, 0, 248, 170
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "インターネット接続の検出"
+CAPTION "@D_SW_NWDETECT"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
     ICON            ICO_FARM,IDC_STATIC,10,1,20,20
-    LTEXT           "この PC がインターネットと通信可能かどうか確認しています。お待ちください...",S_TITLE,11,26,226,19
-    LTEXT           "インターネット接続を確認しています...",S_BOLD,34,5,203,20
-    DEFPUSHBUTTON   "手動でネットワーク種類を選択(&M)",IDCANCEL,52,146,142,19
+    LTEXT           "@S_TITLE",S_TITLE,11,26,226,19
+    LTEXT           "@S_BOLD",,34,5,203,20
+    DEFPUSHBUTTON   "@IDCANCEL",IDCANCEL,52,146,142,19
     CONTROL         BMP_NWDETECT,D_SW_NWDETECT_BMP_NWDETECT,"Static",SS_BITMAP,11,51,226,63
     CONTROL         "",A_PROGRESS,"SysAnimate32",ACS_TRANSPARENT | WS_TABSTOP,64,125,120,16,WS_EX_TRANSPARENT
 END

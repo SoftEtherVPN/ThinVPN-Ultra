@@ -5041,6 +5041,20 @@ IDOK					&OK
 IDCANCEL				&Cancel
 
 
+PREFIX					D_SW_NWSELECT
+CAPTION					Select network connectivity
+C_NW1					(&1) This is a LGWAN-side PC, connected to the Local Government network.
+C_NW2					(&2) This is a Home-side PC, connected to your home network or ISP.
+S_1						Select your network connectivity type.\r\n(Note: You must re-install if you change this settings afterward.)
+
+
+PREFIX					D_SW_NWDETECT
+CAPTION					Detect Internet connectivity
+S_TITLE					Detecting whether this PC is connected to Internet. Please wait...
+S_BOLD					Checking the Internet connectivity...
+IDCANCEL				Select &manually
+
+
 
 
 
