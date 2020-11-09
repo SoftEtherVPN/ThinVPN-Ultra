@@ -189,23 +189,47 @@ void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
 		msg = pol->ServerMessage;
 	}
 
-	if (pol->EnforceOtp)
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
 	{
-		otp_str = _UU("DS_POLICY_YES");
-	}
+		// 通常版
+		if (pol->EnforceOtp)
+		{
+			otp_str = _UU("DS_POLICY_YES");
+		}
 
-	if (pol->EnforceInspection)
-	{
-		inspection_str = _UU("DS_POLICY_YES");
-	}
+		if (pol->EnforceInspection)
+		{
+			inspection_str = _UU("DS_POLICY_YES");
+		}
 
-	if (pol->EnforceMacCheck)
-	{
-		maccheck_str = _UU("DS_POLICY_YES");
-	}
+		if (pol->EnforceMacCheck)
+		{
+			maccheck_str = _UU("DS_POLICY_YES");
+		}
 
-	if (pol->DisableShare)
+		if (pol->DisableShare)
+		{
+			disableshare_str = _UU("DS_POLICY_YES");
+		}
+	}
+	else
 	{
+		// セキュリティ強化版 (例: LGWAN)
+		if (pol->DisableOtp == false)
+		{
+			otp_str = _UU("DS_POLICY_YES");
+		}
+
+		if (pol->DisableInspection == false)
+		{
+			inspection_str = _UU("DS_POLICY_YES");
+		}
+
+		if (pol->DisableMacCheck == false)
+		{
+			maccheck_str = _UU("DS_POLICY_YES");
+		}
+
 		disableshare_str = _UU("DS_POLICY_YES");
 	}
 
