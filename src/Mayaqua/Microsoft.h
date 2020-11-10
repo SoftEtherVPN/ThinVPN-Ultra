@@ -365,6 +365,64 @@ typedef struct MS
 	bool IsWine;
 } MS;
 
+typedef struct _NT_RTL_USER_PROCESS_PARAMETERS {
+	BYTE Reserved1[16];
+	PVOID Reserved2[10];
+	UNICODE_STRING ImagePathName;
+	UNICODE_STRING CommandLine;
+} NT_RTL_USER_PROCESS_PARAMETERS, * PNT_RTL_USER_PROCESS_PARAMETERS;
+
+typedef struct _NT_PEB_LDR_DATA {
+	BYTE Reserved1[8];
+	PVOID Reserved2[3];
+	LIST_ENTRY InMemoryOrderModuleList;
+} NT_PEB_LDR_DATA, * PNT_PEB_LDR_DATA;
+
+typedef
+VOID
+(NTAPI* PNT_PS_POST_PROCESS_INIT_ROUTINE) (
+	VOID
+	);
+
+typedef struct _NT_PEB {
+	BYTE Reserved1[2];
+	BYTE BeingDebugged;
+	BYTE Reserved2[1];
+	PVOID Reserved3[2];
+	PNT_PEB_LDR_DATA Ldr;
+	PNT_RTL_USER_PROCESS_PARAMETERS ProcessParameters;
+	PVOID Reserved4[3];
+	PVOID AtlThunkSListPtr;
+	PVOID Reserved5;
+	ULONG Reserved6;
+	PVOID Reserved7;
+	ULONG Reserved8;
+	ULONG AtlThunkSListPtr32;
+	PVOID Reserved9[45];
+	BYTE Reserved10[96];
+	PNT_PS_POST_PROCESS_INIT_ROUTINE PostProcessInitRoutine;
+	BYTE Reserved11[128];
+	PVOID Reserved12[1];
+	ULONG SessionId;
+} NT_PEB, * PNT_PEB;
+
+typedef enum _NT_PROCESSINFOCLASS {
+	NT_ProcessBasicInformation = 0,
+	NT_ProcessDebugPort = 7,
+	NT_ProcessWow64Information = 26,
+	NT_ProcessImageFileName = 27,
+	NT_ProcessBreakOnTermination = 29
+} NT_PROCESSINFOCLASS;
+
+typedef struct _NT_PROCESS_BASIC_INFORMATION {
+	PVOID Reserved1;
+	PNT_PEB PebBaseAddress;
+	PVOID Reserved2[2];
+	ULONG_PTR UniqueProcessId;
+	PVOID Reserved3;
+} NT_PROCESS_BASIC_INFORMATION;
+typedef NT_PROCESS_BASIC_INFORMATION* PNT_PROCESS_BASIC_INFORMATION;
+
 // For Windows NT API
 typedef struct NT_API
 {
@@ -381,6 +439,7 @@ typedef struct NT_API
 	HINSTANCE hWcmapi;
 	HINSTANCE hDwmapi;
 	HINSTANCE hUserenv;
+	HINSTANCE hNtdll;
 	BOOL (WINAPI *OpenProcessToken)(HANDLE, DWORD, PHANDLE);
 	BOOL (WINAPI *LookupPrivilegeValue)(char *, char *, PLUID);
 	BOOL (WINAPI *AdjustTokenPrivileges)(HANDLE, BOOL, PTOKEN_PRIVILEGES, DWORD, PTOKEN_PRIVILEGES, PDWORD);
@@ -466,6 +525,9 @@ typedef struct NT_API
 	LONG (WINAPI *RegUnLoadKeyW)(HKEY, LPCWSTR);
 	BOOL (WINAPI* RefreshPolicy)(BOOL);
 	BOOL (WINAPI* RefreshPolicyEx)(BOOL, DWORD);
+	NTSTATUS(NTAPI* NtQueryInformationProcess)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG);
+	NTSTATUS(NTAPI* NtWow64QueryInformationProcess64)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG);
+	NTSTATUS(NTAPI* NtQueryInformationProcess_64BitNative)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG);
 } NT_API;
 
 typedef struct MS_EVENTLOG
@@ -1158,6 +1220,11 @@ LIST *MsGetMacAddressList();
 
 void *MsGetCurrentInstanceHandle();
 
+bool MsApplyGroupPolicy(bool machine);
+
+wchar_t* MsGetProcessCommandLineW(void* process_handle);
+wchar_t* MsGetPcoesssCommandLineByIdW(UINT process_id);
+
 // Inner functions
 #ifdef	MICROSOFT_C
 
@@ -1195,9 +1262,6 @@ bool CALLBACK MsEnumResourcesInternalProc(HMODULE hModule, const char *type, cha
 void CALLBACK MsScmDispatcher(DWORD argc, LPTSTR *argv);
 LRESULT CALLBACK MsSuspendHandlerWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void MsSuspendHandlerThreadProc(THREAD *thread, void *param);
-
-bool MsApplyGroupPolicy(bool machine);
-
 
 #endif	// MICROSOFT_C
 

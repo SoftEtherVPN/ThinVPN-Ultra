@@ -295,6 +295,92 @@ void MsInitProcessCallOnce(bool restricted_mode)
 	}
 }
 
+wchar_t* MsGetPcoesssCommandLineByIdW(UINT process_id)
+{
+	wchar_t* ret = NULL;
+	HANDLE h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+		false, process_id);
+	if (h == NULL)
+	{
+		return NULL;
+	}
+
+	ret = MsGetProcessCommandLineW(h);
+
+	CloseHandle(h);
+
+	return ret;
+}
+
+wchar_t* MsGetProcessCommandLineW(void* process_handle)
+{
+	wchar_t* ret = NULL;
+	NT_PROCESS_BASIC_INFORMATION proc_info = CLEAN;
+	UINT ret_size = 0;
+	NT_PEB* peb_addr = NULL;
+
+	if (MsIsNt() == false)
+	{
+		return NULL;
+	}
+	if (process_handle == NULL)
+	{
+		return NULL;
+	}
+	if (ms->nt->NtQueryInformationProcess_64BitNative == NULL)
+	{
+		return NULL;
+	}
+
+	if (ms->nt->NtQueryInformationProcess_64BitNative((HANDLE)process_handle,
+		NT_ProcessBasicInformation,
+		&proc_info,
+		sizeof(NT_PROCESS_BASIC_INFORMATION),
+		&ret_size) == 0)
+	{
+		peb_addr = proc_info.PebBaseAddress;
+		if (peb_addr != NULL)
+		{
+			NT_PEB* peb_copy = ZeroMalloc(sizeof(NT_PEB));
+
+			if (ReadProcessMemory(process_handle, peb_addr, peb_copy, sizeof(NT_PEB), NULL))
+			{
+				NT_RTL_USER_PROCESS_PARAMETERS* params_addr = peb_copy->ProcessParameters;
+				if (params_addr != NULL)
+				{
+					NT_RTL_USER_PROCESS_PARAMETERS* params_copy = ZeroMalloc(sizeof(NT_RTL_USER_PROCESS_PARAMETERS));
+					
+					if (ReadProcessMemory(process_handle, params_addr, params_copy, sizeof(NT_RTL_USER_PROCESS_PARAMETERS), NULL))
+					{
+						PWSTR buffer_addr = params_copy->CommandLine.Buffer;
+						if (buffer_addr != NULL)
+						{
+							USHORT size = params_copy->CommandLine.Length;
+							wchar_t* buffer_copy = ZeroMalloc(size + sizeof(wchar_t) * 2);
+
+							if (ReadProcessMemory(process_handle, buffer_addr, buffer_copy, size, NULL))
+							{
+								ret = buffer_copy;
+							}
+							else
+							{
+								Free(buffer_copy);
+							}
+						}
+					}
+
+					Free(params_copy);
+				}
+			}
+
+			Free(peb_copy);
+		}
+	}
+
+
+	return ret;
+}
+
 bool MsApplyGroupPolicy(bool machine)
 {
 	if (ms != NULL && ms->nt != NULL && ms->nt->RefreshPolicyEx != NULL)
@@ -13242,6 +13328,7 @@ NT_API *MsLoadNtApiFunctions()
 {
 	NT_API *nt = ZeroMalloc(sizeof(NT_API));
 	OSVERSIONINFO info;
+	bool is_wow64 = false;
 
 	Zero(&info, sizeof(info));
 	info.dwOSVersionInfoSize = sizeof(info);
@@ -13296,6 +13383,8 @@ NT_API *MsLoadNtApiFunctions()
 	nt->hDwmapi = LoadLibrary("dwmapi.dll");
 
 	nt->hUserenv = LoadLibrary("Userenv.dll");
+
+	nt->hNtdll = LoadLibrary("Ntdll.dll");
 
 	// Read the function
 	nt->GetComputerNameExW =
@@ -13405,6 +13494,32 @@ NT_API *MsLoadNtApiFunctions()
 	nt->RegUnLoadKeyW =
 		(LSTATUS (__stdcall *)(HKEY,LPCWSTR))
 		GetProcAddress(nt->hAdvapi32, "RegUnLoadKeyW");
+
+	// Determine WoW64
+	if (Is32())
+	{
+		if (nt->IsWow64Process2 != NULL)
+		{
+			USHORT v1 = IMAGE_FILE_MACHINE_UNKNOWN, v2 = IMAGE_FILE_MACHINE_UNKNOWN;
+			if (nt->IsWow64Process2(GetCurrentProcess(), &v1, &v2))
+			{
+				is_wow64 = true;
+			}
+		}
+
+		// Windows 8 or below
+		if (nt->IsWow64Process)
+		{
+			bool b = false;
+			if (nt->IsWow64Process(GetCurrentProcess(), &b))
+			{
+				if (b)
+				{
+					is_wow64 = true;
+				}
+			}
+		}
+	}
 
 	if (info.dwMajorVersion >= 5)
 	{
@@ -13604,6 +13719,28 @@ NT_API *MsLoadNtApiFunctions()
 			GetProcAddress(nt->hUserenv, "RefreshPolicyEx");
 	}
 
+	if (nt->hNtdll != NULL)
+	{
+		nt->NtQueryInformationProcess =
+			(NTSTATUS(__stdcall*)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG))
+			GetProcAddress(nt->hNtdll, "NtQueryInformationProcess");
+
+		nt->NtWow64QueryInformationProcess64 =
+			(NTSTATUS(__stdcall*)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG))
+			GetProcAddress(nt->hNtdll, "NtWow64QueryInformationProcess64");
+
+		if (is_wow64)
+		{
+			// WOW64
+			nt->NtQueryInformationProcess_64BitNative = nt->NtWow64QueryInformationProcess64;
+		}
+		else
+		{
+			// Native windows
+			nt->NtQueryInformationProcess_64BitNative = nt->NtQueryInformationProcess;
+		}
+	}
+
 	// Desktop related API
 	if (nt->hUser32 != NULL)
 	{
@@ -13694,6 +13831,11 @@ void MsFreeNtApiFunctions(NT_API *nt)
 	if (nt->hUserenv != NULL)
 	{
 		FreeLibrary(nt->hUserenv);
+	}
+
+	if (nt->hNtdll != NULL)
+	{
+		FreeLibrary(nt->hNtdll);
 	}
 
 	FreeLibrary(nt->hKernel32);
