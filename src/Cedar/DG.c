@@ -1174,7 +1174,7 @@ void DgOptionDlgInit(HWND hWnd, DG *dg)
 
 	dg->IsAdminOrSystem_Cache = s.IsAdminOrSystem;
 
-	SetEnable(hWnd, C_SHOW_WATERMARK, !s.EnforceWatermark);
+	SetEnable(hWnd, C_SHOW_WATERMARK, !s.EnforceWatermark && !s.DisableWatermark);
 
 	DgOptionDlgUpdate(hWnd, dg);
 }
@@ -1489,8 +1489,8 @@ void DgAuthDlgInit(HWND hWnd, DG *dg)
 	Check(hWnd, C_INSPECTION, t.EnableInspection);
 	Check(hWnd, C_CHECKMAC, t.EnableMacCheck);
 
-	SetEnable(hWnd, C_INSPECTION, !st.EnforceInspection);
-	SetEnable(hWnd, C_CHECKMAC, !st.EnforceMacCheck);
+	SetEnable(hWnd, C_INSPECTION, !st.EnforceInspection && !st.DisableInspection);
+	SetEnable(hWnd, C_CHECKMAC, !st.EnforceMacCheck && !st.DisableMacCheck);
 
 	DgAuthDlgUpdate(hWnd);
 }

@@ -183,53 +183,30 @@ void DsPreparePolicyMessage(wchar_t *str, UINT str_size, DS_POLICY_BODY *pol)
 	{
 		return;
 	}
-
+	
 	if (UniIsEmptyStr(pol->ServerMessage) == false)
 	{
 		msg = pol->ServerMessage;
 	}
 
-	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
+	// 通常版
+	if (pol->EnforceOtp)
 	{
-		// 通常版
-		if (pol->EnforceOtp)
-		{
-			otp_str = _UU("DS_POLICY_YES");
-		}
-
-		if (pol->EnforceInspection)
-		{
-			inspection_str = _UU("DS_POLICY_YES");
-		}
-
-		if (pol->EnforceMacCheck)
-		{
-			maccheck_str = _UU("DS_POLICY_YES");
-		}
-
-		if (pol->DisableShare)
-		{
-			disableshare_str = _UU("DS_POLICY_YES");
-		}
+		otp_str = _UU("DS_POLICY_YES");
 	}
-	else
+
+	if (pol->EnforceInspection)
 	{
-		// セキュリティ強化版 (例: LGWAN)
-		if (pol->DisableOtp == false)
-		{
-			otp_str = _UU("DS_POLICY_YES");
-		}
+		inspection_str = _UU("DS_POLICY_YES");
+	}
 
-		if (pol->DisableInspection == false)
-		{
-			inspection_str = _UU("DS_POLICY_YES");
-		}
+	if (pol->EnforceMacCheck)
+	{
+		maccheck_str = _UU("DS_POLICY_YES");
+	}
 
-		if (pol->DisableMacCheck == false)
-		{
-			maccheck_str = _UU("DS_POLICY_YES");
-		}
-
+	if (pol->DisableShare)
+	{
 		disableshare_str = _UU("DS_POLICY_YES");
 	}
 
@@ -263,16 +240,41 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 
 	o = ReadIni(buf);
 
-	b->EnforceOtp = IniIntValue(o, "ENFORCE_OTP");
-	b->DisableOtp = IniIntValue(o, "DISABLE_OTP") && (!b->EnforceOtp);
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") == false)
+	{
+		// 通常版
+		b->EnforceOtp = IniIntValue(o, "ENFORCE_OTP");
+		b->DisableOtp = IniIntValue(o, "DISABLE_OTP") && (!b->EnforceOtp);
 
-	b->EnforceInspection = IniIntValue(o, "ENFORCE_INSPECTION");
-	b->DisableInspection = IniIntValue(o, "DISABLE_INSPECTION") && (!b->EnforceInspection);
+		b->EnforceInspection = IniIntValue(o, "ENFORCE_INSPECTION");
+		b->DisableInspection = IniIntValue(o, "DISABLE_INSPECTION") && (!b->EnforceInspection);
 
-	b->EnforceMacCheck = IniIntValue(o, "ENFORCE_MACCHECK");
-	b->DisableMacCheck = IniIntValue(o, "DISABLE_MACCHECK") && (!b->EnforceMacCheck);
+		b->EnforceMacCheck = IniIntValue(o, "ENFORCE_MACCHECK");
+		b->DisableMacCheck = IniIntValue(o, "DISABLE_MACCHECK") && (!b->EnforceMacCheck);
 
-	b->DisableShare = IniIntValue(o, "DISABLE_SHARE");
+		b->EnforceWatermark = IniIntValue(o, "ENFORCE_WATERMARK");
+		b->DisableWatermark = IniIntValue(o, "DISABLE_WATERMARK") && (!b->EnforceWatermark);
+
+		b->DisableShare = IniIntValue(o, "DISABLE_SHARE");
+	}
+	else
+	{
+		// LGWAN 版
+		b->DisableOtp = IniIntValue(o, "DISABLE_OTP");
+		b->EnforceOtp = !b->DisableOtp;
+
+		b->DisableInspection = IniIntValue(o, "DISABLE_INSPECTION");
+		b->EnforceInspection = !b->DisableInspection;
+
+		b->DisableMacCheck = IniIntValue(o, "DISABLE_MACCHECK");
+		b->EnforceMacCheck = !b->DisableMacCheck;
+
+		b->DisableWatermark = IniIntValue(o, "DISABLE_WATERMARK");
+		b->EnforceWatermark = !b->DisableWatermark;
+
+		b->DisableShare = true;
+	}
+
 
 	s = IniStrValue(o, "SERVER_ALLOWED_MAC_LIST_URL");
 	if (IsEmptyStr(s) == false)
@@ -297,9 +299,6 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 			b->SyslogPort = SYSLOG_PORT;
 		}
 	}
-
-	b->EnforceWatermark = IniIntValue(o, "ENFORCE_WATERMARK");
-	b->DisableWatermark = IniIntValue(o, "DISABLE_WATERMARK") && (!b->EnforceWatermark);
 
 	if (b->EnforceWatermark)
 	{
@@ -1692,7 +1691,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 				Lock(ds->ConfigLock);
 				{
-					// サーバーに登録されている MAC アドレス一覧に一致するものがあるかどうか検査
+					// サーバーに登録されている (ローカルの) MAC アドレス一覧に一致するものがあるかどうか検査
 					check_ret = CheckStrListIncludedInOtherStrMac(ds->MacAddressList, ins.MacAddressList);
 				}
 				Unlock(ds->ConfigLock);
@@ -2916,6 +2915,10 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 		t->EnforceMacCheck = pol.EnforceMacCheck;
 
 		t->EnforceWatermark = pol.EnforceWatermark;
+
+		t->DisableInspection = pol.DisableInspection;
+		t->DisableMacCheck = pol.DisableMacCheck;
+		t->DisableWatermark = pol.DisableWatermark;
 	}
 	else
 	{
