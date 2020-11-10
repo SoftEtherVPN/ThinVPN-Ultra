@@ -108,7 +108,7 @@
 #define DS_OTP_NUM_TRY				20
 
 // ポリシークライアント更新間隔
-#define DS_POLICY_CLIENT_UPDATE_INTERVAL	(1000)
+#define DS_POLICY_CLIENT_UPDATE_INTERVAL	(5 * 60 * 1000)
 
 // 受信ポリシーの有効期限
 #define	DS_POLICY_EXPIRES					(DS_POLICY_CLIENT_UPDATE_INTERVAL * 2)
