@@ -472,6 +472,7 @@ DG_OTP_SETTINGS_REQUIRED		The "Two-Factor Authentication/One Time Password (OTP)
 
 DG_MAC_SETTINGS_REQUIRED		Client MAC Address Authentication is enabled, but no MAC address is configured for the client device.\r\n\r\nThe Client device will not be able to connect to this server remotely.\r\n\r\nDo you want to set the MAC address of the client terminal now?\r\n(You will need to find out the MAC address of the Client device at home or elsewhere.)\r\n\r\nAlternatively, you can always start this configuration tool again at a later date.
 
+DG_NO_LOCAL_MAC_ADDRESS_LIST	The $APPSHORT$ Enterprise Policy Enforcement Server currently enforces the Client MAC Address Authentication. The current policy enforces the central administration of the MAC adddress list by the CLIENT_ALLOWED_MAC_LIST_URL policy item.\r\n\rnAlso, the current policy enforces the NO_LOCAL_MAC_ADDRESS_LIST item to 1 (true).\r\n\r\nTherefore the local MAC address list cannot be edited manually by the local user.\r\n\r\nPlease contact to your system administrator to add / delete MAC addresses to the central list.
 
 
 
