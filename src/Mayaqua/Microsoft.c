@@ -295,6 +295,309 @@ void MsInitProcessCallOnce(bool restricted_mode)
 	}
 }
 
+// プロセスウォッチャーを常時動作させるかどうかの設定
+void MsSetProcessWatcherAlwaysFlag(MS_PROCESS_WATCHER* w, bool flag)
+{
+	if (w == NULL)
+	{
+		return;
+	}
+
+	w->Always = flag;
+}
+bool MsGetProcessWatcherAlwaysFlag(MS_PROCESS_WATCHER* w)
+{
+	if (w == NULL)
+	{
+		return false;
+	}
+
+	return w->Always;
+}
+
+// プロセスウォッチャーを無効化するかどうかの設定
+void MsSetProcessWatcherDisabledFlag(MS_PROCESS_WATCHER* w, bool flag)
+{
+	if (w == NULL)
+	{
+		return;
+	}
+
+	w->Disabled = flag;
+}
+bool MsGetProcessWatcherDisabledFlag(MS_PROCESS_WATCHER* w)
+{
+	if (w == NULL)
+	{
+		return false;
+	}
+
+	return w->Disabled;
+}
+
+// プロセスウォッチャーの有効化
+void MsActivateProcessWatcher(MS_PROCESS_WATCHER* w)
+{
+	if (w == NULL)
+	{
+		return;
+	}
+
+	Inc(w->Counter);
+}
+
+// プロセスウォッチャーの無効化
+void MsDeactivateProcessWatcher(MS_PROCESS_WATCHER* w)
+{
+	if (w == NULL)
+	{
+		return;
+	}
+
+	Dec(w->Counter);
+}
+
+// プロセスウォッチャースレッド
+void MsProcessWatcherThreadProc(THREAD* thread, void* param)
+{
+	MS_PROCESS_WATCHER* w;
+	LIST* current = NULL;
+	if (thread == NULL || param == NULL)
+	{
+		return;
+	}
+
+	w = (MS_PROCESS_WATCHER*)param;
+
+	while (true)
+	{
+		bool is_started = false;
+		if (w->Halt)
+		{
+			break;
+		}
+
+		if ((Count(w->Counter) != 0 || w->Always) && (w->Disabled == false))
+		{
+			is_started = true;
+		}
+		
+		if (is_started)
+		{
+			UINT i;
+			MS_PROCESS_DIFF* diff = NULL;
+
+			if (current == NULL)
+			{
+				// ウォッチが開始された
+				current = MsNewCurrentProcessList();
+				MsFreeProcessDiff(MsGetProcessDiff(current));
+			}
+
+			// 前回からの変化をみます
+			diff = MsGetProcessDiff(current);
+
+			if (diff != NULL)
+			{
+				for (i = 0;i < LIST_NUM(diff->CreatedProcessList);i++)
+				{
+					MS_PROCESS* p = LIST_DATA(diff->CreatedProcessList, i);
+					if (w->Callback != NULL)
+					{
+						w->Callback(true, p, w->Param);
+					}
+				}
+
+				for (i = 0;i < LIST_NUM(diff->DeletedProcessList);i++)
+				{
+					MS_PROCESS* p = LIST_DATA(diff->DeletedProcessList, i);
+					if (w->Callback != NULL)
+					{
+						w->Callback(false, p, w->Param);
+					}
+				}
+
+				MsFreeProcessDiff(diff);
+			}
+		}
+		else
+		{
+			if (current != NULL)
+			{
+				// ウォッチが終了された
+				MsFreeProcessList(current);
+				current = NULL;
+			}
+		}
+
+		Wait(w->Event, MS_PROCESS_WATCHER_INTERVAL);
+	}
+
+	MsFreeProcessList(current);
+	current = NULL;
+}
+
+// プロセスウォッチャーの終了
+void MsFreeProcessWatcher(MS_PROCESS_WATCHER* w)
+{
+	if (w == NULL)
+	{
+		return;
+	}
+
+	w->Halt = true;
+	Set(w->Event);
+
+	WaitThread(w->Thread, INFINITE);
+	ReleaseThread(w->Thread);
+
+	DeleteCounter(w->Counter);
+
+	ReleaseEvent(w->Event);
+
+	Free(w);
+}
+
+// プロセスウォッチャーの開始
+MS_PROCESS_WATCHER* MsNewProcessWatcher(MS_PROCESS_WATCHER_CALLBACK* callback, void* param)
+{
+	MS_PROCESS_WATCHER* w = ZeroMalloc(sizeof(MS_PROCESS_WATCHER));
+
+	w->Event = NewEvent();
+	w->Callback = callback;
+	w->Counter = NewCounter();
+	w->Param = param;
+
+	w->Thread = NewThread(MsProcessWatcherThreadProc, w);
+
+	return w;
+}
+
+// プロセスリスト比較
+int MsCmpProcessList(void* p1, void* p2)
+{
+	MS_PROCESS* t1, * t2;
+	if (p1 == NULL || p2 == NULL)
+	{
+		return 0;
+	}
+	t1 = *((MS_PROCESS**)p1);
+	t2 = *((MS_PROCESS**)p2);
+	if (t1 == NULL || t2 == NULL)
+	{
+		return 0;
+	}
+
+	return COMPARE_RET(t1->ProcessId, t2->ProcessId);
+}
+
+// プロセスリスト作成
+LIST* MsNewCurrentProcessList()
+{
+	LIST* o = NewListFast(MsCmpProcessList);
+
+	return o;
+}
+
+// プロセスの Diff を取得
+MS_PROCESS_DIFF* MsGetProcessDiff(LIST* o)
+{
+	MS_PROCESS_DIFF* d;
+	LIST* current_list;
+	UINT i;
+	LIST* del = NULL;
+	// 引数チェック
+	if (o == NULL)
+	{
+		return NULL;
+	}
+
+	d = ZeroMalloc(sizeof(MS_PROCESS_DIFF));
+
+	d->CreatedProcessList = NewListFast(NULL);
+	d->DeletedProcessList = NewListFast(NULL);
+
+	current_list = MsGetProcessList();
+
+	for (i = 0;i < LIST_NUM(current_list);i++)
+	{
+		MS_PROCESS* p = LIST_DATA(current_list, i);
+
+		if (Search(o, p) == false)
+		{
+			// 新たなプロセス
+			Insert(o, Clone(p, sizeof(MS_PROCESS)));
+
+			Add(d->CreatedProcessList, Clone(p, sizeof(MS_PROCESS)));
+		}
+	}
+
+	for (i = 0;i < LIST_NUM(o);i++)
+	{
+		MS_PROCESS* pdata = (MS_PROCESS*)LIST_DATA(o, i);
+		UINT j;
+		bool exists = false;
+
+		for (j = 0;j < LIST_NUM(current_list);j++)
+		{
+			MS_PROCESS* p = LIST_DATA(current_list, j);
+
+			if (p->ProcessId == pdata->ProcessId)
+			{
+				exists = true;
+				break;
+			}
+		}
+
+		if (exists == false)
+		{
+			// 消えたプロセス
+			Add(d->DeletedProcessList, Clone(pdata, sizeof(MS_PROCESS)));
+
+			if (del == NULL)
+			{
+				del = NewListFast(NULL);
+			}
+			Add(del, pdata);
+		}
+	}
+
+	if (del != NULL)
+	{
+		UINT i;
+		for (i = 0;i < LIST_NUM(del);i++)
+		{
+			MS_PROCESS* p = LIST_DATA(del, i);
+
+			Free(p);
+
+			Delete(o, p);
+		}
+
+		ReleaseList(del);
+	}
+
+	MsFreeProcessList(current_list);
+
+	return d;
+}
+
+// プロセスの Diff を解放
+void MsFreeProcessDiff(MS_PROCESS_DIFF* d)
+{
+	// 引数チェック
+	if (d == NULL)
+	{
+		return;
+	}
+
+	FreeStrList(d->CreatedProcessList);
+	FreeStrList(d->DeletedProcessList);
+
+	Free(d);
+}
+
+
 wchar_t* MsGetPcoesssCommandLineByIdW(UINT process_id)
 {
 	wchar_t* ret = NULL;

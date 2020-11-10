@@ -730,6 +730,33 @@ typedef struct MS_SUSPEND_HANDLER
 } MS_SUSPEND_HANDLER;
 
 
+// プロセス Diff
+typedef struct MS_PROCESS_DIFF
+{
+	LIST* CreatedProcessList;
+	LIST* DeletedProcessList;
+} MS_PROCESS_DIFF;
+
+// プロセスウォッチャー
+typedef void (MS_PROCESS_WATCHER_CALLBACK)(bool start, MS_PROCESS *process, void *param);
+
+typedef struct MS_PROCESS_WATCHER
+{
+	volatile bool Halt;
+	EVENT* Event;
+	THREAD* Thread;
+	MS_PROCESS_WATCHER_CALLBACK* Callback;
+	COUNTER* Counter;
+	volatile bool Always;
+	volatile bool Disabled;
+	void* Param;
+} MS_PROCESS_WATCHER;
+
+// プロセスウォッチャー頻度
+#define MS_PROCESS_WATCHER_INTERVAL		200
+
+
+
 // Function prototype
 void MsInit();
 void MsFree();
@@ -1288,6 +1315,20 @@ wchar_t* MsGetPcoesssCommandLineByIdW(UINT process_id);
 
 bool MsReadProcessVirtualMemory64BitNative(void *handle, UINT64 address, void *buffer, UINT in_size, UINT *out_size);
 bool MsReadProcessVirtualMemory32BitNative(void* handle, UINT address, void* buffer, UINT in_size, UINT* out_size);
+
+void MsSetProcessWatcherAlwaysFlag(MS_PROCESS_WATCHER* w, bool flag);
+bool MsGetProcessWatcherAlwaysFlag(MS_PROCESS_WATCHER* w);
+void MsActivateProcessWatcher(MS_PROCESS_WATCHER* w);
+void MsDeactivateProcessWatcher(MS_PROCESS_WATCHER* w);
+void MsProcessWatcherThreadProc(THREAD* thread, void* param);
+void MsFreeProcessWatcher(MS_PROCESS_WATCHER* w);
+MS_PROCESS_WATCHER* MsNewProcessWatcher(MS_PROCESS_WATCHER_CALLBACK* callback, void *param);
+
+int MsCmpProcessList(void* p1, void* p2);
+LIST* MsNewCurrentProcessList();
+MS_PROCESS_DIFF* MsGetProcessDiff(LIST* o);
+void MsFreeProcessDiff(MS_PROCESS_DIFF* d);
+
 
 // Inner functions
 #ifdef	MICROSOFT_C
