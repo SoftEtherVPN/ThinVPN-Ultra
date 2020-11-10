@@ -584,6 +584,7 @@ typedef struct NT_API
 	NTSTATUS(NTAPI* NtQueryInformationProcess)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG);
 	NTSTATUS(NTAPI* NtWow64QueryInformationProcess64)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG);
 	NTSTATUS(NTAPI* NtQueryInformationProcess_64BitNative)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG);
+	NTSTATUS(NTAPI* NtWow64ReadVirtualMemory64)(HANDLE, UINT64, PVOID, ULONG64, PULONG64);
 } NT_API;
 
 typedef struct MS_EVENTLOG
@@ -628,6 +629,7 @@ typedef struct MS_PROCESS
 {
 	char ExeFilename[MAX_PATH];		// EXE file name
 	wchar_t ExeFilenameW[MAX_PATH];	// EXE file name (Unicode)
+	wchar_t CommandLineW[MAX_SIZE];	// Command line
 	UINT ProcessId;					// Process ID
 	bool Is64BitProcess;			// Is 64bit Process
 } MS_PROCESS;
@@ -1283,6 +1285,9 @@ bool MsApplyGroupPolicy(bool machine);
 
 wchar_t* MsGetProcessCommandLineW(void* process_handle);
 wchar_t* MsGetPcoesssCommandLineByIdW(UINT process_id);
+
+bool MsReadProcessVirtualMemory64BitNative(void *handle, UINT64 address, void *buffer, UINT in_size, UINT *out_size);
+bool MsReadProcessVirtualMemory32BitNative(void* handle, UINT address, void* buffer, UINT in_size, UINT* out_size);
 
 // Inner functions
 #ifdef	MICROSOFT_C

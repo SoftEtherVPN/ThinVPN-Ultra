@@ -306,7 +306,7 @@ wchar_t* MsGetPcoesssCommandLineByIdW(UINT process_id)
 	}
 
 	ret = MsGetProcessCommandLineW(h);
-
+	
 	CloseHandle(h);
 
 	return ret;
@@ -315,9 +315,7 @@ wchar_t* MsGetPcoesssCommandLineByIdW(UINT process_id)
 wchar_t* MsGetProcessCommandLineW(void* process_handle)
 {
 	wchar_t* ret = NULL;
-	NT_PROCESS_BASIC_INFORMATION_64 proc_info = CLEAN;
 	UINT ret_size = 0;
-	UINT32 peb_addr = 0;
 
 	if (MsIsNt() == false)
 	{
@@ -327,68 +325,196 @@ wchar_t* MsGetProcessCommandLineW(void* process_handle)
 	{
 		return NULL;
 	}
-	if (ms->nt->NtQueryInformationProcess_64BitNative == NULL)
-	{
-		return NULL;
-	}
 
-	if (MsIs64bitProcess(process_handle) == false)
+	if (MsIs64BitWindows())
 	{
-		DoNothing();
-	}
+		NT_PROCESS_BASIC_INFORMATION_64 proc_info = CLEAN;
+		UINT64 peb_addr = 0;
 
-	if (ms->nt->NtQueryInformationProcess_64BitNative((HANDLE)process_handle,
-		NT_ProcessBasicInformation,
-		&proc_info,
-		sizeof(proc_info),
-		&ret_size) == 0)
-	{
-		peb_addr = (UINT32)proc_info.PebBaseAddress;
-		if (peb_addr != 0)
+		if (ms->nt->NtQueryInformationProcess_64BitNative == NULL)
 		{
-			NT_PEB_32* peb_copy = ZeroMalloc(sizeof(NT_PEB_32));
+			return NULL;
+		}
 
-			if (proc_info.UniqueProcessId == 808)
+		if (ms->nt->NtQueryInformationProcess_64BitNative((HANDLE)process_handle,
+			NT_ProcessBasicInformation,
+			&proc_info,
+			sizeof(proc_info),
+			&ret_size) == 0)
+		{
+			peb_addr = proc_info.PebBaseAddress;
+			if (peb_addr != 0)
 			{
-				Print("%p\n", proc_info.PebBaseAddress);
-			}
+				NT_PEB_64* peb_copy = ZeroMalloc(sizeof(NT_PEB_64));
 
-			if (ReadProcessMemory(process_handle, (void *)peb_addr, peb_copy, sizeof(NT_PEB_32), NULL))
-			{
-				UINT32 params_addr = (UINT32)peb_copy->ProcessParameters;
-				if (params_addr != 0)
+				if (MsReadProcessVirtualMemory64BitNative(process_handle, peb_addr, peb_copy, sizeof(NT_PEB_64), NULL))
 				{
-					NT_RTL_USER_PROCESS_PARAMETERS_32* params_copy = ZeroMalloc(sizeof(NT_RTL_USER_PROCESS_PARAMETERS_32));
-					
-					if (ReadProcessMemory(process_handle, (void *)params_addr, params_copy, sizeof(NT_RTL_USER_PROCESS_PARAMETERS_32), NULL))
+					UINT64 params_addr = peb_copy->ProcessParameters;
+					if (params_addr != 0)
 					{
-						UINT32 buffer_addr = params_copy->CommandLine.Buffer;
-						if (buffer_addr != 0)
-						{
-							USHORT size = params_copy->CommandLine.Length;
-							wchar_t* buffer_copy = ZeroMalloc(size + sizeof(wchar_t) * 2);
+						NT_RTL_USER_PROCESS_PARAMETERS_64* params_copy = ZeroMalloc(sizeof(NT_RTL_USER_PROCESS_PARAMETERS_64));
 
-							if (ReadProcessMemory(process_handle, (void *)buffer_addr, buffer_copy, size, NULL))
+						if (MsReadProcessVirtualMemory64BitNative(process_handle, params_addr, params_copy, sizeof(NT_RTL_USER_PROCESS_PARAMETERS_64), NULL))
+						{
+							UINT64 buffer_addr = params_copy->CommandLine.Buffer;
+							if (buffer_addr != 0)
 							{
-								ret = buffer_copy;
-							}
-							else
-							{
-								Free(buffer_copy);
+								USHORT size = params_copy->CommandLine.Length;
+								wchar_t* buffer_copy = ZeroMalloc(size + sizeof(wchar_t) * 2);
+
+								if (MsReadProcessVirtualMemory64BitNative(process_handle, buffer_addr, buffer_copy, size, NULL))
+								{
+									ret = buffer_copy;
+								}
+								else
+								{
+									Free(buffer_copy);
+								}
 							}
 						}
+
+						Free(params_copy);
 					}
-
-					Free(params_copy);
 				}
-			}
 
-			Free(peb_copy);
+				Free(peb_copy);
+			}
+		}
+	}
+	else
+	{
+		NT_PROCESS_BASIC_INFORMATION_32 proc_info = CLEAN;
+		UINT32 peb_addr = 0;
+
+		if (ms->nt->NtQueryInformationProcess((HANDLE)process_handle,
+			NT_ProcessBasicInformation,
+			&proc_info,
+			sizeof(proc_info),
+			&ret_size) == 0)
+		{
+			peb_addr = proc_info.PebBaseAddress;
+			if (peb_addr != 0)
+			{
+				NT_PEB_32* peb_copy = ZeroMalloc(sizeof(NT_PEB_32));
+
+				if (MsReadProcessVirtualMemory32BitNative(process_handle, peb_addr, peb_copy, sizeof(NT_PEB_32), NULL))
+				{
+					UINT32 params_addr = peb_copy->ProcessParameters;
+					if (params_addr != 0)
+					{
+						NT_RTL_USER_PROCESS_PARAMETERS_32* params_copy = ZeroMalloc(sizeof(NT_RTL_USER_PROCESS_PARAMETERS_32));
+
+						if (MsReadProcessVirtualMemory32BitNative(process_handle, params_addr, params_copy, sizeof(NT_RTL_USER_PROCESS_PARAMETERS_32), NULL))
+						{
+							UINT32 buffer_addr = params_copy->CommandLine.Buffer;
+							if (buffer_addr != 0)
+							{
+								USHORT size = params_copy->CommandLine.Length;
+								wchar_t* buffer_copy = ZeroMalloc(size + sizeof(wchar_t) * 2);
+
+								if (MsReadProcessVirtualMemory32BitNative(process_handle, buffer_addr, buffer_copy, size, NULL))
+								{
+									ret = buffer_copy;
+								}
+								else
+								{
+									Free(buffer_copy);
+								}
+							}
+						}
+
+						Free(params_copy);
+					}
+				}
+
+				Free(peb_copy);
+			}
 		}
 	}
 
-
 	return ret;
+}
+
+// Read 32bit native memory of other process
+bool MsReadProcessVirtualMemory32BitNative(void* handle, UINT address, void* buffer, UINT in_size, UINT* out_size)
+{
+	SIZE_T out_tmp_2 = 0;
+	if (out_size != NULL)
+	{
+		*out_size = 0;
+	}
+	if (handle == NULL)
+	{
+		return false;
+	}
+
+	if (ReadProcessMemory(handle, UINT32_TO_POINTER(address), buffer, (SIZE_T)in_size, &out_tmp_2))
+	{
+		if (out_size != NULL)
+		{
+			*out_size = (UINT)out_tmp_2;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+// Read 64bit native memory of other process
+bool MsReadProcessVirtualMemory64BitNative(void* handle, UINT64 address, void* buffer, UINT in_size, UINT* out_size)
+{
+	SIZE_T out_tmp_2 = 0;
+	if (out_size != NULL)
+	{
+		*out_size = 0;
+	}
+	if (handle == NULL)
+	{
+		return false;
+	}
+	if (MsIsNt() == false)
+	{
+		return false;
+	}
+
+	if (MsIs64BitWindows() && Is32())
+	{
+		UINT ret;
+		ULONG64 out_tmp = 0;
+		// I am WoW64 process: call the special API
+		if (ms->nt->NtWow64ReadVirtualMemory64 == NULL)
+		{
+			return false;
+		}
+
+		ret = ms->nt->NtWow64ReadVirtualMemory64(handle, address, buffer, (ULONG64)in_size, &out_tmp);
+
+		if (ret == 0)
+		{
+			if (out_size != NULL)
+			{
+				*out_size = (UINT)out_tmp;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	// Otherwise call the normal API
+	if (ReadProcessMemory(handle, (LPVOID)address, buffer, (SIZE_T)in_size, &out_tmp_2))
+	{
+		if (out_size != NULL)
+		{
+			*out_size = (UINT)out_tmp_2;
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 bool MsApplyGroupPolicy(bool machine)
@@ -5709,11 +5835,23 @@ LIST *MsGetProcessListNt()
 			if (ok)
 			{
 				MS_PROCESS *p = ZeroMalloc(sizeof(MS_PROCESS));
+				wchar_t* cmdline;
 
 				StrCpy(p->ExeFilename, sizeof(p->ExeFilename), exe);
 				UniStrCpy(p->ExeFilenameW, sizeof(p->ExeFilenameW), exe_w);
 				p->ProcessId = id;
 				p->Is64BitProcess = MsIs64bitProcess(h);
+
+				cmdline = MsGetProcessCommandLineW(h);
+				if (UniIsEmptyStr(cmdline) == false)
+				{
+					UniStrCpy(p->CommandLineW, sizeof(p->CommandLineW), cmdline);
+				}
+				else
+				{
+					UniStrCpy(p->CommandLineW, sizeof(p->CommandLineW), p->ExeFilenameW);
+				}
+				Free(cmdline);
 
 				Add(o, p);
 			}
@@ -13824,6 +13962,10 @@ NT_API *MsLoadNtApiFunctions()
 		nt->NtWow64QueryInformationProcess64 =
 			(NTSTATUS(__stdcall*)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG))
 			GetProcAddress(nt->hNtdll, "NtWow64QueryInformationProcess64");
+
+		nt->NtWow64ReadVirtualMemory64 =
+			(NTSTATUS(__stdcall*)(HANDLE, UINT64, PVOID, ULONG64, PULONG64))
+			GetProcAddress(nt->hNtdll, "NtWow64ReadVirtualMemory64");
 
 		if (is_wow64)
 		{

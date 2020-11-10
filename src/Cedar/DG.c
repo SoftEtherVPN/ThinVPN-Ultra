@@ -1848,7 +1848,7 @@ UINT DgAuthDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 
 				if (CALL(hWnd, DtcGetStatus(dg->Rpc, &st)) == false)
 				{
-					return;
+					break;
 				}
 
 				if (st.NoLocalMacAddressList)
