@@ -300,6 +300,7 @@ struct DS_POLICY_BODY
 	UINT SyslogPort;
 	char ServerAllowedMacListUrl[MAX_PATH];
 	char ClientAllowedMacListUrl[MAX_PATH];
+	bool NoLocalMacAddressList;
 };
 
 struct DS_POLICY_CLIENT

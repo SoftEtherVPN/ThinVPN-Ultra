@@ -286,6 +286,15 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 	if (IsEmptyStr(s) == false)
 	{
 		StrCpy(b->ClientAllowedMacListUrl, sizeof(b->ClientAllowedMacListUrl), s);
+
+		if (b->EnforceMacCheck)
+		{
+			if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+			{
+				// セキュリティ強化版では、NO_LOCAL_MAC_ADDRESS_LIST のポリシー指定を読み込むことができる
+				b->NoLocalMacAddressList = IniIntValue(o, "NO_LOCAL_MAC_ADDRESS_LIST");
+			}
+		}
 	}
 
 	s = IniStrValue(o, "SYSLOG_HOSTNAME");
@@ -1689,12 +1698,15 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			{
 				bool check_ret = false;
 
-				Lock(ds->ConfigLock);
+				if (pol.NoLocalMacAddressList == false) // NO_LOCAL_MAC_ADDRESS_LIST が設定されていない場合のみローカルを読み込む
 				{
-					// サーバーに登録されている (ローカルの) MAC アドレス一覧に一致するものがあるかどうか検査
-					check_ret = CheckStrListIncludedInOtherStrMac(ds->MacAddressList, ins.MacAddressList);
+					Lock(ds->ConfigLock);
+					{
+						// サーバーに登録されている (ローカルの) MAC アドレス一覧に一致するものがあるかどうか検査
+						check_ret = CheckStrListIncludedInOtherStrMac(ds->MacAddressList, ins.MacAddressList);
+					}
+					Unlock(ds->ConfigLock);
 				}
-				Unlock(ds->ConfigLock);
 
 				if (check_ret == false)
 				{
@@ -2919,6 +2931,7 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 		t->DisableInspection = pol.DisableInspection;
 		t->DisableMacCheck = pol.DisableMacCheck;
 		t->DisableWatermark = pol.DisableWatermark;
+		t->NoLocalMacAddressList = pol.NoLocalMacAddressList;
 	}
 	else
 	{

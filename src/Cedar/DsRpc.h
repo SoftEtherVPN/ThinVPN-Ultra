@@ -111,6 +111,7 @@ struct RPC_DS_STATUS
 	bool DisableInspection;
 	bool DisableMacCheck;
 	bool DisableWatermark;
+	bool NoLocalMacAddressList;
 	bool IsAdminOrSystem;
 };
 

@@ -1842,8 +1842,25 @@ UINT DgAuthDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 
 		case B_MAC:
 			// MAC
-			DgMacDlg(hWnd,dg);
-			break;
+			if (true)
+			{
+				RPC_DS_STATUS st = CLEAN;
+
+				if (CALL(hWnd, DtcGetStatus(dg->Rpc, &st)) == false)
+				{
+					return;
+				}
+
+				if (st.NoLocalMacAddressList)
+				{
+					MsgBox(hWnd, MB_ICONINFORMATION, _UU("DG_NO_LOCAL_MAC_ADDRESS_LIST"));
+				}
+				else
+				{
+					DgMacDlg(hWnd, dg);
+				}
+				break;
+			}
 		}
 		break;
 
@@ -2676,7 +2693,7 @@ UINT DgMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 			{
 				if (DtcGetConfig(dg->Rpc, &cfg) == ERR_NO_ERROR)
 				{
-					if ((st.EnforceMacCheck || cfg.EnableMacCheck) && IsEmptyStr(cfg.MacAddressList))
+					if ((st.EnforceMacCheck || cfg.EnableMacCheck) && IsEmptyStr(cfg.MacAddressList) && st.NoLocalMacAddressList == false)
 					{
 						// MAC Address Auth
 						if (MsgBox(hWnd, MB_ICONQUESTION | MB_YESNO, _UU("DG_MAC_SETTINGS_REQUIRED")) == IDYES)
