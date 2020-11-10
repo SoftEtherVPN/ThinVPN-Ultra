@@ -365,18 +365,43 @@ typedef struct MS
 	bool IsWine;
 } MS;
 
-typedef struct _NT_RTL_USER_PROCESS_PARAMETERS {
-	BYTE Reserved1[16];
-	PVOID Reserved2[10];
-	UNICODE_STRING ImagePathName;
-	UNICODE_STRING CommandLine;
-} NT_RTL_USER_PROCESS_PARAMETERS, * PNT_RTL_USER_PROCESS_PARAMETERS;
+typedef struct _NT_UNICODE_STRING_32 {
+	USHORT Length;
+	USHORT MaximumLength;
+	UINT32  Buffer;
+} NT_UNICODE_STRING_32;
 
-typedef struct _NT_PEB_LDR_DATA {
+typedef struct _NT_UNICODE_STRING_64 {
+	USHORT Length;
+	USHORT MaximumLength;
+	UINT64  Buffer;
+} NT_UNICODE_STRING_64;
+
+typedef struct _NT_RTL_USER_PROCESS_PARAMETERS_64 {
+	BYTE Reserved1[16];
+	UINT64 Reserved2[10];
+	NT_UNICODE_STRING_64 ImagePathName;
+	NT_UNICODE_STRING_64 CommandLine;
+} NT_RTL_USER_PROCESS_PARAMETERS_64;
+
+typedef struct _NT_RTL_USER_PROCESS_PARAMETERS_32 {
+	BYTE Reserved1[16];
+	UINT32 Reserved2[10];
+	NT_UNICODE_STRING_32 ImagePathName;
+	NT_UNICODE_STRING_32 CommandLine;
+} NT_RTL_USER_PROCESS_PARAMETERS_32;
+
+typedef struct _NT_PEB_LDR_DATA_32 {
 	BYTE Reserved1[8];
-	PVOID Reserved2[3];
+	UINT32 Reserved2[3];
 	LIST_ENTRY InMemoryOrderModuleList;
-} NT_PEB_LDR_DATA, * PNT_PEB_LDR_DATA;
+} _NT_PEB_LDR_DATA_32;
+
+typedef struct _NT_PEB_LDR_DATA_64 {
+	BYTE Reserved1[8];
+	UINT64 Reserved2[3];
+	LIST_ENTRY InMemoryOrderModuleList;
+} _NT_PEB_LDR_DATA_64;
 
 typedef
 VOID
@@ -384,27 +409,49 @@ VOID
 	VOID
 	);
 
-typedef struct _NT_PEB {
+typedef struct _NT_PEB_64 {
 	BYTE Reserved1[2];
 	BYTE BeingDebugged;
 	BYTE Reserved2[1];
-	PVOID Reserved3[2];
-	PNT_PEB_LDR_DATA Ldr;
-	PNT_RTL_USER_PROCESS_PARAMETERS ProcessParameters;
-	PVOID Reserved4[3];
-	PVOID AtlThunkSListPtr;
-	PVOID Reserved5;
+	UINT64 Reserved3[2];
+	UINT64 Ldr;
+	UINT64 ProcessParameters;
+	UINT64 Reserved4[3];
+	UINT64 AtlThunkSListPtr;
+	UINT64 Reserved5;
 	ULONG Reserved6;
-	PVOID Reserved7;
+	UINT64 Reserved7;
 	ULONG Reserved8;
 	ULONG AtlThunkSListPtr32;
-	PVOID Reserved9[45];
+	UINT64 Reserved9[45];
 	BYTE Reserved10[96];
-	PNT_PS_POST_PROCESS_INIT_ROUTINE PostProcessInitRoutine;
+	UINT64 PostProcessInitRoutine;
 	BYTE Reserved11[128];
-	PVOID Reserved12[1];
+	UINT64 Reserved12[1];
 	ULONG SessionId;
-} NT_PEB, * PNT_PEB;
+} NT_PEB_64, * PNT_PEB_64;
+
+typedef struct _NT_PEB_32 {
+	BYTE Reserved1[2];
+	BYTE BeingDebugged;
+	BYTE Reserved2[1];
+	UINT32 Reserved3[2];
+	UINT32 Ldr;
+	UINT32 ProcessParameters;
+	UINT32 Reserved4[3];
+	UINT32 AtlThunkSListPtr;
+	UINT32 Reserved5;
+	ULONG Reserved6;
+	UINT32 Reserved7;
+	ULONG Reserved8;
+	ULONG AtlThunkSListPtr32;
+	UINT32 Reserved9[45];
+	BYTE Reserved10[96];
+	UINT32 PostProcessInitRoutine;
+	BYTE Reserved11[128];
+	UINT32 Reserved12[1];
+	ULONG SessionId;
+} NT_PEB_32, * PNT_PEB_32;
 
 typedef enum _NT_PROCESSINFOCLASS {
 	NT_ProcessBasicInformation = 0,
@@ -414,14 +461,23 @@ typedef enum _NT_PROCESSINFOCLASS {
 	NT_ProcessBreakOnTermination = 29
 } NT_PROCESSINFOCLASS;
 
-typedef struct _NT_PROCESS_BASIC_INFORMATION {
-	PVOID Reserved1;
-	PNT_PEB PebBaseAddress;
-	PVOID Reserved2[2];
-	ULONG_PTR UniqueProcessId;
-	PVOID Reserved3;
-} NT_PROCESS_BASIC_INFORMATION;
-typedef NT_PROCESS_BASIC_INFORMATION* PNT_PROCESS_BASIC_INFORMATION;
+typedef struct _NT_PROCESS_BASIC_INFORMATION_64 {
+	UINT64 Reserved1;
+	UINT64 PebBaseAddress;
+	UINT64 Reserved2[2];
+	UINT64 UniqueProcessId;
+	UINT64 Reserved3;
+} NT_PROCESS_BASIC_INFORMATION_64;
+typedef NT_PROCESS_BASIC_INFORMATION_64* PNT_PROCESS_BASIC_INFORMATION_64;
+
+typedef struct _NT_PROCESS_BASIC_INFORMATION_32 {
+	UINT32 Reserved1;
+	UINT32 PebBaseAddress;
+	UINT32 Reserved2[2];
+	UINT32 UniqueProcessId;
+	UINT32 Reserved3;
+} NT_PROCESS_BASIC_INFORMATION_32;
+typedef NT_PROCESS_BASIC_INFORMATION_32* PNT_PROCESS_BASIC_INFORMATION_32;
 
 // For Windows NT API
 typedef struct NT_API
@@ -573,6 +629,7 @@ typedef struct MS_PROCESS
 	char ExeFilename[MAX_PATH];		// EXE file name
 	wchar_t ExeFilenameW[MAX_PATH];	// EXE file name (Unicode)
 	UINT ProcessId;					// Process ID
+	bool Is64BitProcess;			// Is 64bit Process
 } MS_PROCESS;
 
 #define	MAX_MS_ADAPTER_IP_ADDRESS	64
@@ -950,6 +1007,7 @@ void MsUpdateCompatibleIDs(char *instance_name);
 LIST *MsGetProcessList();
 LIST *MsGetProcessList9x();
 LIST *MsGetProcessListNt();
+bool MsIs64bitProcess(void* handle);
 void MsFreeProcessList(LIST *o);
 void MsPrintProcessList(LIST *o);
 int MsCompareProcessList(void *p1, void *p2);
@@ -1041,6 +1099,7 @@ bool MsIsWin2000OrGreater();
 bool MsIsWinXPOrGreater();
 void MsRegistWindowsFirewallEx(char *title, char *exe);
 void MsRegistWindowsFirewallEx2(char *title, char *exe, char *dir);
+bool MsIs64BitWindows_Internal();
 bool MsIs64BitWindows();
 bool MsIsX64();
 bool MsIsIA64();

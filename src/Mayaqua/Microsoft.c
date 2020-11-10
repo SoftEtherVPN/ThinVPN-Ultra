@@ -315,9 +315,9 @@ wchar_t* MsGetPcoesssCommandLineByIdW(UINT process_id)
 wchar_t* MsGetProcessCommandLineW(void* process_handle)
 {
 	wchar_t* ret = NULL;
-	NT_PROCESS_BASIC_INFORMATION proc_info = CLEAN;
+	NT_PROCESS_BASIC_INFORMATION_64 proc_info = CLEAN;
 	UINT ret_size = 0;
-	NT_PEB* peb_addr = NULL;
+	UINT32 peb_addr = 0;
 
 	if (MsIsNt() == false)
 	{
@@ -332,33 +332,43 @@ wchar_t* MsGetProcessCommandLineW(void* process_handle)
 		return NULL;
 	}
 
+	if (MsIs64bitProcess(process_handle) == false)
+	{
+		DoNothing();
+	}
+
 	if (ms->nt->NtQueryInformationProcess_64BitNative((HANDLE)process_handle,
 		NT_ProcessBasicInformation,
 		&proc_info,
-		sizeof(NT_PROCESS_BASIC_INFORMATION),
+		sizeof(proc_info),
 		&ret_size) == 0)
 	{
-		peb_addr = proc_info.PebBaseAddress;
-		if (peb_addr != NULL)
+		peb_addr = (UINT32)proc_info.PebBaseAddress;
+		if (peb_addr != 0)
 		{
-			NT_PEB* peb_copy = ZeroMalloc(sizeof(NT_PEB));
+			NT_PEB_32* peb_copy = ZeroMalloc(sizeof(NT_PEB_32));
 
-			if (ReadProcessMemory(process_handle, peb_addr, peb_copy, sizeof(NT_PEB), NULL))
+			if (proc_info.UniqueProcessId == 808)
 			{
-				NT_RTL_USER_PROCESS_PARAMETERS* params_addr = peb_copy->ProcessParameters;
-				if (params_addr != NULL)
+				Print("%p\n", proc_info.PebBaseAddress);
+			}
+
+			if (ReadProcessMemory(process_handle, (void *)peb_addr, peb_copy, sizeof(NT_PEB_32), NULL))
+			{
+				UINT32 params_addr = (UINT32)peb_copy->ProcessParameters;
+				if (params_addr != 0)
 				{
-					NT_RTL_USER_PROCESS_PARAMETERS* params_copy = ZeroMalloc(sizeof(NT_RTL_USER_PROCESS_PARAMETERS));
+					NT_RTL_USER_PROCESS_PARAMETERS_32* params_copy = ZeroMalloc(sizeof(NT_RTL_USER_PROCESS_PARAMETERS_32));
 					
-					if (ReadProcessMemory(process_handle, params_addr, params_copy, sizeof(NT_RTL_USER_PROCESS_PARAMETERS), NULL))
+					if (ReadProcessMemory(process_handle, (void *)params_addr, params_copy, sizeof(NT_RTL_USER_PROCESS_PARAMETERS_32), NULL))
 					{
-						PWSTR buffer_addr = params_copy->CommandLine.Buffer;
-						if (buffer_addr != NULL)
+						UINT32 buffer_addr = params_copy->CommandLine.Buffer;
+						if (buffer_addr != 0)
 						{
 							USHORT size = params_copy->CommandLine.Length;
 							wchar_t* buffer_copy = ZeroMalloc(size + sizeof(wchar_t) * 2);
 
-							if (ReadProcessMemory(process_handle, buffer_addr, buffer_copy, size, NULL))
+							if (ReadProcessMemory(process_handle, (void *)buffer_addr, buffer_copy, size, NULL))
 							{
 								ret = buffer_copy;
 							}
@@ -4035,7 +4045,7 @@ bool MsIsIA64()
 }
 
 // Acquisition whether it's a 64bit Windows
-bool MsIs64BitWindows()
+bool MsIs64BitWindows_Internal()
 {
 	if (Is64())
 	{
@@ -4087,6 +4097,29 @@ bool MsIs64BitWindows()
 			}
 		}
 	}
+}
+
+static volatile bool ms_is64bit_windows_cached = false;
+static volatile bool ms_is64bit_windows_cached_value = false;
+
+bool MsIs64BitWindows()
+{
+	bool ret;
+	if (ms_is64bit_windows_cached)
+	{
+		return ms_is64bit_windows_cached_value;
+	}
+
+	ret = MsIs64BitWindows_Internal();
+
+	if (ms != NULL && ms->nt != NULL)
+	{
+		ms_is64bit_windows_cached_value = ret;
+
+		ms_is64bit_windows_cached = true;
+	}
+
+	return ret;
 }
 
 // Windows Firewall registration
@@ -5549,6 +5582,67 @@ void MsFreeProcessList(LIST *o)
 	ReleaseList(o);
 }
 
+// Determine if process is 64bit
+bool MsIs64bitProcess(void* handle)
+{
+	if (handle == NULL)
+	{
+		return false;
+	}
+
+	if (MsIs64BitWindows() == false)
+	{
+		// Windows is 32bit, then all processes must be 32bit
+		return false;
+	}
+
+	if (ms->nt->IsWow64Process2 != NULL)
+	{
+		// Windows 10 or above
+		USHORT v1 = IMAGE_FILE_MACHINE_UNKNOWN, v2 = IMAGE_FILE_MACHINE_UNKNOWN;
+		if (ms->nt->IsWow64Process2(handle, &v1, &v2))
+		{
+			if (v1 == IMAGE_FILE_MACHINE_UNKNOWN)
+			{
+				// Native 64bit process
+				return true;
+			}
+			else
+			{
+				// WoW64 process
+				return false;
+			}
+		}
+	}
+
+	// Windows 8 or below
+	if (ms->nt->IsWow64Process == NULL)
+	{
+		// Failed: Assume native 64bit
+		return true;
+	}
+	else
+	{
+		bool b = false;
+		if (ms->nt->IsWow64Process(handle, &b) == false)
+		{
+			// Failed: Assume native 64bit
+			return true;
+		}
+
+		if (b == false)
+		{
+			// Native 64bit process
+			return true;
+		}
+		else
+		{
+			// WoW64 process
+			return false;
+		}
+	}
+}
+
 // Get the Process List (for WinNT)
 LIST *MsGetProcessListNt()
 {
@@ -5557,6 +5651,7 @@ LIST *MsGetProcessListNt()
 	DWORD *processes;
 	UINT needed, num;
 	UINT i;
+	bool is_64bit_windows = MsIs64BitWindows();
 
 	o = NewListFast(MsCompareProcessList);
 
@@ -5618,6 +5713,7 @@ LIST *MsGetProcessListNt()
 				StrCpy(p->ExeFilename, sizeof(p->ExeFilename), exe);
 				UniStrCpy(p->ExeFilenameW, sizeof(p->ExeFilenameW), exe_w);
 				p->ProcessId = id;
+				p->Is64BitProcess = MsIs64bitProcess(h);
 
 				Add(o, p);
 			}
