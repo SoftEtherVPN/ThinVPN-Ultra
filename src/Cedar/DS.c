@@ -275,6 +275,8 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 		b->DisableShare = true;
 	}
 
+	b->EnforceProcessWatcherAlways = IniIntValue(o, "ENFORCE_PROCESS_WATCHER_ALWAYS");
+	b->EnforceProcessWatcher = b->EnforceProcessWatcherAlways || IniIntValue(o, "ENFORCE_PROCESS_WATCHER");
 
 	s = IniStrValue(o, "SERVER_ALLOWED_MAC_LIST_URL");
 	if (IsEmptyStr(s) == false)
@@ -2952,6 +2954,8 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 		t->DisableMacCheck = pol.DisableMacCheck;
 		t->DisableWatermark = pol.DisableWatermark;
 		t->NoLocalMacAddressList = pol.NoLocalMacAddressList;
+		t->EnforceProcessWatcher = pol.EnforceProcessWatcher;
+		t->EnforceProcessWatcherAlways = pol.EnforceProcessWatcherAlways;
 	}
 	else
 	{
@@ -3779,6 +3783,16 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 			if (pol.DisableOtp)
 			{
 				ds->EnableOtp = false;
+			}
+
+			if (pol.EnforceProcessWatcher)
+			{
+				MsSetProcessWatcherDisabledFlag(ds->ProcessWatcher, false);
+			}
+
+			if (pol.EnforceProcessWatcherAlways)
+			{
+				MsSetProcessWatcherAlwaysFlag(ds->ProcessWatcher, true);
 			}
 		}
 		else

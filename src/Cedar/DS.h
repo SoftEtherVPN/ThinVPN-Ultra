@@ -298,6 +298,9 @@ struct DS_POLICY_BODY
 	bool EnforceWatermark;
 	bool DisableWatermark;
 
+	bool EnforceProcessWatcher;
+	bool EnforceProcessWatcherAlways;
+
 	wchar_t WatermarkMessage[MAX_SIZE];
 	char SyslogHostname[MAX_PATH];
 	UINT SyslogPort;

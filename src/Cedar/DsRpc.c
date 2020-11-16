@@ -266,6 +266,9 @@ void InRpcDsStatus(RPC_DS_STATUS *t, PACK *p)
 	t->DisableWatermark = PackGetBool(p, "DisableWatermark");
 	t->NoLocalMacAddressList = PackGetBool(p, "NoLocalMacAddressList");
 
+	t->EnforceProcessWatcher = PackGetBool(p, "EnforceProcessWatcher");
+	t->EnforceProcessWatcherAlways = PackGetBool(p, "EnforceProcessWatcherAlways");
+
 	t->EnforceOtp = PackGetBool(p, "EnforceOtp");
 
 	t->IsAdminOrSystem = PackGetBool(p, "IsAdminOrSystem");
@@ -312,6 +315,9 @@ void OutRpcDsStatus(PACK *p, RPC_DS_STATUS *t)
 	PackAddBool(p, "EnforceInspection", t->EnforceInspection);
 	PackAddBool(p, "EnforceMacCheck", t->EnforceMacCheck);
 	PackAddBool(p, "EnforceWatermark", t->EnforceWatermark);
+
+	PackAddBool(p, "EnforceProcessWatcher", t->EnforceProcessWatcher);
+	PackAddBool(p, "EnforceProcessWatcherAlways", t->EnforceProcessWatcherAlways);
 
 	PackAddBool(p, "DisableInspection", t->DisableInspection);
 	PackAddBool(p, "DisableMacCheck", t->DisableMacCheck);

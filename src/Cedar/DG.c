@@ -1182,6 +1182,12 @@ void DgOptionDlgInit(HWND hWnd, DG *dg)
 	Check(hWnd, C_PROCESSLOG1, c.ProcessWatcherEnabled);
 	Check(hWnd, C_PROCESSLOG2, c.ProcessWatcherAlways);
 
+	if (s.EnforceProcessWatcher)
+	{
+		SetEnable(hWnd, C_PROCESSLOG1, false);
+		Check(hWnd, C_PROCESSLOG1, true);
+	}
+
 	DgOptionDlgUpdate(hWnd, dg);
 }
 

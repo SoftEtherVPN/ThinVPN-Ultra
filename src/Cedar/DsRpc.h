@@ -113,6 +113,8 @@ struct RPC_DS_STATUS
 	bool DisableWatermark;
 	bool NoLocalMacAddressList;
 	bool IsAdminOrSystem;
+	bool EnforceProcessWatcher;
+	bool EnforceProcessWatcherAlways;
 };
 
 struct RPC_PCID
