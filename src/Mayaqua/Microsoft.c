@@ -14040,7 +14040,10 @@ NT_API *MsLoadNtApiFunctions()
 			USHORT v1 = IMAGE_FILE_MACHINE_UNKNOWN, v2 = IMAGE_FILE_MACHINE_UNKNOWN;
 			if (nt->IsWow64Process2(GetCurrentProcess(), &v1, &v2))
 			{
-				is_wow64 = true;
+				if (v1 != IMAGE_FILE_MACHINE_UNKNOWN)
+				{
+					is_wow64 = true;
+				}
 			}
 		}
 
