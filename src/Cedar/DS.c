@@ -3794,6 +3794,14 @@ void DsNormalizeConfig(DS *ds, bool change_rdp_status)
 			{
 				MsSetProcessWatcherAlwaysFlag(ds->ProcessWatcher, true);
 			}
+
+			if (pol.EnforceOtp)
+			{
+				if (IsEmptyStr(ds->OtpEmail) == false)
+				{
+					ds->EnableOtp = true;
+				}
+			}
 		}
 		else
 		{
