@@ -77,8 +77,8 @@
 
 
 // インストールする製品の種類
-#define DI_PRODUCT_SERVER		1	// Desktop VPN Server のインストール
-#define DI_PRODUCT_CLIENT		2	// Desktop VPN Client のインストール
+#define DI_PRODUCT_SERVER		1	// シン・テレワークシステム Server のインストール
+#define DI_PRODUCT_CLIENT		2	// シン・テレワークシステム Client のインストール
 
 //ディレクトリ
 #define	DI_DIR_STARTMENU		((wchar_t *)1)		// スタートメニュー

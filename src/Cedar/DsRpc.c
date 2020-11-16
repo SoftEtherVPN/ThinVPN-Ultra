@@ -71,7 +71,7 @@
 
 
 // DsRpc.c
-// PacketiX Desktop VPN Server RPC
+// シン・テレワークシステム サーバー RPC
 
 // Build 8600
 
@@ -130,6 +130,9 @@ void InRpcDsConfig(RPC_DS_CONFIG *t, PACK *p)
 	t->EnableWoLTarget = PackGetBool(p, "EnableWoLTarget");
 	t->EnableWoLTrigger = PackGetBool(p, "EnableWoLTrigger");
 
+	t->ProcessWatcherEnabled = PackGetBool(p, "ProcessWatcherEnabled");
+	t->ProcessWatcherAlways = PackGetBool(p, "ProcessWatcherAlways");
+
 	PackGetStr(p, "RegistrationPassword", t->RegistrationPassword, sizeof(t->RegistrationPassword));
 	PackGetStr(p, "RegistrationEmail", t->RegistrationEmail, sizeof(t->RegistrationEmail));
 }
@@ -171,6 +174,9 @@ void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 
 	PackAddBool(p, "EnableWoLTarget", t->EnableWoLTarget);
 	PackAddBool(p, "EnableWoLTrigger", t->EnableWoLTrigger);
+
+	PackAddBool(p, "ProcessWatcherEnabled", t->ProcessWatcherEnabled);
+	PackAddBool(p, "ProcessWatcherAlways", t->ProcessWatcherAlways);
 
 	PackAddStr(p, "RegistrationPassword", t->RegistrationPassword);
 	PackAddStr(p, "RegistrationEmail", t->RegistrationEmail);

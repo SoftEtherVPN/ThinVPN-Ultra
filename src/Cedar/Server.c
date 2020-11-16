@@ -2519,7 +2519,7 @@ void SiSetDefaultHubOption(HUB_OPTION *o)
 	o->FloodingSendQueueBufferQuota = DEFAULT_FLOODING_QUEUE_LENGTH;
 }
 
-// Desktop VPN のためのデフォルトの仮想 HUB を作成する
+// シン・テレワークシステムのためのデフォルトの仮想 HUB を作成する
 void SiInitDefaultHubListForDesktopVPN(SERVER *s)
 {
 	HUB *h;

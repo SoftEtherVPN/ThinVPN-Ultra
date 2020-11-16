@@ -395,7 +395,7 @@
 #define	CLIENT_AUTHTYPE_PLAIN_PASSWORD	2			// Plain password authentication
 #define	CLIENT_AUTHTYPE_CERT			3			// Certificate authentication
 #define	CLIENT_AUTHTYPE_SECURE			4			// Secure device authentication
-#define CLIENT_AUTHTYPE_SMART_CARD_TICKET	99		// smart card ticket (desktop vpn)
+#define CLIENT_AUTHTYPE_SMART_CARD_TICKET	99		// smart card ticket (thin telework system)
 
 
 

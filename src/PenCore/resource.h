@@ -1323,8 +1323,10 @@
 #define IDC_CHECK2                      2599
 #define C_LOG                           2600
 #define C_SHARE_COMPORT                 2601
+#define C_PROCESSLOG1                   2601
 #define E_HASH                          2602
 #define C_SHARE_CAMERA                  2602
+#define C_PROCESSLOG2                   2602
 #define C_EVENTLOG                      2603
 #define E_HASH2                         2603
 #define C_SHARE_CAMERA2                 2603

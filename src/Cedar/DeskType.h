@@ -71,7 +71,7 @@
 
 
 // DeskType.h
-// PacketiX Desktop VPN 型一覧ヘッダ
+// シン・テレワークシステム 型一覧ヘッダ
 
 #ifndef	DESKTYPE_H
 #define DESKTYPE_H

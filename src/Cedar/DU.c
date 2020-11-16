@@ -71,7 +71,7 @@
 
 
 // DU.c
-// PacketiX Desktop VPN Client GUI
+// シン・テレワークシステム クライアント GUI
 
 // Build 8600
 

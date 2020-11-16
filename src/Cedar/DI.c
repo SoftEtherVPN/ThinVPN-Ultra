@@ -71,7 +71,7 @@
 
 
 // DI.c
-// PacketiX Desktop VPN Setup GUI
+// シン・テレワークシステム Setup GUI
 
 // Build 8600
 

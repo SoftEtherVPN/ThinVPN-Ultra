@@ -71,7 +71,7 @@
 
 
 // DS.c
-// PacketiX Desktop VPN Server
+// シン・テレワークシステム サーバー
 
 // Build 8600
 
@@ -2304,13 +2304,14 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 	if (svc_type == DESK_SERVICE_RDP)
 	{
-		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+		Lock(ds->RDPSessionIncDecLock);
 		{
-			if (MsIsAdmin())
+			if (Inc(ds->CurrentNumRDPSessions) == 1)
 			{
-				Lock(ds->RDPSessionIncDecLock);
+				// ポリシー調整
+				if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
 				{
-					if (Inc(ds->CurrentNumRDPSessions) == 1)
+					if (MsIsAdmin())
 					{
 						Debug("*** DsWin32GetRdpPolicy()\n");
 
@@ -2341,9 +2342,9 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 						}
 					}
 				}
-				Unlock(ds->RDPSessionIncDecLock);
 			}
 		}
+		Unlock(ds->RDPSessionIncDecLock);
 	}
 
 	// 接続
@@ -2433,8 +2434,14 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 		DsUpdateTaskIcon(ds);
 
+		// プロセスウォッチャーを活性化
+		MsActivateProcessWatcher(ds->ProcessWatcher);
+
 		// リレー動作を開始
 		total_relay_size = DeskRelay(sock, s);
+
+		// プロセスウォッチャーを非活性化
+		MsDeactivateProcessWatcher(ds->ProcessWatcher);
 
 		disconnected_datetime = SystemTime64();
 
@@ -2482,13 +2489,14 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 	if (svc_type == DESK_SERVICE_RDP)
 	{
-		if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+		Lock(ds->RDPSessionIncDecLock);
 		{
-			if (MsIsAdmin())
+			if (Dec(ds->CurrentNumRDPSessions) == 0)
 			{
-				Lock(ds->RDPSessionIncDecLock);
+				// ポリシー調整
+				if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
 				{
-					if (Dec(ds->CurrentNumRDPSessions) == 0)
+					if (MsIsAdmin())
 					{
 						if (ds->Win32RdpPolicy.HasValidValue)
 						{
@@ -2507,9 +2515,9 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 						Zero(&ds->Win32RdpPolicy, sizeof(DS_WIN32_RDP_POLICY));
 					}
 				}
-				Unlock(ds->RDPSessionIncDecLock);
 			}
 		}
+		Unlock(ds->RDPSessionIncDecLock);
 	}
 
 LABEL_END:
@@ -3115,6 +3123,9 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 
 		ds->EnableWoLTarget = t->EnableWoLTarget;
 		ds->EnableWoLTrigger = t->EnableWoLTrigger;
+
+		MsSetProcessWatcherAlwaysFlag(ds->ProcessWatcher, t->ProcessWatcherAlways);
+		MsSetProcessWatcherDisabledFlag(ds->ProcessWatcher, !t->ProcessWatcherEnabled);
 	}
 	Unlock(ds->ConfigLock);
 
@@ -3186,6 +3197,9 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 
 	t->EnableWoLTarget = ds->EnableWoLTarget;
 	t->EnableWoLTrigger = ds->EnableWoLTrigger;
+
+	t->ProcessWatcherAlways = MsGetProcessWatcherAlwaysFlag(ds->ProcessWatcher);
+	t->ProcessWatcherEnabled = !MsGetProcessWatcherDisabledFlag(ds->ProcessWatcher);
 
 	StrCpy(t->RegistrationPassword, sizeof(t->RegistrationPassword), ds->Wide->RegistrationPassword);
 	StrCpy(t->RegistrationEmail, sizeof(t->RegistrationEmail), ds->Wide->RegistrationEmail);
@@ -3669,6 +3683,13 @@ void DsInitDefaultConfig(DS *ds)
 	ds->RdpEnableGroupKeeper = true;
 	ds->RdpEnableOptimizer = true;
 
+#ifdef OS_WIN32
+	// プロセスウォッチャー
+	MsSetProcessWatcherAlwaysFlag(ds->ProcessWatcher, false);
+	MsSetProcessWatcherDisabledFlag(ds->ProcessWatcher, false);
+#endif // OS_WIN32
+
+
 	UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), _UU("DU_FELONY_STR1"));
 
 	WideSetDontCheckCert(ds->Wide, false);
@@ -3841,6 +3862,8 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 	INTERNET_SETTING setting;
 	FOLDER *f;
 	FOLDER *syslog_f = NULL;
+	bool process_watcher_enabled = false;
+	bool process_watcher_always = false;
 	// 引数チェック
 	if (ds == NULL || root == NULL)
 	{
@@ -3869,6 +3892,14 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 
 	ds->EnableWoLTarget = CfgGetBool(root, "EnableWoLTarget");
 	ds->EnableWoLTrigger = CfgGetBool(root, "EnableWoLTrigger");
+
+#ifdef OS_WIN32
+	process_watcher_enabled = CfgGetBoolEx(root, "ProcessWatcherEnabled", true);
+	process_watcher_always = CfgGetBoolEx(root, "ProcessWatcherAlways", false);
+
+	MsSetProcessWatcherAlwaysFlag(ds->ProcessWatcher, process_watcher_always);
+	MsSetProcessWatcherDisabledFlag(ds->ProcessWatcher, !process_watcher_enabled);
+#endif // OS_WIN32
 
 	switch (ds->AuthType)
 	{
@@ -4008,6 +4039,11 @@ FOLDER *DsSaveConfigMain(DS *ds)
 		CfgAddBool(root, "EnableOtp", ds->EnableOtp);
 
 		CfgAddStr(root, "OtpEmail", ds->OtpEmail);
+
+#ifdef OS_WIN32
+		CfgAddBool(root, "ProcessWatcherAlways", MsGetProcessWatcherAlwaysFlag(ds->ProcessWatcher));
+		CfgAddBool(root, "ProcessWatcherEnabled", !MsGetProcessWatcherDisabledFlag(ds->ProcessWatcher));
+#endif // OS_WIN32
 
 		// 2020/10/3 保存不要!?
 		//if (IsEmptyStr(ds->Wide->RegistrationPassword) == false)
@@ -4478,7 +4514,27 @@ bool DsCheckShareDisableSignature(wchar_t *exe)
 #endif  // OS_WIN32
 }
 
-// Desktop VPN Server の初期化
+#ifdef	OS_WIN32
+// プロセスウォッチャーのコールバック
+void DsWin32ProcessWatcherCallback(bool start, MS_PROCESS* process, void* param)
+{
+	DS* ds = NULL;
+	if (param == NULL)
+	{
+		return;
+	}
+
+	ds = (DS*)param;
+
+	DsLogEx(ds, DS_LOG_INFO, start ? "DSL_PROCESS_START" : "DSL_PROCESS_END",
+		process->ProcessId,
+		process->ExeFilenameW,
+		process->Is64BitProcess ? _UU("DS_POLICY_YES") : _UU("DS_POLICY_NO"),
+		process->CommandLineW);
+}
+#endif //OS_WIN32
+
+// シン・テレワークシステム サーバーの初期化
 DS *NewDs(bool is_user_mode, bool force_share_disable)
 {
 #ifdef	OS_WIN32
@@ -4535,6 +4591,9 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 	{
 		ds->EventLog = MsInitEventLog(DS_EVENTLOG_SOURCE_NAME);
 	}
+
+	// プロセスウォッチャーの作成
+	ds->ProcessWatcher = MsNewProcessWatcher(DsWin32ProcessWatcherCallback, ds);
 
 	ds->ClientList = NewList(NULL);
 
@@ -4737,7 +4796,7 @@ void DsUnlockHistory(DS *ds)
 	UnlockList(ds->History);
 }
 
-// Desktop VPN Server の解放
+// シン・テレワークシステム サーバーの解放
 void FreeDs(DS *ds)
 {
 #ifdef	OS_WIN32
@@ -4780,6 +4839,8 @@ void FreeDs(DS *ds)
 
 	SiReleaseServer(ds->Server);
 	ds->Server = NULL;
+
+	MsFreeProcessWatcher(ds->ProcessWatcher);
 
 	MsFreeEventLog(ds->EventLog);
 

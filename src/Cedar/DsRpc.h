@@ -154,6 +154,9 @@ struct RPC_DS_CONFIG
 	bool EnableWoLTarget;
 	bool EnableWoLTrigger;
 
+	bool ProcessWatcherEnabled;
+	bool ProcessWatcherAlways;
+
 	char RegistrationPassword[MAX_PATH];
 	char RegistrationEmail[MAX_PATH];
 };

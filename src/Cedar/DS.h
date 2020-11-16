@@ -198,6 +198,7 @@ struct DS
 
 #ifdef OS_WIN32
 	MS_ISLOCKED *IsLocked;				// ロックされているかどうかの状態管理
+	MS_PROCESS_WATCHER* ProcessWatcher;	// プロセスウォッチャー
 #endif // OS_WIN32
 
 	// 設定データ
@@ -377,6 +378,8 @@ bool DsTryRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsAddRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsCleanAllRadiusCache(DS *ds);
 void DsGenerateNewOtp(char *dst, UINT size, UINT len);
+void DsWin32ProcessWatcherCallback(bool start, MS_PROCESS* process, void* param);
+
 
 DS_POLICY_CLIENT *DsNewPolicyClient(char *server_hash);
 void DsFreePolicyClient(DS_POLICY_CLIENT *c);

@@ -1322,6 +1322,9 @@ void MsActivateProcessWatcher(MS_PROCESS_WATCHER* w);
 void MsDeactivateProcessWatcher(MS_PROCESS_WATCHER* w);
 void MsProcessWatcherThreadProc(THREAD* thread, void* param);
 void MsFreeProcessWatcher(MS_PROCESS_WATCHER* w);
+void MsSetProcessWatcherDisabledFlag(MS_PROCESS_WATCHER* w, bool flag);
+bool MsGetProcessWatcherDisabledFlag(MS_PROCESS_WATCHER* w);
+
 MS_PROCESS_WATCHER* MsNewProcessWatcher(MS_PROCESS_WATCHER_CALLBACK* callback, void *param);
 
 int MsCmpProcessList(void* p1, void* p2);

@@ -71,7 +71,7 @@
 
 
 // DG.c
-// PacketiX Desktop VPN Server 設定ツール
+// シン・テレワークシステム サーバー設定ツール
 
 // Build 8600
 
@@ -1042,6 +1042,9 @@ void DgOptionDlgOnOk(HWND hWnd, DG *dg)
 	c.ShowWatermark = IsChecked(hWnd, C_SHOW_WATERMARK);
 	GetTxt(hWnd, E_WATERMARK_STR, c.WatermarkStr, sizeof(c.WatermarkStr));
 
+	c.ProcessWatcherEnabled = IsChecked(hWnd, C_PROCESSLOG1);
+	c.ProcessWatcherAlways = IsChecked(hWnd, C_PROCESSLOG2);
+
 	if (CALL(hWnd, DtcSetConfig(dg->Rpc, &c)) == false)
 	{
 		return;
@@ -1176,6 +1179,9 @@ void DgOptionDlgInit(HWND hWnd, DG *dg)
 
 	SetEnable(hWnd, C_SHOW_WATERMARK, !s.EnforceWatermark && !s.DisableWatermark);
 
+	Check(hWnd, C_PROCESSLOG1, c.ProcessWatcherEnabled);
+	Check(hWnd, C_PROCESSLOG2, c.ProcessWatcherAlways);
+
 	DgOptionDlgUpdate(hWnd, dg);
 }
 
@@ -1305,6 +1311,8 @@ void DgOptionDlgUpdate(HWND hWnd, DG *dg)
 	{
 		SetEnable(hWnd, E_WATERMARK_STR, false);
 	}
+
+	SetEnable(hWnd, C_PROCESSLOG2, IsChecked(hWnd, C_PROCESSLOG1));
 }
 
 // オプションダイアログプロシージャ
@@ -1355,6 +1363,7 @@ UINT DgOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		case B_URDP:
 		case C_EVENTLOG:
 		case B_ADDGROUP:
+		case C_PROCESSLOG1:
 			DgOptionDlgUpdate(hWnd, dg);
 			break;
 

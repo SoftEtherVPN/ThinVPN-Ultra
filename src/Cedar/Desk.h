@@ -71,14 +71,14 @@
 
 
 // Desk.h
-// PacketiX Desktop VPN ヘッダ
+// シン・テレワークシステム ヘッダ
 
 #ifndef	DESK_H
 #define DESK_H
 
 //////////////////////////////////////////////////////////////////////
 // 
-// Desktop VPN 内部定数
+// シン・テレワークシステム 内部定数
 // 
 //////////////////////////////////////////////////////////////////////
 
@@ -186,22 +186,22 @@
 // 型一覧
 #include <Cedar/DeskType.h>
 
-// Desktop VPN Server
+// シン・テレワークシステム サーバー
 #include <Cedar/DS.h>
 
-// Desktop VPN Server RPC
+// シン・テレワークシステム サーバー RPC
 #include <Cedar/DsRpc.h>
 
-// Desktop VPN Client
+// シン・テレワークシステム クライアント
 #include <Cedar/DC.h>
 
-// Desktop VPN Server 設定ツール
+// シン・テレワークシステム サーバー設定ツール
 #include <Cedar/DG.h>
 
-// Desktop VPN Client GUI
+// シン・テレワークシステム クライアント GUI
 #include <Cedar/DU.h>
 
-// Desktop VPN Setup GUI
+// シン・テレワークシステム セットアップ関係
 #include <Cedar/DI.h>
 
 

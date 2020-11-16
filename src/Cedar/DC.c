@@ -2090,7 +2090,7 @@ void DcInitConfig(DC *dc, bool localconfig)
 	DcSaveConfig(dc);
 }
 
-// Desktop VPN Client の初期化
+// シン・テレワークシステム クライアントの初期化
 DC *NewDc(bool localconfig)
 {
 	DC *dc;
@@ -2107,7 +2107,7 @@ DC *NewDc(bool localconfig)
 	return dc;
 }
 
-// Desktop VPN Client の解放
+// シン・テレワークシステム クライアントの解放
 void FreeDc(DC *dc)
 {
 	UINT i;
