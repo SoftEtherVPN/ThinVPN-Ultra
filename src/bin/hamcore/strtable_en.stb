@@ -268,6 +268,7 @@ ERR_254					The version of the $APPSHORT_SERVER$ on the specified Trigger PC is 
 ERR_255					To get started, you have to enter the "Unlock Password". Click "Unlock Password" to configure.
 ERR_256					To get started, you have to enter the correct "Unlock Password". Click "Unlock Password" to configure.
 ERR_257					Communication between gateway <--> intermediate proxy server <--> controller is bad.
+ERR_258					The $APPSHORT$ server function cannot be installed on the Internet PC. You have to install this function on your PCs on the LGWAN. Please perform the reinstallation.
 
 
 
@@ -355,7 +356,7 @@ DSL_BT_ESTABLISHED		Bluetooth data exchange tunnel is established.
 DSL_RECV_BT_FILE		Bluetooth data exchange tunnel data "%s" (size: %u bytes) is received.
 DSL_SAVE_BT_FILE		Bluetooth data exchange tunnel file "%s" (size: %u bytes) is saved.
 DSL_BT_CLOSES			Bluetooth data exchange tunnel is closed.
-DSL_TUNNEL_CONNECTED	Tunnel %u: Client computer (IP address: %S, Hostname: %S, Source port number: %u, Client ID: %S) is connected. The user authentication process starts.
+DSL_TUNNEL_CONNECTED	Tunnel %u: Client computer (IP address: %S, Hostname: %S, Source port number: %u, Client ID: %S, Client local computer name: %s, Client username: %s, Client local computer IP address: %r) is connected. The user authentication process starts.
 DSL_AUTH_OLD_OK			Tunnel %u: Simple password authentication is passed.
 DSL_AUTH_OLD_NG			Tunnel %u: Simple password authentication is failed. Username or password was incorrect.
 DSL_AUTH_ANONYMOUS_NG	Tunnel %u: Simple password authentication is failed. No password set.
@@ -367,8 +368,11 @@ DSL_AUTH_PW3_OK			Tunnel %u: User %S login OK with external password authenticat
 DSL_AUTH_CERT_OK		Tunnel %u: User %S login OK with certificate authentication. The client authentication data: %s
 DSL_USER_EXPIRED		Tunnel %u: User %S is expired then access denied.
 DSL_AUTH_FAILED			Tunnel %u: User authentication failed.
-DSL_TUNNEL_DISCONNECTED	Connected client computer (Client ID: %S) was disconnected.
+DSL_TUNNEL_RELAY_START	The connected client computer (IP address: %S, Hostname: %S, Source port number: %u, Client ID: %S) established a new virtual communication channel ID: %u to this computer. The current number of connected virtual communication channel is %u.
+DSL_TUNNEL_RELAY_STOP			The connected client computer (IP address: %S, Hostname: %S, Source port number: %u, Client ID: %S) disconnected the virtual communication channel ID: %u from this computer. Total amount of transmitted data is %u bytes. The current number of connected virtual communication channel is %u.
 DSL_AUTH_ERROR			Tunnel %u: Client computer (IP address: %S, hostname: %S) is very frequently connected to this computer. Recent %u seconds, %u times to connect to this server. Be caution!
+DSL_PROCESS_START		A process started. Process ID: %u, Process filename: "%s", 64 bits: %s, Command-line arguments: %s
+DSL_PROCESS_END			The process terminated. Process ID: %u, Process filename: "%s", 64 bits: %s, Command-line arguments: %s
 
 
 
@@ -4675,6 +4679,8 @@ S_STATIC16				Your Eyes Only &Watermark...
 C_SHOW_WATERMARK		Your Eyes Only &Watermark message
 S_STATIC2				Disable Sharing Functions
 C_DISABLESHARE			&Disable Sharing Functions
+C_PROCESSLOG1			Enable process logs during telework sessions
+C_PROCESSLOG2			Always enable process logs
 
 
 PREFIX					D_DG_PASSWORD
@@ -7870,13 +7876,13 @@ SW_COMPONENT_VPNCMGR_DESCRIPTION			Only the VPN Client Manager will be installed
 
 
 
-SW_COMPONENT_THINSVR_TITLE				$APPSHORT_SERVER$
-SW_COMPONENT_THINSVR_DESCRIPTION			Install it on the PC that will accept remote access (e.g., your office PC).\r\nYou can use features such as clipboard and drive sharing, file transfer, and remote printing.\r\nNote: Depending on the environment and operating mode, the sharing feature may not be available.
+SW_COMPONENT_$APP_ID_PREFIX$THINSVR_TITLE				$APPSHORT_SERVER$
+SW_COMPONENT_$APP_ID_PREFIX$THINSVR_DESCRIPTION			Install it on the PC that will accept remote access (e.g., your office PC).\r\nYou can use features such as clipboard and drive sharing, file transfer, and remote printing.\r\nNote: Depending on the environment and operating mode, the sharing feature may not be available.
 
-SW_COMPONENT_THINSVR_DESCRIPTION_NS_POSTFIX		Install it on the PC that will accept remote access (e.g., your office PC).\r\n"Sharing Function Disabled version" disables functions such as clipboard and drive sharing, file transfer, and remote printing. Select this if you want to disable these functions for the security policy of your organization.\r\nGeneral note: Even with system protections, malicious users may still take information out of the system using special manipulation methods.
+SW_COMPONENT_$APP_ID_PREFIX$THINSVR_DESCRIPTION_NS_POSTFIX		Install it on the PC that will accept remote access (e.g., your office PC).\r\n"Sharing Function Disabled version" disables functions such as clipboard and drive sharing, file transfer, and remote printing. Select this if you want to disable these functions for the security policy of your organization.\r\nGeneral note: Even with system protections, malicious users may still take information out of the system using special manipulation methods.
 
-SW_COMPONENT_THINCLIENT_TITLE				$APPSHORT_CLIENT$
-SW_COMPONENT_THINCLIENT_DESCRIPTION			Install it on the PC you want to activate remote access on (e.g. your home PC or mobile PC).
+SW_COMPONENT_$APP_ID_PREFIX$THINCLIENT_TITLE				$APPSHORT_CLIENT$
+SW_COMPONENT_$APP_ID_PREFIX$THINCLIENT_DESCRIPTION			Install it on the PC you want to activate remote access on (e.g. your home PC or mobile PC).
 
 SW_WELCOME_UAC_WARNING						There is a possibility that you are operating the screen of this computer remotely by using $APPFULL_SERVER$.\r\n\r\nIt is recommended that you do not remotely operate the software of $APPFULL_SERVER$, but directly operate the screen of the PC that serves as the server to upgrade the software.\r\n\r\nDo you really want to continue working remotely?\r\n\r\n\r\nOnce you click 'OK', the computer's Windows User Account Control (UAC) pop-up will appear. Since the current mode of operation of $APPSHORT_SERVER$ is User Mode, the screen may be disconnected or rendered inoperable when the UAC pop-up appears. If this happens, wait for about 1 to 2 minutes and then try to reconnect. If the connection does not recover, please operate the screen of the computer that serves as the server directly and perform the update.
 
@@ -7891,6 +7897,7 @@ SW_COMPONENTS_TITLE							Select Software Components to Install
 SW_EULA_TITLE								Terms of Use
 SW_WARNING_TITLE							Important Notices
 SW_DIR_TITLE								Directory to Install on
+SW_NWSELECT_TITLE							Network Type Selection
 SW_READY_TITLE								Ready to Install
 SW_PERFORM_TITLE							Setup is in Progress
 SW_ERROR_TITLE								Results of Setup

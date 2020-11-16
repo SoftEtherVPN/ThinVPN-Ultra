@@ -4689,6 +4689,8 @@ S_STATIC16				撮影・キャプチャ等秘密情報持ち出し抑止機能
 C_SHOW_WATERMARK		撮影・キャプチャ防止の透かしメッセージを表示(&W)
 S_STATIC2				共有機能の禁止
 C_DISABLESHARE			共有機能の使用を禁止する(&D)
+C_PROCESSLOG1			テレワーク中のプロセスの起動・終了を記録
+C_PROCESSLOG2			テレワーク中以外も常時記録する
 
 
 PREFIX					D_DG_PASSWORD
