@@ -4560,7 +4560,7 @@ IDCANCEL				Cancel
 
 
 PREFIX					D_DG_MAIN
-CAPTION					$APPFULL_SERVER$ Configuration Tool (Version %u.%02u)
+CAPTION					$APPFULL_SERVER$ (Ver %u.%02u)
 S1						$APPSHORT$ Commun&ication Settings
 S_PCID					Computer I&D:
 IDOK					&Change

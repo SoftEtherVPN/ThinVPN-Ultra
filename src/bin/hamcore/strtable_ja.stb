@@ -4568,7 +4568,7 @@ IDCANCEL				キャンセル
 
 
 PREFIX					D_DG_MAIN
-CAPTION					$APPFULL_SERVER$設定ツール (バージョン %u.%02u)
+CAPTION					$APPFULL_SERVER$ (Ver %u.%02u)
 S1						$APPSHORT_SERVER$ の通信に関する設定(&I)
 S_PCID					コンピュータ I&D:
 IDOK					変更(&C)
