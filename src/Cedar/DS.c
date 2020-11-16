@@ -1183,6 +1183,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	IP client_local_ip = {0};
 	bool server_allowed_mac_list_check_ok = true;
 	bool support_server_allowed_mac_list_err = false;
+	UINT total_relay_size = 0;
 	// 引数チェック
 	if (ds == NULL || sock == NULL)
 	{
@@ -1775,7 +1776,8 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	if (first_connection)
 	{
 		DsLogEx(ds, DS_LOG_INFO, "DSL_TUNNEL_CONNECTED",
-			tunnel_id, client_ip_str, client_host, client_port, client_id_str);
+			tunnel_id, client_ip_str, client_host, client_port, client_id_str,
+			computer_name, user_name, &client_local_ip);
 	}
 
 	ret = false;
@@ -2386,6 +2388,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		wchar_t datetime2[MAX_PATH];
 		UINT64 connected_datetime;
 		UINT64 disconnected_datetime;
+		UINT current_channel_count = 0;
 
 		Debug("*** CONNECTED\n");
 
@@ -2408,9 +2411,15 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 		LockList(ds->ClientList);
 		{
+			dsc->SeqNo = (++ds->LastClientSeqNo);
 			Add(ds->ClientList, dsc);
+			current_channel_count = LIST_NUM(ds->ClientList);
 		}
 		UnlockList(ds->ClientList);
+
+		// リレー動作を開始することを示すログを出力する
+		DsLogEx(ds, DS_LOG_INFO, "DSL_TUNNEL_RELAY_START",
+			client_ip_str, client_host, client_port, client_id_str, dsc->SeqNo, current_channel_count);
 
 		// バルーンを表示する
 		GetDateTimeStrEx64(datetime, sizeof(datetime),
@@ -2425,7 +2434,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		DsUpdateTaskIcon(ds);
 
 		// リレー動作を開始
-		DeskRelay(sock, s);
+		total_relay_size = DeskRelay(sock, s);
 
 		disconnected_datetime = SystemTime64();
 
@@ -2447,10 +2456,16 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			{
 				last_connection = true;
 			}
+
+			current_channel_count = LIST_NUM(ds->ClientList);
 		}
 		UnlockList(ds->ClientList);
 
-		Debug("*** DISCONNECTED\n");
+		// リレー動作を終了することを示すログを出力する
+		DsLogEx(ds, DS_LOG_INFO, "DSL_TUNNEL_RELAY_STOP",
+			client_ip_str, client_host, client_port, client_id_str, dsc->SeqNo, total_relay_size, current_channel_count);
+
+		Debug("*** DISCONNECTED  total_size = %u\n", total_relay_size);
 
 		DsUpdateTaskIcon(ds);
 
@@ -2459,9 +2474,6 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 	if (last_connection)
 	{
-		DsLogEx(ds, DS_LOG_INFO, "DSL_TUNNEL_DISCONNECTED",
-			client_id_str);
-
 		DsCleanAllRadiusCache(ds);
 	}
 
@@ -2729,7 +2741,7 @@ void DsSendErrorEx(SOCKIO *sock, UINT error_code, char *add_value_name, UCHAR *a
 PACK *DsRpcServer(RPC *r, char *name, PACK *p)
 {
 	DS *ds = (DS *)r->Param;
-	ADMIN admin, *a;
+	ADMIN admin = CLEAN, *a;
 	PACK *ret;
 	UINT err;
 	bool ok;

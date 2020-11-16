@@ -235,7 +235,7 @@ void DeskTerminateOldUrdpProcesses(UINT version);
 void DeskGetUrdpServerExeName(wchar_t *name, UINT size, UINT version);
 bool DeskWaitReadyForUrdpServer();
 bool DeskWaitReadyForDeskServerRpc();
-void DeskRelay(SOCKIO *io, SOCK *s);
+UINT DeskRelay(SOCKIO *io, SOCK *s);
 void DeskGetMachineKey(void *data);
 void DeskGetAppDataDir(wchar_t *name, UINT name_size);
 void DeskGetAppDataDirOld(wchar_t *name, UINT name_size);

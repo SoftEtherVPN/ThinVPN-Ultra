@@ -154,6 +154,7 @@ struct DS_CLIENT
 	UINT Port;							// ポート番号
 	UCHAR ClientID[SHA1_SIZE];			// クライアント ID
 	UINT TunnelID;						// トンネル ID
+	UINT SeqNo;							// シーケンス番号
 };
 
 struct DS_WIN32_RDP_POLICY
@@ -177,6 +178,7 @@ struct DS
 	bool IsConfigured;					// 設定が行われたかどうか
 	LOG *Log;							// ログ
 	LIST *ClientList;					// クライアント一覧
+	UINT LastClientSeqNo;				// 最後のクライアントシーケンス番号
 	bool SupportBluetooth;				// Bluetooth サポート
 	SERVER *Server;						// Server オブジェクト (ユーザー認証用)
 	bool ForceDisableShare;				// 強制的に共有機能が無効になっているかどうか

@@ -162,16 +162,17 @@ void DeskGetMachineKey(void *data)
 }
 
 // SockIo と SOCK との間のリレー処理
-void DeskRelay(SOCKIO *io, SOCK *s)
+UINT DeskRelay(SOCKIO *io, SOCK *s)
 {
 	SOCK_EVENT *e;
 	FIFO *f1, *f2;
 	void *buf;
 	UINT buf_size;
+	UINT total_size = 0;
 	// 引数チェック
 	if (io == NULL || s == NULL)
 	{
-		return;
+		return 0;
 	}
 
 	SetTimeout(s, INFINITE);
@@ -216,6 +217,7 @@ void DeskRelay(SOCKIO *io, SOCK *s)
 				}
 				else
 				{
+					total_size += ret;
 					WriteFifo(f1, buf, ret);
 				}
 			}
@@ -235,6 +237,7 @@ void DeskRelay(SOCKIO *io, SOCK *s)
 				}
 				else
 				{
+					total_size += ret;
 					WriteFifo(f2, buf, ret);
 				}
 			}
@@ -303,6 +306,8 @@ void DeskRelay(SOCKIO *io, SOCK *s)
 	Free(buf);
 
 	SockIoDisconnect(io);
+
+	return total_size;
 }
 
 // URDP Server が利用可能になるまで待機する
