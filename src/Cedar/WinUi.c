@@ -4515,6 +4515,7 @@ UINT AboutDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 	WINUI_ABOUT *a = (WINUI_ABOUT *)param;
 	char tmp[MAX_PATH];
 	LANGLIST t;
+	char* url = NULL;
 	// Validate arguments
 	if (hWnd == NULL)
 	{
@@ -4541,7 +4542,8 @@ UINT AboutDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 			EndDialog(hWnd, true);
 			break;
 		case B_WEB:
-			ShellExecute(hWnd, "open", _SS("SE_COMPANY_URL"), NULL, NULL, SW_SHOW);
+			url = Vars_ActivePatch_GetStrEx("ThinTelework_AboutBox_AlternativeSoftwareUpdateUrl", _SS("SE_COMPANY_URL"));
+			ShellExecute(hWnd, "open", url, NULL, NULL, SW_SHOW);
 			break;
 		case B_EULA:
 			ShowTextFile(hWnd, "|eula.txt", _UU("SW_EULA_TITLE"), ICO_LOG);
