@@ -215,6 +215,8 @@ struct WIDE
 	bool NoLookupDnsHostname;
 	bool DisableDoSProtection;
 
+	bool IsStandaloneMode;
+
 
 	// 2020/4/15 追加 アグレッシブタイムアウト機能
 	LOCK *AggressiveTimeoutLock;

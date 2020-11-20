@@ -185,6 +185,9 @@
 // クライアントフラグ
 #define WT_CLIENT_OPTIONS_WOL		1
 
+// マシンデータベースファイル名 (Standalone Mode)
+#define WTG_SAM_DATABASE_FILENAME	"@MachineDatabase.dat"
+
 
 
 
@@ -244,6 +247,9 @@ struct WT
 	char EntranceUrlForProxy[MAX_SIZE];
 	char WanMacAddress[MAX_PATH];
 	char OsInfo[MAX_PATH];
+	bool IsStandaloneMode;
+	LIST* MachineDatabase;
+	CFG_RW* CfgRwMachineDatabase;
 
 	// Client / Server / Gate 共通
 	char EntranceUrl[MAX_PATH];			// エントランス URL

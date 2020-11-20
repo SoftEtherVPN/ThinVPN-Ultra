@@ -3236,6 +3236,8 @@ WIDE *WideGateStart()
 		w->AcceptProxyProtocol = INT_TO_BOOL(IniIntValue(o, "AcceptProxyProtocol"));
 		w->DisableDoSProtection = INT_TO_BOOL(IniIntValue(o, "DisableDoSProtection"));
 
+		w->IsStandaloneMode = INT_TO_BOOL(IniIntValue(o, "StandaloneMode"));
+
 		WideFreeIni(o);
 	}
 
@@ -3259,11 +3261,14 @@ WIDE *WideGateStart()
 	}
 
 	// Gate の開始
-	WtgStart(w->wt, w->GateCert, w->GateKey, WT_PORT);
+	WtgStart(w->wt, w->GateCert, w->GateKey, WT_PORT, w->IsStandaloneMode);
 
-	// 報告スレッドの開始
-	w->ReportThreadHaltEvent = NewEvent();
-	w->ReportThread = NewThread(WideGateReportThread, w);
+	if (w->IsStandaloneMode == false)
+	{
+		// 報告スレッドの開始
+		w->ReportThreadHaltEvent = NewEvent();
+		w->ReportThread = NewThread(WideGateReportThread, w);
+	}
 
 	return w;
 }

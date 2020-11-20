@@ -88,18 +88,13 @@ typedef struct TSESSION TSESSION;
 typedef struct TTCP TTCP;
 typedef struct TUNNEL TUNNEL;
 typedef struct DATABLOCK DATABLOCK;
+typedef struct WG_MACHINE WG_MACHINE;
 
 // WtServer.h
 typedef struct WT_CONNECT WT_CONNECT;
 typedef struct WTS_CONNECT_THREAD_PARAM WTS_CONNECT_THREAD_PARAM;
 typedef struct WTS_NEW_TUNNEL_THREAD_PARAM WTS_NEW_TUNNEL_THREAD_PARAM;
 typedef void (WT_ACCEPT_PROC)(THREAD *thread, SOCKIO *sock, void *param);
-
-// WtWpc.h
-//typedef struct INTERNET_SETTING INTERNET_SETTING;
-//typedef struct URL_DATA URL_DATA;
-//typedef struct WPC_ENTRY WPC_ENTRY;
-//typedef struct WPC_PACKET WPC_PACKET;
 
 // Wide.h
 typedef struct WIDE WIDE;

@@ -86,6 +86,54 @@
 #include <Mayaqua/Mayaqua.h>
 #include <Cedar/Cedar.h>
 
+// Standalone Mode 初期化
+void WtgSamInit(WT* wt)
+{
+	FOLDER* root = CLEAN;
+	if (wt == NULL || wt->IsStandaloneMode == false)
+	{
+		return;
+	}
+
+	wt->MachineDatabase = NewList(NULL);
+
+	wt->CfgRwMachineDatabase = NewCfgRwEx2A(&root, WTG_SAM_DATABASE_FILENAME, false, NULL);
+
+	if (root != NULL)
+	{
+		// データベースファイルが発見された。読み込みをする。
+		CfgDeleteFolder(root);
+	}
+	else
+	{
+		// データベースファイルがない。
+	}
+}
+
+// Standalone Mode 終了
+void WtgSamFree(WT* wt)
+{
+	if (wt == NULL || wt->IsStandaloneMode == false)
+	{
+		return;
+	}
+
+	FreeCfgRw(wt->CfgRwMachineDatabase);
+	wt->CfgRwMachineDatabase = NULL;
+
+	ReleaseList(wt->MachineDatabase);
+	wt->MachineDatabase = NULL;
+}
+
+// マシンデータベースのフラッシュ
+void WtgSamFlushDatabase(WT* wt)
+{
+	if (wt == NULL)
+	{
+		return;
+	}
+}
+
 // Gate のセッションメイン関数
 void WtgSessionMain(TSESSION *s)
 {
@@ -1922,12 +1970,20 @@ void WtgAcceptThread(THREAD *thread, void *param)
 }
 
 // Gate の開始
-void WtgStart(WT *wt, X *cert, K *key, UINT port)
+void WtgStart(WT* wt, X* cert, K* key, UINT port, bool standalone_mode)
 {
 	// 引数チェック
 	if (wt == NULL || cert == NULL || key == NULL || port == 0)
 	{
 		return;
+	}
+
+	wt->IsStandaloneMode = standalone_mode;
+
+	if (wt->IsStandaloneMode)
+	{
+		// スタンドアロンモードの初期化
+		WtgSamInit(wt);
 	}
 
 	// メモリサイズの節約
@@ -1978,6 +2034,9 @@ void WtgStop(WT *wt)
 	// 接続中のすべてのソケットと対応するスレッドの削除
 	FreeSockThreadList(wt->SockThreadList);
 	wt->SockThreadList = NULL;
+
+	// スタンドアロンモードの終了
+	WtgSamFree(wt);
 
 	ReleaseList(wt->SessionList);
 

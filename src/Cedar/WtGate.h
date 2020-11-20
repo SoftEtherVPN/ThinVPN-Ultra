@@ -176,6 +176,26 @@ struct TSESSION
 	IP ServerLocalIP;					// サーバー側で見たローカル IP
 };
 
+// 登録マシーン一覧
+struct WG_MACHINE
+{
+	char Msid[MAX_PATH];				// 固有 ID
+	char HostSecret2[MAX_PATH];			// ホストシークレット 2
+	char Pcid[MAX_PATH];				// コンピュータ ID
+	UINT64 ServerMask64;				// サーバーマスク 64
+	UINT64 CreateDate;					// 作成日時
+	UINT64 UpdateDate;					// 更新日時
+	UINT64 LastServerDate;				// 最後にサーバーが接続した日時
+	UINT64 FirstClientDate;				// 最初にクライアントが接続した日時
+	UINT64 LastClientDate;				// 最後にクライアントが接続した日時
+	int NumServer;						// サーバー接続回数
+	int NumClient;						// クライアント接続回数
+	char CreateIp[MAX_PATH];			// 作成元 IP アドレス
+	char CreateHost[MAX_PATH];			// 作成元 FQDN
+	char LastIp[MAX_PATH];				// 最後にサーバーが接続した接続元 IP アドレス
+	char WolMacList[1024];				// WoL MAC アドレスリスト
+};
+
 // HTTP プロキシ
 #define	WG_PROXY_TCP_TIMEOUT_SERVER		(60 * 1000)
 #define	WG_PROXY_MAX_POST_SIZE			(1024 * 1024)
@@ -186,7 +206,7 @@ bool WtGateConnectParamFromPack(WT_GATE_CONNECT_PARAM *g, PACK *p);
 BUF *WtGateConnectParamPayloadToBuf(WT_GATE_CONNECT_PARAM *g);
 bool WtGateConnectParamCheckSignature(WIDE *wide, WT_GATE_CONNECT_PARAM *g);
 void WtGateConnectParamToPack(PACK *p, WT_GATE_CONNECT_PARAM *g);
-void WtgStart(WT *wt, X *cert, K *key, UINT port);
+void WtgStart(WT *wt, X *cert, K *key, UINT port, bool standalone_mode);
 void WtgStop(WT *wt);
 void WtgAccept(WT *wt, SOCK *s);
 bool WtgSendError(SOCK *s, UINT code);
@@ -230,6 +250,11 @@ WT_GATE_CONNECT_PARAM *WtCloneGateConnectParam(WT_GATE_CONNECT_PARAM *p);
 void WtFreeGateConnectParam(WT_GATE_CONNECT_PARAM *p);
 void WtGenerateClientIdFromIP(UCHAR *client_id, IP *ip);
 void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, char *shared_secret);
+
+void WtgSamInit(WT* wt);
+void WtgSamFree(WT* wt);
+void WtgSamFlushDatabase(WT* wt);
+
 
 #endif	// WTGATE_H
 
