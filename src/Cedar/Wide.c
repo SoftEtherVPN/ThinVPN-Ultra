@@ -3271,6 +3271,20 @@ WIDE *WideGateStart()
 
 		port = IniIntValue(o, "ListenPort");
 
+		tmp = IniStrValue(o, "SmtpServerHostname");
+		if (IsEmptyStr(tmp) == false)
+		{
+			StrCpy(w->wt->SmtpServerHostname, sizeof(w->wt->SmtpServerHostname), tmp);
+		}
+
+		w->wt->SmtpServerPort = IniIntValue(o, "SmtpServerPort");
+
+		tmp = IniStrValue(o, "SmtpOtpFrom");
+		if (IsEmptyStr(tmp) == false)
+		{
+			StrCpy(w->wt->SmtpOtpFrom, sizeof(w->wt->SmtpOtpFrom), tmp);
+		}
+
 		WideFreeIni(o);
 	}
 

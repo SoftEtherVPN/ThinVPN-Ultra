@@ -270,6 +270,8 @@ ERR_256					To get started, you have to enter the correct "Unlock Password". Cli
 ERR_257					Communication between gateway <--> intermediate proxy server <--> controller is bad.
 ERR_258					The $APPSHORT$ server function cannot be installed on the Internet PC. You have to install this function on your PCs on the LGWAN. Please perform the reinstallation.
 ERR_259					The destination relay gateway servers of $APPSHORT$ has many established $APPFULL_SERVER$ sessions. The number of concurrent sessions exceeded. No more connections allowed.
+ERR_260					The destination relay gateway servers of $APPSHORT$ has no SMTP server configuration.
+ERR_261					The destination relay gateway servers of $APPSHORT$ has error to communicate with the configured SMTP server. For troubleshooting, analyze the log file of the SMTP server.
 
 
 

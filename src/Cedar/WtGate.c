@@ -384,6 +384,7 @@ PACK* WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet)
 	char* wol_maclist = NULL;
 	UINT i;
 	WG_MACHINE* authed = NULL;
+	bool no_unlock_database = false;
 	if (wt == NULL || s == NULL || packet == NULL)
 	{
 		err = ERR_INTERNAL_ERROR;
@@ -737,17 +738,59 @@ PACK* WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet)
 		char email[128] = CLEAN;
 		char ip[64] = CLEAN;
 		char fqdn[128] = CLEAN;
-		char pcid[WT_PCID_SIZE] = CLEAN;
+		UINT body_size = 4096;
+		char* body = NULL;
+		bool smtp_ok = false;
+
+		char* body_format =
+			"From: %s\r\nTo: %s\r\nSubject: Thin Telework OTP - %s\r\n\r\n"
+			"Your new One Time Password (OTP) code is:\r\n"
+			"%s\r\n\r\n"
+			"A client is attempting to connect to the server: %s.\r\n\r\n"
+			"The source IP address of the client is: %s\r\n\r\n";
 
 		if (authed == NULL)
 		{
 			err = ERR_NO_INIT_CONFIG;
 			goto LABEL_CLEANUP;
 		}
+
+		PackGetStr(req, "Otp", otp, sizeof(otp));
+		PackGetStr(req, "Email", email, sizeof(email));
+		PackGetStr(req, "Ip", ip, sizeof(ip));
+		PackGetStr(req, "Fqdn", fqdn, sizeof(fqdn));
+
+		if (IsEmptyStr(wt->SmtpServerHostname) || wt->SmtpServerPort == 0 ||
+			IsEmptyStr(wt->SmtpOtpFrom))
+		{
+			err = ERR_WG_NO_SMTP_SERVER_CONFIG;
+			goto LABEL_CLEANUP;
+		}
+
+		body = ZeroMalloc(body_size);
+
+		Format(body, body_size, body_format, wt->SmtpOtpFrom, email, otp, otp, authed->Pcid, ip);
+
+		smtp_ok = SmtpSendMail(wt->SmtpServerHostname, wt->SmtpServerPort, wt->SmtpOtpFrom, email,
+			body);
+
+		if (smtp_ok)
+		{
+			err = ERR_NO_ERROR;
+		}
+		else
+		{
+			err = ERR_WG_SMTP_ERROR;
+		}
+
+		Free(body);
 	}
 
 LABEL_CLEANUP:
-	UnlockList(wt->MachineDatabase);
+	if (no_unlock_database == false)
+	{
+		UnlockList(wt->MachineDatabase);
+	}
 
 	PackAddInt(ret, "Error", err);
 

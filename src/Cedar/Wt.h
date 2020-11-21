@@ -120,6 +120,8 @@
 #define ERR_GATE_SYSTEM_INTERNAL_PROXY		257	// ゲートウェイ <--> 中間プロキシサーバー <--> コントローラ 間の通信が不良である
 #define ERR_NOT_LGWAN						258	// LGWAN 上の PC でない
 #define ERR_WG_TOO_MANY_SESSIONS			259	// スタンドアロンモード Gate のセッション数が多すぎる
+#define ERR_WG_NO_SMTP_SERVER_CONFIG		260	// SMTP サーバーの設定がされていません
+#define	ERR_WG_SMTP_ERROR					261	// SMTP エラーが発生
 
 
 // SNI 文字列
@@ -257,6 +259,9 @@ struct WT
 	UINT MachineDatabaseRevision;
 	CFG_RW* CfgRwMachineDatabase;
 	LOCK* CfgRwSaveLock;
+	char SmtpServerHostname[128];
+	UINT SmtpServerPort;
+	char SmtpOtpFrom[128];
 
 	// Client / Server / Gate 共通
 	char EntranceUrl[MAX_PATH];			// エントランス URL
