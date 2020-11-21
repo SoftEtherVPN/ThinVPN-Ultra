@@ -3326,7 +3326,11 @@ WIDE *WideGateStart()
 }
 
 // WideGate の停止
-void WideGateStop(WIDE *wide)
+void WideGateStop(WIDE* wide)
+{
+	WideGateStopEx(wide, false);
+}
+void WideGateStopEx(WIDE* wide, bool daemon_force_exit)
 {
 	UCHAR gateid[SHA1_SIZE];
 	// 引数チェック
@@ -3334,6 +3338,23 @@ void WideGateStop(WIDE *wide)
 	{
 		return;
 	}
+
+	if (wide->wt->IsStandaloneMode)
+	{
+		// スタンドアロンモードの場合 データベースを Flush する (念のため)
+		WtgSamFlushDatabase(wide->wt);
+	}
+
+#ifdef OS_UNIX
+	if (daemon_force_exit)
+	{
+		// 2020/11/21 dnobori
+		// この後のセッション開放時にタイムアウトが発生することが多いので
+		// Daemon として終了する場合はこの時点でプロセスを強制終了 (正常終了コード) する。
+		// クリーンアップは OS に任せるのである。手抜き！！
+		_exit(0);
+	}
+#endif // OS_UNIX
 
 	// 報告スレッドの停止
 	wide->GateHalt = true;

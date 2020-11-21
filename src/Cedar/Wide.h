@@ -369,6 +369,7 @@ ACCEPT_QUEUE_ENTRY *AcceptQueueGetNext(WIDE *w);
 // WideGate
 WIDE *WideGateStart();
 void WideGateStop(WIDE *wide);
+void WideGateStopEx(WIDE* wide, bool daemon_force_exit);
 LIST *WideGateLoadIni();
 void WideGateLoadCertKey(X **cert, K **key);
 UINT WideGateGetIniEntry(char *name);

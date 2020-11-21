@@ -113,6 +113,10 @@ void WtgSamInit(WT* wt)
 
 	// フラッシュを いたします
 	WtgSamFlushDatabase(wt);
+
+	// 自動保存スレッド開始
+	wt->CfgSaveThreadHaltEvent = NewEvent();
+	wt->CfgSaveThread = NewThread(CfgSaveThreadProc, wt);
 }
 
 // Standalone Mode 終了
@@ -123,6 +127,16 @@ void WtgSamFree(WT* wt)
 	{
 		return;
 	}
+
+	wt->CfgSaveThreadHaltFlag = true;
+
+	Set(wt->CfgSaveThreadHaltEvent);
+
+	WaitThread(wt->CfgSaveThread, INFINITE);
+
+	ReleaseThread(wt->CfgSaveThread);
+
+	ReleaseEvent(wt->CfgSaveThreadHaltEvent);
 
 	FreeCfgRw(wt->CfgRwMachineDatabase);
 	wt->CfgRwMachineDatabase = NULL;
@@ -135,6 +149,31 @@ void WtgSamFree(WT* wt)
 
 	ReleaseList(wt->MachineDatabase);
 	wt->MachineDatabase = NULL;
+}
+
+// データベース定期保存スレッド
+void CfgSaveThreadProc(THREAD* thread, void* param)
+{
+	WT* wt = (WT*)param;
+	if (thread == NULL || param == NULL)
+	{
+		return;
+	}
+
+	while (true)
+	{
+		if (wt->CfgSaveThreadHaltFlag)
+		{
+			break;
+		}
+
+		Wait(wt->CfgSaveThreadHaltEvent, WT_SAM_DATABASE_AUTO_SAVE_INTERVAL);
+
+		if (wt->CfgSaveThreadHaltFlag == false)
+		{
+			WtgSamFlushDatabase(wt);
+		}
+	}
 }
 
 // マシンデータベースの読み込み

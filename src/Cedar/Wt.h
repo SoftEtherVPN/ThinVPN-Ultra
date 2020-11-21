@@ -197,6 +197,9 @@
 // スタンドアロン版 サーバー同時接続最大数
 #define WT_SAM_MAX_SERVER_SESSIONS		512
 
+// スタンドアロン版 データベース保存間隔
+#define WT_SAM_DATABASE_AUTO_SAVE_INTERVAL	(60 * 1000)
+
 
 //////////////////////////////////////////////////////////////////////
 // 
@@ -259,6 +262,9 @@ struct WT
 	UINT MachineDatabaseRevision;
 	CFG_RW* CfgRwMachineDatabase;
 	LOCK* CfgRwSaveLock;
+	THREAD* CfgSaveThread;
+	EVENT* CfgSaveThreadHaltEvent;
+	volatile bool CfgSaveThreadHaltFlag;
 	char SmtpServerHostname[128];
 	UINT SmtpServerPort;
 	char SmtpOtpFrom[128];

@@ -271,6 +271,7 @@ void WtgSamGenerateMsid(char *msid, UINT msid_size, char* hostkey_str);
 void WtgConvertStrToSafeForPcid(char* dst, UINT dst_size, char* src);
 WG_MACHINE* WtgSamGetMachineByPCID(WT* wt, char* pcid);
 WG_MACHINE* WtgSamGetMachineByMSID(WT* wt, char* msid);
+void CfgSaveThreadProc(THREAD* thread, void* param);
 
 #endif	// WTGATE_H
 
