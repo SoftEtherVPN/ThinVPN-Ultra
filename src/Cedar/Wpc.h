@@ -196,6 +196,7 @@ void WpcFillEntryName(char *dst, char *name);
 LIST *WpcParseDataEntry(BUF *b);
 void WpcFreeDataEntryList(LIST *o);
 WPC_ENTRY *WpcFindDataEntry(LIST *o, char *name);
+WPC_ENTRY* WpcFindDataEntryEx(LIST* o, char* name, UINT index);
 BUF *WpcDataEntryToBuf(WPC_ENTRY *e);
 BUF *WpcGeneratePacket(PACK *pack, UCHAR *host_key, UCHAR *host_secret);
 bool WpcParsePacket(WPC_PACKET *packet, BUF *buf);

@@ -993,6 +993,8 @@ WT *NewWt(X *master_cert)
 
 	wt = ZeroMalloc(sizeof(WT));
 
+	wt->CfgRwSaveLock = NewLock();
+
 	wt->Lock = NewLock();
 	wt->Ref = NewRef();
 
@@ -1038,6 +1040,7 @@ void CleanupWt(WT *wt)
 
 	DeleteLock(wt->Lock);
 	DeleteLock(wt->EntranceCacheLock);
+	DeleteLock(wt->CfgRwSaveLock);
 	Free(wt->InternetSetting);
 
 	Free(wt);

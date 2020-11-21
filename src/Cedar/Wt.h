@@ -186,7 +186,7 @@
 #define WT_CLIENT_OPTIONS_WOL		1
 
 // マシンデータベースファイル名 (Standalone Mode)
-#define WTG_SAM_DATABASE_FILENAME	"@MachineDatabase.dat"
+#define WTG_SAM_DATABASE_FILENAME	"@MachineDatabase.config"
 
 
 
@@ -249,7 +249,9 @@ struct WT
 	char OsInfo[MAX_PATH];
 	bool IsStandaloneMode;
 	LIST* MachineDatabase;
+	UINT MachineDatabaseRevision;
 	CFG_RW* CfgRwMachineDatabase;
+	LOCK* CfgRwSaveLock;
 
 	// Client / Server / Gate 共通
 	char EntranceUrl[MAX_PATH];			// エントランス URL

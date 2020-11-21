@@ -260,6 +260,30 @@ bool WpcParsePacket(WPC_PACKET *packet, BUF *buf)
 		}
 	}
 
+	b = WpcDataEntryToBuf(WpcFindDataEntryEx(o, "HOST", 0)); // HOSTKEY
+
+	if (b != NULL)
+	{
+		if (b->Size == SHA1_SIZE)
+		{
+			Copy(packet->HostKey, b->Buf, SHA1_SIZE);
+		}
+
+		FreeBuf(b);
+	}
+
+	b = WpcDataEntryToBuf(WpcFindDataEntryEx(o, "HOST", 1)); // HOSTSECRET
+
+	if (b != NULL)
+	{
+		if (b->Size == SHA1_SIZE)
+		{
+			Copy(packet->HostSecret, b->Buf, SHA1_SIZE);
+		}
+
+		FreeBuf(b);
+	}
+
 	WpcFreeDataEntryList(o);
 
 	return ret;
@@ -350,6 +374,35 @@ WPC_ENTRY *WpcFindDataEntry(LIST *o, char *name)
 		if (Cmp(e->EntryName, name_str, WPC_DATA_ENTRY_SIZE) == 0)
 		{
 			return e;
+		}
+	}
+
+	return NULL;
+}
+WPC_ENTRY* WpcFindDataEntryEx(LIST* o, char* name, UINT index)
+{
+	UINT i;
+	UINT j = 0;
+	char name_str[WPC_DATA_ENTRY_SIZE];
+	// Validate arguments
+	if (o == NULL || name == NULL)
+	{
+		return NULL;
+	}
+
+	WpcFillEntryName(name_str, name);
+
+	for (i = 0;i < LIST_NUM(o);i++)
+	{
+		WPC_ENTRY* e = LIST_DATA(o, i);
+
+		if (Cmp(e->EntryName, name_str, WPC_DATA_ENTRY_SIZE) == 0)
+		{
+			if (j == index)
+			{
+				return e;
+			}
+			j++;
 		}
 	}
 

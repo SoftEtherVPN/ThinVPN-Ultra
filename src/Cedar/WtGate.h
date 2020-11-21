@@ -200,6 +200,9 @@ struct WG_MACHINE
 #define	WG_PROXY_TCP_TIMEOUT_SERVER		(60 * 1000)
 #define	WG_PROXY_MAX_POST_SIZE			(1024 * 1024)
 
+// ThinDate Standalone Mode 定数
+#define WTG_SAM_MAX_RECVSTR_SIZE		(64 * 1024)
+
 
 // 関数プロトタイプ
 bool WtGateConnectParamFromPack(WT_GATE_CONNECT_PARAM *g, PACK *p);
@@ -210,7 +213,7 @@ void WtgStart(WT *wt, X *cert, K *key, UINT port, bool standalone_mode);
 void WtgStop(WT *wt);
 void WtgAccept(WT *wt, SOCK *s);
 bool WtgSendError(SOCK *s, UINT code);
-bool WtgDownloadSignature(SOCK *s, bool* check_ssl_ok, char *gate_secret_key, char *entrance_url_for_proxy);
+bool WtgDownloadSignature(WT* wt,SOCK *s, bool* check_ssl_ok, char *gate_secret_key, char *entrance_url_for_proxy);
 bool WtgUploadHello(WT *wt, SOCK *s, void *session_id);
 int WtgCompareSession(void *p1, void *p2);
 TSESSION *WtgNewSession(WT *wt, SOCK *sock, char *msid, void *session_id, bool use_compress, bool request_initial_pack, UINT tunnel_timeout, UINT tunnel_keepalive, bool tunnel_use_aggressive_timeout);
@@ -254,6 +257,8 @@ void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, c
 void WtgSamInit(WT* wt);
 void WtgSamFree(WT* wt);
 void WtgSamFlushDatabase(WT* wt);
+void WtgSamProcessRequestStr(WT* wt, SOCK* s, char* reqstr);
+PACK *WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet);
 
 
 #endif	// WTGATE_H

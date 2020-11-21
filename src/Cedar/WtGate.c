@@ -108,6 +108,9 @@ void WtgSamInit(WT* wt)
 	{
 		// データベースファイルがない。
 	}
+
+	// フラッシュを いたします
+	WtgSamFlushDatabase(wt);
 }
 
 // Standalone Mode 終了
@@ -128,10 +131,84 @@ void WtgSamFree(WT* wt)
 // マシンデータベースのフラッシュ
 void WtgSamFlushDatabase(WT* wt)
 {
+	FOLDER* root = CLEAN;
+
 	if (wt == NULL)
 	{
 		return;
 	}
+
+	root = CfgCreateFolder(NULL, TAG_ROOT);
+
+	LockList(wt->MachineDatabase);
+	{
+	}
+	UnlockList(wt->MachineDatabase);
+
+	Lock(wt->CfgRwSaveLock);
+	{
+		SaveCfgRwEx(wt->CfgRwMachineDatabase, root, wt->MachineDatabaseRevision);
+	}
+	Unlock(wt->CfgRwSaveLock);
+
+	CfgDeleteFolder(root);
+}
+
+// リクエスト文字列の処理
+void WtgSamProcessRequestStr(WT* wt, SOCK* s, char* reqstr)
+{
+	WPC_PACKET packet = CLEAN;
+	BUF* buf;
+	bool ok = false;
+	if (wt == NULL || s == NULL || reqstr == NULL)
+	{
+		return;
+	}
+
+	buf = NewBuf();
+	WriteBuf(buf, reqstr, StrLen(reqstr));
+
+	ok = WpcParsePacket(&packet, buf);
+
+	FreeBuf(buf);
+
+	if (ok)
+	{
+		PACK* ret_pack = WtgSamDoProcess(wt, s, &packet);
+
+		if (ret_pack != NULL)
+		{
+			BUF* ret_buf = WpcGeneratePacket(ret_pack, NULL, NULL);
+
+			if (ret_buf != NULL)
+			{
+				HttpSendBody(s, ret_buf->Buf, ret_buf->Size, "text/plain");
+
+				FreeBuf(ret_buf);
+			}
+
+			FreePack(ret_pack);
+		}
+
+		WpcFreePacket(&packet);
+	}
+}
+
+// リスエストの処理
+PACK* WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet)
+{
+	PACK* ret = NewPack();
+	UINT err = ERR_INTERNAL_ERROR;
+	if (wt == NULL || s == NULL || packet == NULL)
+	{
+		err = ERR_INTERNAL_ERROR;
+		goto LABEL_CLEANUP;
+	}
+
+LABEL_CLEANUP:
+	PackAddInt(ret, "Error", err);
+
+	return ret;
 }
 
 // Gate のセッションメイン関数
@@ -1026,7 +1103,7 @@ void WtgAccept(WT *wt, SOCK *s)
 	}
 
 	// シグネチャのダウンロード
-	continue_ok = WtgDownloadSignature(s, &check_ssl_ok, wt->Wide->GateKeyStr, wt->EntranceUrlForProxy);
+	continue_ok = WtgDownloadSignature(wt, s, &check_ssl_ok, wt->Wide->GateKeyStr, wt->EntranceUrlForProxy);
 
 	if (check_ssl_ok)
 	{
@@ -1035,7 +1112,6 @@ void WtgAccept(WT *wt, SOCK *s)
 
 	if (continue_ok == false)
 	{
-		Debug("WtgDownloadSignature Failed.\n");
 		return;
 	}
 
@@ -1689,7 +1765,7 @@ bool WtgUploadHello(WT *wt, SOCK *s, void *session_id)
 }
 
 // シグネチャのダウンロード
-bool WtgDownloadSignature(SOCK *s, bool* check_ssl_ok, char *gate_secret_key, char *entrance_url_for_proxy)
+bool WtgDownloadSignature(WT* wt, SOCK* s, bool* check_ssl_ok, char* gate_secret_key, char* entrance_url_for_proxy)
 {
 	HTTP_HEADER *h;
 	UCHAR *data;
@@ -1702,7 +1778,7 @@ bool WtgDownloadSignature(SOCK *s, bool* check_ssl_ok, char *gate_secret_key, ch
 	}
 	*check_ssl_ok = false;
 	// 引数チェック
-	if (s == NULL)
+	if (s == NULL || wt == NULL)
 	{
 		return false;
 	}
@@ -1723,7 +1799,7 @@ bool WtgDownloadSignature(SOCK *s, bool* check_ssl_ok, char *gate_secret_key, ch
 		}
 
 		// 解釈する
-		if (StartWith(h->Target, "/widecontrol/"))
+		if (StartWith(h->Target, "/widecontrol/") && wt->IsStandaloneMode == false)
 		{
 			char url[MAX_PATH];
 
@@ -1739,6 +1815,47 @@ bool WtgDownloadSignature(SOCK *s, bool* check_ssl_ok, char *gate_secret_key, ch
 
 			FreeHttpHeader(h);
 
+			return false;
+		}
+		else if (StartWith(h->Target, "/thingate/") && wt->IsStandaloneMode)
+		{
+			// ThinGate Standalone Mode
+			char* recv_str = NULL;
+
+			if (StrCmpi(h->Method, "POST") == 0)
+			{
+				// POST なのでデータを受信する
+				data_size = GetContentLength(h);
+				if (data_size > WTG_SAM_MAX_RECVSTR_SIZE)
+				{
+					// データが大きすぎる
+					HttpSendForbidden(s, h->Target, NULL);
+					FreeHttpHeader(h);
+					return false;
+				}
+				data = ZeroMalloc(data_size + 2);
+				if (RecvAll(s, data, data_size, s->SecureMode) == false)
+				{
+					// データ受信失敗
+					Free(data);
+					FreeHttpHeader(h);
+					return false;
+				}
+
+				FreeHttpHeader(h);
+
+				recv_str = data;
+			}
+			else
+			{
+				recv_str = CopyStr("");
+			}
+
+			WtgSamProcessRequestStr(wt, s, recv_str);
+
+			Free(recv_str);
+
+			*check_ssl_ok = true;
 			return false;
 		}
 		else if (StrCmpi(h->Method, "POST") == 0)
