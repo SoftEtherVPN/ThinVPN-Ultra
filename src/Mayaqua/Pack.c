@@ -1497,6 +1497,27 @@ bool PackGetStrEx(PACK *p, char *name, char *str, UINT size, UINT index)
 	StrCpy(str, size, GetStrValue(e, index));
 	return true;
 }
+char* PackGetStrCopy(PACK* p, char* name)
+{
+	return PackGetStrCopyEx(p, name, 0);
+}
+char* PackGetStrCopyEx(PACK* p, char* name, UINT index)
+{
+	ELEMENT* e;
+	// Validate arguments
+	if (p == NULL || name == NULL)
+	{
+		return NULL;
+	}
+
+	e = GetElement(p, name, VALUE_STR);
+	if (e == NULL)
+	{
+		return NULL;
+	}
+
+	return CopyStr(GetStrValue(e, index));
+}
 
 // Add the buffer to the PACK (array)
 ELEMENT *PackAddBufEx(PACK *p, char *name, BUF *b, UINT index, UINT total)

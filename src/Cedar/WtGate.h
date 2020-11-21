@@ -180,6 +180,7 @@ struct TSESSION
 struct WG_MACHINE
 {
 	char Msid[MAX_PATH];				// 固有 ID
+	char CertHash[MAX_PATH];			// 証明書ハッシュ
 	char HostSecret2[MAX_PATH];			// ホストシークレット 2
 	char Pcid[MAX_PATH];				// コンピュータ ID
 	UINT64 ServerMask64;				// サーバーマスク 64
@@ -257,8 +258,16 @@ void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, c
 void WtgSamInit(WT* wt);
 void WtgSamFree(WT* wt);
 void WtgSamFlushDatabase(WT* wt);
+void WtgSamLoadDatabase(WT* wt, FOLDER *root);
 void WtgSamProcessRequestStr(WT* wt, SOCK* s, char* reqstr);
 PACK *WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet);
+UINT WtgCheckPcid(char* pcid);
+bool WtgIsSafeCharForPcid(char c);
+bool WtgSamIsMachineExistsByHostKey(WT* wt, char* hostkey_str);
+bool WtgSamIsMachineExistsByHostSecret(WT* wt, char* hostsecret_str);
+bool WtgSamIsMachineExistsByPCID(WT* wt, char* pcid);
+void WtgSamGenerateMsid(char *msid, UINT msid_size, char* hostkey_str);
+void WtgConvertStrToSafeForPcid(char* dst, UINT dst_size, char* src);
 
 
 #endif	// WTGATE_H

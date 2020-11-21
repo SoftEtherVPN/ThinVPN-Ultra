@@ -102,6 +102,8 @@ void WtgSamInit(WT* wt)
 	if (root != NULL)
 	{
 		// データベースファイルが発見された。読み込みをする。
+		WtgSamLoadDatabase(wt, root);
+
 		CfgDeleteFolder(root);
 	}
 	else
@@ -116,6 +118,7 @@ void WtgSamInit(WT* wt)
 // Standalone Mode 終了
 void WtgSamFree(WT* wt)
 {
+	UINT i;
 	if (wt == NULL || wt->IsStandaloneMode == false)
 	{
 		return;
@@ -124,14 +127,86 @@ void WtgSamFree(WT* wt)
 	FreeCfgRw(wt->CfgRwMachineDatabase);
 	wt->CfgRwMachineDatabase = NULL;
 
+	for (i = 0;i < LIST_NUM(wt->MachineDatabase);i++)
+	{
+		WG_MACHINE* m = LIST_DATA(wt->MachineDatabase, i);
+		Free(m);
+	}
+
 	ReleaseList(wt->MachineDatabase);
 	wt->MachineDatabase = NULL;
+}
+
+// マシンデータベースの読み込み
+void WtgSamLoadDatabase(WT* wt, FOLDER* root)
+{
+	FOLDER* machine = NULL;
+	if (wt == NULL || root == NULL)
+	{
+		return;
+	}
+
+	wt->MachineDatabaseRevision = CfgGetInt(root, "Revision");
+
+	machine = CfgGetFolder(root, "Machines");
+
+	LockList(wt->MachineDatabase);
+	{
+		TOKEN_LIST *name_list = CfgEnumFolderToTokenList(machine);
+		if (name_list != NULL)
+		{
+			UINT i;
+			for (i = 0;i < name_list->NumTokens;i++)
+			{
+				char* name = name_list->Token[i];
+				FOLDER* mf = CfgGetFolder(machine, name);
+
+				if (mf != NULL)
+				{
+					WG_MACHINE* m = ZeroMalloc(sizeof(WG_MACHINE));
+
+					CfgGetStr(mf, "Msid", m->Msid, sizeof(m->Msid));
+					CfgGetStr(mf, "CertHash", m->CertHash, sizeof(m->CertHash));
+					CfgGetStr(mf, "HostSecret2", m->HostSecret2, sizeof(m->HostSecret2));
+					CfgGetStr(mf, "Pcid", m->Pcid, sizeof(m->Pcid));
+					m->ServerMask64 = CfgGetInt64(mf, "ServerMask64");
+					m->CreateDate = CfgGetInt64(mf, "CreateDate");
+					m->UpdateDate = CfgGetInt64(mf, "UpdateDate");
+					m->LastServerDate = CfgGetInt64(mf, "LastServerDate");
+					m->FirstClientDate = CfgGetInt64(mf, "FirstClientDate");
+					m->LastClientDate = CfgGetInt64(mf, "LastClientDate");
+					m->NumServer = CfgGetInt(mf, "NumServer");
+					m->NumClient = CfgGetInt(mf, "NumClient");
+					CfgGetStr(mf, "CreateIp", m->CreateIp, sizeof(m->CreateIp));
+					CfgGetStr(mf, "CreateHost", m->CreateHost, sizeof(m->CreateHost));
+					CfgGetStr(mf, "LastIp", m->LastIp, sizeof(m->LastIp));
+					CfgGetStr(mf, "WolMacList", m->WolMacList, sizeof(m->WolMacList));
+
+					if (IsFilledStr(m->Msid) &&
+						IsFilledStr(m->CertHash) &&
+						IsFilledStr(m->HostSecret2) &&
+						IsFilledStr(m->Pcid))
+					{
+						Add(wt->MachineDatabase, m);
+					}
+					else
+					{
+						Free(m);
+					}
+				}
+			}
+
+			FreeToken(name_list);
+		}
+	}
+	UnlockList(wt->MachineDatabase);
 }
 
 // マシンデータベースのフラッシュ
 void WtgSamFlushDatabase(WT* wt)
 {
-	FOLDER* root = CLEAN;
+	FOLDER* root = NULL;
+	FOLDER* machine = NULL;
 
 	if (wt == NULL)
 	{
@@ -140,8 +215,35 @@ void WtgSamFlushDatabase(WT* wt)
 
 	root = CfgCreateFolder(NULL, TAG_ROOT);
 
+	CfgAddInt(root, "Revision", wt->MachineDatabaseRevision);
+
+	machine = CfgCreateFolder(root, "Machines");
+
 	LockList(wt->MachineDatabase);
 	{
+		UINT i;
+		for (i = 0;i < LIST_NUM(wt->MachineDatabase);i++)
+		{
+			WG_MACHINE* m = LIST_DATA(wt->MachineDatabase, i);
+			FOLDER* mf = CfgCreateFolder(machine, m->Msid);
+
+			CfgAddStr(mf, "Msid", m->Msid);
+			CfgAddStr(mf, "CertHash", m->CertHash);
+			CfgAddStr(mf, "HostSecret2", m->HostSecret2);
+			CfgAddStr(mf, "Pcid", m->Pcid);
+			CfgAddInt64(mf, "ServerMask64", m->ServerMask64);
+			CfgAddInt64(mf, "CreateDate", m->CreateDate);
+			CfgAddInt64(mf, "UpdateDate", m->UpdateDate);
+			CfgAddInt64(mf, "LastServerDate", m->LastServerDate);
+			CfgAddInt64(mf, "FirstClientDate", m->FirstClientDate);
+			CfgAddInt64(mf, "LastClientDate", m->LastClientDate);
+			CfgAddInt(mf, "NumServer", m->NumServer);
+			CfgAddInt(mf, "NumClient", m->NumClient);
+			CfgAddStr(mf, "CreateIp", m->CreateIp);
+			CfgAddStr(mf, "CreateHost", m->CreateHost);
+			CfgAddStr(mf, "LastIp", m->LastIp);
+			CfgAddStr(mf, "WolMacList", m->WolMacList);
+		}
 	}
 	UnlockList(wt->MachineDatabase);
 
@@ -160,10 +262,14 @@ void WtgSamProcessRequestStr(WT* wt, SOCK* s, char* reqstr)
 	WPC_PACKET packet = CLEAN;
 	BUF* buf;
 	bool ok = false;
+	PACK* ret_pack = NULL;
+	UINT prev_revision = 0;
 	if (wt == NULL || s == NULL || reqstr == NULL)
 	{
 		return;
 	}
+
+	prev_revision = wt->MachineDatabaseRevision;
 
 	buf = NewBuf();
 	WriteBuf(buf, reqstr, StrLen(reqstr));
@@ -174,23 +280,34 @@ void WtgSamProcessRequestStr(WT* wt, SOCK* s, char* reqstr)
 
 	if (ok)
 	{
-		PACK* ret_pack = WtgSamDoProcess(wt, s, &packet);
+		ret_pack = WtgSamDoProcess(wt, s, &packet);
+	}
+	else
+	{
+		ret_pack = NewPack();
+		PackAddInt(ret_pack, "Error", ERR_INTERNAL_ERROR);
+	}
 
-		if (ret_pack != NULL)
+	if (ret_pack != NULL)
+	{
+		BUF* ret_buf = WpcGeneratePacket(ret_pack, NULL, NULL);
+
+		if (ret_buf != NULL)
 		{
-			BUF* ret_buf = WpcGeneratePacket(ret_pack, NULL, NULL);
+			HttpSendBody(s, ret_buf->Buf, ret_buf->Size, "text/plain");
 
-			if (ret_buf != NULL)
-			{
-				HttpSendBody(s, ret_buf->Buf, ret_buf->Size, "text/plain");
-
-				FreeBuf(ret_buf);
-			}
-
-			FreePack(ret_pack);
+			FreeBuf(ret_buf);
 		}
 
-		WpcFreePacket(&packet);
+		FreePack(ret_pack);
+	}
+
+	WpcFreePacket(&packet);
+
+	if (prev_revision != wt->MachineDatabaseRevision)
+	{
+		// DB の内容が大きく変更されていた場合は DB を強制フラッシュする
+		WtgSamFlushDatabase(wt);
 	}
 }
 
@@ -199,16 +316,379 @@ PACK* WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet)
 {
 	PACK* ret = NewPack();
 	UINT err = ERR_INTERNAL_ERROR;
+	PACK* req;
+	char function[64] = CLEAN;
+	UINT tmperr = ERR_INTERNAL_ERROR;
+	char hostkey_str[SHA1_SIZE * 2 + 8] = CLEAN;
+	char hostsecret_str[SHA1_SIZE * 2 + 8] = CLEAN;
+	char* wol_maclist = NULL;
+	UINT i;
+	WG_MACHINE* authed = NULL;
 	if (wt == NULL || s == NULL || packet == NULL)
 	{
 		err = ERR_INTERNAL_ERROR;
 		goto LABEL_CLEANUP;
 	}
 
+	req = packet->Pack;
+
+	LockList(wt->MachineDatabase);
+
+	if (IsZero(packet->HostKey, SHA1_SIZE) == false &&
+		IsZero(packet->HostSecret, SHA1_SIZE) == false)
+	{
+		// サーバーからの認証データで認証を実施
+		BinToStr(hostkey_str, sizeof(hostkey_str), packet->HostKey, SHA1_SIZE);
+		BinToStr(hostsecret_str, sizeof(hostsecret_str), packet->HostSecret, SHA1_SIZE);
+
+		// ログインを試行
+		for (i = 0;i < LIST_NUM(wt->MachineDatabase);i++)
+		{
+			WG_MACHINE* m = LIST_DATA(wt->MachineDatabase, i);
+
+			if (StrCmpi(m->CertHash, hostkey_str) == 0 &&
+				StrCmpi(m->HostSecret2, hostsecret_str) == 0)
+			{
+				// ログインに成功
+				authed = m;
+				break;
+			}
+		}
+	}
+
+	PackGetStr(req, "Function", function, sizeof(function));
+
+	if (StrCmpi(function, "RegistMachine") == 0)
+	{
+		// 新しい Machine の登録
+		char pcid[64] = CLEAN;
+		WG_MACHINE* m = NULL;
+
+		PackGetStr(req, "Pcid", pcid, sizeof(pcid));
+
+		Trim(pcid);
+		StrLower(pcid);
+
+		tmperr = WtgCheckPcid(pcid);
+		if (tmperr != ERR_NO_ERROR)
+		{
+			err = tmperr;
+			goto LABEL_CLEANUP;
+		}
+
+		// 同一キーが存在しないかどうかチェック
+		if (WtgSamIsMachineExistsByHostKey(wt, hostkey_str))
+		{
+			// 存在する
+			err = ERR_SECURITY_ERROR;
+			goto LABEL_CLEANUP;
+		}
+
+		// 同一シークレットが存在しないかどうかチェック
+		if (WtgSamIsMachineExistsByHostSecret(wt, hostsecret_str))
+		{
+			// 存在する
+			err = ERR_SECURITY_ERROR;
+			goto LABEL_CLEANUP;
+		}
+
+		// PCID が存在しないかどうかチェック
+		if (WtgSamIsMachineExistsByPCID(wt, pcid))
+		{
+			// 存在する
+			err = ERR_PCID_ALREADY_EXISTS;
+			goto LABEL_CLEANUP;
+		}
+
+		// 存在しない場合のみ登録
+		m = ZeroMalloc(sizeof(WG_MACHINE));
+		WtgSamGenerateMsid(m->Msid, sizeof(m->Msid), hostkey_str);
+		StrCpy(m->CertHash, sizeof(m->CertHash), hostkey_str);
+		StrCpy(m->HostSecret2, sizeof(m->HostSecret2), hostsecret_str);
+		StrCpy(m->Pcid, sizeof(m->Pcid), pcid);
+		m->CreateDate = m->UpdateDate = m->LastServerDate = SystemTime64();
+		IPToStr(m->CreateIp, sizeof(m->CreateIp), &s->RemoteIP);
+		IPToStr(m->LastIp, sizeof(m->LastIp), &s->RemoteIP);
+		StrCpy(m->CreateHost, sizeof(m->CreateHost), s->RemoteHostname);
+		Add(wt->MachineDatabase, m);
+
+		wt->MachineDatabaseRevision++;
+
+		err = ERR_NO_ERROR;
+	}
+	else if (StrCmpi(function, "GetPcidCandidate") == 0)
+	{
+		char machine_name[32] = CLEAN;
+		char computer_name[32] = CLEAN;
+		char username[32] = CLEAN;
+		char key[64] = CLEAN;
+		UINT n = 0;
+		char candidate[64] = CLEAN;
+
+		PackGetStr(req, "MachineName", machine_name, sizeof(machine_name));
+		PackGetStr(req, "ComputerName", computer_name, sizeof(computer_name));
+		PackGetStr(req, "UserName", username, sizeof(username));
+
+		WtgConvertStrToSafeForPcid(username, sizeof(username), username);
+
+		i = SearchStrEx(machine_name, ".", 0, false);
+		if (i != INFINITE)
+		{
+			machine_name[i] = 0;
+		}
+		machine_name[8] = 0;
+		WtgConvertStrToSafeForPcid(machine_name, sizeof(machine_name), machine_name);
+
+		Trim(machine_name);
+		Trim(username);
+
+		if (IsEmptyStr(username) == false && StrCmpi(username, "administrator") != 0 && StrCmpi(username, "system") != 0)
+		{
+			StrCpy(key, sizeof(key), username);
+		}
+		else if (IsEmptyStr(machine_name) == false)
+		{
+			StrCpy(key, sizeof(key), machine_name);
+		}
+		else
+		{
+			UCHAR rand2[2];
+			Rand(rand2, sizeof(rand2));
+			BinToStr(key, sizeof(key), rand2, sizeof(rand2));
+		}
+
+		StrLower(key);
+
+		while (true)
+		{
+			i = 1 + Rand32() % 9999;
+			n++;
+			if (n >= 100)
+			{
+				i = Rand32() % 9999999 + n;
+			}
+
+			Format(candidate, sizeof(candidate), "%s-%u", key, i);
+
+			if (WtgSamIsMachineExistsByPCID(wt, candidate) == false)
+			{
+				break;
+			}
+		}
+
+		PackAddStr(ret, "Ret", candidate);
+		err = ERR_NO_ERROR;
+	}
+	else if (StrCmpi(function, "ServerConnect") == 0)
+	{
+		UINT64 server_mask_64;
+		BUF* b;
+		UINT64 expires = 0;
+		UCHAR sign[SHA1_SIZE] = CLEAN;
+		if (authed == NULL)
+		{
+			err = ERR_NO_INIT_CONFIG;
+			goto LABEL_CLEANUP;
+		}
+
+		wol_maclist = PackGetStrCopy(req, "wol_maclist");
+		if (wol_maclist == NULL) wol_maclist = CopyStr("");
+
+		server_mask_64 = PackGetInt64(req, "ServerMask64");
+
+		// 回数インクリメント、HOST_SECRET2 更新、WOL_MACLIST 更新, SERVERMASK64 更新
+		authed->NumServer++;
+		authed->LastServerDate = SystemTime64();
+		IPToStr(authed->LastIp, sizeof(authed->LastIp), &s->RemoteIP);
+		if (StrCmpi(authed->WolMacList, wol_maclist) != 0)
+		{
+			StrCpy(authed->WolMacList, sizeof(authed->WolMacList), wol_maclist);
+			wt->MachineDatabaseRevision++;
+		}
+		if (authed->ServerMask64 != server_mask_64)
+		{
+			authed->ServerMask64 = server_mask_64;
+			wt->MachineDatabaseRevision++;
+		}
+
+		expires = SystemTime64() + (UINT64)(20 * 60 * 1000);
+
+		b = NewBuf();
+		WriteBuf(b, authed->Msid, StrLen(authed->Msid));
+		WriteBufInt64(b, expires);
+		WriteBuf(b, wt->GateId, SHA1_SIZE);
+
+		PackAddStr(ret, "Msid", authed->Msid);
+		PackAddData(ret, "GateId", wt->GateId, SHA1_SIZE);
+		PackAddInt64(ret, "Expires", expires);
+
+		HashSha1(sign, b->Buf, b->Size);
+
+		PackAddData(ret, "Signature2", sign, SHA1_SIZE);
+		PackAddStr(ret, "Hostname", "127.0.0.1");
+		PackAddStr(ret, "HostnameForProxy", "127.0.0.1");
+		PackAddStr(ret, "Pcid", authed->Pcid);
+		PackAddInt(ret, "Port", 443);
+
+		FreeBuf(b);
+
+		err = ERR_NO_ERROR;
+	}
+
 LABEL_CLEANUP:
+	UnlockList(wt->MachineDatabase);
+
 	PackAddInt(ret, "Error", err);
 
+	Free(wol_maclist);
+
 	return ret;
+}
+
+// PCID に使用できる文字列にコンバート
+void WtgConvertStrToSafeForPcid(char* dst, UINT dst_size, char* src)
+{
+	char tmp[64] = CLEAN;
+	UINT i, len;
+
+	len = StrLen(src);
+
+	for (i = 0;i < len;i++)
+	{
+		char c = src[i];
+		if (WtgIsSafeCharForPcid(c))
+		{
+			char s[2] = CLEAN;
+			s[0] = c;
+			StrCat(tmp, sizeof(tmp), s);
+		}
+	}
+
+	tmp[20] = 0;
+
+	StrCpy(dst, dst_size, tmp);
+}
+
+// MSID の作成
+void WtgSamGenerateMsid(char* msid, UINT msid_size, char* hostkey_str)
+{
+	ClearStr(msid, msid_size);
+	if (msid == NULL || hostkey_str == NULL)
+	{
+		return;
+	}
+
+	Format(msid, msid_size, "MSID-DESK-%s", hostkey_str);
+}
+
+// 指定した HostKey を持った Machine が存在するかどうかチェック
+bool WtgSamIsMachineExistsByHostKey(WT* wt, char* hostkey_str)
+{
+	UINT i;
+	if (wt == NULL || hostkey_str == NULL)
+	{
+		return false;
+	}
+
+	for (i = 0;i < LIST_NUM(wt->MachineDatabase);i++)
+	{
+		WG_MACHINE* m = LIST_DATA(wt->MachineDatabase, i);
+
+		if (StrCmpi(m->CertHash, hostkey_str) == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// 指定した HostSecret を持った Machine が存在するかどうかチェック
+bool WtgSamIsMachineExistsByHostSecret(WT* wt, char* hostsecret_str)
+{
+	UINT i;
+	if (wt == NULL || hostsecret_str == NULL)
+	{
+		return false;
+	}
+
+	for (i = 0;i < LIST_NUM(wt->MachineDatabase);i++)
+	{
+		WG_MACHINE* m = LIST_DATA(wt->MachineDatabase, i);
+
+		if (StrCmpi(m->HostSecret2, hostsecret_str) == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// 指定した PCID を持った Machine が存在するかどうかチェック
+bool WtgSamIsMachineExistsByPCID(WT* wt, char* pcid)
+{
+	UINT i;
+	if (wt == NULL || pcid == NULL)
+	{
+		return false;
+	}
+
+	for (i = 0;i < LIST_NUM(wt->MachineDatabase);i++)
+	{
+		WG_MACHINE* m = LIST_DATA(wt->MachineDatabase, i);
+
+		if (StrCmpi(m->Pcid, pcid) == 0)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// PCID のチェック
+UINT WtgCheckPcid(char* pcid)
+{
+	UINT i, len;
+	len = StrLen(pcid);
+	if (len == 0)
+	{
+		return ERR_PCID_NOT_SPECIFIED;
+	}
+	if (len > (WT_PCID_SIZE - 1))
+	{
+		return ERR_PCID_TOO_LONG;
+	}
+	for (i = 0;i < len;i++)
+	{
+		if (WtgIsSafeCharForPcid(pcid[i]) == false)
+		{
+			return ERR_PCID_INVALID;
+		}
+	}
+
+	return ERR_NO_ERROR;
+}
+bool WtgIsSafeCharForPcid(char c)
+{
+	if ('a' <= c && c <= 'z')
+	{
+		return true;
+	}
+	else if ('A' <= c && c <= 'Z')
+	{
+		return true;
+	}
+	else if (c == '_' || c == '-')
+	{
+		return true;
+	}
+	else if ('0' <= c && c <= '9')
+	{
+		return true;
+	}
+	return false;
 }
 
 // Gate のセッションメイン関数
@@ -1842,8 +2322,6 @@ bool WtgDownloadSignature(WT* wt, SOCK* s, bool* check_ssl_ok, char* gate_secret
 					return false;
 				}
 
-				FreeHttpHeader(h);
-
 				recv_str = data;
 			}
 			else
@@ -1856,6 +2334,9 @@ bool WtgDownloadSignature(WT* wt, SOCK* s, bool* check_ssl_ok, char* gate_secret
 			Free(recv_str);
 
 			*check_ssl_ok = true;
+
+			FreeHttpHeader(h);
+			
 			return false;
 		}
 		else if (StrCmpi(h->Method, "POST") == 0)
@@ -1934,10 +2415,36 @@ bool WtGateConnectParamCheckSignature(WIDE *wide, WT_GATE_CONNECT_PARAM *g)
 	}
 
 	// 署名検証
-	if (WideGateGetControllerGateSecretKey(wide, secret_key, sizeof(secret_key)))
+	if (wide->wt->IsStandaloneMode == false)
 	{
+		// 通常モード
+		if (WideGateGetControllerGateSecretKey(wide, secret_key, sizeof(secret_key)))
+		{
+			b2 = NewBuf();
+			WriteBuf(b2, secret_key, StrLen(secret_key));
+			WriteBuf(b2, b->Buf, b->Size);
+
+			HashSha1(hash, b2->Buf, b2->Size);
+
+			FreeBuf(b2);
+
+			if (Cmp(hash, g->Signature2, SHA1_SIZE) == 0)
+			{
+				ret = true;
+			}
+		}
+		else
+		{
+			// 何らかの原因で Controller からの secret_key の取得に失敗している場合
+			// はチェックをしない (fail safe)
+			WHERE;
+			ret = true;
+		}
+	}
+	else
+	{
+		// Standalone Mode
 		b2 = NewBuf();
-		WriteBuf(b2, secret_key, StrLen(secret_key));
 		WriteBuf(b2, b->Buf, b->Size);
 
 		HashSha1(hash, b2->Buf, b2->Size);
@@ -1948,13 +2455,6 @@ bool WtGateConnectParamCheckSignature(WIDE *wide, WT_GATE_CONNECT_PARAM *g)
 		{
 			ret = true;
 		}
-	}
-	else
-	{
-		// 何らかの原因で Controller からの secret_key の取得に失敗している場合
-		// はチェックをしない (fail safe)
-		WHERE;
-		ret = true;
 	}
 
 	FreeBuf(b);

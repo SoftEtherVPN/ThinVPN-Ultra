@@ -218,6 +218,8 @@ bool PackGetStr(PACK *p, char *name, char *str, UINT size);
 bool PackGetStrEx(PACK *p, char *name, char *str, UINT size, UINT index);
 bool PackGetUniStr(PACK *p, char *name, wchar_t *unistr, UINT size);
 bool PackGetUniStrEx(PACK *p, char *name, wchar_t *unistr, UINT size, UINT index);
+char* PackGetStrCopy(PACK* p, char* name);
+char* PackGetStrCopyEx(PACK* p, char* name, UINT index);
 bool PackCmpStr(PACK *p, char *name, char *str);
 UINT PackGetIndexCount(PACK *p, char *name);
 UINT PackGetInt(PACK *p, char *name);

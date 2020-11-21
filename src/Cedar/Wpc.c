@@ -146,7 +146,7 @@ PACK *WpcCallEx2(char *url, INTERNET_SETTING *setting, UINT timeout_connect, UIN
 	URL_DATA data;
 	BUF *b, *recv;
 	UINT error;
-	WPC_PACKET packet;
+	WPC_PACKET packet = CLEAN;
 	// Validate arguments
 	if (function_name == NULL || pack == NULL)
 	{
