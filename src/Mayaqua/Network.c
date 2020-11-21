@@ -228,6 +228,118 @@ static LIST *g_dyn_value_list = NULL;
 //#define	RUDP_DETAIL_LOG
 
 
+// SMTP メール送信
+bool SmtpSendMail(char* server_host, UINT server_port, char* from, char* to, char* body)
+{
+	bool ret = false;
+	SOCK* s = NULL;
+	char* line = NULL;
+	char str[MAX_PATH] = CLEAN;
+
+	s = Connect(server_host, server_port);
+	if (s == NULL)
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	line = RecvLine(s, 1024);
+
+	if (StartWith(line, "2") == false)
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	Free(line);
+	line = NULL;
+
+	Format(str, sizeof(str), "HELO %r\r\n", &s->LocalIP);
+	SendAll(s, str, StrLen(str), false);
+
+	line = RecvLine(s, 1024);
+
+	if (StartWith(line, "2") == false)
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	Free(line);
+	line = NULL;
+
+	Format(str, sizeof(str), "MAIL FROM:%s\r\n", from);
+	SendAll(s, str, StrLen(str), false);
+
+	line = RecvLine(s, 1024);
+
+	if (StartWith(line, "2") == false)
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	Free(line);
+	line = NULL;
+
+	Format(str, sizeof(str), "RCPT TO:%s\r\n", to);
+	SendAll(s, str, StrLen(str), false);
+
+	line = RecvLine(s, 1024);
+
+	if (StartWith(line, "2") == false)
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	Free(line);
+	line = NULL;
+
+	StrCpy(str, sizeof(str), "DATA\r\n");
+	SendAll(s, str, StrLen(str), false);
+
+	line = RecvLine(s, 1024);
+
+	if (StartWith(line, "3") == false)
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	Free(line);
+	line = NULL;
+
+	SendAll(s, body, StrLen(body), false);
+	SendAll(s, "\r\n", 2, false);
+	SendAll(s, ".\r\n", 3, false);
+
+	line = RecvLine(s, 1024);
+
+	if (StartWith(line, "2") == false)
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	Free(line);
+	line = NULL;
+
+	ret = true;
+
+
+	StrCpy(str, sizeof(str), "QUIT\r\n");
+	SendAll(s, str, StrLen(str), false);
+
+	line = RecvLine(s, 1024);
+
+
+LABEL_CLEANUP:
+	if (line != NULL)
+	{
+		Free(line);
+	}
+	if (s != NULL)
+	{
+		Disconnect(s);
+		ReleaseSock(s);
+	}
+	return ret;
+}
+
 // Check whether the MAC address is valid
 bool IsMacInvalid(UCHAR *mac)
 {

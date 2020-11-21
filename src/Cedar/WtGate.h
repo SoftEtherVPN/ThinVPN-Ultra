@@ -270,7 +270,7 @@ bool WtgSamIsMachineExistsByPCID(WT* wt, char* pcid);
 void WtgSamGenerateMsid(char *msid, UINT msid_size, char* hostkey_str);
 void WtgConvertStrToSafeForPcid(char* dst, UINT dst_size, char* src);
 WG_MACHINE* WtgSamGetMachineByPCID(WT* wt, char* pcid);
-
+WG_MACHINE* WtgSamGetMachineByMSID(WT* wt, char* msid);
 
 #endif	// WTGATE_H
 

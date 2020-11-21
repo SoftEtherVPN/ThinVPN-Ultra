@@ -119,6 +119,7 @@
 #define	ERR_REG_PASSWORD_INCORRECT			256 // 登録用パスワードが誤っている
 #define ERR_GATE_SYSTEM_INTERNAL_PROXY		257	// ゲートウェイ <--> 中間プロキシサーバー <--> コントローラ 間の通信が不良である
 #define ERR_NOT_LGWAN						258	// LGWAN 上の PC でない
+#define ERR_WG_TOO_MANY_SESSIONS			259	// スタンドアロンモード Gate のセッション数が多すぎる
 
 
 // SNI 文字列
@@ -190,6 +191,9 @@
 
 // スタンドアロン版で Controller と Gate とが同じホストであることを示す特別なホスト名
 #define WT_CONTROLLER_GATE_SAME_HOST	"<<!!samehost!!>>"
+
+// スタンドアロン版 サーバー同時接続最大数
+#define WT_SAM_MAX_SERVER_SESSIONS		512
 
 
 //////////////////////////////////////////////////////////////////////

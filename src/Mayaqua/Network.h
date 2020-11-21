@@ -1708,6 +1708,8 @@ bool IsMacInvalid(UCHAR *mac);
 
 UINT ParseProxyProtocol(PROXY_PROTOCOL *dst, UCHAR* peek_buf, UINT peek_size);
 
+bool SmtpSendMail(char* server_host, UINT server_port, char* from, char* to, char* body);
+
 
 #endif	// NETWORK_H
 

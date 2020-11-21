@@ -466,7 +466,7 @@ bool DuWoLDlgOnOk(HWND hWnd, DU_MAIN *m)
 		return false;
 	}
 
-	if (StrCmpi(pcid, pcid2) == 0)
+	if (StrCmpi(pcid, pcid2) == 0 && DcGetDebugFlag() == false)
 	{
 		MsgBox(hWnd, MB_ICONEXCLAMATION, _UU("DU_WOL_TARGET_IS_TRIGGER"));
 		Focus(hWnd, C_PCID);

@@ -551,6 +551,12 @@ PACK* WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet)
 			goto LABEL_CLEANUP;
 		}
 
+		if (LIST_NUM(wt->SessionList) >= WT_SAM_MAX_SERVER_SESSIONS)
+		{
+			err = ERR_WG_TOO_MANY_SESSIONS;
+			goto LABEL_CLEANUP;
+		}
+
 		wol_maclist = PackGetStrCopy(req, "wol_maclist");
 		if (wol_maclist == NULL) wol_maclist = CopyStr("");
 
@@ -670,6 +676,75 @@ PACK* WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet)
 		}
 		UnlockList(wt->SessionList);
 	}
+	else if (StrCmpi(function, "RenameMachine") == 0)
+	{
+		char new_name[WT_PCID_SIZE] = CLEAN;
+
+		if (authed == NULL)
+		{
+			err = ERR_NO_INIT_CONFIG;
+			goto LABEL_CLEANUP;
+		}
+
+		PackGetStr(req, "NewName", new_name, sizeof(new_name));
+
+		Trim(new_name);
+		StrLower(new_name);
+
+		tmperr = WtgCheckPcid(new_name);
+		if (tmperr != ERR_NO_ERROR)
+		{
+			err = tmperr;
+			goto LABEL_CLEANUP;
+		}
+
+		if (WtgSamIsMachineExistsByPCID(wt, new_name))
+		{
+			// 既に存在する名前を指定した
+			err = ERR_PCID_ALREADY_EXISTS;
+			goto LABEL_CLEANUP;
+		}
+
+		err = ERR_NO_ERROR;
+
+		// 名前の変更
+		StrCpy(authed->Pcid, sizeof(authed->Pcid), new_name);
+
+		wt->MachineDatabaseRevision++;
+	}
+	else if (StrCmpi(function, "ClientGetWolMacList") == 0)
+	{
+		WG_MACHINE* target_machine = NULL;
+		char pcid[WT_PCID_SIZE] = CLEAN;
+		PackGetStr(req, "Pcid", pcid, sizeof(pcid));
+
+		target_machine = WtgSamGetMachineByPCID(wt, pcid);
+
+		if (target_machine == NULL)
+		{
+			// PCID が見つからない
+			err = ERR_PCID_NOT_FOUND;
+			goto LABEL_CLEANUP;
+		}
+
+		PackAddStr(ret, "wol_maclist", target_machine->WolMacList);
+
+		err = ERR_NO_ERROR;
+	}
+	else if (StrCmpi(function, "SendOtpEmail") == 0)
+	{
+		char otp[128] = CLEAN;
+		char email[128] = CLEAN;
+		char ip[64] = CLEAN;
+		char fqdn[128] = CLEAN;
+		char pcid[WT_PCID_SIZE] = CLEAN;
+
+		if (authed == NULL)
+		{
+			err = ERR_NO_INIT_CONFIG;
+			goto LABEL_CLEANUP;
+		}
+	}
 
 LABEL_CLEANUP:
 	UnlockList(wt->MachineDatabase);
@@ -695,6 +770,28 @@ WG_MACHINE* WtgSamGetMachineByPCID(WT* wt, char* pcid)
 		WG_MACHINE* m = LIST_DATA(wt->MachineDatabase, i);
 
 		if (StrCmpi(m->Pcid, pcid) == 0)
+		{
+			return m;
+		}
+	}
+
+	return NULL;
+}
+
+// MSID から Machine を取得
+WG_MACHINE* WtgSamGetMachineByMSID(WT* wt, char* msid)
+{
+	UINT i;
+	if (wt == NULL || msid == NULL)
+	{
+		return NULL;
+	}
+
+	for (i = 0;i < LIST_NUM(wt->MachineDatabase);i++)
+	{
+		WG_MACHINE* m = LIST_DATA(wt->MachineDatabase, i);
+
+		if (StrCmpi(m->Msid, msid) == 0)
 		{
 			return m;
 		}
