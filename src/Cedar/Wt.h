@@ -188,7 +188,8 @@
 // マシンデータベースファイル名 (Standalone Mode)
 #define WTG_SAM_DATABASE_FILENAME	"@MachineDatabase.config"
 
-
+// スタンドアロン版で Controller と Gate とが同じホストであることを示す特別なホスト名
+#define WT_CONTROLLER_GATE_SAME_HOST	"<<!!samehost!!>>"
 
 
 //////////////////////////////////////////////////////////////////////

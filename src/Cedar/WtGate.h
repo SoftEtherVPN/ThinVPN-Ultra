@@ -260,6 +260,7 @@ void WtgSamFree(WT* wt);
 void WtgSamFlushDatabase(WT* wt);
 void WtgSamLoadDatabase(WT* wt, FOLDER *root);
 void WtgSamProcessRequestStr(WT* wt, SOCK* s, char* reqstr);
+void WtgSamProcessStat(WT* wt, SOCK* s, char *target);
 PACK *WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet);
 UINT WtgCheckPcid(char* pcid);
 bool WtgIsSafeCharForPcid(char c);
@@ -268,6 +269,7 @@ bool WtgSamIsMachineExistsByHostSecret(WT* wt, char* hostsecret_str);
 bool WtgSamIsMachineExistsByPCID(WT* wt, char* pcid);
 void WtgSamGenerateMsid(char *msid, UINT msid_size, char* hostkey_str);
 void WtgConvertStrToSafeForPcid(char* dst, UINT dst_size, char* src);
+WG_MACHINE* WtgSamGetMachineByPCID(WT* wt, char* pcid);
 
 
 #endif	// WTGATE_H

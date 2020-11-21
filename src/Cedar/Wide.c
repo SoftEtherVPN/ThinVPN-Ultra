@@ -1079,6 +1079,21 @@ UINT WideClientConnectInner(WIDE *w, WT_CONNECT *c, char *pcid, UINT ver, UINT b
 			PackGetData2(p, "SessionId", c->SessionId, sizeof(c->SessionId));
 			c->ServerMask64 = PackGetInt64(p, "ServerMask64");
 
+			if (StrCmpi(c->HostName, WT_CONTROLLER_GATE_SAME_HOST) == 0)
+			{
+				char hostname[MAX_HOST_NAME_LEN + 1] = CLEAN;
+				UINT port;
+
+				PackGetStr(p, "__remote_hostname", hostname, sizeof(hostname));
+				port = PackGetInt(p, "__remote_port");
+
+				if (IsEmptyStr(hostname) == false && port != 0)
+				{
+					StrCpy(c->HostName, sizeof(c->HostName), hostname);
+					c->Port = port;
+				}
+			}
+
 			if (no_cache == false)
 			{
 				WideSessionInfoCacheAdd(w->SessionInfoCache, pcid,
@@ -1175,6 +1190,21 @@ UINT WideServerConnect(WIDE *w, WT_CONNECT *c)
 			c->Port = PackGetInt(p, "Port");
 			c->DontCheckCert = WideGetDontCheckCert(w);
 			c->UseCompress = false;
+
+			if (StrCmpi(c->HostName, WT_CONTROLLER_GATE_SAME_HOST) == 0)
+			{
+				char hostname[MAX_HOST_NAME_LEN + 1] = CLEAN;
+				UINT port;
+
+				PackGetStr(p, "__remote_hostname", hostname, sizeof(hostname));
+				port = PackGetInt(p, "__remote_port");
+
+				if (IsEmptyStr(hostname) == false && port != 0)
+				{
+					StrCpy(c->HostName, sizeof(c->HostName), hostname);
+					c->Port = port;
+				}
+			}
 		}
 	}
 
@@ -3205,6 +3235,7 @@ WIDE *WideGateStart()
 {
 	WIDE *w;
 	LIST *o;
+	UINT port = 0;
 
 	w = ZeroMalloc(sizeof(WIDE));
 
@@ -3238,7 +3269,14 @@ WIDE *WideGateStart()
 
 		w->IsStandaloneMode = INT_TO_BOOL(IniIntValue(o, "StandaloneMode"));
 
+		port = IniIntValue(o, "ListenPort");
+
 		WideFreeIni(o);
+	}
+
+	if (port == 0)
+	{
+		port = WT_PORT;
 	}
 
 	w->AggressiveTimeoutLock = NewLock();
@@ -3261,7 +3299,7 @@ WIDE *WideGateStart()
 	}
 
 	// Gate の開始
-	WtgStart(w->wt, w->GateCert, w->GateKey, WT_PORT, w->IsStandaloneMode);
+	WtgStart(w->wt, w->GateCert, w->GateKey, port, w->IsStandaloneMode);
 
 	if (w->IsStandaloneMode == false)
 	{

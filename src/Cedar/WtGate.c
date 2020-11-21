@@ -256,6 +256,66 @@ void WtgSamFlushDatabase(WT* wt)
 	CfgDeleteFolder(root);
 }
 
+// 現在このスタンドアロン GW に接続しているセッションの一覧を表示する
+void WtgSamProcessStat(WT* wt, SOCK* s, char* target)
+{
+	FOLDER* root;
+	BUF* buf;
+	if (wt == NULL || s == NULL)
+	{
+		return;
+	}
+
+	if (IsLocalHostIP(&s->RemoteIP) == false)
+	{
+		// おいこら！！ localhost 以外からは アクセス できません！！
+		HttpSendForbidden(s, target, NULL);
+		return;
+	}
+
+	root = CfgCreateFolder(NULL, TAG_ROOT);
+
+	LockList(wt->SessionList);
+	{
+		UINT i, num;
+
+		num = LIST_NUM(wt->SessionList);
+		for (i = 0;i < num;i++)
+		{
+			TSESSION* s = LIST_DATA(wt->SessionList, i);
+			char session_id_str[MAX_PATH];
+			char tmp[MAX_PATH];
+			FOLDER* f;
+
+			BinToStr(session_id_str, sizeof(session_id_str), s->SessionId, sizeof(s->SessionId));
+
+			f = CfgCreateFolder(root, session_id_str);
+
+			CfgAddStr(f, "SessionId", session_id_str);
+			CfgAddStr(f, "Msid", s->Msid);
+			CfgAddInt64(f, "EstablishedDateTime", TickToTime(s->EstablishedTick));
+			CfgAddInt(f, "NumClients", LIST_NUM(s->TunnelList));
+
+			IPToStr(tmp, sizeof(tmp), &s->ServerTcp->Ip);
+			CfgAddStr(f, "IpAddress", tmp);
+			CfgAddStr(f, "Hostname", s->ServerTcp->Hostname);
+
+			CfgAddInt64(f, "ServerMask64", s->ServerMask64);
+		}
+
+		CfgAddInt(root, "NumSession", num);
+	}
+	UnlockList(wt->SessionList);
+
+	buf = CfgFolderToBufEx(root, true, true);
+
+	CfgDeleteFolder(root);
+
+	HttpSendBody(s, buf->Buf, buf->Size, "text/plain");
+
+	FreeBuf(buf);
+}
+
 // リクエスト文字列の処理
 void WtgSamProcessRequestStr(WT* wt, SOCK* s, char* reqstr)
 {
@@ -525,14 +585,90 @@ PACK* WtgSamDoProcess(WT* wt, SOCK* s, WPC_PACKET* packet)
 		HashSha1(sign, b->Buf, b->Size);
 
 		PackAddData(ret, "Signature2", sign, SHA1_SIZE);
-		PackAddStr(ret, "Hostname", "127.0.0.1");
-		PackAddStr(ret, "HostnameForProxy", "127.0.0.1");
+		PackAddStr(ret, "Hostname", WT_CONTROLLER_GATE_SAME_HOST);
+		PackAddStr(ret, "HostnameForProxy", WT_CONTROLLER_GATE_SAME_HOST);
 		PackAddStr(ret, "Pcid", authed->Pcid);
 		PackAddInt(ret, "Port", 443);
 
 		FreeBuf(b);
 
 		err = ERR_NO_ERROR;
+	}
+	else if (StrCmpi(function, "ClientConnect") == 0)
+	{
+		char pcid[WT_PCID_SIZE] = CLEAN;
+		UINT ver = PackGetInt(req, "Ver");
+		UINT build = PackGetInt(req, "Build");
+		UINT64 client_flags = PackGetInt64(req, "ClientFlags");
+		UINT client_options = PackGetInt(req, "ClientOptions");
+		WG_MACHINE* target = NULL;
+		TSESSION* target_session = NULL;
+		char* msid = NULL;
+
+		PackGetStr(req, "Pcid", pcid, sizeof(pcid));
+
+		target = WtgSamGetMachineByPCID(wt, pcid);
+		if (target == NULL)
+		{
+			err = ERR_PCID_NOT_FOUND;
+			goto LABEL_CLEANUP;
+		}
+
+		msid = target->Msid;
+
+		// 接続先の Gate と Session を取得
+		LockList(wt->SessionList);
+		{
+			UINT i;
+			UINT64 sort_test = 0;
+
+			for (i = 0;i < LIST_NUM(wt->SessionList);i++)
+			{
+				TSESSION* s = LIST_DATA(wt->SessionList, i);
+
+				// MSID が一致するセッションのうち、最も接続日時が新しいものを 1 つ取得する
+				if (StrCmpi(s->Msid, msid) == 0)
+				{
+					if (s->EstablishedTick >= sort_test)
+					{
+						sort_test = s->EstablishedTick;
+						target_session = s;
+					}
+				}
+			}
+
+			if (target_session == NULL)
+			{
+				// MSID が一致するセッションが 1 つもありませんでした！！
+				err = ERR_DEST_MACHINE_NOT_EXISTS;
+			}
+			else
+			{
+				// セッションを発見いたしました。
+				err = ERR_NO_ERROR;
+
+				if ((client_options & WT_CLIENT_OPTIONS_WOL) != 0)
+				{
+					// WoL クライアントである
+					if ((target_session->ServerMask64 & DS_MASK_SUPPORT_WOL_TRIGGER) == 0)
+					{
+						// トリガー PC のバージョンが WoL トリガー機能がない古いバージョンである
+						err = ERR_WOL_TRIGGER_NOT_SUPPORTED;
+					}
+				}
+
+				if (err == ERR_NO_ERROR)
+				{
+					// 接続 OK。情報をクライアントに返す
+					PackAddStr(ret, "Hostname", WT_CONTROLLER_GATE_SAME_HOST);
+					PackAddStr(ret, "HostnameForProxy", WT_CONTROLLER_GATE_SAME_HOST);
+					PackAddInt(ret, "Port", 443);
+					PackAddData(ret, "SessionId", target_session->SessionId, SHA1_SIZE);
+					PackAddInt64(ret, "ServerMask64", target_session->ServerMask64);
+				}
+			}
+		}
+		UnlockList(wt->SessionList);
 	}
 
 LABEL_CLEANUP:
@@ -543,6 +679,28 @@ LABEL_CLEANUP:
 	Free(wol_maclist);
 
 	return ret;
+}
+
+// PCID から Machine を取得
+WG_MACHINE* WtgSamGetMachineByPCID(WT* wt, char* pcid)
+{
+	UINT i;
+	if (wt == NULL || pcid == NULL)
+	{
+		return NULL;
+	}
+
+	for (i = 0;i < LIST_NUM(wt->MachineDatabase);i++)
+	{
+		WG_MACHINE* m = LIST_DATA(wt->MachineDatabase, i);
+
+		if (StrCmpi(m->Pcid, pcid) == 0)
+		{
+			return m;
+		}
+	}
+
+	return NULL;
 }
 
 // PCID に使用できる文字列にコンバート
@@ -2337,6 +2495,16 @@ bool WtgDownloadSignature(WT* wt, SOCK* s, bool* check_ssl_ok, char* gate_secret
 
 			FreeHttpHeader(h);
 			
+			return false;
+		}
+		else if (StartWith(h->Target, "/thinstat/") && wt->IsStandaloneMode)
+		{
+			WtgSamProcessStat(wt, s, h->Target);
+
+			*check_ssl_ok = true;
+
+			FreeHttpHeader(h);
+
 			return false;
 		}
 		else if (StrCmpi(h->Method, "POST") == 0)

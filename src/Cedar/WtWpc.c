@@ -631,7 +631,7 @@ L_CLEANUP:
 
 PACK *WtWpcCallInner(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only, char *url)
 {
-	URL_DATA data;
+	URL_DATA data = CLEAN;
 	BUF *b, *recv;
 	UINT error;
 	WPC_PACKET packet;
@@ -701,6 +701,9 @@ L_RETRY:
 	}
 
 	FreeBuf(recv);
+
+	PackAddStr(packet.Pack, "__remote_hostname", data.HostName);
+	PackAddInt(packet.Pack, "__remote_port", data.Port);
 
 	return packet.Pack;
 }
