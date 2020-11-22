@@ -585,6 +585,7 @@ typedef struct NT_API
 	NTSTATUS(NTAPI* NtWow64QueryInformationProcess64)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG);
 	NTSTATUS(NTAPI* NtQueryInformationProcess_64BitNative)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG);
 	NTSTATUS(NTAPI* NtWow64ReadVirtualMemory64)(HANDLE, UINT64, PVOID, ULONG64, PULONG64);
+	BOOL(WINAPI* SetWindowDisplayAffinity)(HWND, DWORD);
 } NT_API;
 
 typedef struct MS_EVENTLOG
@@ -1331,6 +1332,8 @@ int MsCmpProcessList(void* p1, void* p2);
 LIST* MsNewCurrentProcessList();
 MS_PROCESS_DIFF* MsGetProcessDiff(LIST* o);
 void MsFreeProcessDiff(MS_PROCESS_DIFF* d);
+
+void MsTestFunc1(HWND hWnd);
 
 
 // Inner functions

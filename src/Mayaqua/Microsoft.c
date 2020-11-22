@@ -295,6 +295,17 @@ void MsInitProcessCallOnce(bool restricted_mode)
 	}
 }
 
+// テストさん
+void MsTestFunc1(HWND hWnd)
+{
+	bool ok = ms->nt->SetWindowDisplayAffinity(hWnd, 0x0000001);
+	if (ok == false)
+	{
+		DWORD err = GetLastError();
+		Print("err = %u\n", err);
+	}
+}
+
 // プロセスウォッチャーを常時動作させるかどうかの設定
 void MsSetProcessWatcherAlwaysFlag(MS_PROCESS_WATCHER* w, bool flag)
 {
@@ -14297,6 +14308,9 @@ NT_API *MsLoadNtApiFunctions()
 		nt->CloseDesktop =
 			(BOOL (__stdcall *)(HDESK))
 			GetProcAddress(nt->hUser32, "CloseDesktop");
+		nt->SetWindowDisplayAffinity =
+			(BOOL(__stdcall*)(HWND, DWORD))
+			GetProcAddress(nt->hUser32, "SetWindowDisplayAffinity");
 	}
 
 	// DWM API
