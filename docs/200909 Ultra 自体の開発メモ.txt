@@ -27,7 +27,7 @@
     ターゲット名: $(ProjectName)
                   EXE の場合、色々な名前を付けて変更できる
                      $(ProjectName)_x64    など
-    プラットフォーム ツールセット: Visual Studio 2017 - Windpws XP (v141_xp)
+    プラットフォーム ツールセット: Visual Studio 2017 - Windows XP (v141_xp)
 
 C/C++
     追加のインクルードディレクトリ: $(ProjectDir);$(ProjectDir)..\
