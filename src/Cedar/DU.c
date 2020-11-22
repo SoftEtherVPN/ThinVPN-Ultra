@@ -2191,6 +2191,16 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 						}
 
 						Zero(&set, sizeof(set));
+
+						// Print Screen キーを無効化
+						set.DisablePrintScreen = true;
+
+						if (s->IsShareDisabled)
+						{
+							// 共有機能が無効化されている場合は、クリップボードを常時消去
+							set.EmptyClipboard = true;
+						}
+
 						StrCpy(set.WindowTitle, sizeof(set.WindowTitle), "Thin Telework Watermark");
 
 						UniStrCpy(set.Text1, 0, s->WatermarkStr1);

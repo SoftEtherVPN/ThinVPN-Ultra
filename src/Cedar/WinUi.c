@@ -548,6 +548,58 @@ bool DesktopWatermarkUpdateScreenSize(HWND hWnd, DESKTOP_WATERMARK *d)
 	return true;
 }
 
+bool DesktopWatermarkAddDisableHotkey(DESKTOP_WATERMARK* d, HWND hWnd, UINT mod, UINT vk)
+{
+	UINT atom;
+	if (d == NULL)
+	{
+		return false;
+	}
+
+	if (d->NumDisableHotKeyAtoms >= WATERMARK_HOTKEY_NUM)
+	{
+		return false;
+	}
+
+	atom = WinNewGlocalAtom();
+	if (atom == 0)
+	{
+		return false;
+	}
+
+	if (RegisterHotKey(hWnd, atom, mod, vk) == FALSE)
+	{
+		WinFreeGlobalAtom(atom);
+		return false;
+	}
+
+	d->DisableHotKeyAtoms[d->NumDisableHotKeyAtoms] = atom;
+
+	d->NumDisableHotKeyAtoms++;
+
+	return true;
+}
+
+void DesktopWatermarkDeleteDisableHotkeys(DESKTOP_WATERMARK* d, HWND hWnd)
+{
+	UINT i;
+	if (d == NULL)
+	{
+		return;
+	}
+
+	for (i = 0;i < WATERMARK_HOTKEY_NUM;i++)
+	{
+		UINT atom = d->DisableHotKeyAtoms[i];
+
+		if (atom != 0)
+		{
+			UnregisterHotKey(hWnd, atom);
+			d->DisableHotKeyAtoms[i] = 0;
+		}
+	}
+}
+
 // Desktop watermark window proc
 LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -569,12 +621,111 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 	case WM_CREATE:
 		cs = (CREATESTRUCT *)lParam;
 		d = (DESKTOP_WATERMARK *)cs->lpCreateParams;
+
+		d->StartSystemTime = SystemTime64();
+
 		SetWindowLongPtrA(hWnd, GWLP_USERDATA, (LONG_PTR)d);
 
 		DesktopWatermarkUpdateScreenSize(hWnd, d);
 
 		ShowWindow(hWnd, SW_SHOWNORMAL);
 
+		if (d->Setting.DisablePrintScreen)
+		{
+			UINT i;
+			wchar_t screen_shots_dir[MAX_PATH] = CLEAN;
+
+			for (i = 0;i < 15;i++)
+			{
+				DesktopWatermarkAddDisableHotkey(d, hWnd, i, VK_SNAPSHOT);
+			}
+
+			if (UniIsFilledStr(MsGetMyPicturesDirW()))
+			{
+				DIRLIST* dir_list = NULL;
+
+				CombinePathW(screen_shots_dir, sizeof(screen_shots_dir), MsGetMyPicturesDirW(), L"Screenshots");
+
+				if (MsIsDirectoryW(screen_shots_dir))
+				{
+					dir_list = EnumDirW(screen_shots_dir);
+				}
+
+				if (dir_list != NULL)
+				{
+					UniStrCpy(d->ScreenShotsDir, sizeof(d->ScreenShotsDir), screen_shots_dir);
+					d->InitialScreenShotFiles = dir_list;
+
+					SetTimer(hWnd, 123, 100, NULL);
+				}
+			}
+		}
+
+		if (d->Setting.EmptyClipboard)
+		{
+			SetTimer(hWnd, 456, 250, NULL);
+		}
+
+		break;
+
+	case WM_TIMER:
+		switch (wParam)
+		{
+		case 123:
+			KillTimer(hWnd, 123);
+
+			if (UniIsFilledStr(d->ScreenShotsDir) && d->InitialScreenShotFiles != NULL)
+			{
+				DIRLIST* dir = EnumDirW(d->ScreenShotsDir);
+
+				if (dir != NULL)
+				{
+					UINT i;
+					for (i = 0;i < dir->NumFiles;i++)
+					{
+						DIRENT* ent = dir->File[i];
+						UINT j;
+
+						if (ent->Folder == false &&
+							(ent->CreateDate >= d->StartSystemTime || ent->UpdateDate >= d->StartSystemTime) &&
+							UniEndWith(ent->FileNameW, L".png"))
+						{
+							bool exist_on_initial = false;
+
+							for (j = 0;j < d->InitialScreenShotFiles->NumFiles;j++)
+							{
+								DIRENT* ent2 = d->InitialScreenShotFiles->File[j];
+
+								if (UniStrCmpi(ent->FileNameW, ent2->FileNameW) == 0)
+								{
+									exist_on_initial = true;
+									break;
+								}
+							}
+
+							if (exist_on_initial == false)
+							{
+								wchar_t fullpath[MAX_PATH] = CLEAN;
+
+								CombinePathW(fullpath, sizeof(fullpath), d->ScreenShotsDir, ent->FileNameW);
+
+								FileDeleteW(fullpath);
+							}
+						}
+					}
+					FreeDir(dir);
+				}
+			}
+
+			SetTimer(hWnd, 123, 100, NULL);
+			break;
+
+		case 456:
+			KillTimer(hWnd, 456);
+			MsDeleteClipboard();
+			SetTimer(hWnd, 456, 250, NULL);
+			break;
+		}
 		break;
 
 	case WM_WTSSESSION_CHANGE:
@@ -618,12 +769,50 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 		break;
 
 	case WM_DESTROY:
+		if (d->Setting.DisablePrintScreen)
+		{
+			DesktopWatermarkDeleteDisableHotkeys(d, hWnd);
+
+			if (d->InitialScreenShotFiles != NULL)
+			{
+				FreeDir(d->InitialScreenShotFiles);
+				d->InitialScreenShotFiles = NULL;
+			}
+		}
 		PostQuitMessage(0);
 		break;
 	}
 
 LABEL_END:
 	return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+// グローバルアトムの作成
+UINT WinNewGlocalAtom()
+{
+	UCHAR rand[SHA1_SIZE] = CLEAN;
+	char rand_str[MAX_PATH] = CLEAN;
+	char atom_str[MAX_PATH] = CLEAN;
+	UINT r = 0;
+
+	Rand(rand, sizeof(rand));
+	BinToStr(rand_str, sizeof(rand_str), rand, sizeof(rand));
+	Format(atom_str, sizeof(atom_str), "atom-%s", rand_str);
+
+	r = GlobalAddAtomA(atom_str);
+
+	return r;
+}
+
+// グローバルアトムの削除
+void WinFreeGlobalAtom(UINT id)
+{
+	if (id == 0)
+	{
+		return;
+	}
+
+	GlobalDeleteAtom(id);
 }
 
 // Desktop watermark thread

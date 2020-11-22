@@ -16567,6 +16567,7 @@ void MsFree()
 	Free(ms->MinidumpBaseFileNameW);
 	Free(ms->ProgramFilesDirX86W);
 	Free(ms->ProgramFilesDirX64W);
+	Free(ms->MyPicturesDirW);
 
 	Free(ms);
 	ms = NULL;
@@ -16769,6 +16770,15 @@ wchar_t *MsGetPersonalStartMenuDirW()
 	}
 
 	return ms->PersonalStartMenuDirW;
+}
+wchar_t* MsGetMyPicturesDirW()
+{
+	if (ms->MyPicturesDirW == NULL)
+	{
+		ms->MyPicturesDirW = MsGetSpecialDirW(CSIDL_MYPICTURES);
+	}
+
+	return ms->MyPicturesDirW;
 }
 wchar_t *MsGetPersonalProgramsDirW()
 {

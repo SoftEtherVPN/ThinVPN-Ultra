@@ -356,6 +356,7 @@ typedef struct MS
 	wchar_t *PersonalAppDataDirW;
 	wchar_t *PersonalDesktopDirW;
 	wchar_t *MyDocumentsDirW;
+	wchar_t* MyPicturesDirW;
 	wchar_t *LocalAppDataDirW;
 	wchar_t *MyTempDirW;
 	wchar_t *UserNameW;
@@ -995,6 +996,7 @@ wchar_t *MsGetMyTempDirW();
 wchar_t *MsGetUserNameW();
 wchar_t *MsGetUserNameExW();
 wchar_t *MsGetWinTempDirW();
+wchar_t* MsGetMyPicturesDirW();
 struct SAFE_TABLE *MsGetSafeTable();
 UINT MsGetProcessId();
 void MsTerminateProcess();

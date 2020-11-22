@@ -484,7 +484,11 @@ typedef struct DESKTOP_WATERMARK_SETTING
 	UINT Alpha;
 	UINT Margin;
 	UINT RandSeed;
+	bool DisablePrintScreen;
+	bool EmptyClipboard;
 } DESKTOP_WATERMARK_SETTING;
+
+#define WATERMARK_HOTKEY_NUM		256
 
 // Watermark
 typedef struct DESKTOP_WATERMARK
@@ -494,6 +498,11 @@ typedef struct DESKTOP_WATERMARK
 	DESKTOP_WATERMARK_SETTING Setting;
 	HFONT Font1, Font2;
 	volatile bool Halt;
+	UINT NumDisableHotKeyAtoms;
+	UINT DisableHotKeyAtoms[WATERMARK_HOTKEY_NUM];
+	wchar_t ScreenShotsDir[MAX_PATH];
+	DIRLIST* InitialScreenShotFiles;
+	UINT64 StartSystemTime;
 } DESKTOP_WATERMARK;
 
 #define DESKTOP_WATERMARK_COLORKEY	RGB(12,34,56)
@@ -949,6 +958,8 @@ void DesktopWatermarkThread(THREAD *thread, void *param);
 void Vars_ActivePatch_AddBitmap(UINT control_id, char* new_bitmap_filename);
 void* LoadBitmapFromBuf(BUF* b);
 
+UINT WinNewGlocalAtom();
+void WinFreeGlobalAtom(UINT id);
 
 #endif	// OS_WIN32
 
