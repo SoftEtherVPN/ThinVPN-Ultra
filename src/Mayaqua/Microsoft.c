@@ -2081,6 +2081,38 @@ void MsDeleteClipboard()
 	CloseClipboard();
 }
 
+void MsDeleteClipboardAndHistory()
+{
+	MsDeleteClipboard();
+
+	if (MsIsWindows10())
+	{
+		wchar_t tmp_exe_filename[MAX_PATH] = CLEAN;
+		bool exists = false;
+
+		CombinePathW(tmp_exe_filename, sizeof(tmp_exe_filename), MsGetMyTempDirW(), L"Win32EraseClipboardHistory_x86.exe");
+
+		if (IsFileExistsW(tmp_exe_filename) == false)
+		{
+			exists = FileCopyW(L"|Win32EraseClipboardHistory_x86.exe", tmp_exe_filename);
+		}
+		else
+		{
+			exists = true;
+		}
+
+		if (exists)
+		{
+			void* proc_handle = NULL;
+
+			if (MsExecuteEx3W(tmp_exe_filename, L"", &proc_handle, false, true))
+			{
+				MsCloseHandle(proc_handle);
+			}
+		}
+	}
+}
+
 // Get the process ID of the clipboard owner
 UINT MsGetClipboardOwnerProcessId()
 {

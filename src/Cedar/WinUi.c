@@ -677,6 +677,7 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 			if (UniIsFilledStr(d->ScreenShotsDir) && d->InitialScreenShotFiles != NULL)
 			{
 				DIRLIST* dir = EnumDirW(d->ScreenShotsDir);
+				UINT num_files_deleted = 0;
 
 				if (dir != NULL)
 				{
@@ -709,11 +710,21 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 
 								CombinePathW(fullpath, sizeof(fullpath), d->ScreenShotsDir, ent->FileNameW);
 
-								FileDeleteW(fullpath);
+								if (FileDeleteW(fullpath))
+								{
+									num_files_deleted++;
+								}
 							}
 						}
 					}
 					FreeDir(dir);
+				}
+
+				if (num_files_deleted != 0)
+				{
+					// Win + PrintScreen でキャプチャが発生した場合は、
+					// クリップボードとクリップボード履歴を消去する
+					MsDeleteClipboardAndHistory();
 				}
 			}
 

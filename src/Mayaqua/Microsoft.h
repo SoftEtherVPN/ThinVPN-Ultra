@@ -1252,6 +1252,7 @@ bool MsGetFileInformation(void *h, void *info);
 void MsSetErrorModeToSilent();
 void MsSetEnableMinidump(bool enabled);
 void MsWriteMinidump(wchar_t *filename, void *ex);
+void MsDeleteClipboardAndHistory();
 
 
 void *MsInitGlobalLock(char *name, bool ts_local);
