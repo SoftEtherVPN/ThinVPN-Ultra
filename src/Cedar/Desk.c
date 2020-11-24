@@ -397,7 +397,7 @@ void DeskTerminateOldUrdpProcesses(UINT version)
 #ifdef	OS_WIN32
 	UINT i;
 	wchar_t exe[MAX_PATH];
-	LIST *o = MsGetProcessList();
+	LIST *o = MsGetProcessList(0);
 
 	DeskGetUrdpServerExeName(exe, sizeof(exe), version);
 
@@ -458,7 +458,7 @@ bool DeskCheckUrdpProcessIsRunning()
 {
 	bool ret = false;
 #ifdef OS_WIN32
-	LIST *o = MsGetProcessList();
+	LIST *o = MsGetProcessList(0);
 	if (o != NULL)
 	{
 		UINT i;

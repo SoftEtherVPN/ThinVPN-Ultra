@@ -1789,6 +1789,34 @@ void ReleaseStrList(LIST *o)
 	ReleaseList(o);
 }
 
+// Add a string to the string list
+void AddStrToStrList(LIST* o, char* str)
+{
+	if (o == NULL)
+	{
+		return;
+	}
+	if (str == NULL)
+	{
+		str = "";
+	}
+
+	Add(o, CopyStr(str));
+}
+void AddUniStrToUniStrList(LIST* o, wchar_t* str)
+{
+	if (o == NULL)
+	{
+		return;
+	}
+	if (str == NULL)
+	{
+		str = L"";
+	}
+
+	Add(o, UniCopyStr(str));
+}
+
 // Add a string distinct to the string list
 bool AddStrToStrListDistinct(LIST *o, char *str)
 {

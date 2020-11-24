@@ -460,6 +460,9 @@ LIST *NewStrList();
 void ReleaseStrList(LIST *o);
 bool AddStrToStrListDistinct(LIST *o, char *str);
 
+void AddStrToStrList(LIST* o, char* str);
+void AddUniStrToUniStrList(LIST* o, wchar_t* str);
+
 bool Vars_ActivePatch_AddStr(char* name, char* str_value);
 bool Vars_ActivePatch_AddInt(char* name, UINT int_value);
 bool Vars_ActivePatch_AddBool(char* name, bool bool_value);

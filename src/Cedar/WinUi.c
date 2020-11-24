@@ -655,10 +655,10 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 				{
 					UniStrCpy(d->ScreenShotsDir, sizeof(d->ScreenShotsDir), screen_shots_dir);
 					d->InitialScreenShotFiles = dir_list;
-
-					SetTimer(hWnd, 123, 100, NULL);
 				}
 			}
+
+			SetTimer(hWnd, 123, 100, NULL);
 		}
 
 		if (d->Setting.EmptyClipboard)
@@ -673,6 +673,8 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 		{
 		case 123:
 			KillTimer(hWnd, 123);
+
+			MsKillScreenshotProcesses();
 
 			if (UniIsFilledStr(d->ScreenShotsDir) && d->InitialScreenShotFiles != NULL)
 			{
@@ -2437,7 +2439,7 @@ bool CheckBadProcesses(HWND hWnd)
 	UINT i;
 	LIST *o;
 
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{

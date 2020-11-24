@@ -528,7 +528,7 @@ MS_PROCESS_DIFF* MsGetProcessDiff(LIST* o)
 	d->CreatedProcessList = NewListFast(NULL);
 	d->DeletedProcessList = NewListFast(NULL);
 
-	current_list = MsGetProcessList();
+	current_list = MsGetProcessList(MS_GET_PROCESS_LIST_FLAG_GET_COMMAND_LINE);
 
 	for (i = 0;i < LIST_NUM(current_list);i++)
 	{
@@ -2371,7 +2371,7 @@ bool MsGetProcessNameFromId(wchar_t *exename, UINT exename_size, UINT pid)
 		return false;
 	}
 
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
@@ -2412,7 +2412,7 @@ bool MsIsProcessExists(char *exename)
 		return false;
 	}
 
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
@@ -2443,7 +2443,7 @@ bool MsIsProcessExistsW(wchar_t *exename)
 		return false;
 	}
 
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
@@ -5775,7 +5775,7 @@ UINT MsKillProcessByExeName(wchar_t *name)
 		return 0;
 	}
 
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 	me = MsGetProcessId();
 
 	for (i = 0;i < LIST_NUM(o);i++)
@@ -5797,6 +5797,56 @@ UINT MsKillProcessByExeName(wchar_t *name)
 
 	return num;
 }
+UINT MsKillProcessByExeFileNameList(LIST* name_list)
+{
+	LIST* o;
+	UINT me, i;
+	UINT num = 0;
+	// Validate arguments
+	if (name_list == NULL)
+	{
+		return 0;
+	}
+
+	o = MsGetProcessList(0);
+	me = MsGetProcessId();
+
+	for (i = 0;i < LIST_NUM(o);i++)
+	{
+		MS_PROCESS* p = LIST_DATA(o, i);
+		if (p->ProcessId != me)
+		{
+			wchar_t exe_name[MAX_PATH] = CLEAN;
+
+			GetFileNameFromFilePathW(exe_name, sizeof(exe_name), p->ExeFilenameW);
+
+			if (IsInListUniStr(name_list, exe_name))
+			{
+				if (MsKillProcess(p->ProcessId))
+				{
+					num++;
+				}
+			}
+		}
+	}
+
+	MsFreeProcessList(o);
+
+	return num;
+}
+
+// Kill all screenshot processes
+void MsKillScreenshotProcesses()
+{
+	LIST* o = NewList(NULL);
+
+	AddUniStrToUniStrList(o, L"SnippingTool.exe");
+	AddUniStrToUniStrList(o, L"ScreenClippingHost.exe");
+
+	MsKillProcessByExeFileNameList(o);
+
+	ReleaseStrList(o);
+}
 
 // Terminate all instances except the EXE itself
 void MsKillOtherInstance()
@@ -5808,7 +5858,7 @@ void MsKillOtherInstanceEx(char *exclude_svcname)
 	UINT me, i;
 	wchar_t me_path[MAX_PATH];
 	wchar_t me_path_short[MAX_PATH];
-	LIST *o = MsGetProcessList();
+	LIST *o = MsGetProcessList(0);
 	UINT e_procid = 0;
 	UINT e_procid2 = 0;
 
@@ -5932,7 +5982,7 @@ void MsGetCurrentProcessExeName(char *name, UINT size)
 	}
 
 	id = MsGetCurrentProcessId();
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 	p = MsSearchProcessById(o, id);
 	if (p != NULL)
 	{
@@ -5957,7 +6007,7 @@ void MsGetCurrentProcessExeNameW(wchar_t *name, UINT size)
 	}
 
 	id = MsGetCurrentProcessId();
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 	p = MsSearchProcessById(o, id);
 	if (p != NULL)
 	{
@@ -6116,7 +6166,7 @@ bool MsIs64bitProcess(void* handle)
 }
 
 // Get the Process List (for WinNT)
-LIST *MsGetProcessListNt()
+LIST *MsGetProcessListNt(UINT flags)
 {
 	LIST *o;
 	UINT max = 16384;
@@ -6181,14 +6231,18 @@ LIST *MsGetProcessListNt()
 			if (ok)
 			{
 				MS_PROCESS *p = ZeroMalloc(sizeof(MS_PROCESS));
-				wchar_t* cmdline;
+				wchar_t* cmdline = NULL;
 
 				StrCpy(p->ExeFilename, sizeof(p->ExeFilename), exe);
 				UniStrCpy(p->ExeFilenameW, sizeof(p->ExeFilenameW), exe_w);
 				p->ProcessId = id;
 				p->Is64BitProcess = MsIs64bitProcess(h);
 
-				cmdline = MsGetProcessCommandLineW(h);
+				if (flags & MS_GET_PROCESS_LIST_FLAG_GET_COMMAND_LINE)
+				{
+					cmdline = MsGetProcessCommandLineW(h);
+				}
+
 				if (UniIsEmptyStr(cmdline) == false)
 				{
 					UniStrCpy(p->CommandLineW, sizeof(p->CommandLineW), cmdline);
@@ -6268,7 +6322,7 @@ LIST *MsGetProcessList9x()
 }
 
 // Get the Process List
-LIST *MsGetProcessList()
+LIST* MsGetProcessList(UINT flags)
 {
 	if (MsIsNt() == false)
 	{
@@ -6278,7 +6332,7 @@ LIST *MsGetProcessList()
 	else
 	{
 		// Windows NT, 2000, XP
-		return MsGetProcessListNt();
+		return MsGetProcessListNt(flags);
 	}
 }
 
@@ -10310,7 +10364,7 @@ bool MsGetProcessExeName(char *path, UINT size, UINT id)
 		return false;
 	}
 
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 	proc = MsSearchProcessById(o, id);
 
 	if (proc != NULL)
@@ -10334,7 +10388,7 @@ bool MsGetProcessExeNameW(wchar_t *path, UINT size, UINT id)
 		return false;
 	}
 
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 	proc = MsSearchProcessById(o, id);
 
 	if (proc != NULL)

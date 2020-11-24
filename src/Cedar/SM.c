@@ -20132,7 +20132,7 @@ void SmInitDefaultSettingList()
 	if (LIST_NUM(sm->SettingList) == 0)
 	{
 		bool b = false;
-		LIST *pl = MsGetProcessList();
+		LIST *pl = MsGetProcessList(0);
 
 		if (pl != NULL)
 		{

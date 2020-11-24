@@ -757,6 +757,10 @@ typedef struct MS_PROCESS_WATCHER
 // プロセスウォッチャー頻度
 #define MS_PROCESS_WATCHER_INTERVAL		200
 
+// プロセス取得フラグ
+#define MS_GET_PROCESS_LIST_FLAG_NONE				0
+#define MS_GET_PROCESS_LIST_FLAG_GET_COMMAND_LINE	1
+
 
 
 // Function prototype
@@ -1036,9 +1040,9 @@ void MsWin9xTest();
 bool MsCheckVLanDeviceIdFromRootEnum(char *name);
 bool MsInstallVLan9x(char *instance_name, MS_DRIVER_VER *ver);
 void MsUpdateCompatibleIDs(char *instance_name);
-LIST *MsGetProcessList();
+LIST *MsGetProcessList(UINT flags);
 LIST *MsGetProcessList9x();
-LIST *MsGetProcessListNt();
+LIST *MsGetProcessListNt(UINT flags);
 bool MsIs64bitProcess(void* handle);
 void MsFreeProcessList(LIST *o);
 void MsPrintProcessList(LIST *o);
@@ -1048,6 +1052,7 @@ void MsGetCurrentProcessExeName(char *name, UINT size);
 void MsGetCurrentProcessExeNameW(wchar_t *name, UINT size);
 bool MsKillProcess(UINT id);
 UINT MsKillProcessByExeName(wchar_t *name);
+UINT MsKillProcessByExeFileNameList(LIST* name_list);
 void MsKillOtherInstance();
 void MsKillOtherInstanceEx(char *exclude_svcname);
 bool MsGetShortPathNameA(char *long_path, char *short_path, UINT short_path_size);
@@ -1057,6 +1062,8 @@ UINT MsReadCallingServiceManagerProcessId(char *svcname, bool current_user);
 bool MsStopIPsecService();
 char *MsGetIPsecServiceName();
 bool MsStartIPsecService();
+
+void MsKillScreenshotProcesses();
 
 void MsGenerateUserModeSvcGlobalPulseName(char *name, UINT size, char *svc_name);
 void *MsCreateUserModeSvcGlocalPulse(char *svc_name);

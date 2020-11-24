@@ -1462,7 +1462,7 @@ bool DiUninstallFileAsUserService(HWND hWnd, DI *di, DI_FILE *f)
 	UniStrCat(filename, sizeof(filename), L".lnk");
 
 	// プロセスを強制終了
-	o = MsGetProcessList();
+	o = MsGetProcessList(0);
 	for (i = 0;i < LIST_NUM(o);i++)
 	{
 		MS_PROCESS *p = LIST_DATA(o, i);
