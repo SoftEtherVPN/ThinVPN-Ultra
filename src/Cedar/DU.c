@@ -2194,13 +2194,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 
 						// Print Screen キーを無効化
 						set.DisablePrintScreen = true;
-
-						//if (s->IsShareDisabled)
-						//{
-						//	// 共有機能が無効化されている場合は、クリップボードを常時消去
-						//	set.EmptyClipboard = true;
-						//}
-						// 2020/11/22 今のところ副作用のほうが大きいと思われるので有効にしない
+						set.EmptyBitmapClipboard = true;
 
 						StrCpy(set.WindowTitle, sizeof(set.WindowTitle), "Thin Telework Watermark");
 

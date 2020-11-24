@@ -485,7 +485,7 @@ typedef struct DESKTOP_WATERMARK_SETTING
 	UINT Margin;
 	UINT RandSeed;
 	bool DisablePrintScreen;
-	bool EmptyClipboard;
+	bool EmptyBitmapClipboard;
 } DESKTOP_WATERMARK_SETTING;
 
 #define WATERMARK_HOTKEY_NUM		256

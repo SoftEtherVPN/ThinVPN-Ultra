@@ -714,6 +714,7 @@ typedef struct ENUM_CHILD_WINDOW_PARAM
 	LIST *o;
 	bool no_recursion;
 	bool include_ipcontrol;
+	bool no_hidden_window;
 } ENUM_CHILD_WINDOW_PARAM;
 
 // Driver version information
@@ -1129,6 +1130,7 @@ LIST *EnumAllChildWindow(HWND hWnd);
 LIST *EnumAllChildWindowEx(HWND hWnd, bool no_recursion, bool include_ipcontrol, bool no_self);
 LIST *EnumAllWindow();
 LIST *EnumAllWindowEx(bool no_recursion, bool include_ipcontrol);
+LIST* EnumAllWindowEx2(ENUM_CHILD_WINDOW_PARAM *p);
 LIST *EnumAllTopWindow();
 
 bool MsExecDriverInstaller(char *arg);
@@ -1260,6 +1262,7 @@ void MsSetErrorModeToSilent();
 void MsSetEnableMinidump(bool enabled);
 void MsWriteMinidump(wchar_t *filename, void *ex);
 void MsDeleteClipboardAndHistory();
+bool MsHasClipboardBitmapAndNonText();
 
 
 void *MsInitGlobalLock(char *name, bool ts_local);
@@ -1344,6 +1347,7 @@ MS_PROCESS_DIFF* MsGetProcessDiff(LIST* o);
 void MsFreeProcessDiff(MS_PROCESS_DIFF* d);
 
 void MsTestFunc1(HWND hWnd);
+void MsTestFunc2();
 
 
 // Inner functions

@@ -2071,6 +2071,24 @@ void *MsInitEventLog(wchar_t *src_name)
 	return (void *)g;
 }
 
+// Check whether the clipboard has a bitmap and non-text
+bool MsHasClipboardBitmapAndNonText()
+{
+	bool ret = false;
+
+	OpenClipboard(NULL);
+
+	if (IsClipboardFormatAvailable(CF_BITMAP) &&
+		IsClipboardFormatAvailable(CF_TEXT) == false)
+	{
+		ret = true;
+	}
+
+	CloseClipboard();
+
+	return ret;
+}
+
 // Empty the clipboard
 void MsDeleteClipboard()
 {
@@ -2107,6 +2125,11 @@ void MsDeleteClipboardAndHistory()
 
 			if (MsExecuteEx3W(tmp_exe_filename, L"", &proc_handle, false, true))
 			{
+				if (MsWaitProcessExitWithTimeout(proc_handle, 30 * 1000) == false)
+				{
+					TerminateProcess(proc_handle, 0);
+				}
+
 				MsCloseHandle(proc_handle);
 			}
 		}
@@ -9975,6 +9998,87 @@ bool CALLBACK MsEnumThreadWindowProc(HWND hWnd, LPARAM lParam)
 	return true;
 }
 
+// Test func 2
+void MsTestFunc2()
+{
+	LIST* o;
+	ENUM_CHILD_WINDOW_PARAM p = CLEAN;
+	LIST* s = NewStrList();
+
+	p.no_hidden_window = false;
+
+	o = EnumAllWindowEx2(&p);
+
+	UINT i;
+	if (true)
+	{
+		Print("num windows = %u\n", LIST_NUM(o));
+		for (i = 0;i < LIST_NUM(o);i++)
+		{
+			HWND* p = LIST_DATA(o, i);
+
+			if (p != NULL)
+			{
+				HWND h = *p;
+				char caption[MAX_PATH] = CLEAN;
+				char classname[MAX_PATH] = CLEAN;
+				char tmp[MAX_SIZE];
+
+				GetClassNameA(h, classname, sizeof(classname));
+
+				GetWindowTextA(h, caption, MAX_PATH - 1);
+
+				Format(tmp, sizeof(tmp), "%08X - \"%s\" - \"%s\"", (UINT)h, caption, classname);
+
+				AddStrToStrListDistinct(s, tmp);
+			}
+		}
+	}
+
+	WHERE;
+	FreeWindowList(o);
+	WHERE;
+
+	Sort(s);
+
+	{
+		BUF* buf = NewBuf();
+		UINT i;
+		wchar_t dirname[MAX_PATH] = CLEAN;
+		wchar_t filename[MAX_PATH] = CLEAN;
+		wchar_t fullpath [MAX_PATH] = CLEAN;
+		SYSTEMTIME st = CLEAN;
+
+		LocalTime(&st);
+
+		for (i = 0; i < LIST_NUM(s);i++)
+		{
+			char* s2 = LIST_DATA(s, i);
+
+			WriteBuf(buf, s2, StrLen(s2));
+			WriteBuf(buf, "\r\n", 2);
+		}
+
+		CombinePathW(dirname, sizeof(dirname), MsGetExeDirNameW(), L"out");
+
+		UniFormat(filename, sizeof(filename), L"%04u%02u%02u_%02u%02u%02u.txt",
+			st.wYear, st.wMonth, st.wDay,
+			st.wHour, st.wMinute, st.wSecond);
+
+		CombinePathW(fullpath, sizeof(fullpath), dirname, filename);
+
+		MakeDirExW(dirname);
+
+		DumpBufW(buf, fullpath);
+
+		FreeBuf(buf);
+
+		UniPrint(L"Saved %u   to %s\n", LIST_NUM(s), fullpath);
+	}
+
+	FreeStrList(s);
+}
+
 // Window enumeration procedure
 BOOL CALLBACK EnumTopWindowProc(HWND hWnd, LPARAM lParam)
 {
@@ -10048,6 +10152,16 @@ BOOL CALLBACK EnumChildWindowProc(HWND hWnd, LPARAM lParam)
 		}
 	}
 
+	if (p->no_hidden_window)
+	{
+		UINT style = GetWindowLong(hWnd, GWL_STYLE);
+
+		if ((style & WS_VISIBLE) == 0)
+		{
+			ok = false;
+		}
+	}
+
 	if (ok)
 	{
 		AddWindow(o, hWnd);
@@ -10064,19 +10178,26 @@ LIST *EnumAllWindow()
 {
 	return EnumAllWindowEx(false, false);
 }
+LIST* EnumAllWindowEx2(ENUM_CHILD_WINDOW_PARAM* p)
+{
+	LIST* o = NewWindowList();
+	ENUM_CHILD_WINDOW_PARAM p2 = CLEAN;
+
+	Copy(&p2, p, sizeof(ENUM_CHILD_WINDOW_PARAM));
+	p2.o = o;
+
+	EnumWindows(EnumChildWindowProc, (LPARAM)&p2);
+
+	return o;
+}
 LIST *EnumAllWindowEx(bool no_recursion, bool include_ipcontrol)
 {
-	ENUM_CHILD_WINDOW_PARAM p;
-	LIST *o = NewWindowList();
+	ENUM_CHILD_WINDOW_PARAM p = CLEAN;
 
-	Zero(&p, sizeof(p));
-	p.o = o;
 	p.no_recursion = no_recursion;
 	p.include_ipcontrol = include_ipcontrol;
 
-	EnumWindows(EnumChildWindowProc, (LPARAM)&p);
-
-	return o;
+	return EnumAllWindowEx2(&p);
 }
 LIST *EnumAllTopWindow()
 {

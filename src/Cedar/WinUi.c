@@ -605,6 +605,8 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 {
 	DESKTOP_WATERMARK *d;
 	CREATESTRUCT *cs;
+	bool start_timer = false;
+	bool clear_clipboard = false;
 	if (hWnd == NULL)
 	{
 		return 0;
@@ -650,20 +652,27 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 				{
 					dir_list = EnumDirW(screen_shots_dir);
 				}
-
-				if (dir_list != NULL)
+				else
 				{
-					UniStrCpy(d->ScreenShotsDir, sizeof(d->ScreenShotsDir), screen_shots_dir);
-					d->InitialScreenShotFiles = dir_list;
+					dir_list = ZeroMalloc(sizeof(DIRLIST));
+					dir_list->File = ZeroMalloc(0);
 				}
+
+				UniStrCpy(d->ScreenShotsDir, sizeof(d->ScreenShotsDir), screen_shots_dir);
+				d->InitialScreenShotFiles = dir_list;
 			}
 
-			SetTimer(hWnd, 123, 100, NULL);
+			start_timer = true;
 		}
 
-		if (d->Setting.EmptyClipboard)
+		if (d->Setting.EmptyBitmapClipboard)
 		{
-			SetTimer(hWnd, 456, 250, NULL);
+			start_timer = true;
+		}
+
+		if (start_timer)
+		{
+			SetTimer(hWnd, 123, 100, NULL);
 		}
 
 		break;
@@ -674,69 +683,79 @@ LRESULT CALLBACK DesktopWatermarkWindowProc(HWND hWnd, UINT msg, WPARAM wParam, 
 		case 123:
 			KillTimer(hWnd, 123);
 
-			MsKillScreenshotProcesses();
-
-			if (UniIsFilledStr(d->ScreenShotsDir) && d->InitialScreenShotFiles != NULL)
+			if (d->Setting.DisablePrintScreen)
 			{
-				DIRLIST* dir = EnumDirW(d->ScreenShotsDir);
-				UINT num_files_deleted = 0;
+				MsKillScreenshotProcesses();
 
-				if (dir != NULL)
+				if (UniIsFilledStr(d->ScreenShotsDir) && d->InitialScreenShotFiles != NULL)
 				{
-					UINT i;
-					for (i = 0;i < dir->NumFiles;i++)
+					DIRLIST* dir = EnumDirW(d->ScreenShotsDir);
+					UINT num_files_deleted = 0;
+
+					if (dir != NULL)
 					{
-						DIRENT* ent = dir->File[i];
-						UINT j;
-
-						if (ent->Folder == false &&
-							(ent->CreateDate >= d->StartSystemTime || ent->UpdateDate >= d->StartSystemTime) &&
-							UniEndWith(ent->FileNameW, L".png"))
+						UINT i;
+						for (i = 0;i < dir->NumFiles;i++)
 						{
-							bool exist_on_initial = false;
+							DIRENT* ent = dir->File[i];
+							UINT j;
 
-							for (j = 0;j < d->InitialScreenShotFiles->NumFiles;j++)
+							if (ent->Folder == false &&
+								(ent->CreateDate >= d->StartSystemTime || ent->UpdateDate >= d->StartSystemTime) &&
+								UniEndWith(ent->FileNameW, L".png"))
 							{
-								DIRENT* ent2 = d->InitialScreenShotFiles->File[j];
+								bool exist_on_initial = false;
 
-								if (UniStrCmpi(ent->FileNameW, ent2->FileNameW) == 0)
+								for (j = 0;j < d->InitialScreenShotFiles->NumFiles;j++)
 								{
-									exist_on_initial = true;
-									break;
+									DIRENT* ent2 = d->InitialScreenShotFiles->File[j];
+
+									if (UniStrCmpi(ent->FileNameW, ent2->FileNameW) == 0)
+									{
+										exist_on_initial = true;
+										break;
+									}
 								}
-							}
 
-							if (exist_on_initial == false)
-							{
-								wchar_t fullpath[MAX_PATH] = CLEAN;
-
-								CombinePathW(fullpath, sizeof(fullpath), d->ScreenShotsDir, ent->FileNameW);
-
-								if (FileDeleteW(fullpath))
+								if (exist_on_initial == false)
 								{
-									num_files_deleted++;
+									wchar_t fullpath[MAX_PATH] = CLEAN;
+
+									CombinePathW(fullpath, sizeof(fullpath), d->ScreenShotsDir, ent->FileNameW);
+
+									if (FileDeleteW(fullpath))
+									{
+										num_files_deleted++;
+									}
 								}
 							}
 						}
+						FreeDir(dir);
 					}
-					FreeDir(dir);
-				}
 
-				if (num_files_deleted != 0)
-				{
-					// Win + PrintScreen でキャプチャが発生した場合は、
-					// クリップボードとクリップボード履歴を消去する
-					MsDeleteClipboardAndHistory();
+					if (num_files_deleted != 0)
+					{
+						// Win + PrintScreen でキャプチャが発生した場合は、
+						// クリップボードとクリップボード履歴を消去する
+						clear_clipboard = true;
+					}
 				}
 			}
 
-			SetTimer(hWnd, 123, 100, NULL);
-			break;
+			if (d->Setting.EmptyBitmapClipboard)
+			{
+				if (MsHasClipboardBitmapAndNonText())
+				{
+					clear_clipboard = true;
+				}
+			}
 
-		case 456:
-			KillTimer(hWnd, 456);
-			MsDeleteClipboard();
-			SetTimer(hWnd, 456, 250, NULL);
+			if (clear_clipboard)
+			{
+				MsDeleteClipboardAndHistory();
+			}
+
+			SetTimer(hWnd, 123, 100, NULL);
 			break;
 		}
 		break;
