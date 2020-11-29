@@ -587,6 +587,9 @@ typedef struct NT_API
 	NTSTATUS(NTAPI* NtQueryInformationProcess_64BitNative)(HANDLE, NT_PROCESSINFOCLASS, PVOID, ULONG, PULONG);
 	NTSTATUS(NTAPI* NtWow64ReadVirtualMemory64)(HANDLE, UINT64, PVOID, ULONG64, PULONG64);
 	BOOL(WINAPI* SetWindowDisplayAffinity)(HWND, DWORD);
+	BOOL(APIENTRY* CheckTokenMembership)(HANDLE, PSID, PBOOL);
+	BOOL(WINAPI* AllocateAndInitializeSid)(PSID_IDENTIFIER_AUTHORITY, BYTE, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, PSID*);
+	PVOID(WINAPI* FreeSid)(PSID);
 } NT_API;
 
 typedef struct MS_EVENTLOG
@@ -903,6 +906,7 @@ char *MsGetSpecialDir(int id);
 wchar_t *MsGetSpecialDirW(int id);
 void MsGetSpecialDirs();
 bool MsCheckIsAdmin();
+bool MsCheckIsAdminWithAdvapi();
 void MsInitTempDir();
 void MsFreeTempDir();
 void MsGenLockFile(wchar_t *name, UINT size, wchar_t *temp_dir);

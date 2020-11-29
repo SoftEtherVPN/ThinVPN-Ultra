@@ -14250,6 +14250,18 @@ NT_API *MsLoadNtApiFunctions()
 		(LSTATUS (__stdcall *)(HKEY,LPCWSTR))
 		GetProcAddress(nt->hAdvapi32, "RegUnLoadKeyW");
 
+	nt->CheckTokenMembership =
+		(BOOL (__stdcall*)(HANDLE, PSID, PBOOL))
+		GetProcAddress(nt->hAdvapi32, "CheckTokenMembership");
+
+	nt->AllocateAndInitializeSid =
+		(BOOL(__stdcall*)(PSID_IDENTIFIER_AUTHORITY, BYTE, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, PSID*))
+		GetProcAddress(nt->hAdvapi32, "AllocateAndInitializeSid");
+
+	nt->FreeSid =
+		(PVOID(__stdcall*)(PSID))
+		GetProcAddress(nt->hAdvapi32, "FreeSid");
+
 	// Determine WoW64
 	if (Is32())
 	{
@@ -16274,6 +16286,44 @@ bool MsCheckIsAdmin()
 
 	return true;
 }
+bool MsCheckIsAdminWithAdvapi()
+{
+	BOOL b = FALSE;
+	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+	PSID AdministratorsGroup = CLEAN;
+
+	if (ms->nt == NULL)
+	{
+		return false;
+	}
+
+	if (ms->nt->CheckTokenMembership == NULL ||
+		ms->nt->AllocateAndInitializeSid == NULL ||
+		ms->nt->FreeSid == NULL)
+	{
+		return false;
+	}
+
+	// From: https://docs.microsoft.com/ja-jp/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembership?redirectedfrom=MSDN
+	b = ms->nt->AllocateAndInitializeSid(
+		&NtAuthority,
+		2,
+		SECURITY_BUILTIN_DOMAIN_RID,
+		DOMAIN_ALIAS_RID_ADMINS,
+		0, 0, 0, 0, 0, 0,
+		&AdministratorsGroup);
+
+	if (b)
+	{
+		if (!ms->nt->CheckTokenMembership(NULL, AdministratorsGroup, &b))
+		{
+			b = FALSE;
+		}
+		ms->nt->FreeSid(AdministratorsGroup);
+	}
+
+	return b;
+}
 
 void *MsGetCurrentInstanceHandle()
 {
@@ -16344,6 +16394,12 @@ void MsInit()
 		{
 			// Whether I am an Administrators
 			ms->IsAdmin = MsCheckIsAdmin();
+
+			if (ms->IsAdmin == false)
+			{
+				// Check with advapi32.dll
+				ms->IsAdmin = MsCheckIsAdminWithAdvapi();
+			}
 		}
 	}
 	else
