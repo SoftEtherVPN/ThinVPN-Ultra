@@ -3204,8 +3204,10 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 	t->EnableWoLTarget = ds->EnableWoLTarget;
 	t->EnableWoLTrigger = ds->EnableWoLTrigger;
 
+#ifdef	OS_WIN32
 	t->ProcessWatcherAlways = MsGetProcessWatcherAlwaysFlag(ds->ProcessWatcher);
 	t->ProcessWatcherEnabled = !MsGetProcessWatcherDisabledFlag(ds->ProcessWatcher);
+#endif	// OS_WIN32
 
 	StrCpy(t->RegistrationPassword, sizeof(t->RegistrationPassword), ds->Wide->RegistrationPassword);
 	StrCpy(t->RegistrationEmail, sizeof(t->RegistrationEmail), ds->Wide->RegistrationEmail);
