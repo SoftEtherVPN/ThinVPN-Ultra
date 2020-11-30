@@ -10028,7 +10028,7 @@ void MsTestFunc2()
 
 				GetWindowTextA(h, caption, MAX_PATH - 1);
 
-				Format(tmp, sizeof(tmp), "%08X - \"%s\" - \"%s\"", (UINT)h, caption, classname);
+				Format(tmp, sizeof(tmp), "%08X - \"%s\" - \"%s\"", POINTER_TO_UINT32(h), caption, classname);
 
 				AddStrToStrListDistinct(s, tmp);
 			}
