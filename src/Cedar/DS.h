@@ -381,7 +381,10 @@ bool DsTryRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsAddRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsCleanAllRadiusCache(DS *ds);
 void DsGenerateNewOtp(char *dst, UINT size, UINT len);
+
+#ifdef	OS_WIN32
 void DsWin32ProcessWatcherCallback(bool start, MS_PROCESS* process, void* param);
+#endif //OS_WIN32
 
 
 DS_POLICY_CLIENT *DsNewPolicyClient(char *server_hash);
