@@ -3128,8 +3128,10 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 		ds->EnableWoLTarget = t->EnableWoLTarget;
 		ds->EnableWoLTrigger = t->EnableWoLTrigger;
 
+#ifdef	OS_WIN32
 		MsSetProcessWatcherAlwaysFlag(ds->ProcessWatcher, t->ProcessWatcherAlways);
 		MsSetProcessWatcherDisabledFlag(ds->ProcessWatcher, !t->ProcessWatcherEnabled);
+#endif	// OS_WIN32
 	}
 	Unlock(ds->ConfigLock);
 
