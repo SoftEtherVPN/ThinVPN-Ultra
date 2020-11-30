@@ -915,7 +915,6 @@ void *UnixNewSingleInstance(char *instance_name)
 	if (fcntl(fd, F_SETLK, &lock) == -1)
 	{
 		close(fd);
-		(void)remove(name);
 		return NULL;
 	}
 	else
