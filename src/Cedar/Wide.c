@@ -3275,11 +3275,19 @@ void WideStatManCallback(STATMAN* stat, void* param, PACK* ret)
 	UINT num_server_sessions = 0;
 	UINT num_client_sessions = 0;
 
-	WHERE;
 	WideGetNumSessions(w->wt, &num_server_sessions, &num_client_sessions);
 
 	PackAddInt64(ret, "WtgCurrentEstablishedServerSessions", num_server_sessions);
 	PackAddInt64(ret, "WtgCurrentEstablishedClientSessions", num_client_sessions);
+
+	if (w->wt->IsStandaloneMode == false)
+	{
+		PackAddInt64(ret, "WtgStandaloneRegisteredMachines", 0);
+	}
+	else
+	{
+		PackAddInt64(ret, "WtgStandaloneRegisteredMachines", LIST_NUM(w->wt->MachineDatabase));
+	}
 }
 
 // WideGate の開始
