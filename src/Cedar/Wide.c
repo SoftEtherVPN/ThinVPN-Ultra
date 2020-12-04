@@ -3293,6 +3293,17 @@ WIDE *WideGateStart()
 		port = WT_PORT;
 	}
 
+	if (w->IsStandaloneMode)
+	{
+		// 統計送付
+		STATMAN_CONFIG cfg = CLEAN;
+
+		StrCpy(cfg.PostUrl, sizeof(cfg.PostUrl), "https://127.0.0.1/stat/");
+
+		w->StatMan = NewStatMan(&cfg);
+		w->wt->StatMan = w->StatMan;
+	}
+
 	w->AggressiveTimeoutLock = NewLock();
 
 	// Timeout 設定の読み込み
@@ -3339,6 +3350,11 @@ void WideGateStopEx(WIDE* wide, bool daemon_force_exit)
 		return;
 	}
 
+	if (wide->StatMan != NULL)
+	{
+		StopStatMan(wide->StatMan);
+	}
+
 	if (wide->wt->IsStandaloneMode)
 	{
 		// スタンドアロンモードの場合 データベースを Flush する (念のため)
@@ -3377,6 +3393,11 @@ void WideGateStopEx(WIDE* wide, bool daemon_force_exit)
 	FreeK(wide->GateKey);
 
 	ReleaseWt(wide->wt);
+
+	if (wide->StatMan != NULL)
+	{
+		FreeStatMan(wide->StatMan);
+	}
 
 	Free(wide);
 }

@@ -1105,6 +1105,8 @@ UINT GetHostIPAddressHash32();
 bool GetMyPrivateIP(IP *ip, bool from_vg);
 char *GetRandHostNameForGetMyPrivateIP();
 UINT GenRandInterval(UINT min, UINT max);
+UINT GenRandInterval2(UINT standard, UINT plusMinusPercentage);
+UINT GenRandIntervalWithRetry(UINT standard, UINT num_retry, UINT max, UINT plusMinusPercentage);
 void RUDPProcess_NatT_Recv(RUDP_STACK *r, UDPPACKET *udp);
 void RUDPDo_NatT_Interrupt(RUDP_STACK *r);
 void RUDPGetRegisterHostNameByIP(char *dst, UINT size, IP *ip);

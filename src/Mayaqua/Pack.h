@@ -257,14 +257,16 @@ bool PackIsValueExists(PACK *p, char *name);
 void PackSetCurrentJsonGroupName(PACK *p, char *json_group_name);
 ELEMENT *ElementNullSafe(ELEMENT *p);
 
-JSON_VALUE *PackToJson(PACK *p);
+JSON_VALUE* PackToJson(PACK* p);
+JSON_VALUE* PackToJsonEx(PACK* p, bool no_suffix);
 char *PackToJsonStr(PACK *p);
+char* PackToJsonStrEx(PACK* p, bool no_suffix);
 
 PACK *JsonToPack(JSON_VALUE *v);
 PACK *JsonStrToPack(char *str);
 
 void PackArrayElementToJsonArray(JSON_ARRAY *ja, PACK *p, ELEMENT *e, UINT index);
-void PackElementToJsonObject(JSON_OBJECT *o, PACK *p, ELEMENT *e, UINT index);
+void PackElementToJsonObject(JSON_OBJECT *o, PACK *p, ELEMENT *e, UINT index, bool no_suffix);
 char *DetermineJsonSuffixForPackElement(ELEMENT *e);
 bool JsonTryParseValueAddToPack(PACK *p, JSON_VALUE *v, char *v_name, UINT index, UINT total, bool is_single);
 

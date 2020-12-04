@@ -86,6 +86,437 @@
 #include <Mayaqua/Mayaqua.h>
 #include <Cedar/Cedar.h>
 
+// Stat manager 保存スレッド
+void StatManSaveThreadProc(THREAD* thread, void* param)
+{
+	STATMAN* m = (STATMAN*)param;
+
+	if (m == NULL)
+	{
+		return;
+	}
+
+	while (true)
+	{
+		UINT interval;
+		if (m->Halt)
+		{
+			break;
+		}
+
+		interval = GenRandInterval2(m->Config.SaveInterval, 0);
+
+		Wait(m->HaltEvent1, interval);
+
+		StatManNormalizeAndPoll(m);
+	}
+}
+
+// Stat manager 送信スレッド
+void StatManPostThreadProc(THREAD* thread, void* param)
+{
+	STATMAN* m = (STATMAN*)param;
+
+	if (m == NULL)
+	{
+		return;
+	}
+
+	while (true)
+	{
+		UINT interval;
+		IP local_ip = CLEAN;
+
+		if (GetMyPrivateIP(&local_ip, false))
+		{
+			CopyIP(&m->CurrentLocalIp, &local_ip);
+		}
+
+		StatManPostMain(m);
+
+		if (m->Halt)
+		{
+			break;
+		}
+
+		interval = GenRandInterval2(m->Config.PostInterval, 0);
+
+		Wait(m->HaltEvent2, interval);
+	}
+}
+
+// POST 送信メイン
+bool StatManPostMain(STATMAN* m)
+{
+	bool ret = false;
+	if (m == NULL)
+	{
+		return false;
+	}
+
+	// バージョン番号を増やす
+	{
+		PACK* p2 = NewPack();
+
+		PackAddInt64(p2, "__Stat_Version_Total", 1);
+
+		StatManAddReport(m, p2);
+
+		FreePack(p2);
+	}
+
+	if (IsEmptyStr(m->Config.PostUrl))
+	{
+		goto LABEL_CLEANUP;
+	}
+
+	Lock(m->Lock);
+	{
+		FOLDER* root = m->Root;
+		FOLDER *system = CfgGetFolder(root, "System");
+		FOLDER *data = CfgGetFolder(root, "Data");
+
+		if (system != NULL && data != NULL)
+		{
+			char uid[MAX_PATH] = CLEAN;
+
+			CfgGetStr(system, "Uid", uid, sizeof(uid));
+
+			if (IsFilledStr(uid))
+			{
+				PACK* json_pack = NewPack();
+				char tmp[MAX_PATH] = CLEAN;
+				PACK* data_pack = NewPack();
+				TOKEN_LIST* data_list;
+				UINT i;
+				JSON_VALUE* json_root;
+				JSON_VALUE* json_data;
+
+				PackAddStr(json_pack, "StatUid", uid);
+
+				IPToStr(tmp, sizeof(tmp), &m->CurrentLocalIp);
+
+				PackAddStr(json_pack, "StatLocalIp", tmp);
+
+				Zero(tmp, sizeof(tmp));
+				GetMachineHostName(tmp, sizeof(tmp));
+
+				PackAddStr(json_pack, "StatLocalFqdn", tmp);
+
+				PackAddStr(json_pack, "SystemName", m->Config.SystemName);
+				PackAddStr(json_pack, "LogName", m->Config.LogName);
+
+				data_list = CfgEnumItemToTokenList(data);
+
+				for (i = 0;i < data_list->NumTokens;i++)
+				{
+					char* name = data_list->Token[i];
+					ITEM* item = CfgFindItem(data, name);
+
+					if (item != NULL)
+					{
+						if (item->Type == ITEM_TYPE_INT64)
+						{
+							UINT64 value = CfgGetInt64(data, name);
+
+							PackAddInt64(data_pack, name, value);
+						}
+						else if (item->Type == ITEM_TYPE_STRING)
+						{
+							wchar_t str[MAX_SIZE] = CLEAN;
+
+							if (CfgGetUniStr(data, name, str, sizeof(str)))
+							{
+								PackAddUniStr(data_pack, name, str);
+							}
+						}
+					}
+				}
+
+				json_root = PackToJsonEx(json_pack, true);
+
+				json_data = PackToJsonEx(data_pack, true);
+
+				JsonSet(JsonValueGetObject(json_root), "Data", json_data);
+
+				char *str = JsonToStr(json_root);
+
+				Print("%s\n", str);
+
+				Free(str);
+
+				FreeToken(data_list);
+				JsonFree(json_root);
+				FreePack(data_pack);
+				FreePack(json_pack);
+			}
+		}
+	}
+	Unlock(m->Lock);
+
+LABEL_CLEANUP:
+
+	return ret;
+}
+
+// レポートの追加 (PACK で、登録したい値をポンポンを追加する)
+void StatManAddReport(STATMAN* m, PACK* p)
+{
+	FOLDER* data;
+	if (m == NULL || p == NULL || m->Root == NULL)
+	{
+		return;
+	}
+
+	data = CfgGetFolder(m->Root, "Data");
+	if (data == NULL)
+	{
+		data = CfgCreateFolder(m->Root, "Data");
+	}
+
+	if (data == NULL)
+	{
+		return;
+	}
+
+	Lock(m->Lock);
+	{
+		UINT i;
+
+		for (i = 0;i < LIST_NUM(p->elements);i++)
+		{
+			ELEMENT* e = LIST_DATA(p->elements, i);
+
+			if (e->num_value == 1)
+			{
+				if (e->type == VALUE_INT64)
+				{
+					ITEM* item;
+
+					UINT64 value = e->values[0]->Int64Value;
+
+					if (EndWith(e->name, "_total"))
+					{
+						value += CfgGetInt64(data, e->name);
+					}
+
+					item = CfgFindItem(data, e->name);
+					if (item != NULL)
+					{
+						CfgDeleteItem(item);
+					}
+
+					CfgAddInt64(data, e->name, value);
+				}
+				else if (e->type == VALUE_STR)
+				{
+					ITEM* item;
+
+					item = CfgFindItem(data, e->name);
+					if (item != NULL)
+					{
+						CfgDeleteItem(item);
+					}
+
+					CfgAddStr(data, e->name, e->values[0]->Str);
+				}
+				else if (e->type == VALUE_UNISTR)
+				{
+					ITEM* item;
+
+					item = CfgFindItem(data, e->name);
+					if (item != NULL)
+					{
+						CfgDeleteItem(item);
+					}
+
+					CfgAddUniStr(data, e->name, e->values[0]->UniStr);
+				}
+			}
+		}
+	}
+	Unlock(m->Lock);
+}
+
+// Stat manager の停止 (もうこれ以上 Poll コールバックを呼ばないことが保証される)
+void StopStatMan(STATMAN* m)
+{
+	if (m == NULL)
+	{
+		return;
+	}
+
+	m->Halt = true;
+
+	Set(m->HaltEvent1);
+	Set(m->HaltEvent2);
+
+	WaitThread(m->SaveThread, INFINITE);
+	WaitThread(m->PostThread, INFINITE);
+}
+
+// Stat manager の終了
+void FreeStatMan(STATMAN* m)
+{
+	if (m == NULL)
+	{
+		return;
+	}
+
+	StopStatMan(m);
+
+	ReleaseThread(m->SaveThread);
+	ReleaseThread(m->PostThread);
+
+	ReleaseEvent(m->HaltEvent1);
+	ReleaseEvent(m->HaltEvent2);
+
+	FreeCfgRw(m->CfgRw);
+
+	CfgDeleteFolder(m->Root);
+
+	DeleteLock(m->Lock);
+
+	Free(m);
+}
+
+// 正規化して Poll してファイル更新する
+void StatManNormalizeAndPoll(STATMAN* m)
+{
+	FOLDER* root;
+	FOLDER* system;
+	FOLDER* data;
+	if (m == NULL)
+	{
+		return;
+	}
+
+	Lock(m->Lock);
+	{
+		root = m->Root;
+		if (root != NULL)
+		{
+			system = CfgGetFolder(root, "System");
+			if (system == NULL)
+			{
+				system = CfgCreateFolder(root, "System");
+			}
+
+			if (system != NULL)
+			{
+				char uid[MAX_PATH] = CLEAN;
+
+				CfgGetStr(system, "Uid", uid, sizeof(uid));
+
+				if (IsEmptyStr(uid))
+				{
+					UCHAR rand[SHA1_SIZE] = CLEAN;
+
+					Rand(rand, sizeof(rand));
+
+					BinToStr(uid, sizeof(uid), rand, sizeof(rand));
+
+					if (CfgIsItem(system, "Uid"))
+					{
+						ITEM* item = CfgFindItem(system, "Uid");
+						if (item != NULL)
+						{
+							CfgDeleteItem(item);
+						}
+					}
+
+					CfgAddStr(system, "Uid", uid);
+				}
+			}
+
+			data = CfgGetFolder(root, "Data");
+			if (data == NULL)
+			{
+				data = CfgCreateFolder(root, "Data");
+			}
+
+			PACK* ret = NewPack();
+
+			if (m->Config.Callback != NULL)
+			{
+				m->Config.Callback(m, m->Config.Param, ret);
+
+				StatManAddReport(m, ret);
+			}
+
+			FreePack(ret);
+		}
+
+		SaveCfgRwEx(m->CfgRw, root, SystemTime64() / (24 * 60 * 60 * 1000));
+	}
+	Unlock(m->Lock);
+}
+
+// Stat manager の開始
+STATMAN* NewStatMan(STATMAN_CONFIG *config)
+{
+	FOLDER* root = CLEAN;
+	STATMAN* m;
+	if (config == NULL)
+	{
+		return NULL;
+	}
+
+	m = ZeroMalloc(sizeof(STATMAN));
+
+	m->Lock = NewLock();
+
+	GetLocalHostIP4(&m->CurrentLocalIp);
+
+	Copy(&m->Config, config, sizeof(STATMAN_CONFIG));
+
+	if (m->Config.PostInterval == 0)
+	{
+		m->Config.PostInterval = STATMAN_DEFAULT_SEND_INTERVAL;
+	}
+
+	if (m->Config.SaveInterval == 0)
+	{
+		m->Config.SaveInterval = STATMAN_DEFAULT_SAVE_INTERVAL;
+	}
+
+	if (UniIsEmptyStr(m->Config.StatFilename))
+	{
+		UniStrCpy(m->Config.StatFilename, sizeof(m->Config.StatFilename), STATMAN_DEFAULT_FILENAME);
+	}
+
+	if (IsEmptyStr(m->Config.SystemName))
+	{
+		StrCpy(m->Config.SystemName, sizeof(m->Config.SystemName), STATMAN_DEFAULT_SYSTEMNAME);
+	}
+
+	if (IsEmptyStr(m->Config.LogName))
+	{
+		StrCpy(m->Config.LogName, sizeof(m->Config.LogName), STATMAN_DEFAULT_LOGNAME);
+	}
+
+	m->CfgRw = NewCfgRwEx2W(&root, m->Config.StatFilename, false, NULL);
+
+	if (root != NULL)
+	{
+		m->Root = root;
+	}
+	else
+	{
+		m->Root = CfgCreateFolder(NULL, TAG_ROOT);
+	}
+
+	StatManNormalizeAndPoll(m);
+
+	m->HaltEvent1 = NewEvent();
+	m->HaltEvent2 = NewEvent();
+
+	m->SaveThread = NewThread(StatManSaveThreadProc, m);
+	m->PostThread = NewThread(StatManPostThreadProc, m);
+
+	return m;
+}
+
 // End of RPC
 void EndRpc(RPC *rpc)
 {

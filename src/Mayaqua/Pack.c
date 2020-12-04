@@ -1988,20 +1988,23 @@ void PackArrayElementToJsonArray(JSON_ARRAY *ja, PACK *p, ELEMENT *e, UINT index
 }
 
 // Add an element of PACK to JSON Object
-void PackElementToJsonObject(JSON_OBJECT *o, PACK *p, ELEMENT *e, UINT index)
+void PackElementToJsonObject(JSON_OBJECT* o, PACK* p, ELEMENT* e, UINT index, bool no_suffix)
 {
-	char *suffix;
+	char *suffix = NULL;
 	char name[MAX_PATH];
 	if (o == NULL || p == NULL || e == NULL)
 	{
 		return;
 	}
 
-	suffix = DetermineJsonSuffixForPackElement(e);
-
-	if (suffix == NULL)
+	if (no_suffix == false)
 	{
-		return;
+		suffix = DetermineJsonSuffixForPackElement(e);
+
+		if (suffix == NULL)
+		{
+			return;
+		}
 	}
 
 	StrCpy(name, sizeof(name), e->name);
@@ -2396,10 +2399,14 @@ PACK *JsonStrToPack(char *str)
 }
 
 // Convert PACK to JSON string
-char *PackToJsonStr(PACK *p)
+char* PackToJsonStr(PACK* p)
+{
+	return PackToJsonStrEx(p, false);
+}
+char* PackToJsonStrEx(PACK* p, bool no_suffix)
 {
 	char *ret;
-	JSON_VALUE *json = PackToJson(p);
+	JSON_VALUE *json = PackToJsonEx(p, no_suffix);
 
 	ret = JsonToStr(json);
 
@@ -2409,7 +2416,11 @@ char *PackToJsonStr(PACK *p)
 }
 
 // Convert PACK to JSON
-JSON_VALUE *PackToJson(PACK *p)
+JSON_VALUE* PackToJson(PACK* p)
+{
+	return PackToJsonEx(p, false);
+}
+JSON_VALUE* PackToJsonEx(PACK* p, bool no_suffix)
 {
 	JSON_VALUE *v;
 	JSON_OBJECT *o;
@@ -2511,7 +2522,7 @@ JSON_VALUE *PackToJson(PACK *p)
 						for (j = 0;j < e->num_value;j++)
 						{
 							PackElementToJsonObject(JsonValueGetObject(json_objects[j]),
-								p, e, j);
+								p, e, j, no_suffix);
 						}
 					}
 				}
@@ -2551,7 +2562,7 @@ JSON_VALUE *PackToJson(PACK *p)
 		}
 		else if (e->num_value == 1)
 		{
-			PackElementToJsonObject(o, p, e, 0);
+			PackElementToJsonObject(o, p, e, 0, no_suffix);
 		}
 	}
 

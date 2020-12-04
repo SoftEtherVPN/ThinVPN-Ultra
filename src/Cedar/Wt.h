@@ -268,6 +268,7 @@ struct WT
 	char SmtpServerHostname[128];
 	UINT SmtpServerPort;
 	char SmtpOtpFrom[128];
+	STATMAN* StatMan;
 
 	// Client / Server / Gate 共通
 	char EntranceUrl[MAX_PATH];			// エントランス URL

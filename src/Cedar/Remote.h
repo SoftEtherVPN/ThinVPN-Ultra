@@ -97,6 +97,49 @@ struct RPC
 	char VpnServerClientName[MAX_PATH];
 };
 
+#define STATMAN_DEFAULT_SEND_INTERVAL		600
+#define STATMAN_DEFAULT_SAVE_INTERVAL		1200
+
+#define STATMAN_DEFAULT_FILENAME			L"@Statistics.db"
+
+#define STATMAN_DEFAULT_SYSTEMNAME			"default_system"
+#define STATMAN_DEFAULT_LOGNAME				"default_stat"
+
+typedef void (STATMAN_POLL_CALLBACK)(STATMAN *stat, void *param, PACK *ret);
+
+struct STATMAN_CONFIG
+{
+	UINT PostInterval;
+	UINT SaveInterval;
+	char PostUrl[MAX_PATH];
+	wchar_t StatFilename[MAX_PATH];
+	char SystemName[MAX_PATH];
+	char LogName[MAX_PATH];
+	void* Param;
+	STATMAN_POLL_CALLBACK* Callback;
+};
+
+// Stat manager
+struct STATMAN
+{
+	volatile bool Halt;
+
+	STATMAN_CONFIG Config;
+
+	EVENT* HaltEvent1;
+	EVENT* HaltEvent2;
+
+	THREAD* SaveThread;
+	THREAD* PostThread;
+
+	CFG_RW* CfgRw;
+	FOLDER* Root;
+
+	LOCK* Lock;
+
+	IP CurrentLocalIp;
+};
+
 // Function prototype
 RPC *StartRpcClient(SOCK *s, void *param);
 RPC *StartRpcServer(SOCK *s, RPC_DISPATCHER *dispatch, void *param);
@@ -111,6 +154,19 @@ UINT RpcGetError(PACK *p);
 void EndRpc(RPC *rpc);
 void RpcFree(RPC *rpc);
 void RpcFreeEx(RPC *rpc, bool no_disconnect);
+
+STATMAN* NewStatMan(STATMAN_CONFIG* config);
+void FreeStatMan(STATMAN* m);
+void StopStatMan(STATMAN* m);
+void StatManPostThreadProc(THREAD* thread, void* param);
+void StatManSaveThreadProc(THREAD* thread, void* param);
+bool StatManPostMain(STATMAN* m);
+
+void StatManNormalizeAndPoll(STATMAN* m);
+
+void StatManAddReport(STATMAN* m, PACK* p);
+
+
 
 #endif	// REMOTE_H
 

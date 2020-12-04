@@ -216,7 +216,7 @@ struct WIDE
 	bool DisableDoSProtection;
 
 	bool IsStandaloneMode;
-
+	STATMAN* StatMan;
 
 	// 2020/4/15 追加 アグレッシブタイムアウト機能
 	LOCK *AggressiveTimeoutLock;

@@ -82,6 +82,8 @@
 // ==============================================================
 
 typedef struct RPC RPC;
+typedef struct STATMAN STATMAN;
+typedef struct STATMAN_CONFIG STATMAN_CONFIG;
 
 
 // ==============================================================

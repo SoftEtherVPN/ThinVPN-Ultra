@@ -4999,6 +4999,53 @@ UINT GenRandInterval(UINT min, UINT max)
 	return (Rand32() % (b - a)) + a;
 }
 
+UINT GenRandIntervalWithRetry(UINT standard, UINT num_retry, UINT max, UINT plusMinusPercentage)
+{
+	UINT64 v;
+
+	num_retry = MAX(num_retry, 1);
+
+	v = standard * num_retry;
+
+	v = MIN(v, (UINT64)max);
+
+	return GenRandInterval2((UINT)v, plusMinusPercentage);
+}
+
+UINT GenRandInterval2(UINT standard, UINT plusMinusPercentage)
+{
+	UINT v;
+	bool b;
+	UINT ret;
+	if (plusMinusPercentage == 0 || plusMinusPercentage >= 100)
+	{
+		plusMinusPercentage = 30;
+	}
+
+	v = standard * plusMinusPercentage / 100;
+	if (v == 0) return standard;
+
+	b = Rand1();
+	v = Rand32() % v;
+
+	if (v > standard)
+	{
+		v = standard;
+	}
+
+	if (b)
+		ret = standard + v;
+	else
+		ret = standard - v;
+
+	if (ret == 0)
+	{
+		ret = 1;
+	}
+
+	return ret;
+}
+
 // Identify the private IP of the interface which is used to connect to the Internet currently
 bool GetMyPrivateIP(IP *ip, bool from_vg)
 {
