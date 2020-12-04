@@ -259,6 +259,23 @@ LABEL_CLEANUP:
 	return ret;
 }
 
+// 1 つの 64bit レポートの追加
+void StatManReportInt64(STATMAN* m, char* name, UINT64 value)
+{
+	if (m == NULL || name == NULL)
+	{
+		return;
+	}
+
+	PACK* p = NewPack();
+
+	PackAddInt64(p, name, value);
+
+	StatManAddReport(m, p);
+
+	FreePack(p);
+}
+
 // レポートの追加 (PACK で、登録したい値をポンポンを追加する)
 void StatManAddReport(STATMAN* m, PACK* p)
 {
@@ -447,7 +464,7 @@ void StatManNormalizeAndPoll(STATMAN* m)
 			FreePack(ret);
 		}
 
-		SaveCfgRwEx(m->CfgRw, root, SystemTime64() / (24 * 60 * 60 * 1000));
+		SaveCfgRwEx(m->CfgRw, root, (UINT)(SystemTime64() / (24U * 60 * 60 * 1000)));
 	}
 	Unlock(m->Lock);
 }

@@ -150,6 +150,8 @@ struct TSESSION
 	TTCP *ServerTcp;					// サーバー側 TCP コネクション
 	bool RequestInitialPack;			// 初期化 Pack の要求
 	UINT64 ServerMask64;				// Server Mask 64
+	UINT64 Stat_ServerToClientTraffic;
+	UINT64 Stat_ClientToServerTraffic;
 
 	// Server 用
 	WT *wt;

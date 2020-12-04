@@ -216,6 +216,8 @@ struct WIDE
 	bool DisableDoSProtection;
 
 	bool IsStandaloneMode;
+
+	bool IsWideGateStarted;
 	STATMAN* StatMan;
 
 	// 2020/4/15 追加 アグレッシブタイムアウト機能
@@ -374,6 +376,7 @@ LIST *WideGateLoadIni();
 void WideGateLoadCertKey(X **cert, K **key);
 UINT WideGateGetIniEntry(char *name);
 void WideGatePackSessionList(PACK *p, WT *wt, LIST *sc_list);
+void WideGetNumSessions(WT* wt, UINT *num_server_sessions, UINT *num_client_sessions);
 void WideGatePackSession(PACK *p, TSESSION *s, UINT i, UINT num, LIST *sc_list);
 void WideGatePackGateInfo(PACK *p, WT *wt);
 void WideGateReportThread(THREAD *thread, void *param);
@@ -389,6 +392,8 @@ void WideGateLoadAggressiveTimeoutSettings(WIDE *wide);
 void WideGateLoadAggressiveTimeoutSettingsWithInterval(WIDE *wide);
 
 bool WideHasDebugFileWithCorrectKey();
+
+void WideStatManCallback(STATMAN* stat, void* param, PACK* ret);
 
 #endif	// WIDE_H
 

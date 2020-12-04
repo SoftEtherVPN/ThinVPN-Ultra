@@ -1047,9 +1047,24 @@ void WtgSessionMain(TSESSION *s)
 
 	SetSockEvent(s->SockEvent);
 
+	UINT64 last_traffic_stat = 0;
+
 	while (true)
 	{
 		bool disconnected = false;
+
+		UINT64 now = Tick64();
+
+		if (last_traffic_stat == 0 || (now >= (last_traffic_stat + 1234ULL)))
+		{
+			last_traffic_stat = now;
+
+			StatManReportInt64(s->wt->StatMan, "WtgClientToServerTraffic_Total", s->Stat_ClientToServerTraffic);
+			StatManReportInt64(s->wt->StatMan, "WtgServerToClientTraffic_Total", s->Stat_ServerToClientTraffic);
+
+			s->Stat_ClientToServerTraffic = 0;
+			s->Stat_ServerToClientTraffic = 0;
+		}
 
 		// ソケットイベントを待機
 		WtgWaitForSock(s);
@@ -1097,6 +1112,9 @@ void WtgSessionMain(TSESSION *s)
 	}
 
 	Debug("WtgSessionMain Cleanup...\n");
+
+	StatManReportInt64(s->wt->StatMan, "WtgClientToServerTraffic_Total", s->Stat_ClientToServerTraffic);
+	StatManReportInt64(s->wt->StatMan, "WtgServerToClientTraffic_Total", s->Stat_ServerToClientTraffic);
 
 	WideGateReportSessionDel(s->wt->Wide, s->SessionId);
 
@@ -1402,6 +1420,12 @@ void WtgRecvFromServer(TSESSION *s)
 		if (send_block != NULL)
 		{
 			send_block = WtRebuildDataBlock(send_block, use_compress ? 1 : 0);
+
+			if (send_block != NULL)
+			{
+				s->Stat_ServerToClientTraffic += send_block->DataSize;
+			}
+
 			InsertQueue(dest_queue, send_block);
 		}
 	}
@@ -1499,6 +1523,12 @@ void WtgRecvFromClient(TSESSION *s)
 				use_compress = s->ServerTcp->UseCompress;
 				send_block = WtRebuildDataBlock(block, use_compress ? 1 : 0);
 				block->TunnelId = p->TunnelId;
+
+				if (send_block != NULL)
+				{
+					s->Stat_ClientToServerTraffic += send_block->DataSize;
+				}
+
 				InsertQueue(dest_queue, send_block);
 			}
 			else
@@ -1887,6 +1917,8 @@ void WtgAccept(WT *wt, SOCK *s)
 		return;
 	}
 
+	StatManReportInt64(wt->StatMan, "WtgTcpAccept_Total", 1);
+
 	if (IsEmptyStr(wt->EntranceUrlForProxy))
 	{
 		WideLoadEntryPoint(NULL, wt->EntranceUrlForProxy, sizeof(wt->EntranceUrlForProxy), NULL, NULL, 0, NULL, 0);
@@ -2074,6 +2106,8 @@ void WtgAccept(WT *wt, SOCK *s)
 
 		SetTimeout(s, TIMEOUT_INFINITE);
 
+		StatManReportInt64(wt->StatMan, "WtgServerEstablished_Total", 1);
+
 		// セッションメイン
 		WtgSessionMain(session);
 
@@ -2171,6 +2205,8 @@ void WtgAccept(WT *wt, SOCK *s)
 		FreePack(p);
 
 		SetTimeout(s, TIMEOUT_INFINITE);
+
+		StatManReportInt64(wt->StatMan, "WtgClientEstablished_Total", 1);
 
 		Lock(session->Lock);
 		{
@@ -2949,6 +2985,13 @@ void WtgStart(WT* wt, X* cert, K* key, UINT port, bool standalone_mode)
 		// スタンドアロンモードの初期化
 		WtgSamInit(wt);
 	}
+
+	// Total 統計のゼロ値追加
+	StatManReportInt64(wt->StatMan, "WtgTcpAccept_Total", 0);
+	StatManReportInt64(wt->StatMan, "WtgServerEstablished_Total", 0);
+	StatManReportInt64(wt->StatMan, "WtgClientEstablished_Total", 0);
+	StatManReportInt64(wt->StatMan, "WtgClientToServerTraffic_Total", 0);
+	StatManReportInt64(wt->StatMan, "WtgServerToClientTraffic_Total", 0);
 
 	// メモリサイズの節約
 	SetFifoCurrentReallocMemSize(65536);

@@ -165,6 +165,7 @@ bool StatManPostMain(STATMAN* m);
 void StatManNormalizeAndPoll(STATMAN* m);
 
 void StatManAddReport(STATMAN* m, PACK* p);
+void StatManReportInt64(STATMAN* m, char *name, UINT64 value);
 
 
 

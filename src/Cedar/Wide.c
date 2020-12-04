@@ -2619,6 +2619,34 @@ void WideGatePackSession(PACK *p, TSESSION *s, UINT i, UINT num, LIST *sc_list)
 	}
 }
 
+// セッション数を取得する
+void WideGetNumSessions(WT* wt, UINT* num_server_sessions, UINT* num_client_sessions)
+{
+	if (wt == NULL || num_server_sessions == NULL || num_client_sessions == NULL)
+	{
+		return;
+	}
+
+	*num_server_sessions = 0;
+	*num_client_sessions = 0;
+
+	LockList(wt->SessionList);
+	{
+		UINT i, num;
+
+		num = LIST_NUM(wt->SessionList);
+		for (i = 0;i < num;i++)
+		{
+			TSESSION* s = LIST_DATA(wt->SessionList, i);
+
+			(*num_client_sessions) += LIST_NUM(s->TunnelList);
+
+			(*num_server_sessions)++;
+		}
+	}
+	UnlockList(wt->SessionList);
+}
+
 // セッションリストを Pack する
 void WideGatePackSessionList(PACK *p, WT *wt, LIST *sc_list)
 {
@@ -3230,6 +3258,30 @@ void WideGateLoadAggressiveTimeoutSettingsWithInterval(WIDE *wide)
 	Unlock(wide->AggressiveTimeoutLock);
 }
 
+// 統計コールバック
+void WideStatManCallback(STATMAN* stat, void* param, PACK* ret)
+{
+	if (stat == NULL || param == NULL || ret == NULL)
+	{
+		return;
+	}
+
+	WIDE* w = (WIDE*)param;
+	if (w->IsWideGateStarted == false)
+	{
+		return;
+	}
+
+	UINT num_server_sessions = 0;
+	UINT num_client_sessions = 0;
+
+	WHERE;
+	WideGetNumSessions(w->wt, &num_server_sessions, &num_client_sessions);
+
+	PackAddInt64(ret, "WtgNumServerSessions", num_server_sessions);
+	PackAddInt64(ret, "WtgNumClientSessions", num_client_sessions);
+}
+
 // WideGate の開始
 WIDE *WideGateStart()
 {
@@ -3293,16 +3345,20 @@ WIDE *WideGateStart()
 		port = WT_PORT;
 	}
 
-	if (w->IsStandaloneMode)
-	{
-		// 統計送付
-		STATMAN_CONFIG cfg = CLEAN;
+	// 統計送付
+	STATMAN_CONFIG cfg = CLEAN;
 
-		StrCpy(cfg.PostUrl, sizeof(cfg.PostUrl), "https://127.0.0.1/stat/");
+	char *system_name_src = Vars_ActivePatch_GetStrEx("WtGateStatSystemName", "thingate_unknown");
 
-		w->StatMan = NewStatMan(&cfg);
-		w->wt->StatMan = w->StatMan;
-	}
+	Format(cfg.SystemName, sizeof(cfg.SystemName), "%s_%s", system_name_src,
+		w->IsStandaloneMode ? "standalone" : "hyperscale");
+	StrCpy(cfg.LogName, sizeof(cfg.LogName), "thingate_stat");
+	StrCpy(cfg.PostUrl, sizeof(cfg.PostUrl), "https://127.0.0.1/stat/");
+	cfg.Callback = WideStatManCallback;
+	cfg.Param = w;
+
+	w->StatMan = NewStatMan(&cfg);
+	w->wt->StatMan = w->StatMan;
 
 	w->AggressiveTimeoutLock = NewLock();
 
@@ -3332,6 +3388,8 @@ WIDE *WideGateStart()
 		w->ReportThreadHaltEvent = NewEvent();
 		w->ReportThread = NewThread(WideGateReportThread, w);
 	}
+
+	w->IsWideGateStarted = true;
 
 	return w;
 }
