@@ -3278,8 +3278,8 @@ void WideStatManCallback(STATMAN* stat, void* param, PACK* ret)
 	WHERE;
 	WideGetNumSessions(w->wt, &num_server_sessions, &num_client_sessions);
 
-	PackAddInt64(ret, "WtgNumServerSessions", num_server_sessions);
-	PackAddInt64(ret, "WtgNumClientSessions", num_client_sessions);
+	PackAddInt64(ret, "WtgCurrentEstablishedServerSessions", num_server_sessions);
+	PackAddInt64(ret, "WtgCurrentEstablishedClientSessions", num_client_sessions);
 }
 
 // WideGate の開始

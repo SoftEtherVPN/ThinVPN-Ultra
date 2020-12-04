@@ -1059,8 +1059,8 @@ void WtgSessionMain(TSESSION *s)
 		{
 			last_traffic_stat = now;
 
-			StatManReportInt64(s->wt->StatMan, "WtgClientToServerTraffic_Total", s->Stat_ClientToServerTraffic);
-			StatManReportInt64(s->wt->StatMan, "WtgServerToClientTraffic_Total", s->Stat_ServerToClientTraffic);
+			StatManReportInt64(s->wt->StatMan, "WtgTrafficClientToServer_Total", s->Stat_ClientToServerTraffic);
+			StatManReportInt64(s->wt->StatMan, "WtgTrafficServerToClient_Total", s->Stat_ServerToClientTraffic);
 
 			s->Stat_ClientToServerTraffic = 0;
 			s->Stat_ServerToClientTraffic = 0;
@@ -1113,8 +1113,8 @@ void WtgSessionMain(TSESSION *s)
 
 	Debug("WtgSessionMain Cleanup...\n");
 
-	StatManReportInt64(s->wt->StatMan, "WtgClientToServerTraffic_Total", s->Stat_ClientToServerTraffic);
-	StatManReportInt64(s->wt->StatMan, "WtgServerToClientTraffic_Total", s->Stat_ServerToClientTraffic);
+	StatManReportInt64(s->wt->StatMan, "WtgTrafficClientToServer_Total", s->Stat_ClientToServerTraffic);
+	StatManReportInt64(s->wt->StatMan, "WtgTrafficServerToClient_Total", s->Stat_ServerToClientTraffic);
 
 	WideGateReportSessionDel(s->wt->Wide, s->SessionId);
 
@@ -1917,7 +1917,7 @@ void WtgAccept(WT *wt, SOCK *s)
 		return;
 	}
 
-	StatManReportInt64(wt->StatMan, "WtgTcpAccept_Total", 1);
+	StatManReportInt64(wt->StatMan, "WtgConnectedTcp_Total", 1);
 
 	if (IsEmptyStr(wt->EntranceUrlForProxy))
 	{
@@ -2106,7 +2106,7 @@ void WtgAccept(WT *wt, SOCK *s)
 
 		SetTimeout(s, TIMEOUT_INFINITE);
 
-		StatManReportInt64(wt->StatMan, "WtgServerEstablished_Total", 1);
+		StatManReportInt64(wt->StatMan, "WtgConnnectedServerSessions_Total", 1);
 
 		// セッションメイン
 		WtgSessionMain(session);
@@ -2206,7 +2206,7 @@ void WtgAccept(WT *wt, SOCK *s)
 
 		SetTimeout(s, TIMEOUT_INFINITE);
 
-		StatManReportInt64(wt->StatMan, "WtgClientEstablished_Total", 1);
+		StatManReportInt64(wt->StatMan, "WtgConnnectedClientSessions_Total", 1);
 
 		Lock(session->Lock);
 		{
@@ -2987,11 +2987,11 @@ void WtgStart(WT* wt, X* cert, K* key, UINT port, bool standalone_mode)
 	}
 
 	// Total 統計のゼロ値追加
-	StatManReportInt64(wt->StatMan, "WtgTcpAccept_Total", 0);
-	StatManReportInt64(wt->StatMan, "WtgServerEstablished_Total", 0);
-	StatManReportInt64(wt->StatMan, "WtgClientEstablished_Total", 0);
-	StatManReportInt64(wt->StatMan, "WtgClientToServerTraffic_Total", 0);
-	StatManReportInt64(wt->StatMan, "WtgServerToClientTraffic_Total", 0);
+	StatManReportInt64(wt->StatMan, "WtgConnectedTcp_Total", 0);
+	StatManReportInt64(wt->StatMan, "WtgConnnectedServerSessions_Total", 0);
+	StatManReportInt64(wt->StatMan, "WtgConnnectedClientSessions_Total", 0);
+	StatManReportInt64(wt->StatMan, "WtgTrafficClientToServer_Total", 0);
+	StatManReportInt64(wt->StatMan, "WtgTrafficServerToClient_Total", 0);
 
 	// メモリサイズの節約
 	SetFifoCurrentReallocMemSize(65536);
