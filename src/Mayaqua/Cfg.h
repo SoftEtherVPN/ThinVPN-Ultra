@@ -219,6 +219,7 @@ CFG_RW *NewCfgRwEx2W(FOLDER **root, wchar_t *cfg_name, bool dont_backup, wchar_t
 CFG_RW *NewCfgRwEx2A(FOLDER **root, char *cfg_name_a, bool dont_backup, char *template_name_a);
 UINT SaveCfgRw(CFG_RW *rw, FOLDER *f);
 UINT SaveCfgRwEx(CFG_RW *rw, FOLDER *f, UINT revision_number);
+UINT SaveCfgRwEx2(CFG_RW* rw, FOLDER* f, UINT revision_number, bool write_binary);
 void FreeCfgRw(CFG_RW *rw);
 ITEM *CfgAddIp32(FOLDER *f, char *name, UINT ip);
 UINT CfgGetIp32(FOLDER *f, char *name);

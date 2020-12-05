@@ -3357,11 +3357,11 @@ WIDE *WideGateStart()
 	STATMAN_CONFIG cfg = CLEAN;
 
 	char *system_name_src = Vars_ActivePatch_GetStrEx("WtGateStatSystemName", "thingate_unknown");
-
+	
 	Format(cfg.SystemName, sizeof(cfg.SystemName), "%s_%s", system_name_src,
 		w->IsStandaloneMode ? "standalone" : "hyperscale");
 	StrCpy(cfg.LogName, sizeof(cfg.LogName), "thingate_stat");
-	StrCpy(cfg.PostUrl, sizeof(cfg.PostUrl), "https://127.0.0.1/stat/");
+	StrCpy(cfg.PostUrl, sizeof(cfg.PostUrl), WIDE_STAT_POST_URL);
 	cfg.Callback = WideStatManCallback;
 	cfg.Param = w;
 

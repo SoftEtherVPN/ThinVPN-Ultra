@@ -97,8 +97,8 @@ struct RPC
 	char VpnServerClientName[MAX_PATH];
 };
 
-#define STATMAN_DEFAULT_SEND_INTERVAL		600
-#define STATMAN_DEFAULT_SAVE_INTERVAL		1200
+#define STATMAN_DEFAULT_SEND_INTERVAL		(30 * 60 * 1000)
+#define STATMAN_DEFAULT_SAVE_INTERVAL		(5 * 60 * 1000)
 
 #define STATMAN_DEFAULT_FILENAME			L"@Statistics.db"
 
@@ -167,6 +167,7 @@ void StatManNormalizeAndPoll(STATMAN* m);
 void StatManAddReport(STATMAN* m, PACK* p);
 void StatManReportInt64(STATMAN* m, char *name, UINT64 value);
 
+UINT HttpPostData(char* url, UINT timeout, char* post_str, bool* cancel);
 
 
 #endif	// REMOTE_H

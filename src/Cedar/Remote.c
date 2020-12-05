@@ -110,6 +110,8 @@ void StatManSaveThreadProc(THREAD* thread, void* param)
 
 		StatManNormalizeAndPoll(m);
 	}
+
+	StatManNormalizeAndPoll(m);
 }
 
 // Stat manager 送信スレッド
@@ -122,6 +124,8 @@ void StatManPostThreadProc(THREAD* thread, void* param)
 		return;
 	}
 
+	UINT num_try = 0;
+
 	while (true)
 	{
 		UINT interval;
@@ -132,14 +136,19 @@ void StatManPostThreadProc(THREAD* thread, void* param)
 			CopyIP(&m->CurrentLocalIp, &local_ip);
 		}
 
-		StatManPostMain(m);
+		num_try++;
+
+		if (StatManPostMain(m))
+		{
+			num_try = 0;
+		}
 
 		if (m->Halt)
 		{
 			break;
 		}
 
-		interval = GenRandInterval2(m->Config.PostInterval, 0);
+		interval = GenRandIntervalWithRetry(m->Config.PostInterval, num_try + 1, m->Config.PostInterval * 30, 0);
 
 		Wait(m->HaltEvent2, interval);
 	}
@@ -149,6 +158,7 @@ void StatManPostThreadProc(THREAD* thread, void* param)
 bool StatManPostMain(STATMAN* m)
 {
 	bool ret = false;
+	char* json_str = NULL;
 	if (m == NULL)
 	{
 		return false;
@@ -193,6 +203,26 @@ bool StatManPostMain(STATMAN* m)
 				JSON_VALUE* json_data;
 
 				PackAddStr(json_pack, "StatUid", uid);
+
+				PackAddStr(json_pack, "StatGitCommitId", ULTRA_COMMIT_ID);
+
+				char verstr[MAX_SIZE] = CLEAN;
+				char exe[MAX_PATH] = CLEAN;
+
+				GetExeName(exe, sizeof(exe));
+
+				GetFileNameFromFilePath(exe, sizeof(exe), exe); // Remove personal information
+
+				OS_INFO* os = GetOsInfo();
+
+				Format(verstr, sizeof(verstr),
+					"CEDAR_VER=%u|CEDAR_BUILD=%u|BUILDER_NAME=%u|BUILD_PLACE=%u|APPNAME=%s|"
+					"OSTYPE=%u|OSSP=%u|OSNAME=%s|OSPROD=%s|OSVENDOR=%s|OSVER=%s|KERNEL=%s|KERNELVER=%s",
+					CEDAR_VER, CEDAR_BUILD, BUILDER_NAME, BUILD_PLACE, exe,
+					os->OsType, os->OsServicePack, os->OsSystemName, os->OsProductName, os->OsVendorName, os->OsVersion, os->KernelName, os->KernelVersion
+					);
+
+				PackAddStr(json_pack, "StatAppVer", verstr);
 
 				IPToStr(tmp, sizeof(tmp), &m->CurrentLocalIp);
 
@@ -239,11 +269,7 @@ bool StatManPostMain(STATMAN* m)
 
 				JsonSet(JsonValueGetObject(json_root), "Data", json_data);
 
-				char *str = JsonToStr(json_root);
-
-				Print("%s\n", str);
-
-				Free(str);
+				json_str = JsonToStr(json_root);
 
 				FreeToken(data_list);
 				JsonFree(json_root);
@@ -254,7 +280,64 @@ bool StatManPostMain(STATMAN* m)
 	}
 	Unlock(m->Lock);
 
+	if (IsFilledStr(json_str))
+	{
+		// JSON データをアップロードいたします
+		UINT err = HttpPostData(m->Config.PostUrl, CONNECTING_TIMEOUT, json_str, (bool *)&m->Halt);
+
+		if (err == ERR_NO_ERROR)
+		{
+			ret = true;
+		}
+	}
+
 LABEL_CLEANUP:
+
+	Free(json_str);
+
+	return ret;
+}
+
+// HTTP でデータを Post する
+UINT HttpPostData(char* url, UINT timeout, char *post_str, bool *cancel)
+{
+	UINT ret = ERR_INTERNAL_ERROR;
+	if (url == NULL || post_str == NULL)
+	{
+		return ERR_INTERNAL_ERROR;
+	}
+
+	URL_DATA data = CLEAN;
+	if (ParseUrl(&data, url, true, NULL) == false)
+	{
+		return ERR_INTERNAL_ERROR;
+	}
+
+	UINT error = ERR_INTERNAL_ERROR;
+
+	BUF* recv = HttpRequestEx5(&data, NULL, timeout, timeout, &error,
+		false, post_str, NULL, NULL, NULL, 0, cancel, 6536, NULL, NULL, NULL, false, false);
+
+	if (recv == NULL)
+	{
+		return error;
+	}
+
+	SeekBufToEnd(recv);
+	WriteBufChar(recv, 0);
+
+	char* recv_str = recv->Buf;
+
+	if (InStr(recv_str, "ok") == false)
+	{
+		ret = ERR_PROTOCOL_ERROR;
+	}
+	else
+	{
+		ret = ERR_NO_ERROR;
+	}
+
+	FreeBuf(recv);
 
 	return ret;
 }
@@ -452,19 +535,22 @@ void StatManNormalizeAndPoll(STATMAN* m)
 				data = CfgCreateFolder(root, "Data");
 			}
 
-			PACK* ret = NewPack();
-
-			if (m->Config.Callback != NULL)
+			if (m->Halt == false)
 			{
-				m->Config.Callback(m, m->Config.Param, ret);
+				PACK* ret = NewPack();
 
-				StatManAddReport(m, ret);
+				if (m->Config.Callback != NULL)
+				{
+					m->Config.Callback(m, m->Config.Param, ret);
+
+					StatManAddReport(m, ret);
+				}
+
+				FreePack(ret);
 			}
-
-			FreePack(ret);
 		}
 
-		SaveCfgRwEx(m->CfgRw, root, (UINT)(SystemTime64() / (24U * 60 * 60 * 1000)));
+		SaveCfgRwEx2(m->CfgRw, root, (UINT)(SystemTime64() / (24U * 60 * 60 * 1000)), true);
 	}
 	Unlock(m->Lock);
 }

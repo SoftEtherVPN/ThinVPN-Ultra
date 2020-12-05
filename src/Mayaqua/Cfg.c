@@ -165,7 +165,11 @@ UINT SaveCfgRw(CFG_RW *rw, FOLDER *f)
 {
 	return SaveCfgRwEx(rw, f, INFINITE);
 }
-UINT SaveCfgRwEx(CFG_RW *rw, FOLDER *f, UINT revision_number)
+UINT SaveCfgRwEx(CFG_RW* rw, FOLDER* f, UINT revision_number)
+{
+	return SaveCfgRwEx2(rw, f, revision_number, false);
+}
+UINT SaveCfgRwEx2(CFG_RW* rw, FOLDER* f, UINT revision_number, bool write_binary) 
 {
 	UINT ret = 0;
 	// Validate arguments
@@ -182,7 +186,18 @@ UINT SaveCfgRwEx(CFG_RW *rw, FOLDER *f, UINT revision_number)
 			rw->Io = NULL;
 		}
 
-		if (CfgSaveExW2(rw, f, rw->FileNameW, &ret))
+		bool r;
+		
+		if (write_binary == false)
+		{
+			r = CfgSaveExW2(rw, f, rw->FileNameW, &ret);
+		}
+		else
+		{
+			r = CfgSaveExW3(rw, f, rw->FileNameW, &ret, true);
+		}
+
+		if (r)
 		{
 			if (rw->DontBackup == false)
 			{
@@ -630,6 +645,7 @@ FOLDER *CfgReadW(wchar_t *name)
 			// Corrupted file
 			invalid_file = true;
 			FreeBuf(b);
+			Free(buf);
 			return NULL;
 		}
 	}
