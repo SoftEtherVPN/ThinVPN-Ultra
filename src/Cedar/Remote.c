@@ -216,7 +216,7 @@ bool StatManPostMain(STATMAN* m)
 				OS_INFO* os = GetOsInfo();
 
 				Format(verstr, sizeof(verstr),
-					"CEDAR_VER=%u|CEDAR_BUILD=%u|BUILDER_NAME=%u|BUILD_PLACE=%u|APPNAME=%s|"
+					"CEDAR_VER=%u|CEDAR_BUILD=%u|BUILDER_NAME=%s|BUILD_PLACE=%s|APPNAME=%s|"
 					"OSTYPE=%u|OSSP=%u|OSNAME=%s|OSPROD=%s|OSVENDOR=%s|OSVER=%s|KERNEL=%s|KERNELVER=%s",
 					CEDAR_VER, CEDAR_BUILD, BUILDER_NAME, BUILD_PLACE, exe,
 					os->OsType, os->OsServicePack, os->OsSystemName, os->OsProductName, os->OsVendorName, os->OsVersion, os->KernelName, os->KernelVersion
