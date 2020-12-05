@@ -1122,7 +1122,13 @@ void DuConnectDlgOnTimer(HWND hWnd, DU_MAIN *t)
 
 	KillTimer(hWnd, 1);
 
+	// システムがスリープしないようにする
+	MsStartEasyNoSleep();
+
 	DuConnectMain(hWnd, t, t->Pcid);
+
+	// システムがスリープしても良いように戻す
+	MsStopEasyNoSleep();
 
 	EndDialog(hWnd, 1);
 

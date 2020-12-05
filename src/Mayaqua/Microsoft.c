@@ -3785,6 +3785,44 @@ void MsNoSleepThread(THREAD *thread, void *param)
 	FreeLibrary(hKernel32);
 }
 
+// Easy sleep prevention
+void MsStartEasyNoSleep()
+{
+	HINSTANCE hKernel32 = LoadLibrary("kernel32.dll");
+
+	if (hKernel32 != NULL)
+	{
+		EXECUTION_STATE(WINAPI * _SetThreadExecutionState)(EXECUTION_STATE) =
+			(EXECUTION_STATE(__stdcall*)(EXECUTION_STATE))
+			GetProcAddress(hKernel32, "SetThreadExecutionState");
+
+		if (_SetThreadExecutionState != NULL)
+		{
+			_SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
+		}
+
+		FreeLibrary(hKernel32);
+	}
+}
+void MsStopEasyNoSleep()
+{
+	HINSTANCE hKernel32 = LoadLibrary("kernel32.dll");
+
+	if (hKernel32 != NULL)
+	{
+		EXECUTION_STATE(WINAPI * _SetThreadExecutionState)(EXECUTION_STATE) =
+			(EXECUTION_STATE(__stdcall*)(EXECUTION_STATE))
+			GetProcAddress(hKernel32, "SetThreadExecutionState");
+
+		if (_SetThreadExecutionState != NULL)
+		{
+			_SetThreadExecutionState(ES_CONTINUOUS);
+		}
+
+		FreeLibrary(hKernel32);
+	}
+}
+
 // Sleep prevention thread (for Windows Vista)
 void MsNoSleepThreadVista(THREAD *thread, void *param)
 {
