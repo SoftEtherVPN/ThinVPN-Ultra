@@ -1335,6 +1335,8 @@
 #define C_WATERMARK                     2604
 #define C_SHOW_WATERMARK                2604
 #define S_S2                            2605
+#define C_LOG2                          2605
+#define C_DEBUG                         2605
 #define S_S10                           2606
 #define S_S11                           2607
 #define S_MACHINE                       2608

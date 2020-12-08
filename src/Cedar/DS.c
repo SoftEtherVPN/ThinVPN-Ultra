@@ -880,7 +880,7 @@ void DsLog(DS *ds, char *name, ...)
 
 	va_start(args, name);
 
-	DsLogMain(ds, DS_LOG_INFO, name, args);
+	DsLogMain(ds, DS_LOG_INFO, NULL, name, args);
 
 	va_end(args);
 }
@@ -896,16 +896,40 @@ void DsLogEx(DS *ds, UINT ds_log_type, char *name, ...)
 
 	va_start(args, name);
 
-	DsLogMain(ds, ds_log_type, name, args);
+	DsLogMain(ds, ds_log_type, NULL, name, args);
 
 	va_end(args);
 }
 
-void DsLogMain(DS *ds, UINT ds_log_type, char *name, va_list args)
+void DsDebugLog(DS* ds, char* prefix, char* format, ...)
+{
+	va_list args;
+	char format2[MAX_SIZE * 2] = CLEAN;
+	// 引数チェック
+	if (format == NULL)
+	{
+		return;
+	}
+	if (ds->EnableDebugLog == false)
+	{
+		return;
+	}
+
+	Format(format2, sizeof(format2), "[DEBUG] (%s) %s", prefix, format);
+
+	va_start(args, format);
+
+	DsLogMain(ds, DS_LOG_INFO, format2, NULL, args);
+
+	va_end(args);
+}
+
+void DsLogMain(DS* ds, UINT ds_log_type, char* alt_format_string, char* name, va_list args)
 {
 #ifdef	OS_WIN32
-	wchar_t buf[MAX_SIZE * 2 + 64];
-	wchar_t buf2[MAX_SIZE * 2];
+	wchar_t buf[MAX_SIZE * 2 + 64] = CLEAN;
+	char buf3[MAX_SIZE * 2 + 64] = CLEAN;
+	wchar_t buf2[MAX_SIZE * 2] = CLEAN;
 	wchar_t *typestr = DsGetLogTypeStr(ds_log_type);
 	SYSLOG_SETTING ss;
 	bool lineonly = false;
@@ -913,7 +937,15 @@ void DsLogMain(DS *ds, UINT ds_log_type, char *name, va_list args)
 
 	DsGetPolicy(ds, &pol);
 
-	UniFormatArgs(buf, sizeof(buf), _UU(name), args);
+	if (alt_format_string == NULL)
+	{
+		UniFormatArgs(buf, sizeof(buf), _UU(name), args);
+	}
+	else
+	{
+		FormatArgs(buf3, sizeof(buf3), alt_format_string, args);
+		StrToUni(buf, sizeof(buf), buf3);
+	}
 
 	if (UniStartWith(buf, L"-------"))
 	{
@@ -1186,6 +1218,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bool server_allowed_mac_list_check_ok = true;
 	bool support_server_allowed_mac_list_err = false;
 	UINT total_relay_size = 0;
+	char logprefix[128] = CLEAN;
 	// 引数チェック
 	if (ds == NULL || sock == NULL)
 	{
@@ -1264,6 +1297,10 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	BinToStr(client_id_str, sizeof(client_id_str), client_id, sizeof(client_id));
 	IPToStr(client_ip_str, sizeof(client_ip_str), &client_ip);
 
+	Format(logprefix, sizeof(logprefix), "%r:%u (%s) [%u/%s]", &client_ip, client_port, client_host, tunnel_id, client_id_str);
+
+	DsDebugLog(ds, logprefix, "DsServerMain Start");
+
 	is_share_disabled = DsIsShareDisabled(ds);
 
 	Rand(rand, sizeof(rand));
@@ -1275,6 +1312,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	p = SockIoRecvPack(sock);
 	if (p == NULL)
 	{
+		DsDebugLog(ds, logprefix, "Error: %s:%u", __FILE__, __LINE__);
 		DsSendError(sock, ERR_PROTOCOL_ERROR);
 		return;
 	}
@@ -1311,9 +1349,19 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	Zero(bluetooth_mode_client_id, sizeof(bluetooth_mode_client_id));
 	PackGetData2(p, "bluetooth_mode_client_id", bluetooth_mode_client_id, sizeof(bluetooth_mode_client_id));
 
+	DsDebugLog(ds, logprefix, "client_ver=%u, client_build=%u, check_port=%u, pingmode=%u,"
+		"wol_mode=%u,first_connection=%u,has_urdp2_client=%u,support_otp=%u,"
+		"support_otp_enforcement=%u,support_inspect=%u,support_server_allowed_mac_list_err=%u,"
+		"support_watermark=%u,client_local_ip=%r",
+		client_ver, client_build, check_port, pingmode,
+		wol_mode, first_connection, has_urdp2_client, support_otp,
+		support_otp_enforcement, support_inspect, support_server_allowed_mac_list_err, support_watermark,
+		&client_local_ip);
+
 	if (server_allowed_mac_list_check_ok == false)
 	{
 		// サーバー側 MAC アドレスチェック失敗
+		DsDebugLog(ds, logprefix, "Error: %s:%u", __FILE__, __LINE__);
 		DsSendError(sock, support_server_allowed_mac_list_err ? ERR_DESK_SERVER_ALLOWED_MAC_LIST : ERR_DESK_UNKNOWN_AUTH_TYPE);
 		FreePack(p);
 		return;
@@ -1328,6 +1376,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		if (ds->EnableWoLTrigger == false)
 		{
 			// WoL Trigger 機能が無効である
+			DsDebugLog(ds, logprefix, "Error: %s:%u", __FILE__, __LINE__);
 			DsSendError(sock, ERR_WOL_TRIGGER_NOT_ENABLED);
 			FreePack(p);
 			return;
@@ -1338,6 +1387,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		PackGetStr(p, "mac_list", mac_str, mac_str_size);
 
 		// WoL 送信の実行
+		DsDebugLog(ds, logprefix, "WoL Magic Sent to %s", mac_str);
 		WoLSendPacketToMacAddressListStr(mac_str);
 
 		Free(mac_str);
@@ -1356,6 +1406,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	if (pingmode)
 	{
 		// ping mode (テスト用)
+		DsDebugLog(ds, logprefix, "Start ping mode");
 		while (true)
 		{
 			UINT64 tick;
@@ -1368,6 +1419,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 				break;
 			}
 		}
+		DsDebugLog(ds, logprefix, "End ping mode");
 
 		return;
 	}
@@ -1379,6 +1431,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			// 共有機能が禁止されており、かつ古いバージョンのクライアントが
 			// 接続してきた場合はエラーにする
 			DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_UNKNOWN_AUTH_TYPE (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 	}
@@ -1387,6 +1440,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	{
 		// OTP が有効なのにクライアントが OTP 非サポート
 		DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+		DsDebugLog(ds, logprefix, "Error: ERR_DESK_UNKNOWN_AUTH_TYPE (%s:%u)", __FILE__, __LINE__);
 		return;
 	}
 
@@ -1394,6 +1448,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	{
 		// 透かしが有効なのにクライアントが透かし非サポート
 		DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+		DsDebugLog(ds, logprefix, "Error: ERR_DESK_UNKNOWN_AUTH_TYPE (%s:%u)", __FILE__, __LINE__);
 		return;
 	}
 
@@ -1404,11 +1459,13 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		{
 			// クライアントが ERR_DESK_OTP_ENFORCED_BUT_NO エラーを表示不能
 			DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_UNKNOWN_AUTH_TYPE (%s:%u)", __FILE__, __LINE__);
 		}
 		else
 		{
 			// クライアントが ERR_DESK_OTP_ENFORCED_BUT_NO エラーを表示可能
 			DsSendError(sock, ERR_DESK_OTP_ENFORCED_BUT_NO);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_OTP_ENFORCED_BUT_NO (%s:%u)", __FILE__, __LINE__);
 		}
 		return;
 	}
@@ -1421,6 +1478,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		{
 			// クライアント検疫が設定されているのに対応していないバージョンのクライアント
 			DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_UNKNOWN_AUTH_TYPE (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 	}
@@ -1432,6 +1490,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			// 新型ユーザー認証を使用する必要があるが
 			// 旧型クライアントが接続してきた場合はエラーにする
 			DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_UNKNOWN_AUTH_TYPE (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 	}
@@ -1463,6 +1522,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	if (client_ver == 0 || client_build == 0)
 	{
 		DsSendError(sock, ERR_PROTOCOL_ERROR);
+		DsDebugLog(ds, logprefix, "Error: ERR_PROTOCOL_ERROR (%s:%u)", __FILE__, __LINE__);
 		return;
 	}
 
@@ -1470,6 +1530,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	{
 		// 接続を受け付けていない
 		DsSendError(sock, ERR_DESK_NOT_ACTIVE);
+		DsDebugLog(ds, logprefix, "Error: ERR_DESK_NOT_ACTIVE (%s:%u)", __FILE__, __LINE__);
 		return;
 	}
 
@@ -1562,12 +1623,17 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	PackAddBool(p, "UseAdvancedSecurity", ds->UseAdvancedSecurity);
 	PackAddBool(p, "IsOtpEnabled", ds->EnableOtp);
 	PackAddBool(p, "RunInspect", run_inspect);
+
+	DsDebugLog(ds, logprefix, "ds_caps=%u, is_share_disabled=%u, UseAdvancedSecurity=%u, IsOtpEnabled=%u, run_inspect=%u",
+		ds_caps, is_share_disabled, ds->UseAdvancedSecurity, ds->EnableOtp, run_inspect);
+
 	ret = SockIoSendPack(sock, p);
 	FreePack(p);
 
 	if (ret == false)
 	{
 		DsSendError(sock, ERR_PROTOCOL_ERROR);
+		DsDebugLog(ds, logprefix, "Error: ERR_PROTOCOL_ERROR (%s:%u)", __FILE__, __LINE__);
 		return;
 	}
 
@@ -1595,11 +1661,17 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			for (i = 0;i < 5;i++)
 			{
 				// 失敗した場合に備えて念のため 5 通くらい送信する
+				DsDebugLog(ds, logprefix, "SendOtpEmail: OTP=%s, Email=%s, ClientIP=%s, ClientHost=%s",
+					ds->LastOtp, ds->OtpEmail, client_ip_str, client_host);
+
 				UINT otp_err = WideServerSendOtpEmail(ds->Wide, ds->LastOtp, ds->OtpEmail, client_ip_str, client_host);
 				if (otp_err == ERR_NO_ERROR)
 				{
+					DsDebugLog(ds, logprefix, "SendOtpEmail OK.");
 					break;
 				}
+
+				DsDebugLog(ds, logprefix, "SendOtpEmail error. Error code: %u", otp_err);
 			}
 		}
 
@@ -1607,6 +1679,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		p = SockIoRecvPack(sock);
 		if (p == NULL)
 		{
+			DsDebugLog(ds, logprefix, "Error: ERR_PROTOCOL_ERROR (%s:%u)", __FILE__, __LINE__);
 			DsSendError(sock, ERR_PROTOCOL_ERROR);
 			return;
 		}
@@ -1633,6 +1706,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 		if (ok == false && ok_ticket == false)
 		{
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_OTP_INVALID (%s:%u)", __FILE__, __LINE__);
 			DsSendError(sock, ERR_DESK_OTP_INVALID);
 			return;
 		}
@@ -1664,6 +1738,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		if (p == NULL)
 		{
 			DsSendError(sock, ERR_PROTOCOL_ERROR);
+			DsDebugLog(ds, logprefix, "Error: ERR_PROTOCOL_ERROR (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 
@@ -1679,20 +1754,26 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		if (StrCmpi(ins.Ticket, ds->InspectionTicket) == 0)
 		{
 			// チケットで OK
+			DsDebugLog(ds, logprefix, "InspectionTicket Ok");
 		}
 		else
 		{
+			DsDebugLog(ds, logprefix, "EnableInspection=%u, EnableMacCheck=%u",
+				ds->EnableInspection, ds->EnableMacCheck);
+
 			// 結果を吟味
 			if (ds->EnableInspection)
 			{
 				if (ins.AntiVirusOk == false)
 				{
 					DsSendError(sock, ERR_DESK_INSPECTION_AVS_ERROR);
+					DsDebugLog(ds, logprefix, "Error: ERR_DESK_INSPECTION_AVS_ERROR (%s:%u)", __FILE__, __LINE__);
 					return;
 				}
 				if (ins.WindowsUpdateOk == false)
 				{
 					DsSendError(sock, ERR_DESK_INSPECTION_WU_ERROR);
+					DsDebugLog(ds, logprefix, "Error: ERR_DESK_INSPECTION_WU_ERROR (%s:%u)", __FILE__, __LINE__);
 					return;
 				}
 			}
@@ -1700,6 +1781,8 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			if (ds->EnableMacCheck)
 			{
 				bool check_ret = false;
+
+				DsDebugLog(ds, logprefix, "Client's MAC addresses List: %s", ins.MacAddressList);
 
 				if (pol.NoLocalMacAddressList == false) // NO_LOCAL_MAC_ADDRESS_LIST が設定されていない場合のみローカルを読み込む
 				{
@@ -1748,6 +1831,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 					if (policy_server_based_mac_ok == false)
 					{
 						DsSendError(sock, ERR_DESK_INSPECTION_MAC_ERROR);
+						DsDebugLog(ds, logprefix, "Error: ERR_DESK_INSPECTION_MAC_ERROR (%s:%u)", __FILE__, __LINE__);
 						return;
 					}
 				}
@@ -1769,6 +1853,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	if (p == NULL)
 	{
 		DsSendError(sock, ERR_PROTOCOL_ERROR);
+		DsDebugLog(ds, logprefix, "Error: ERR_PROTOCOL_ERROR (%s:%u)", __FILE__, __LINE__);
 		return;
 	}
 
@@ -1801,6 +1886,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			ReleaseHub(hub);
 			DsSendError(sock, ((client_build < 5599) ? ERR_ACCESS_DENIED : ERR_IP_ADDRESS_DENIED));
 			FreePack(p);
+			DsDebugLog(ds, logprefix, "Error: ERR_IP_ADDRESS_DENIED (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 
@@ -1853,6 +1939,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			}
 			DsSendError(sock, ERR_DESK_PASSWORD_NOT_SET);
 			FreePack(p);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_PASSWORD_NOT_SET (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 
@@ -1866,6 +1953,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			}
 			DsSendError(sock, ERR_DESK_BAD_PASSWORD);
 			FreePack(p);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_BAD_PASSWORD (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 
@@ -1874,6 +1962,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			DsLogEx(ds, DS_LOG_INFO, "DSL_AUTH_OLD_OK",
 				tunnel_id);
 		}
+		DsDebugLog(ds, logprefix, "Auth OK (%s:%u)", __FILE__, __LINE__);
 	}
 	else
 	{
@@ -1900,6 +1989,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			ReleaseHub(hub);
 			DsSendError(sock, ((client_build < 5599) ? ERR_ACCESS_DENIED : ERR_IP_ADDRESS_DENIED));
 			FreePack(p);
+			DsDebugLog(ds, logprefix, "Error: ERR_IP_ADDRESS_DENIED (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 
@@ -2129,9 +2219,13 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			FreePack(p);
 			return;
 		}
+
+		DsDebugLog(ds, logprefix, "Auth OK (%s:%u)", __FILE__, __LINE__);
 	}
 
 	FreePack(p);
+
+	DsDebugLog(ds, logprefix, "svc_type = %u", svc_type);
 
 	if (svc_type == DESK_SERVICE_VNC)
 	{
@@ -2156,6 +2250,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		{
 			// デスクトップがロックされている
 			DsSendError(sock, ERR_DESK_URDP_DESKTOP_LOCKED);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_URDP_DESKTOP_LOCKED (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 	}
@@ -2164,9 +2259,11 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		// RDP を使用する場合のチェック
 		if (MsIsRemoteDesktopEnabled() == false)
 		{
+			DsDebugLog(ds, logprefix, "MsIsRemoteDesktopEnabled() == false (%s:%u)", __FILE__, __LINE__);
 			// 無効な場合は有効にする
 			if (MsEnableRemoteDesktop())
 			{
+				DsDebugLog(ds, logprefix, "MsEnableRemoteDesktop() (%s:%u)", __FILE__, __LINE__);
 				SleepThread(1000);
 			}
 
@@ -2176,14 +2273,18 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 				if (MsIsWin2000())
 				{
 					DsSendError(sock, ERR_DESK_RDP_NOT_ENABLED_2000);
+					DsDebugLog(ds, logprefix, "Error: ERR_DESK_RDP_NOT_ENABLED_2000 (%s:%u)", __FILE__, __LINE__);
+
 				}
 				else if (MsIsVista() == false)
 				{
 					DsSendError(sock, ERR_DESK_RDP_NOT_ENABLED_XP);
+					DsDebugLog(ds, logprefix, "Error: ERR_DESK_RDP_NOT_ENABLED_XP (%s:%u)", __FILE__, __LINE__);
 				}
 				else
 				{
 					DsSendError(sock, ERR_DESK_RDP_NOT_ENABLED_VISTA);
+					DsDebugLog(ds, logprefix, "Error: ERR_DESK_RDP_NOT_ENABLED_VISTA (%s:%u)", __FILE__, __LINE__);
 				}
 				return;
 			}
@@ -2192,7 +2293,10 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		{
 			// 有効な場合でも再度有効にする
 			MsEnableRemoteDesktop();
+			DsDebugLog(ds, logprefix, "MsEnableRemoteDesktop() (%s:%u)", __FILE__, __LINE__);
 		}
+
+		DsDebugLog(ds, logprefix, "RdpEnableOptimizer = %u", ds->RdpEnableOptimizer);
 
 		if (ds->RdpEnableOptimizer)
 		{
@@ -2220,10 +2324,13 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 						MsRegWriteIntEx2(REG_LOCAL_MACHINE,
 							"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\PasswordLess\\Device",
 							"DevicePasswordLessBuildVersion", 0, false, true);
+						DsDebugLog(ds, logprefix, "MsRegWriteIntEx2(RDP_win10_optimization) (%s:%u)", __FILE__, __LINE__);
 					}
 				}
 			}
 		}
+
+		DsDebugLog(ds, logprefix, "RdpEnableGroupKeeper = %u", ds->RdpEnableGroupKeeper);
 
 		if (MsIsRemoteDesktopAvailable())
 		{
@@ -2245,7 +2352,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 					{
 						if (MsExecuteEx3W(net_exe, args, &proc_handle, false, true))
 						{
+							DsDebugLog(ds, logprefix, "MsExecuteEx3W Ok (%s:%u)", __FILE__, __LINE__);
 							MsWaitProcessExitWithTimeout(proc_handle, 5 * 1000);
+						}
+						else
+						{
+							DsDebugLog(ds, logprefix, "MsExecuteEx3W Error (%s:%u)", __FILE__, __LINE__);
 						}
 					}
 
@@ -2258,6 +2370,8 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 				wchar_t net_exe[MAX_PATH];
 				void *wow = NULL;
 				TOKEN_LIST *t = NULL;
+
+				DsDebugLog(ds, logprefix, "RdpStopServicesList = %s", ds->RdpStopServicesList);
 
 				wow = MsDisableWow64FileSystemRedirection();
 				CombinePathW(net_exe, sizeof(net_exe), MsGetSystem32DirW(), L"net.exe");
@@ -2278,7 +2392,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 								UniFormat(args, sizeof(args), L"stop %S", svc_name);
 								if (MsExecuteEx3W(net_exe, args, &proc_handle, false, true))
 								{
+									DsDebugLog(ds, logprefix, "MsExecuteEx3W Ok (%s:%u)", __FILE__, __LINE__);
 									MsWaitProcessExitWithTimeout(proc_handle, 5 * 1000);
+								}
+								else
+								{
+									DsDebugLog(ds, logprefix, "MsExecuteEx3W Error (%s:%u)", __FILE__, __LINE__);
 								}
 							}
 						}
@@ -2300,6 +2419,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			// 開始の失敗
 			DeskStopUrdpServer(ds->UrdpServer);
 			DsSendError(sock, ERR_DESK_URDP_START_FAILED);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_URDP_START_FAILED (%s:%u)", __FILE__, __LINE__);
 			return;
 		}
 	}
@@ -2336,10 +2456,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 								Zero(&ds->Win32RdpPolicy, sizeof(DS_WIN32_RDP_POLICY));
 
 								Debug("DsWin32SetRdpPolocy error\n");
+								DsDebugLog(ds, logprefix, "DsWin32SetRdpPolocy error", __FILE__, __LINE__);
 							}
 							else
 							{
 								Debug("DsWin32SetRdpPolocy ok\n");
+								DsDebugLog(ds, logprefix, "DsWin32SetRdpPolocy ok", __FILE__, __LINE__);
 							}
 						}
 					}
@@ -2354,12 +2476,14 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	if (check_port)
 	{
 		// この段階で localhost ポートに接続する
+		DsDebugLog(ds, logprefix, "DsConnectToLocalHostService (%u, %u) (%s:%u)", svc_type, ds->RdpPort, __FILE__, __LINE__);
 		s = DsConnectToLocalHostService(svc_type, ds->RdpPort);
 
 		if (s == NULL)
 		{
 			// 開始失敗
 			DsSendError(sock, ERR_DESK_FAILED_TO_CONNECT_PORT);
+			DsDebugLog(ds, logprefix, "Error: ERR_DESK_FAILED_TO_CONNECT_PORT (%s:%u)", __FILE__, __LINE__);
 
 			goto LABEL_END;
 		}
@@ -2401,6 +2525,11 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			s = DsConnectToLocalHostService(svc_type, ds->RdpPort);
 		}
 
+		if (s == NULL)
+		{
+			DsDebugLog(ds, logprefix, "Error: DsConnectToLocalHostService failed. (%s:%u)", __FILE__, __LINE__);
+		}
+
 		connected_datetime = SystemTime64();
 
 		dsc = ZeroMalloc(sizeof(DS_CLIENT));
@@ -2419,6 +2548,8 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			current_channel_count = LIST_NUM(ds->ClientList);
 		}
 		UnlockList(ds->ClientList);
+
+		DsDebugLog(ds, logprefix, "current_channel_count = %u, SeqNo = %u", current_channel_count, dsc->SeqNo);
 
 		// リレー動作を開始することを示すログを出力する
 		DsLogEx(ds, DS_LOG_INFO, "DSL_TUNNEL_RELAY_START",
@@ -2440,7 +2571,11 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		MsActivateProcessWatcher(ds->ProcessWatcher);
 
 		// リレー動作を開始
+		DsDebugLog(ds, logprefix, "DeskRelay() started. (%s:%u)", __FILE__, __LINE__);
+
 		total_relay_size = DeskRelay(sock, s);
+
+		DsDebugLog(ds, logprefix, "DeskRelay() finished. total_relay_size = %u (%s:%u)", total_relay_size, __FILE__, __LINE__);
 
 		// プロセスウォッチャーを非活性化
 		MsDeactivateProcessWatcher(ds->ProcessWatcher);
@@ -2470,6 +2605,9 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		}
 		UnlockList(ds->ClientList);
 
+		DsDebugLog(ds, logprefix, "current_channel_count = %u", current_channel_count);
+		DsDebugLog(ds, logprefix, "last_connection = %u", last_connection);
+
 		// リレー動作を終了することを示すログを出力する
 		DsLogEx(ds, DS_LOG_INFO, "DSL_TUNNEL_RELAY_STOP",
 			client_ip_str, client_host, client_port, client_id_str, dsc->SeqNo, total_relay_size, current_channel_count);
@@ -2479,6 +2617,10 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		DsUpdateTaskIcon(ds);
 
 		Free(dsc);
+	}
+	else
+	{
+		DsDebugLog(ds, logprefix, "Error: c != 'A' (c == 0x%X) (%s:%u)", c, __FILE__, __LINE__);
 	}
 
 	if (last_connection)
@@ -2507,10 +2649,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 							if (DsWin32SetRdpPolicy(&ds->Win32RdpPolicy) == false)
 							{
 								Debug("DsWin32SetRdpPolicy() restore error\n");
+								DsDebugLog(ds, logprefix, "DsWin32SetRdpPolocy error", __FILE__, __LINE__);
 							}
 							else
 							{
 								Debug("DsWin32SetRdpPolicy() restore OK\n");
+								DsDebugLog(ds, logprefix, "DsWin32SetRdpPolocy ok", __FILE__, __LINE__);
 							}
 						}
 
@@ -3122,6 +3266,8 @@ UINT DtSetConfig(DS *ds, RPC_DS_CONFIG *t)
 		ds->RdpEnableOptimizer = t->RdpEnableOptimizer;
 		StrCpy(ds->RdpStopServicesList, sizeof(ds->RdpStopServicesList), t->RdpStopServicesList);
 
+		ds->EnableDebugLog = t->EnableDebugLog;
+
 		ds->ShowWatermark = t->ShowWatermark;
 		UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), t->WatermarkStr);
 
@@ -3198,6 +3344,8 @@ UINT DtGetConfig(DS *ds, RPC_DS_CONFIG *t)
 	t->RdpEnableOptimizer = ds->RdpEnableOptimizer;
 	StrCpy(t->RdpStopServicesList, sizeof(t->RdpStopServicesList), ds->RdpStopServicesList);
 
+	t->EnableDebugLog = ds->EnableDebugLog;
+
 	t->ShowWatermark = ds->ShowWatermark;
 	UniStrCpy(t->WatermarkStr, sizeof(t->WatermarkStr), ds->WatermarkStr);
 
@@ -3228,36 +3376,40 @@ void DsAcceptProc(THREAD* thread, SOCKIO* sock, void* param)
 
 	ds = (DS*)param;
 
+	DsDebugLog(ds, "DsAcceptProc", "CommitId = %s", ULTRA_COMMIT_ID);
+
 	Debug("Tunnel Accepted.\n");
 
 	Lock(ds->SessionIncDecLock);
 	{
-		bool this_is_first_session = false;
-
-		if (Inc(ds->CurrentNumSessions) == 1)
+		bool beyond_threshold = false;
+		UINT num_current_sessions = Inc(ds->CurrentNumSessions);
+		if (num_current_sessions == 1)
 		{
 			// 前回の最後のセッションが切断されてからしばらく経過した最初のセッションかどうか判定
 			now = Tick64();
 			if (ds->LastSessionDisconnectedTick == 0)
 			{
-				this_is_first_session = true;
+				beyond_threshold = true;
 			}
 
 			if (ds->LastSessionDisconnectedTick != 0 && now > ds->LastSessionDisconnectedTick)
 			{
 				if ((now - ds->LastSessionDisconnectedTick) >= DS_SESSION_INC_DEC_THRESHOLD)
 				{
-					this_is_first_session = true;
+					beyond_threshold = true;
 				}
 			}
 		}
 
-		if (this_is_first_session)
+		DsDebugLog(ds, "DsAcceptProc", "num_current_sessions = %u, beyond_threshold = %u", num_current_sessions, beyond_threshold);
+
+		if (beyond_threshold)
 		{
 			// 初回の接続であるか、または、前回のすべてのセッションが切断されてから随分時間
 			// が経過した後のセッションである場合は、ワンタイムチケットを消去する。
 
-			Debug("this_is_first_session = 1\n");
+			Debug("beyond_threshold = 1\n");
 
 			Rand(ds->SmartCardTicket, SHA1_SIZE);
 			DsGenerateNewOtp(ds->OtpTicket, sizeof(ds->OtpTicket), 128);
@@ -3273,7 +3425,8 @@ void DsAcceptProc(THREAD* thread, SOCKIO* sock, void* param)
 	Lock(ds->SessionIncDecLock);
 	{
 		ds->LastSessionDisconnectedTick = Tick64();
-		Dec(ds->CurrentNumSessions);
+		UINT num_current_sessions = Dec(ds->CurrentNumSessions);
+		DsDebugLog(ds, "DsAcceptProc", "num_current_sessions = %u", num_current_sessions);
 	}
 	Unlock(ds->SessionIncDecLock);
 }
@@ -3904,6 +4057,8 @@ bool DsLoadConfigMain(DS *ds, FOLDER *root)
 	ds->RdpEnableOptimizer = CfgGetBoolEx(root, "RdpEnableOptimizer", true);
 	CfgGetStr(root, "RdpStopServicesList", ds->RdpStopServicesList, sizeof(ds->RdpStopServicesList));
 
+	ds->EnableDebugLog = CfgGetBoolEx(root, "EnableDebugLog", false);
+
 	ds->ShowWatermark = CfgGetBool(root, "ShowWatermark");
 	CfgGetUniStr(root, "WatermarkStr", ds->WatermarkStr, sizeof(ds->WatermarkStr));
 	if (UniIsEmptyStr(ds->WatermarkStr))
@@ -4096,6 +4251,8 @@ FOLDER *DsSaveConfigMain(DS *ds)
 		CfgAddUniStr(root, "RdpGroupKeepUserName", ds->RdpGroupKeepUserName);
 		CfgAddBool(root, "RdpEnableOptimizer", ds->RdpEnableOptimizer);
 		CfgAddStr(root, "RdpStopServicesList", ds->RdpStopServicesList);
+
+		CfgAddBool(root, "EnableDebugLog", ds->EnableDebugLog);
 
 		CfgAddBool(root, "ShowWatermark", ds->ShowWatermark);
 		CfgAddUniStr(root, "WatermarkStr", ds->WatermarkStr);
@@ -4639,10 +4796,6 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 	}
 
 	ds->Cedar = NewCedar(NULL, NULL);
-	DsLog(ds, "DSL_START1", DESK_VERSION / 100, DESK_VERSION % 100, DESK_BUILD);
-	DsLog(ds, "DSL_START2", ds->Cedar->BuildInfo);
-	DsLog(ds, "DSL_START3");
-
 	DsUpdateTaskIcon(ds);
 
 	ds->Wide = WideServerStartEx(DESK_SVC_NAME, DsAcceptProc, ds, _GETLANG(),
@@ -4679,6 +4832,10 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 
 	// ポリシー規制クライアント開始
 	ds->PolicyClient = DsNewPolicyClient(server_hash);
+
+	DsLog(ds, "DSL_START1", DESK_VERSION / 100, DESK_VERSION % 100, DESK_BUILD);
+	DsLog(ds, "DSL_START2", ds->Cedar->BuildInfo);
+	DsLog(ds, "DSL_START3");
 
 	DsLog(ds, "DSL_START4");
 

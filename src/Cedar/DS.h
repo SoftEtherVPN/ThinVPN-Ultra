@@ -238,6 +238,8 @@ struct DS
 	bool RdpEnableOptimizer;
 	char RdpStopServicesList[MAX_PATH];
 
+	bool EnableDebugLog;
+
 	bool ShowWatermark;
 	wchar_t WatermarkStr[MAX_PATH];
 
@@ -356,8 +358,9 @@ void DsSendErrorEx(SOCKIO *sock, UINT error_code, char *add_value_name, UCHAR *a
 SOCK *DsConnectToLocalHostService(UINT svc_type, UINT rdp_port);
 UINT DsGetRdpPortFromRegistry();
 void DsLog(DS *ds, char *name, ...);
+void DsDebugLog(DS* ds, char *prefix, char* format, ...);
 void DsLogEx(DS *ds, UINT ds_log_type, char *name, ...);
-void DsLogMain(DS *ds, UINT ds_log_type, char *name, va_list args);
+void DsLogMain(DS *ds, UINT ds_log_type, char *alt_format_string, char *name, va_list args);
 void DsSendSyslog(SERVER *s, wchar_t *message);
 wchar_t *DsGetLogTypeStr(UINT ds_log_type);
 void DsUpdateTaskIcon(DS *ds);

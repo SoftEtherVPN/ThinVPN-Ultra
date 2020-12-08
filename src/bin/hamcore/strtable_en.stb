@@ -4665,6 +4665,7 @@ IDCANCEL				Cancel
 S6						Remote Desktop Settings
 S7						Save Logs
 C_LOG					Save &Local logs
+C_DEBUG					Enable debug logs
 B_LOG					&Open log directory
 B_ADDGROUP				Add below user to Remote Desktop Users &group of Windows
 S_1						Username:

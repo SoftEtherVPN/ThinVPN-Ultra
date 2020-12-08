@@ -4674,6 +4674,7 @@ IDCANCEL				キャンセル
 S6						リモートデスクトップの設定
 S7						ログの保存
 C_LOG					動作ログファイルを保存する(&L)
+C_DEBUG					詳細デバッグログを有効
 B_LOG					ログファイルを開く(&O)
 B_ADDGROUP				以下のユーザーを常に Remote Desktop Users グループに追加(&G)
 S_1						ユーザー名:

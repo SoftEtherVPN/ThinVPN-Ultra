@@ -150,6 +150,8 @@ struct RPC_DS_CONFIG
 	bool RdpEnableOptimizer;
 	char RdpStopServicesList[MAX_PATH];
 
+	bool EnableDebugLog;
+
 	bool ShowWatermark;
 	wchar_t WatermarkStr[MAX_PATH];
 

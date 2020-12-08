@@ -124,6 +124,8 @@ void InRpcDsConfig(RPC_DS_CONFIG *t, PACK *p)
 	t->RdpEnableOptimizer = PackGetBool(p, "RdpEnableOptimizer");
 	PackGetStr(p, "RdpStopServicesList", t->RdpStopServicesList, sizeof(t->RdpStopServicesList));
 
+	t->EnableDebugLog = PackGetBool(p, "EnableDebugLog");
+
 	t->ShowWatermark = PackGetBool(p, "ShowWatermark");
 	PackGetUniStr(p, "WatermarkStr", t->WatermarkStr, sizeof(t->WatermarkStr));
 
@@ -168,6 +170,8 @@ void OutRpcDsConfig(PACK *p, RPC_DS_CONFIG *t)
 	PackAddUniStr(p, "RdpGroupKeepUserName", t->RdpGroupKeepUserName);
 	PackAddBool(p, "RdpEnableOptimizer", t->RdpEnableOptimizer);
 	PackAddStr(p, "RdpStopServicesList", t->RdpStopServicesList);
+
+	PackAddBool(p, "EnableDebugLog", t->EnableDebugLog);
 
 	PackAddBool(p, "ShowWatermark", t->ShowWatermark);
 	PackAddUniStr(p, "WatermarkStr", t->WatermarkStr);

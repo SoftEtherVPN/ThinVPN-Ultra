@@ -1039,6 +1039,8 @@ void DgOptionDlgOnOk(HWND hWnd, DG *dg)
 	c.RdpEnableOptimizer = IsChecked(hWnd, B_RDP_OPTIMIZE);
 	GetTxtA(hWnd, E_STOPSVC, c.RdpStopServicesList, sizeof(c.RdpStopServicesList));
 
+	c.EnableDebugLog = IsChecked(hWnd, C_DEBUG);
+
 	c.ShowWatermark = IsChecked(hWnd, C_SHOW_WATERMARK);
 	GetTxt(hWnd, E_WATERMARK_STR, c.WatermarkStr, sizeof(c.WatermarkStr));
 
@@ -1174,6 +1176,8 @@ void DgOptionDlgInit(HWND hWnd, DG *dg)
 	SetText(hWnd, E_USERNAME, c.RdpGroupKeepUserName);
 	Check(hWnd, B_RDP_OPTIMIZE, c.RdpEnableOptimizer);
 	SetTextA(hWnd, E_STOPSVC, c.RdpStopServicesList);
+
+	Check(hWnd, C_DEBUG, c.EnableDebugLog);
 
 	dg->IsAdminOrSystem_Cache = s.IsAdminOrSystem;
 
@@ -1319,6 +1323,8 @@ void DgOptionDlgUpdate(HWND hWnd, DG *dg)
 	}
 
 	SetEnable(hWnd, C_PROCESSLOG2, IsChecked(hWnd, C_PROCESSLOG1));
+
+	SetEnable(hWnd, C_DEBUG, IsChecked(hWnd, C_LOG));
 }
 
 // オプションダイアログプロシージャ
@@ -1370,6 +1376,7 @@ UINT DgOptionDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *pa
 		case C_EVENTLOG:
 		case B_ADDGROUP:
 		case C_PROCESSLOG1:
+		case C_LOG:
 			DgOptionDlgUpdate(hWnd, dg);
 			break;
 
