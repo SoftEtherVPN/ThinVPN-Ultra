@@ -2521,8 +2521,23 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 		if (s == NULL)
 		{
-			// この段階で localhost ポートに接続する
-			s = DsConnectToLocalHostService(svc_type, ds->RdpPort);
+			UINT num_retry = 3;
+			UINT i;
+			for (i = 0;i < num_retry;i++)
+			{
+				// この段階で localhost ポートに接続する
+				s = DsConnectToLocalHostService(svc_type, ds->RdpPort);
+				if (s != NULL)
+				{
+					break;
+				}
+
+				if (i != (num_retry - 1))
+				{
+					// リトライ
+					SleepThread(100);
+				}
+			}
 		}
 
 		if (s == NULL)
@@ -2573,9 +2588,11 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		// リレー動作を開始
 		DsDebugLog(ds, logprefix, "DeskRelay() started. (%s:%u)", __FILE__, __LINE__);
 
-		total_relay_size = DeskRelay(sock, s);
+		UINT total_send = 0, total_recv = 0;
 
-		DsDebugLog(ds, logprefix, "DeskRelay() finished. total_relay_size = %u (%s:%u)", total_relay_size, __FILE__, __LINE__);
+		total_relay_size = DeskRelay(sock, s, 3000, &total_send, &total_recv);
+
+		DsDebugLog(ds, logprefix, "DeskRelay() finished. total_relay_size = %u (total_send = %u, total_recv = %u) (%s:%u)", total_relay_size, total_send, total_recv, __FILE__, __LINE__);
 
 		// プロセスウォッチャーを非活性化
 		MsDeactivateProcessWatcher(ds->ProcessWatcher);
@@ -2736,11 +2753,11 @@ SOCK *DsConnectToLocalHostService(UINT svc_type, UINT rdp_port)
 	switch (svc_type)
 	{
 	case DESK_SERVICE_RDP:
-		s = Connect("localhost", rdp_port);
+		s = Connect("127.0.0.1", rdp_port);
 		break;
 
 	case DESK_SERVICE_VNC:
-		s = Connect("localhost", DS_URDP_PORT);
+		s = Connect("127.0.0.1", DS_URDP_PORT);
 		break;
 	}
 

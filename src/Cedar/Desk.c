@@ -162,18 +162,22 @@ void DeskGetMachineKey(void *data)
 }
 
 // SockIo と SOCK との間のリレー処理
-UINT DeskRelay(SOCKIO *io, SOCK *s)
+UINT DeskRelay(SOCKIO* io, SOCK* s, UINT wait_interval_after_disconnected, UINT* total_send, UINT* total_recv)
 {
 	SOCK_EVENT *e;
 	FIFO *f1, *f2;
 	void *buf;
 	UINT buf_size;
 	UINT total_size = 0;
+	static UINT dummy = 0;
 	// 引数チェック
 	if (io == NULL || s == NULL)
 	{
 		return 0;
 	}
+
+	if (total_send == NULL) total_send = &dummy;
+	if (total_recv == NULL) total_recv = &dummy;
 
 	SetTimeout(s, INFINITE);
 	SockIoSetTimeout(io, INFINITE);
@@ -218,6 +222,7 @@ UINT DeskRelay(SOCKIO *io, SOCK *s)
 				else
 				{
 					total_size += ret;
+					(*total_send) += ret;
 					WriteFifo(f1, buf, ret);
 				}
 			}
@@ -238,6 +243,7 @@ UINT DeskRelay(SOCKIO *io, SOCK *s)
 				else
 				{
 					total_size += ret;
+					(*total_recv) += ret;
 					WriteFifo(f2, buf, ret);
 				}
 			}
@@ -296,6 +302,11 @@ UINT DeskRelay(SOCKIO *io, SOCK *s)
 		{
 			break;
 		}
+	}
+
+	if (wait_interval_after_disconnected != 0)
+	{
+		SleepThread(wait_interval_after_disconnected);
 	}
 
 	ReleaseSockEvent(e);

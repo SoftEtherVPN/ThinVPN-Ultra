@@ -2344,11 +2344,12 @@ void DcListenedSockThread(THREAD *thread, void *param)
 	{
 		// SockIo を取得したのでリレー処理に移行する
 		char c = 'A';
+		UINT total_send = 0, total_recv = 0;
 
 		SockIoSendAll(io, &c, 1);
 
 		Debug("Start DeskRelay.\n");
-		DeskRelay(io, sock);
+		DeskRelay(io, sock, 500, &total_send, &total_recv);
 		Debug("End DeskRelay.\n");
 
 		// SockIo を切断
