@@ -145,6 +145,10 @@ struct SESSION_AND_CLIENT
 // 待機すべきか
 #define WIDE_REPORT_FAST_SEND_INTERVAL	200
 
+// GatewayInterval および EntryExpires の最大値
+#define WIDE_GATEWAY_INTERVAL_HARD_MAX	(5 * 60 * 1000)
+#define WIDE_ENTRY_EXPIRES_HARD_MAX		(10 * 60 * 1000)
+
 // その場合次のセッションリスト報告を送信するまでの間の遅延
 //#define	WIDE_REPORT_FAST_SEND_DELAY		4000
 
@@ -228,6 +232,16 @@ struct WIDE
 	UINT GateTunnelTimeout;
 	UINT GateTunnelKeepAlive;
 	bool GateTunnelUseAggressiveTimeout;
+
+	// Controller から受信した値
+	bool GateSettings_Int_Tunnel_Settings_Received;
+	UINT GateSettings_Int_TunnelTimeout;
+	UINT GateSettings_Int_TunnelKeepAlive;
+	bool GateSettings_Int_TunnelUseAggressiveTimeout;
+
+	bool GateSettings_Int_ReportSettings_Received;
+	UINT GateSettings_Int_ReportInterval;
+	UINT GateSettings_Int_ReportExpires;
 
 	UINT64 GateTunnelTimeoutLastLoadTick;
 	// WideServer
@@ -388,7 +402,7 @@ void WideGateReportSessionAdd(WIDE *wide, TSESSION *s);
 void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id);
 void WideGateSetControllerGateSecretKey(WIDE *wide, char *key);
 bool WideGateGetControllerGateSecretKey(WIDE *wide, char *key, UINT key_size);
-void WideGateSetControllerGateSecretKeyFromPack(WIDE *wide, PACK *p);
+void WideGateReadGateSettingsFromPack(WIDE *wide, PACK *p);
 void WideGenerateRandomDummyDomain(char *str, UINT size);
 
 void WideGateLoadAggressiveTimeoutSettings(WIDE *wide);

@@ -2676,16 +2676,31 @@ void WideGatePackSessionList(PACK *p, WT *wt, LIST *sc_list)
 // Gate の情報を Pack する
 void WideGatePackGateInfo(PACK *p, WT *wt)
 {
+	UINT entry_expires = 0;
 	// 引数チェック
 	if (p == NULL || wt == NULL)
 	{
 		return;
 	}
 
+	if (wt->Wide != NULL && wt->Wide->GateSettings_Int_ReportSettings_Received)
+	{
+		entry_expires = wt->Wide->GateSettings_Int_ReportExpires;
+	}
+	else
+	{
+		entry_expires = WideGateGetIniEntry("EntryExpires");
+	}
+
+	entry_expires = MIN(entry_expires, WIDE_ENTRY_EXPIRES_HARD_MAX);
+
 	PackAddData(p, "GateId", wt->GateId, sizeof(wt->GateId));
-	PackAddInt(p, "EntryExpires", WideGateGetIniEntry("EntryExpires"));
+	PackAddInt(p, "EntryExpires", entry_expires);
 	PackAddInt(p, "Performance", WideGateGetIniEntry("Performance"));
 	PackAddInt(p, "Build", CEDAR_BUILD);
+	PackAddInt(p, "Port", wt->Port);
+
+	PackAddStr(p, "UltraCommitId", ULTRA_COMMIT_ID);
 
 	// MAC アドレス
 	if (IsEmptyStr(wt->WanMacAddress))
@@ -2708,6 +2723,10 @@ void WideGatePackGateInfo(PACK *p, WT *wt)
 	}
 
 	PackAddStr(p, "MacAddress", wt->WanMacAddress);
+
+	PackAddInt64(p, "BootTime", wt->BootTime);
+	PackAddInt64(p, "BootTick", Tick64() - wt->BootTick);
+	PackAddInt64(p, "CurrentTime", SystemTime64());
 
 	// OS 情報
 	if (IsEmptyStr(wt->OsInfo))
@@ -2922,7 +2941,7 @@ void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id)
 
 		if (ret != NULL)
 		{
-			WideGateSetControllerGateSecretKeyFromPack(wide, ret);
+			WideGateReadGateSettingsFromPack(wide, ret);
 			FreePack(ret);
 		}
 
@@ -2931,7 +2950,7 @@ void WideGateReportSessionDel(WIDE *wide, UCHAR *session_id)
 	Unlock(wide->LockReport);
 }
 
-void WideGateSetControllerGateSecretKeyFromPack(WIDE *wide, PACK *p)
+void WideGateReadGateSettingsFromPack(WIDE *wide, PACK *p)
 {
 	char controller_gate_secret_key[64] = {0};
 
@@ -2947,6 +2966,72 @@ void WideGateSetControllerGateSecretKeyFromPack(WIDE *wide, PACK *p)
 			WideGateSetControllerGateSecretKey(wide, controller_gate_secret_key);
 		}
 	}
+
+	bool tunnel_settings_received = false;
+	bool report_settings_received = false;
+
+	TOKEN_LIST* names = GetPackElementNames(p);
+	if (names != NULL)
+	{
+		UINT i;
+		UINT num_tunnel_settings = 0;
+		UINT num_report_settings = 0;
+
+		for (i = 0;i < names->NumTokens;i++)
+		{
+			char* name = names->Token[i];
+
+			if (StartWith(name, "GateSettings_Int_"))
+			{
+				UINT value = PackGetInt(p, name);
+
+				if (StrCmpi(name, "GateSettings_Int_TunnelUseAggressiveTimeout") == 0)
+				{
+					wide->GateSettings_Int_TunnelUseAggressiveTimeout = value;
+					num_tunnel_settings++;
+				}
+
+				if (StrCmpi(name, "GateSettings_Int_TunnelTimeout") == 0 && value != 0)
+				{
+					wide->GateSettings_Int_TunnelTimeout = value;
+					num_tunnel_settings++;
+				}
+
+				if (StrCmpi(name, "GateSettings_Int_TunnelKeepAlive") == 0 && value != 0)
+				{
+					wide->GateSettings_Int_TunnelKeepAlive = value;
+					num_tunnel_settings++;
+				}
+
+				if (StrCmpi(name, "GateSettings_Int_ReportInterval") == 0 && value != 0)
+				{
+					wide->GateSettings_Int_ReportInterval = value;
+					num_report_settings++;
+				}
+
+				if (StrCmpi(name, "GateSettings_Int_ReportExpires") == 0 && value != 0)
+				{
+					wide->GateSettings_Int_ReportExpires = value;
+					num_report_settings++;
+				}
+			}
+		}
+
+		if (num_tunnel_settings >= 3)
+		{
+			tunnel_settings_received = true;
+		}
+
+		if (num_report_settings >= 2)
+		{
+			report_settings_received = true;
+		}
+
+		FreeToken(names);
+	}
+
+	wide->GateSettings_Int_Tunnel_Settings_Received = tunnel_settings_received;
+	wide->GateSettings_Int_ReportSettings_Received = report_settings_received;
 }
 
 // セッション追加の報告
@@ -2954,7 +3039,17 @@ void WideGateReportSessionAdd(WIDE *wide, TSESSION *s)
 {
 	WT *wt;
 	bool b = true;
-	UINT64 gateway_interval = (UINT64)WideGateGetIniEntry("GatewayInterval");
+	UINT64 gateway_interval;
+	if (wide->GateSettings_Int_ReportSettings_Received == false)
+	{
+		gateway_interval = (UINT64)WideGateGetIniEntry("GatewayInterval");
+	}
+	else
+	{
+		gateway_interval = (UINT64)wide->GateSettings_Int_ReportInterval;
+	}
+	gateway_interval = MIN(gateway_interval, WIDE_GATEWAY_INTERVAL_HARD_MAX);
+
 	bool global_ip_only = true;
 	// 引数チェック
 	if (wide == NULL)
@@ -3014,7 +3109,7 @@ void WideGateReportSessionAdd(WIDE *wide, TSESSION *s)
 
 			if (ret != NULL)
 			{
-				WideGateSetControllerGateSecretKeyFromPack(wide, ret);
+				WideGateReadGateSettingsFromPack(wide, ret);
 				FreePack(ret);
 			}
 
@@ -3094,7 +3189,7 @@ void WideGateReportSessionList(WIDE *wide)
 				}
 			}
 
-			WideGateSetControllerGateSecretKeyFromPack(wide, ret);
+			WideGateReadGateSettingsFromPack(wide, ret);
 			FreePack(ret);
 		}
 
@@ -3147,7 +3242,17 @@ void WideGateReportThread(THREAD *thread, void *param)
 
 	while (true)
 	{
-		UINT64 gateway_interval = (UINT64)WideGateGetIniEntry("GatewayInterval");
+		UINT64 gateway_interval;
+		if (wide->GateSettings_Int_ReportSettings_Received == false)
+		{
+			gateway_interval = (UINT64)WideGateGetIniEntry("GatewayInterval");
+		}
+		else
+		{
+			gateway_interval = (UINT64)wide->GateSettings_Int_ReportInterval;
+		}
+		gateway_interval = MIN(gateway_interval, WIDE_GATEWAY_INTERVAL_HARD_MAX);
+
 		if (wide->GateHalt)
 		{
 			break;
@@ -3216,6 +3321,14 @@ void WideGateLoadAggressiveTimeoutSettings(WIDE *wide)
 		v1 = WideGateGetIniEntry("TunnelTimeout");
 		v2 = WideGateGetIniEntry("TunnelKeepAlive");
 		v3 = WideGateGetIniEntry("TunnelUseAggressiveTimeout");
+
+		// Controller から受信した設定値がある場合は、Ini ファイルよりも受信した値を優先的に利用
+		if (wide->GateSettings_Int_Tunnel_Settings_Received)
+		{
+			v1 = wide->GateSettings_Int_TunnelTimeout;
+			v2 = wide->GateSettings_Int_TunnelKeepAlive;
+			v3 = wide->GateSettings_Int_TunnelUseAggressiveTimeout;
+		}
 
 		// 異常に大きい値が ini ファイルに設定されるリスクの軽減
 		v1 = MIN(v1, WT_TUNNEL_TIMEOUT_HARD_MAX);
