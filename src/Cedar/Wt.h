@@ -160,8 +160,8 @@
 #define WT_TUNNEL_TIMEOUT		(30 * 1000)				// トンネル通信のタイムアウト時間
 #define WT_TUNNEL_KEEPALIVE		(10 * 1000)				// トンネル通信のキープアライブ時間
 
-#define WT_TUNNEL_TIMEOUT_HARD_MAX		(10 * 60 * 1000)		// トンネル通信のタイムアウト時間
-#define WT_TUNNEL_KEEPALIVE_HARD_MAX	(10 * 60 * 1000)		// トンネル通信のキープアライブ時間
+#define WT_TUNNEL_TIMEOUT_HARD_MAX		(5 * 60 * 1000)		// トンネル通信のタイムアウト時間
+#define WT_TUNNEL_KEEPALIVE_HARD_MAX	(2 * 60 * 1000)		// トンネル通信のキープアライブ時間
 
 #define WT_TUNNEL_USED_EXPIRES	(360 * 1000)			// 同一のトンネル ID を再利用しない間隔
 
@@ -246,6 +246,8 @@ struct WT
 	UINT64 LastTryUpdateNewEntryPoint;	// 最後に GitHub から Entry Point 更新を試行した時刻
 	char EntranceMode[MAX_PATH];
 	char System[MAX_PATH];
+	UINT64 BootTime;
+	UINT64 BootTick;
 
 	// Gate 用
 	LISTENER *Listener;				// リスナー

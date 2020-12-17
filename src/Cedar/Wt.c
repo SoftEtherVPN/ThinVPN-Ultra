@@ -993,6 +993,9 @@ WT *NewWt(X *master_cert)
 
 	wt = ZeroMalloc(sizeof(WT));
 
+	wt->BootTime = SystemTime64();
+	wt->BootTick = Tick64();
+
 	wt->CfgRwSaveLock = NewLock();
 
 	wt->Lock = NewLock();
