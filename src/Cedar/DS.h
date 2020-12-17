@@ -162,6 +162,7 @@ struct DS_WIN32_RDP_POLICY
 	bool HasValidValue;
 	UINT fDisableCdm;
 	UINT fDisableClip;
+	bool fDenyTSConnections;
 };
 
 struct DS

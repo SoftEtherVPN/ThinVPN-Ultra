@@ -109,6 +109,10 @@ void DsWin32GetRdpPolicy(DS_WIN32_RDP_POLICY* pol)
 			"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
 			"fDisableCdm");
 
+		pol->fDenyTSConnections = Win32ReadLocalGroupPolicyValueInt32(true,
+			"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+			"fDenyTSConnections");
+
 		pol->fDisableClip = Win32ReadLocalGroupPolicyValueInt32(true,
 			"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
 			"fDisableClip");
@@ -143,6 +147,14 @@ bool DsWin32SetRdpPolicy(DS_WIN32_RDP_POLICY* pol)
 		"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
 		"fDisableCdm",
 		pol->fDisableCdm))
+	{
+		ret = true;
+	}
+
+	if (Win32WriteLocalGroupPolicyValueInt32(true,
+		"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+		"fDenyTSConnections",
+		pol->fDenyTSConnections))
 	{
 		ret = true;
 	}
@@ -2446,10 +2458,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 							Debug("fDisableCdm: %u\n", ds->Win32RdpPolicy.fDisableCdm);
 							Debug("fDisableClip: %u\n", ds->Win32RdpPolicy.fDisableClip);
+							Debug("fDenyTSConnections: %u\n", ds->Win32RdpPolicy.fDenyTSConnections);
 
 							new_policy.HasValidValue = true;
 							new_policy.fDisableCdm = 1;
 							new_policy.fDisableClip = 1;
+							new_policy.fDenyTSConnections = 0;
 
 							if (DsWin32SetRdpPolicy(&new_policy) == false)
 							{
@@ -2662,6 +2676,8 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 						if (ds->Win32RdpPolicy.HasValidValue)
 						{
 							Debug("*** DsWin32SetRdpPolicy() -- restore\n");
+
+							ds->Win32RdpPolicy.fDenyTSConnections = 0;
 
 							if (DsWin32SetRdpPolicy(&ds->Win32RdpPolicy) == false)
 							{
