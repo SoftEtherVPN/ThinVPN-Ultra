@@ -537,7 +537,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 {
 	UINT error = ERR_NO_ERROR;
 	PACK *ret = NULL;
-	char url[MAX_PATH] = {0};
+	char url[MAX_SIZE] = {0};
 	LIST *secondary_list = NewStrList();
 	LIST* widegate_ini = NULL;
 	LIST* controller_urls_for_gate = NULL;
@@ -754,11 +754,104 @@ PACK *WtWpcCallInner(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, U
 	UINT error;
 	WPC_PACKET packet;
 	UINT num_retry = 0;
+	TOKEN_LIST* url_list = NULL;
 	// 引数チェック
 	if (wt == NULL || function_name == NULL || pack == NULL)
 	{
 		return PackError(ERR_INTERNAL_ERROR);
 	}
+
+	if (wt->Wide != NULL && wt->Wide->Type != WIDE_TYPE_GATE)
+	{
+		// 引数に指定されている url が、セミコロンで区切ることができる場合は、複数の URL にランダムに接続試行する
+		// (2020.12.19 新方式)
+		url_list = ParseToken(url, ";");
+		if (url_list->NumTokens >= 2)
+		{
+			PACK* url_list_ret_pack = NULL;
+			UINT* shuffle_list = GenerateShuffleList(url_list->NumTokens);
+			UINT i;
+			PACK* first_comm_error = NULL;
+
+			// シャッフル結果で、前回接続できた URL があれば、それを 1 番に持ってくる (順番抜かし)
+			if (IsFilledStr(wt->LastTimeOkUrlMulti))
+			{
+				if (url_list->NumTokens >= 2)
+				{
+					for (i = 0;i < url_list->NumTokens;i++)
+					{
+						UINT index = shuffle_list[i];
+						if (StrCmp(url_list->Token[index], wt->LastTimeOkUrlMulti) == 0)
+						{
+							UINT tmp = shuffle_list[0];
+							shuffle_list[0] = index;
+							shuffle_list[i] = tmp;
+							break;
+						}
+					}
+				}
+			}
+
+			char ok_url[MAX_PATH] = CLEAN;
+
+			// 順に試行
+			for (i = 0;i < url_list->NumTokens;i++)
+			{
+				if (url_list_ret_pack != NULL)
+				{
+					// 結果確定！
+					break;
+				}
+
+				char* url2 = url_list->Token[shuffle_list[i]];
+				PACK* pack_request_copy = ClonePack(pack);
+
+				Debug("Trying %u for the URL: %s\n", i, url2);
+				PACK* p_ret = WtWpcCallInner(wt, function_name, pack_request_copy, host_key, host_secret, global_ip_only, url2);
+				UINT p_err = GetErrorFromPack(p_ret);
+
+				if (p_ret != NULL && (p_err == ERR_NO_ERROR || WtIsCommunicationError(p_err) == false))
+				{
+					// コレを返す
+					url_list_ret_pack = p_ret;
+
+					StrCpy(ok_url, sizeof(ok_url), url2);
+				}
+				else
+				{
+					// 通信エラーが発生したので次のやつを試す。結果は破棄する
+					if (first_comm_error == NULL)
+					{
+						// 最初の通信エラーは保存しておく
+						first_comm_error = p_ret;
+					}
+					else
+					{
+						Free(p_ret);
+					}
+				}
+
+				FreePack(pack_request_copy);
+			}
+
+			StrCpy(wt->LastTimeOkUrlMulti, sizeof(wt->LastTimeOkUrlMulti), ok_url);
+
+			Free(shuffle_list);
+
+			if (url_list_ret_pack == NULL)
+			{
+				url_list_ret_pack = first_comm_error;
+			}
+			else
+			{
+				FreePack(first_comm_error);
+			}
+			FreeToken(url_list);
+			return url_list_ret_pack;
+		}
+		FreeToken(url_list);
+	}
+
 L_RETRY:
 
 	if (ParseUrl(&data, url, true, NULL) == false)
