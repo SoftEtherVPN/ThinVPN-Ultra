@@ -108,5 +108,9 @@ typedef void (WIDE_RESET_CERT_PROC)(WIDE *wide, void *param);
 typedef struct ACCEPT_QUEUE ACCEPT_QUEUE;
 typedef struct ACCEPT_QUEUE_ENTRY ACCEPT_QUEUE_ENTRY;
 
+// WtWpc.h
+typedef struct WT_PARALLEL_CALL WT_PARALLEL_CALL;
+
+
 #endif	// WTTYPE_H
 
