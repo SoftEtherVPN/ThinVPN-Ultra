@@ -436,8 +436,6 @@ PACK* WtgWpcCallParallel(WT* wt, LIST* url_list, PACK* pack, char* function_name
 		return PackError(ERR_INTERNAL_ERROR);
 	}
 
-	Print("---\n");
-
 	LIST* call_list = NewList(NULL);
 
 	for (i = 0;i < LIST_NUM(url_list);i++)
