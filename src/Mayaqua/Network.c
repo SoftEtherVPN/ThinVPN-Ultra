@@ -23204,8 +23204,6 @@ HTTP_HEADER *RecvHttpHeader(SOCK *s)
 		goto LABEL_ERROR;
 	}
 
-	Debug("!!! %s\n", str);
-
 	// Split into tokens
 	token = ParseToken(str, " ");
 	if (token->NumTokens < 3)

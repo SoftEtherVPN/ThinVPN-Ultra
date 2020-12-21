@@ -4715,6 +4715,18 @@ UINT* GenerateShuffleList(UINT num)
 
 	return ret;
 }
+UINT* GenerateShuffleListWithSeed(UINT num, void* seed, UINT seed_size)
+{
+	UINT* ret = ZeroMalloc(sizeof(UINT) * num);
+	UINT i;
+	for (i = 0;i < num;i++)
+	{
+		ret[i] = i;
+	}
+	ShuffleWithSeed(ret, num, seed, seed_size);
+
+	return ret;
+}
 
 // Shuffle
 void Shuffle(UINT* array, UINT size)
@@ -4728,4 +4740,18 @@ void Shuffle(UINT* array, UINT size)
 		array[j] = t;
 	}
 }
+void ShuffleWithSeed(UINT* array, UINT size, void* seed, UINT seed_size)
+{
+	UINT i;
+	SEEDRAND *rand = NewSeedRand(seed, seed_size);
+	for (i = 0;i < size;i++)
+	{
+		UINT j = SeedRand32(rand) % size;
+		UINT t = array[i];
+		array[i] = array[j];
+		array[j] = t;
+	}
+	FreeSeedRand(rand);
+}
+
 

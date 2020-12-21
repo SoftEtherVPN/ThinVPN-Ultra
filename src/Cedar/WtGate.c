@@ -1952,7 +1952,7 @@ void WtgAccept(WT *wt, SOCK *s)
 	}
 
 	// シグネチャのダウンロード
-	continue_ok = WtgDownloadSignature(wt, s, &check_ssl_ok, wt->Wide->GateKeyStr, wt->EntranceUrlForProxy);
+	continue_ok = WtgDownloadSignature(wt, s, &check_ssl_ok, wt->Wide->GateKeyStr, wt->EntranceUrlForProxy, wt->ProxyTargetUrlList);
 
 	if (check_ssl_ok)
 	{
@@ -2618,7 +2618,7 @@ bool WtgUploadHello(WT *wt, SOCK *s, void *session_id)
 }
 
 // シグネチャのダウンロード
-bool WtgDownloadSignature(WT* wt, SOCK* s, bool* check_ssl_ok, char* gate_secret_key, char* entrance_url_for_proxy)
+bool WtgDownloadSignature(WT* wt, SOCK* s, bool* check_ssl_ok, char* gate_secret_key, char* entrance_url_for_proxy, LIST* entrance_url_list_for_proxy)
 {
 	HTTP_HEADER *h;
 	UCHAR *data;
@@ -2652,7 +2652,7 @@ bool WtgDownloadSignature(WT* wt, SOCK* s, bool* check_ssl_ok, char* gate_secret
 		}
 
 		// 解釈する
-		if (StartWith(h->Target, "/widecontrol/") && wt->IsStandaloneMode == false)
+		if ((StartWith(h->Target, "/widecontrol/") || StartWith(h->Target, "/thincontrol/")) && wt->IsStandaloneMode == false)
 		{
 			char url[MAX_PATH];
 
@@ -2662,7 +2662,7 @@ bool WtgDownloadSignature(WT* wt, SOCK* s, bool* check_ssl_ok, char* gate_secret
 
 			ReplaceStrEx(url, sizeof(url), url, "https://", "http://", false);
 
-			WtgHttpProxy(url, s, s->SecureMode, h, gate_secret_key);
+			WtgHttpProxy(url, s, s->SecureMode, h, gate_secret_key, entrance_url_list_for_proxy);
 
 			*check_ssl_ok = true;
 
@@ -3053,7 +3053,7 @@ void WtgStop(WT *wt)
 }
 
 // HTTP プロキシ機能
-void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, char *shared_secret)
+void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, char *shared_secret, LIST* entrance_url_list_for_proxy)
 {
 	URL_DATA url;
 	SOCK *s2 = NULL;
@@ -3065,9 +3065,14 @@ void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, c
 	}
 
 	Zero(&url, sizeof(url));
+	// url_str のパースの試行
 	if (ParseUrl(&url, url_str, false, NULL) == false)
 	{
-		Zero(&url, sizeof(url));
+		// entrance_url_list_for_proxy の 1 個目のパースの試行
+		if (LIST_NUM(entrance_url_list_for_proxy) == 0 || ParseUrl(&url, LIST_DATA(entrance_url_list_for_proxy, 0), false, NULL) == false)
+		{
+			Zero(&url, sizeof(url));
+		}
 	}
 
 #ifndef	VPN_SPEED
@@ -3187,9 +3192,9 @@ void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, c
 				ToStr64(tmp, SystemTime64());
 				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-Time", tmp));
 
-				// 署名
-				Format(sign_str, sizeof(sign_str), "%I64u:%s", tmp, shared_secret);
-				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-Sign", sign_str));
+				//// 署名 bugbug
+				//Format(sign_str, sizeof(sign_str), "%I64u:%s", tmp, shared_secret);
+				//AddHttpValue(h2, NewHttpValue("X-WG-Proxy-Sign", sign_str));
 
 				IPToStr(src_ip_str, sizeof(src_ip_str), &s->RemoteIP);
 				ToStr(src_port, s->RemotePort);
@@ -3201,7 +3206,40 @@ void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, c
 			// Connect to the destination server
 			if (s2 == NULL)
 			{
-				s2 = ConnectEx2(url.HostName, url.Port, 0, NULL);
+				if (LIST_NUM(entrance_url_list_for_proxy) == 0)
+				{
+					// entrance_url_list_for_proxy が 1 つも指定されていない場合は
+					// url_str の指定ホストに対する接続を試行する
+					s2 = ConnectEx2(url.HostName, url.Port, 0, NULL);
+				}
+				else
+				{
+					// entrance_url_list_for_proxy が 1 つ以上指定されている場合は
+					// ランダム順に接続成功するまで 1 つずつ試行する
+					// (シャッフルに必要なシードは、接続元ホストの IP アドレス文字列とする)
+					char client_ip_str[64] = CLEAN;
+					IPToStr(client_ip_str, sizeof(client_ip_str), &s->RemoteIP);
+					UINT* seq = GenerateShuffleListWithSeed(LIST_NUM(entrance_url_list_for_proxy), client_ip_str, StrLen(client_ip_str));
+					UINT j;
+					for (j = 0;j < LIST_NUM(entrance_url_list_for_proxy);j++)
+					{
+						char* url = LIST_DATA(entrance_url_list_for_proxy, seq[j]);
+						URL_DATA url2 = CLEAN;
+						ParseUrl(&url2, url, false, NULL);
+						Debug("WtgHttpProxy: Trying for %s ...\n", url);
+						s2 = ConnectEx2(url2.HostName, url2.Port, 0, NULL);
+						if (s2 != NULL)
+						{
+							Debug("WtgHttpProxy: %s OK.\n", url);
+							break;
+						}
+						else
+						{
+							Debug("WtgHttpProxy: %s Failed.\n", url);
+						}
+					}
+					Free(seq);
+				}
 
 				if (s2 != NULL)
 				{

@@ -3480,6 +3480,26 @@ WIDE *WideGateStart()
 			StrCpy(w->wt->SmtpOtpFrom, sizeof(w->wt->SmtpOtpFrom), tmp);
 		}
 
+		UINT i;
+		for (i = 0;i < LIST_NUM(o);i++)
+		{
+			INI_ENTRY* e = LIST_DATA(o, i);
+
+			if (StrCmpi(e->Key, "ProxyTargetUrl") == 0)
+			{
+				char* url = e->Value;
+				if (IsFilledStr(url))
+				{
+					if (w->wt->ProxyTargetUrlList == NULL)
+					{
+						w->wt->ProxyTargetUrlList = NewStrList();
+					}
+
+					AddStrToStrListDistinct(w->wt->ProxyTargetUrlList, url);
+				}
+			}
+		}
+
 		WideFreeIni(o);
 	}
 
@@ -3592,6 +3612,8 @@ void WideGateStopEx(WIDE* wide, bool daemon_force_exit)
 	DeleteLock(wide->AggressiveTimeoutLock);
 	FreeX(wide->GateCert);
 	FreeK(wide->GateKey);
+
+	FreeStrList(wide->wt->ProxyTargetUrlList);
 
 	ReleaseWt(wide->wt);
 

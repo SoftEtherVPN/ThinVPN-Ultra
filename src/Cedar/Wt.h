@@ -271,6 +271,7 @@ struct WT
 	UINT SmtpServerPort;
 	char SmtpOtpFrom[128];
 	STATMAN* StatMan;
+	LIST* ProxyTargetUrlList;
 
 	// Client / Server / Gate 共通
 	char EntranceUrl[MAX_PATH];			// エントランス URL

@@ -478,7 +478,9 @@ char* Vars_ActivePatch_GetStr(char* name);
 char* Vars_ActivePatch_GetStrEx(char* name, char *default_str);
 
 UINT* GenerateShuffleList(UINT num);
+UINT* GenerateShuffleListWithSeed(UINT num, void* seed, UINT seed_size);
 void Shuffle(UINT* array, UINT size);
+void ShuffleWithSeed(UINT* array, UINT size, void* seed, UINT seed_size);
 
 #endif	// MEMORY_H
 
