@@ -2447,35 +2447,57 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 				{
 					if (MsIsAdmin())
 					{
+						Zero(&ds->Win32RdpPolicy, sizeof(DS_WIN32_RDP_POLICY));
 						Debug("*** DsWin32GetRdpPolicy()\n");
 
-						DsWin32GetRdpPolicy(&ds->Win32RdpPolicy);
-
-						Debug("HasValidValue: %u\n", ds->Win32RdpPolicy.HasValidValue);
-						if (ds->Win32RdpPolicy.HasValidValue)
+						if (MsRegReadIntEx2(REG_LOCAL_MACHINE,
+							"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+							"fDisableCdm",
+							false, true)
+							&&
+							MsRegReadIntEx2(REG_LOCAL_MACHINE,
+								"SOFTWARE\\Policies\\Microsoft\\Windows NT\\Terminal Services",
+								"fDisableClip",
+								false, true))
 						{
-							DS_WIN32_RDP_POLICY new_policy = CLEAN;
+							// すでに fDisableCdm と fDisableClip が設定されている。
+							// これはインストーラの SwInstallMain() の中で設定されたものであると思われる。
+							// この場合、グループポリシーを読み書きするとそれが刺激となって
+							// Windows の動作がおかしくなり、RDP を無効化してしまうおそれがある
+							// ので、DsWin32GetRdpPolicy / DsWin32SetRdpPolicy 関係の処理は
+							// すべてスキップすることにする。
+							DsDebugLog(ds, logprefix, "fDisableCdm && fDisableClip", __FILE__, __LINE__);
+						}
+						else
+						{
+							DsWin32GetRdpPolicy(&ds->Win32RdpPolicy);
 
-							Debug("fDisableCdm: %u\n", ds->Win32RdpPolicy.fDisableCdm);
-							Debug("fDisableClip: %u\n", ds->Win32RdpPolicy.fDisableClip);
-							Debug("fDenyTSConnections: %u\n", ds->Win32RdpPolicy.fDenyTSConnections);
-
-							new_policy.HasValidValue = true;
-							new_policy.fDisableCdm = 1;
-							new_policy.fDisableClip = 1;
-							new_policy.fDenyTSConnections = 0;
-
-							if (DsWin32SetRdpPolicy(&new_policy) == false)
+							Debug("HasValidValue: %u\n", ds->Win32RdpPolicy.HasValidValue);
+							if (ds->Win32RdpPolicy.HasValidValue)
 							{
-								Zero(&ds->Win32RdpPolicy, sizeof(DS_WIN32_RDP_POLICY));
+								DS_WIN32_RDP_POLICY new_policy = CLEAN;
 
-								Debug("DsWin32SetRdpPolocy error\n");
-								DsDebugLog(ds, logprefix, "DsWin32SetRdpPolocy error", __FILE__, __LINE__);
-							}
-							else
-							{
-								Debug("DsWin32SetRdpPolocy ok\n");
-								DsDebugLog(ds, logprefix, "DsWin32SetRdpPolocy ok", __FILE__, __LINE__);
+								Debug("fDisableCdm: %u\n", ds->Win32RdpPolicy.fDisableCdm);
+								Debug("fDisableClip: %u\n", ds->Win32RdpPolicy.fDisableClip);
+								Debug("fDenyTSConnections: %u\n", ds->Win32RdpPolicy.fDenyTSConnections);
+
+								new_policy.HasValidValue = true;
+								new_policy.fDisableCdm = 1;
+								new_policy.fDisableClip = 1;
+								new_policy.fDenyTSConnections = 0;
+
+								if (DsWin32SetRdpPolicy(&new_policy) == false)
+								{
+									Zero(&ds->Win32RdpPolicy, sizeof(DS_WIN32_RDP_POLICY));
+
+									Debug("DsWin32SetRdpPolocy error\n");
+									DsDebugLog(ds, logprefix, "DsWin32SetRdpPolocy error", __FILE__, __LINE__);
+								}
+								else
+								{
+									Debug("DsWin32SetRdpPolocy ok\n");
+									DsDebugLog(ds, logprefix, "DsWin32SetRdpPolocy ok", __FILE__, __LINE__);
+								}
 							}
 						}
 					}
@@ -2489,9 +2511,32 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	s = NULL;
 	if (check_port)
 	{
-		// この段階で localhost ポートに接続する
-		DsDebugLog(ds, logprefix, "DsConnectToLocalHostService (%u, %u) (%s:%u)", svc_type, ds->RdpPort, __FILE__, __LINE__);
-		s = DsConnectToLocalHostService(svc_type, ds->RdpPort);
+		UINT num_retry = 5;
+		UINT i;
+
+		for (i = 0;i < num_retry;i++)
+		{
+			// この段階で localhost ポートに接続する
+			DsDebugLog(ds, logprefix, "DsConnectToLocalHostService (%u, %u) (%s:%u)", svc_type, ds->RdpPort, __FILE__, __LINE__);
+			s = DsConnectToLocalHostService(svc_type, ds->RdpPort);
+
+			if (s != NULL)
+			{
+				break;
+			}
+
+			if (i != (num_retry - 1))
+			{
+				// リトライ
+				SleepThread(100);
+
+				if (svc_type == DESK_SERVICE_RDP && MsIsAdmin())
+				{
+					// RDP の場合は、失敗する度に RDP の有効化を試行する (グループポリシーがおかしな挙動をして RDP を無効化することがあるため)
+					MsEnableRemoteDesktop();
+				}
+			}
+		}
 
 		if (s == NULL)
 		{
@@ -2535,7 +2580,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 		if (s == NULL)
 		{
-			UINT num_retry = 3;
+			UINT num_retry = 5;
 			UINT i;
 			for (i = 0;i < num_retry;i++)
 			{
@@ -2550,6 +2595,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 				{
 					// リトライ
 					SleepThread(100);
+
+					if (svc_type == DESK_SERVICE_RDP && MsIsAdmin())
+					{
+						// RDP の場合は、失敗する度に RDP の有効化を試行する (グループポリシーがおかしな挙動をして RDP を無効化することがあるため)
+						MsEnableRemoteDesktop();
+					}
 				}
 			}
 		}

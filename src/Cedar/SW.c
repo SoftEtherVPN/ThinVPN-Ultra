@@ -3940,6 +3940,42 @@ bool SwInstallMain(SW* sw, WIZARD_PAGE* wp, SW_COMPONENT* c)
 				}
 			}
 
+			if (c->Id == SW_CMP_THIN_SERVER || c->Id == SW_CMP_THIN_SERVER_NS)
+			{
+				if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+				{
+					// LGWAN 版等で、グループポリシーで RDP が無効化されている場合は、
+					// グループポリシーでファイルおよびクリップボードの共有を無効にしてしまう。
+					// その理由は、ここで無効化しておけば、接続を試行する際に無効化する必要
+					// がなくなり、接続を試行する際にこれらを無効化する際に全部のポリシーが適用
+					// されてしまい RDP が無効になってしまうタイミング問題を解決できるためである。
+					DS_WIN32_RDP_POLICY current_policy = CLEAN;
+					DsWin32GetRdpPolicy(&current_policy);
+					if (current_policy.HasValidValue)
+					{
+						if (current_policy.fDenyTSConnections)
+						{
+							if (MsIsAdmin())
+							{
+								DS_WIN32_RDP_POLICY new_policy = CLEAN;
+
+								new_policy.HasValidValue = true;
+								new_policy.fDisableCdm = 1;
+								new_policy.fDisableClip = 1;
+								new_policy.fDenyTSConnections = current_policy.fDenyTSConnections;
+
+								DsWin32SetRdpPolicy(&new_policy);
+							}
+
+							// 警告出す
+							sw->DenyTsConnectionPolicyWarningDlg = StartAsyncOnceMsg(_UU("SW_DENY_TS_CONNECTION_POLICY_WARNING_TITLE"),
+								_UU("SW_DENY_TS_CONNECTION_POLICY_WARNING"),
+								false, ICO_WARNING, true);
+						}
+					}
+				}
+			}
+
 			if (c->Id == SW_CMP_VPN_CLIENT)
 			{
 				// In the VPN Client service, wait until the service port can be connected
@@ -7041,6 +7077,9 @@ UINT FreeSw(SW* sw)
 	{
 		return SW_EXIT_CODE_INTERNAL_ERROR;
 	}
+
+	// Close warning dialogs
+	StopAsyncOnceMsg(sw->DenyTsConnectionPolicyWarningDlg);
 
 	SwLeaveSingle(sw);
 
