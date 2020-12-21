@@ -3227,7 +3227,7 @@ void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, c
 						URL_DATA url2 = CLEAN;
 						ParseUrl(&url2, url, false, NULL);
 						Debug("WtgHttpProxy: Trying for %s ...\n", url);
-						s2 = ConnectEx2(url2.HostName, url2.Port, 0, NULL);
+						s2 = ConnectEx2(url2.HostName, url2.Port, CONNECTING_TIMEOUT_PROXY, NULL);
 						if (s2 != NULL)
 						{
 							Debug("WtgHttpProxy: %s OK.\n", url);
