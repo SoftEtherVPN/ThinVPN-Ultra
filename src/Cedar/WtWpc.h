@@ -84,6 +84,9 @@
 #define WPC_RECV_BUF_SIZE			64000		// 受信バッファサイズ
 #define WPC_DATA_ENTRY_SIZE			4			// データエントリサイズ
 #define WPC_MAX_HTTP_DATASIZE		(134217728)	// 最大の HTTP データサイズ
+
+#define WPC_PARALLEL_WATCHDOG_TIMEOUT	(3 * 60 * 1000) // これ以上パラレル WPC がタイムアウトしたらプロセスを kill する
+
 //
 //// インターネット接続設定
 //struct INTERNET_SETTING
@@ -152,6 +155,17 @@
 //void WpcFreePacket(WPC_PACKET *packet);
 //PACK *WpcCall(WT *wt, char *function_name, PACK *pack, X *cert, K *key);
 
+struct WT_PARALLEL_CALL
+{
+	THREAD* Thread;
+	WT* Wt;
+	char FunctionName[MAX_PATH];
+	char Url[MAX_PATH];
+	PACK* RequestPack;
+	PACK* ResponsePack;
+	bool GlobalIpOnly;
+};
+
 SOCK *WtSockConnectHttpProxy(WT_CONNECT *param, char *target, UINT *error_code);
 void WtSetEntranceUrl(WT *wt, char *url);
 void WtGetEntranceUrl(WT *wt, char *url, UINT url_size);
@@ -172,6 +186,9 @@ PACK *WtWpcCallWithCertAndKey(WT *wt, char *function_name, PACK *pack, X *cert, 
 
 PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only, bool try_secondary);
 PACK *WtWpcCallInner(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR *host_secret, bool global_ip_only, char *url);
+
+PACK *WtgWpcCallParallel(WT* wt, LIST* url_list, PACK* pack, char* function_name, bool global_ip_only);
+void WtgWpcCallParallelThreadProc(THREAD* thread, void* param);
 
 bool WtIsCommunicationError(UINT error);
 

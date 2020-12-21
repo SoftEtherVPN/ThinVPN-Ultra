@@ -416,6 +416,77 @@ void WtGetInternetSetting(WT *wt, INTERNET_SETTING *setting)
 	Unlock(wt->Lock);
 }
 
+// 並列 WPC 呼び出しスレッド
+void WtgWpcCallParallelThreadProc(THREAD* thread, void* param)
+{
+	WT_PARALLEL_CALL* c = (WT_PARALLEL_CALL*)param;
+	if (thread == NULL || c == NULL) return;
+
+	c->ResponsePack = WtWpcCallInner(c->Wt, c->FunctionName, c->RequestPack, NULL, NULL,
+		c->GlobalIpOnly, c->Url);
+}
+
+// 複数コントローラに対する並列 WPC 呼び出し
+PACK* WtgWpcCallParallel(WT* wt, LIST* url_list, PACK* pack, char* function_name, bool global_ip_only)
+{
+	UINT i;
+	PACK* ret = NULL;
+	if (wt == NULL || url_list == NULL || pack == NULL)
+	{
+		return PackError(ERR_INTERNAL_ERROR);
+	}
+
+	LIST* call_list = NewList(NULL);
+
+	for (i = 0;i < LIST_NUM(url_list);i++)
+	{
+		char* url = LIST_DATA(url_list, i);
+
+		WT_PARALLEL_CALL* c = ZeroMalloc(sizeof(WT_PARALLEL_CALL));
+
+		c->Wt = wt;
+		c->RequestPack = ClonePack(pack);
+		StrCpy(c->Url, sizeof(c->Url), url);
+		StrCpy(c->FunctionName, sizeof(c->FunctionName), function_name);
+		c->GlobalIpOnly = global_ip_only;
+
+		c->Thread = NewThread(WtgWpcCallParallelThreadProc, c);
+
+		Add(call_list, c);
+	}
+
+	for (i = 0;i < LIST_NUM(call_list);i++)
+	{
+		WT_PARALLEL_CALL* c = LIST_DATA(call_list, i);
+
+		if (WaitThread(c->Thread, WPC_PARALLEL_WATCHDOG_TIMEOUT) == false)
+		{
+			AbortExitEx("WPC_PARALLEL_WATCHDOG_TIMEOUT");
+		}
+
+		ReleaseThread(c->Thread);
+
+		if (c->ResponsePack != NULL && GetErrorFromPack(c->ResponsePack) == ERR_NO_ERROR && ret == NULL)
+		{
+			// 1 つ目の非 Error pack が戻ってきたらそいつを応答 Pack にする
+			ret = c->ResponsePack;
+		}
+		else
+		{
+			// それ以外の Pack 応答は無視する
+			FreePack(c->ResponsePack);
+		}
+
+		FreePack(c->RequestPack);
+
+		Free(c);
+	}
+
+	ReleaseList(call_list);
+
+	return ret;
+}
+
 // 通信に起因するエラー (つまり、間の FW 等が問題でネットワーク上のエラーが発生している) かどうか判定
 bool WtIsCommunicationError(UINT error)
 {
@@ -466,8 +537,53 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 {
 	UINT error = ERR_NO_ERROR;
 	PACK *ret = NULL;
-	char url[MAX_PATH] = {0};
+	char url[MAX_SIZE] = {0};
 	LIST *secondary_list = NewStrList();
+	LIST* widegate_ini = NULL;
+	LIST* controller_urls_for_gate = NULL;
+
+	// Gate の場合: widegate.ini の読み込み
+	if (wt->Wide != NULL && wt->Wide->Type == WIDE_TYPE_GATE)
+	{
+		widegate_ini = WideGateLoadIni();
+	}
+
+	if (widegate_ini != NULL)
+	{
+		UINT i;
+		for (i = 0;i < LIST_NUM(widegate_ini);i++)
+		{
+			INI_ENTRY* e = LIST_DATA(widegate_ini, i);
+
+			if (StrCmpi(e->Key, "ControllerUrl") == 0)
+			{
+				char* url = e->Value;
+				if (IsFilledStr(url))
+				{
+					if (controller_urls_for_gate == NULL)
+					{
+						controller_urls_for_gate = NewStrList();
+					}
+
+					AddStrToStrListDistinct(controller_urls_for_gate, url);
+				}
+			}
+		}
+	}
+
+	if (controller_urls_for_gate != NULL && LIST_NUM(controller_urls_for_gate) >= 1)
+	{
+		// widegate.ini の ControllerUrl が指定されており、1 つ以上 URL が存在する場合は、
+		// 並列方式で呼び出すことにする
+		ret = WtgWpcCallParallel(wt, controller_urls_for_gate, pack, function_name, global_ip_only);
+
+		if (ret == NULL)
+		{
+			ret = PackError(ERR_CONNECT_FAILED);
+		}
+
+		goto L_CLEANUP;
+	}
 
 	// EntryPoint.txt の読み込み
 	error = WpcGetEntranceUrlEx(wt, url, sizeof(url), wt->DefaultEntranceCacheExpireSpan, secondary_list);
@@ -625,6 +741,8 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 
 L_CLEANUP:
 	ReleaseStrList(secondary_list);
+	WideFreeIni(widegate_ini);
+	FreeStrList(controller_urls_for_gate);
 
 	return ret;
 }
@@ -636,11 +754,104 @@ PACK *WtWpcCallInner(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, U
 	UINT error;
 	WPC_PACKET packet;
 	UINT num_retry = 0;
+	TOKEN_LIST* url_list = NULL;
 	// 引数チェック
 	if (wt == NULL || function_name == NULL || pack == NULL)
 	{
 		return PackError(ERR_INTERNAL_ERROR);
 	}
+
+	if (wt->Wide != NULL && wt->Wide->Type != WIDE_TYPE_GATE)
+	{
+		// 引数に指定されている url が、セミコロンで区切ることができる場合は、複数の URL にランダムに接続試行する
+		// (2020.12.19 新方式)
+		url_list = ParseToken(url, ";");
+		if (url_list->NumTokens >= 2)
+		{
+			PACK* url_list_ret_pack = NULL;
+			UINT* shuffle_list = GenerateShuffleList(url_list->NumTokens);
+			UINT i;
+			PACK* first_comm_error = NULL;
+
+			// シャッフル結果で、前回接続できた URL があれば、それを 1 番に持ってくる (順番抜かし)
+			if (IsFilledStr(wt->LastTimeOkUrlMulti))
+			{
+				if (url_list->NumTokens >= 2)
+				{
+					for (i = 0;i < url_list->NumTokens;i++)
+					{
+						UINT index = shuffle_list[i];
+						if (StrCmp(url_list->Token[index], wt->LastTimeOkUrlMulti) == 0)
+						{
+							UINT tmp = shuffle_list[0];
+							shuffle_list[0] = index;
+							shuffle_list[i] = tmp;
+							break;
+						}
+					}
+				}
+			}
+
+			char ok_url[MAX_PATH] = CLEAN;
+
+			// 順に試行
+			for (i = 0;i < url_list->NumTokens;i++)
+			{
+				if (url_list_ret_pack != NULL)
+				{
+					// 結果確定！
+					break;
+				}
+
+				char* url2 = url_list->Token[shuffle_list[i]];
+				PACK* pack_request_copy = ClonePack(pack);
+
+				Debug("Trying %u for the URL: %s\n", i, url2);
+				PACK* p_ret = WtWpcCallInner(wt, function_name, pack_request_copy, host_key, host_secret, global_ip_only, url2);
+				UINT p_err = GetErrorFromPack(p_ret);
+
+				if (p_ret != NULL && (p_err == ERR_NO_ERROR || WtIsCommunicationError(p_err) == false))
+				{
+					// コレを返す
+					url_list_ret_pack = p_ret;
+
+					StrCpy(ok_url, sizeof(ok_url), url2);
+				}
+				else
+				{
+					// 通信エラーが発生したので次のやつを試す。結果は破棄する
+					if (first_comm_error == NULL)
+					{
+						// 最初の通信エラーは保存しておく
+						first_comm_error = p_ret;
+					}
+					else
+					{
+						Free(p_ret);
+					}
+				}
+
+				FreePack(pack_request_copy);
+			}
+
+			StrCpy(wt->LastTimeOkUrlMulti, sizeof(wt->LastTimeOkUrlMulti), ok_url);
+
+			Free(shuffle_list);
+
+			if (url_list_ret_pack == NULL)
+			{
+				url_list_ret_pack = first_comm_error;
+			}
+			else
+			{
+				FreePack(first_comm_error);
+			}
+			FreeToken(url_list);
+			return url_list_ret_pack;
+		}
+		FreeToken(url_list);
+	}
+
 L_RETRY:
 
 	if (ParseUrl(&data, url, true, NULL) == false)

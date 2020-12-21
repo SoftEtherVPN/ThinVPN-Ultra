@@ -4701,3 +4701,31 @@ void XorData(void *dst, void *src1, void *src2, UINT size)
 		c2++;
 	}
 }
+
+// Shuffle list
+UINT* GenerateShuffleList(UINT num)
+{
+	UINT* ret = ZeroMalloc(sizeof(UINT) * num);
+	UINT i;
+	for (i = 0;i < num;i++)
+	{
+		ret[i] = i;
+	}
+	Shuffle(ret, num);
+
+	return ret;
+}
+
+// Shuffle
+void Shuffle(UINT* array, UINT size)
+{
+	UINT i;
+	for (i = 0;i < size;i++)
+	{
+		UINT j = Rand32() % size;
+		UINT t = array[i];
+		array[i] = array[j];
+		array[j] = t;
+	}
+}
+

@@ -278,6 +278,7 @@ struct WT
 	INTERNET_SETTING *InternetSetting;	// インターネット接続設定
 	bool CheckSslTrust;					// SSL 証明書の信頼性を検証するかどうか
 	char RecommendedSecondaryUrl[MAX_PATH];	// 最後に接続に成功したセカンダリ URL
+	char LastTimeOkUrlMulti[MAX_PATH];	// 前回 OK だった URL (複数 URL 指定の場合)
 
 	char CurrentGateIp[64];				// 現在の接続先 Gate の IP アドレス
 };

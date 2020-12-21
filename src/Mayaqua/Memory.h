@@ -477,5 +477,8 @@ UINT64 Vars_ActivePatch_GetInt64(char* name);
 char* Vars_ActivePatch_GetStr(char* name);
 char* Vars_ActivePatch_GetStrEx(char* name, char *default_str);
 
+UINT* GenerateShuffleList(UINT num);
+void Shuffle(UINT* array, UINT size);
+
 #endif	// MEMORY_H
 

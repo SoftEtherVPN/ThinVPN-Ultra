@@ -23073,14 +23073,26 @@ bool PostHttp(SOCK *s, HTTP_HEADER *header, void *post_data, UINT post_size)
 	char *header_str;
 	BUF *b;
 	bool ret;
+	UINT i;
 	// Validate arguments
 	if (s == NULL || header == NULL || (post_size != 0 && post_data == NULL))
 	{
 		return false;
 	}
 
+	bool exist_content_length_header = false;
+	for (i = 0;i < LIST_NUM(header->ValueList);i++)
+	{
+		HTTP_VALUE* v = LIST_DATA(header->ValueList, i);
+
+		if (StrCmpi(v->Name, "Content-Length") == 0)
+		{
+			exist_content_length_header = true;
+		}
+	}
+
 	// Check whether the Content-Lentgh exists?
-	if (GetHttpValue(header, "Content-Length") == NULL)
+	if (exist_content_length_header == false)
 	{
 		char tmp[MAX_SIZE];
 		// Add because it does not exist
@@ -23191,6 +23203,8 @@ HTTP_HEADER *RecvHttpHeader(SOCK *s)
 	{
 		goto LABEL_ERROR;
 	}
+
+	Debug("!!! %s\n", str);
 
 	// Split into tokens
 	token = ParseToken(str, " ");

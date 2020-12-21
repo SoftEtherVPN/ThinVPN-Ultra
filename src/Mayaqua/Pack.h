@@ -188,6 +188,7 @@ void WriteElement(BUF *b, ELEMENT *e);
 void WriteValue(BUF *b, VALUE *v, UINT type);
 PACK *BufToPack(BUF *b);
 bool ReadPack(BUF *b, PACK *p);
+PACK* ClonePack(PACK* p);
 ELEMENT *ReadElement(BUF *b);
 VALUE *ReadValue(BUF *b, UINT type);
 void Bit160ToStr(char *str, UCHAR *data);

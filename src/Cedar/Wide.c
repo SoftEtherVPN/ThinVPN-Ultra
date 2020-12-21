@@ -3242,24 +3242,29 @@ void WideGateReportThread(THREAD *thread, void *param)
 
 	while (true)
 	{
-		UINT64 gateway_interval;
+		UINT gateway_interval;
 		if (wide->GateSettings_Int_ReportSettings_Received == false)
 		{
-			gateway_interval = (UINT64)WideGateGetIniEntry("GatewayInterval");
+			gateway_interval = WideGateGetIniEntry("GatewayInterval");
 		}
 		else
 		{
-			gateway_interval = (UINT64)wide->GateSettings_Int_ReportInterval;
+			gateway_interval = wide->GateSettings_Int_ReportInterval;
 		}
 		gateway_interval = MIN(gateway_interval, WIDE_GATEWAY_INTERVAL_HARD_MAX);
-
+		
 		if (wide->GateHalt)
 		{
 			break;
 		}
 
 		// セッションリストの報告
+		UINT64 tick_start, tick_end;
+		tick_start = Tick64();
 		WideGateReportSessionList(wide);
+		tick_end = Tick64();
+
+		UINT took_tick = (UINT)(tick_end - tick_start);
 
 		if (wide->GateHalt)
 		{
@@ -3270,7 +3275,24 @@ void WideGateReportThread(THREAD *thread, void *param)
 		{
 			// 次の NextReportTick の時刻を計算
 			UINT64 now = Tick64();
-			UINT64 next = now + gateway_interval;
+
+			UINT this_time_interval = GenRandInterval2(gateway_interval * 70 / 100, 0);
+
+			// 今回かかった時間分減算する
+			if (this_time_interval > took_tick)
+			{
+				this_time_interval -= took_tick;
+			}
+			else
+			{
+				this_time_interval = 0;
+			}
+
+			// 少なくとも 1 秒は待つ
+			this_time_interval = MAX(this_time_interval, 1000);
+
+			// 次回時刻の決定
+			UINT64 next = now + this_time_interval;
 
 			wide->NextReportTick = next;
 		}

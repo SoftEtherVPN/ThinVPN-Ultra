@@ -110,6 +110,27 @@ TOKEN_LIST *GetPackElementNames(PACK *p)
 	return ret;
 }
 
+// Clone a PACK
+PACK* ClonePack(PACK* p)
+{
+	BUF* buf;
+	PACK* ret;
+	if (p == NULL)
+	{
+		return NULL;
+	}
+
+	buf = PackToBuf(p);
+
+	SeekBufToBegin(buf);
+
+	ret = BufToPack(buf);
+
+	FreeBuf(buf);
+
+	return ret;
+}
+
 // Convert the BUF to a PACK
 PACK *BufToPack(BUF *b)
 {
