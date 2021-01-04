@@ -3178,7 +3178,6 @@ void WtgHttpProxy(char *url_str, SOCK *s, bool ssl, HTTP_HEADER *first_header, c
 				char tmp[MAX_SIZE];
 				char src_ip_str[128];
 				char src_port[64];
-				char sign_str[64];
 
 				Format(tmp, sizeof(tmp), "%r:%u", &s->LocalIP, s->LocalPort);
 				AddHttpValue(h2, NewHttpValue("X-WG-Proxy-Server", tmp));
