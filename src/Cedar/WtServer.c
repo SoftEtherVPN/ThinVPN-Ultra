@@ -252,7 +252,7 @@ void WtsInsertSockIosToSendQueue(TSESSION *s)
 			b = WtNewDataBlock(tunnel_id, NULL, 0, s->GateTcp->UseCompress ? 1 : 0);
 			InsertQueue(s->BlockQueue, b);
 
-			WtSessionLog(s, "Tunnel Id %u: Disconnected", tunnel_id);
+			WtSessionLog(s, "Tunnel ID %u: Disconnected", tunnel_id);
 
 			WtFreeTunnel(t);
 //			Debug("WtFreeTunnel: %u\n", tunnel_id);
@@ -475,9 +475,9 @@ void WtsNewTunnelThread(THREAD *thread, void *param)
 
 	CopyIP(&p->SockIo->ServerLocalIP, &p->Session->ServerLocalIP);
 
-	WtSessionLog(s, "Tunnel ID Start AcceptProc(): %u", p->TunnelId);
+	WtSessionLog(s, "Tunnel ID %u: Start AcceptProc()", p->TunnelId);
 	p->Session->AcceptProc(thread, p->SockIo, p->Session->AcceptProcParam);
-	WtSessionLog(s, "Tunnel ID Exit AcceptProc(): %u", p->TunnelId);
+	WtSessionLog(s, "Tunnel ID %u: Exit AcceptProc()", p->TunnelId);
 
 	SockIoDisconnect(p->SockIo);
 
@@ -609,6 +609,8 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 		*should_retry_proxy_alternative = true;
 		return;
 	}
+
+	WtSessionLog(session, "SSL Version: %s, CipherName: %s, SNI: %s", s->TlsVersion, s->CipherName, sni);
 
 	SystemTime(&tm);
 

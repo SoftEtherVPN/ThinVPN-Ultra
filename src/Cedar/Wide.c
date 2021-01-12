@@ -1497,6 +1497,18 @@ PACK *WideCall(WIDE *wide, char *function_name, PACK *pack, bool global_ip_only,
 
 	WideServerGetCertAndKey(wide, &server_x, &server_k);
 
+	if (server_x != NULL)
+	{
+		UCHAR hash[SHA1_SIZE] = CLEAN;
+		char hash_str[64] = CLEAN;
+
+		GetXDigest(server_x, hash, true);
+
+		BinToStr(hash_str, sizeof(hash_str), hash, sizeof(hash));
+
+		WideLog(wide, "This Server's Cert Hash: %s", hash_str);
+	}
+
 	ret = WtWpcCallWithCertAndKey(wt, function_name, pack, server_x, server_k, global_ip_only, try_secondary);
 
 	FreeX(server_x);
@@ -1793,7 +1805,7 @@ WIDE *WideServerStartEx2(char *svc_name, WT_ACCEPT_PROC *accept_proc, void *acce
 	w->WideLog = NewLog(WIDE_LOG_DIRNAME, "tunnel", LOG_SWITCH_DAY);
 	w->WideLog->Flush = true;
 
-	WideLog(w, "-------------------- Start Tunnel System --------------------");
+	WideLog(w, "-------------------- Start Tunnel System (Server) --------------------");
 
 	w->SeLang = se_lang;
 	if (master_cert == NULL)
@@ -2100,7 +2112,7 @@ void WideServerStop(WIDE *w)
 		FreeAcceptQueue(w->AcceptQueue);
 	}
 
-	WideLog(w, "-------------------- Stop Tunnel System --------------------");
+	WideLog(w, "-------------------- Stop Tunnel System (Server) --------------------");
 
 	FreeLog(w->WideLog);
 

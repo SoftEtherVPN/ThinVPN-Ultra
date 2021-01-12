@@ -252,6 +252,7 @@ struct SOCK
 	X *LocalX;					// Certificate of the local host
 	char *CipherName;			// Cipher algorithm name
 	char *WaitToUseCipher;		// Set the algorithm name to want to use
+	char TlsVersion[16];		// TLS version
 	bool IgnoreRecvErr;			// Whether the RecvFrom error is ignorable
 	bool IgnoreSendErr;			// Whether the SendTo error is ignorable
 	UINT TimeOut;				// Time-out value
