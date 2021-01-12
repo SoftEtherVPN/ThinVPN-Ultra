@@ -1227,7 +1227,7 @@ bool WtIsTTcpDisconnected(TSESSION *s, TTCP *ttcp)
 	{
 		if ((ttcp->LastCommTime + (UINT64)ttcp->TunnelTimeout) < s->Tick)
 		{
-			WtSessionLog(s, "WtIsTTcpDisconnected: Receive timeout detected. ttcp->LastCommTime = %I64u, ttcp->TunnelTimeout = %u, s->Tick = %u",
+			WtSessionLog(s, "WtIsTTcpDisconnected: Receive timeout detected. ttcp->LastCommTime = %I64u, ttcp->TunnelTimeout = %u, s->Tick = %I64u",
 				ttcp->LastCommTime, ttcp->TunnelTimeout, s->Tick);
 			ttcp->Disconnected = true;
 		}
@@ -1826,7 +1826,7 @@ TTCP_DISCONNECTED:
 		// 受信待ち
 		if ((s->Tick > ttcp->LastCommTime) && ((s->Tick - ttcp->LastCommTime) >= (UINT64)ttcp->TunnelTimeout))
 		{
-			WtSessionLog(s, "WtIsTTcpDisconnected: Receive timeout detected. ttcp->LastCommTime = %I64u, ttcp->TunnelTimeout = %u, s->Tick = %u",
+			WtSessionLog(s, "WtIsTTcpDisconnected: Receive timeout detected. ttcp->LastCommTime = %I64u, ttcp->TunnelTimeout = %u, s->Tick = %I64u",
 				ttcp->LastCommTime, ttcp->TunnelTimeout, s->Tick);
 			// タイムアウト発生
 			goto TTCP_DISCONNECTED;

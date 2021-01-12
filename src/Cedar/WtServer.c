@@ -389,7 +389,7 @@ void WtsRecvFromGate(TSESSION *s)
 
 			// まだ確立されていない新しいトンネル宛にデータが届いたので
 			// 新しいトンネルを確立する
-			WtSessionLog(s, "WtsCreateNewTunnel: tunnel_id = %u");
+			WtSessionLog(s, "WtsCreateNewTunnel: tunnel_id = %u", tunnel_id);
 			t = WtsCreateNewTunnel(s, tunnel_id);
 		}
 
