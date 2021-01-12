@@ -542,6 +542,8 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 	LIST* widegate_ini = NULL;
 	LIST* controller_urls_for_gate = NULL;
 
+	WtLog(wt, "WtWpcCall: function_name = %s, global_ip_only = %u, try_secondary = %u", function_name, global_ip_only, try_secondary);
+
 	// Gate の場合: widegate.ini の読み込み
 	if (wt->Wide != NULL && wt->Wide->Type == WIDE_TYPE_GATE)
 	{
@@ -612,6 +614,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 		// SECONDARY ホストを試す。新方式。
 		if (IsEmptyStr(wt->RecommendedSecondaryUrl) == false)
 		{
+			WtLog(wt, "WtWpcCall: Use wt->RecommendedSecondaryUrl: %s", wt->RecommendedSecondaryUrl);
 			Debug("WtWpcCall: Use wt->RecommendedSecondaryUrl: %s\n", wt->RecommendedSecondaryUrl);
 			// まず、前回成功したセカンダリ URL を覚えている場合はそれに接続をする
 			p = WtWpcCallInner(wt, function_name, pack, host_key, host_secret, global_ip_only, wt->RecommendedSecondaryUrl);
@@ -619,6 +622,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 			if (GetErrorFromPack(p) == ERR_NO_ERROR)
 			{
 				// 成功した。この結果を返す
+				WtLog(wt, "WtWpcCall: OK.");
 				Debug("WtWpcCall: OK.\n");
 				ret = p;
 				goto L_CLEANUP;
@@ -628,12 +632,14 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 				// 通信エラーが発生した。間におかしな中継 FW がいる可能性がある
 				// のでセカンダリ URL キャッシュを削除する
 				ClearStr(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl));
+				WtLog(wt, "WtWpcCall: CommunicationError. Error: %u", GetErrorFromPack(p));
 				Debug("WtWpcCall: CommunicationError. Error: %u\n", GetErrorFromPack(p));
 			}
 			else
 			{
 				// 通信自体は成功しているが、本家でエラーが発生した。
 				// セカンダリ URL 自体は生きているので、何もしない。
+				WtLog(wt, "WtWpcCall: Generic Error. Error: %u", GetErrorFromPack(p));
 				Debug("WtWpcCall: Generic Error. Error: %u\n", GetErrorFromPack(p));
 			}
 
@@ -643,6 +649,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 		}
 
 		// 次に、本家に接続する。
+		WtLog(wt, "WtWpcCall: Use direct: %s", url);
 		Debug("WtWpcCall: Use direct: %s\n", url);
 
 #ifndef	WT_TEST_WIDECONTROL_PROXY_CLIENT
@@ -657,6 +664,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 		{
 			// 成功した。この結果を返す
 			ret = p;
+			WtLog(wt, "WtWpcCall: OK.");
 			Debug("WtWpcCall: OK.\n");
 			// 本家と通信できているので、セカンダリ URL キャッシュを削除する
 			ClearStr(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl));
@@ -667,6 +675,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 			// 本家と通信できているが、本家の側でエラーが発生しているのでもうここで
 			// 諦めることとする。この結果を返す
 			ret = p;
+			WtLog(wt, "WtWpcCall: Generic Error. Error: %u", GetErrorFromPack(p));
 			Debug("WtWpcCall: Generic Error. Error: %u\n", GetErrorFromPack(p));
 			// 本家と通信できているので、セカンダリ URL キャッシュを削除する
 			ClearStr(wt->RecommendedSecondaryUrl, sizeof(wt->RecommendedSecondaryUrl));
@@ -693,6 +702,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 
 			if (IsEmptyStr(secondary_url) == false)
 			{
+				WtLog(wt, "WtWpcCall: Use choosed secondary: %s", secondary_url);
 				Debug("WtWpcCall: Use choosed secondary: %s\n", secondary_url);
 
 				// セカンダリの URL を決定した。
@@ -704,6 +714,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 					// 成功した。この結果を返す
 					ret = p2;
 					FreePack(p);
+					WtLog(wt, "WtWpcCall: OK.");
 					Debug("WtWpcCall: OK.\n");
 
 					// 本家と通信できているので、セカンダリ URL キャッシュを保存する
@@ -713,6 +724,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 				else if (WtIsCommunicationError(GetErrorFromPack(p2)) == false)
 				{
 					// 本家と通信できているが、本家の側でエラーが発生した。
+					WtLog(wt, "WtWpcCall: Generic Error. Error: %u", GetErrorFromPack(p2));
 					Debug("WtWpcCall: Generic Error. Error: %u\n", GetErrorFromPack(p2));
 
 					// この結果を返す
@@ -726,6 +738,7 @@ PACK *WtWpcCall(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, UCHAR 
 				else
 				{
 					// 通信エラーが発生した。間に不正な FW がいる。
+					WtLog(wt, "WtWpcCall: CommunicationError. Error: %u", GetErrorFromPack(p2));
 					Debug("WtWpcCall: CommunicationError. Error: %u\n", GetErrorFromPack(p2));
 					FreePack(p2);
 					p2 = NULL;
@@ -743,6 +756,8 @@ L_CLEANUP:
 	ReleaseStrList(secondary_list);
 	WideFreeIni(widegate_ini);
 	FreeStrList(controller_urls_for_gate);
+
+	WtLog(wt, "WtWpcCall error: %u", GetErrorFromPack(ret));
 
 	return ret;
 }
@@ -806,6 +821,7 @@ PACK *WtWpcCallInner(WT *wt, char *function_name, PACK *pack, UCHAR *host_key, U
 				char* url2 = url_list->Token[shuffle_list[i]];
 				PACK* pack_request_copy = ClonePack(pack);
 
+				WtLog(wt, "Trying %u for the URL: %s", i, url2);
 				Debug("Trying %u for the URL: %s\n", i, url2);
 				PACK* p_ret = WtWpcCallInner(wt, function_name, pack_request_copy, host_key, host_secret, global_ip_only, url2);
 				UINT p_err = GetErrorFromPack(p_ret);
@@ -874,6 +890,15 @@ L_RETRY:
 	recv = HttpRequestEx5(&data, NULL, 0, 0, &error,
 		wt->CheckSslTrust, b->Buf, NULL, NULL, NULL, 0, NULL, 0, NULL, NULL, wt, global_ip_only, false);
 
+	if (recv == NULL)
+	{
+		WtLog(wt, "HttpRequestEx5 error: %u", error);
+	}
+	else
+	{
+		WtLog(wt, "HttpRequestEx5 ok. Received %u bytes.", recv->Size);
+	}
+
 	FreeBuf(b);
 
 	if (recv == NULL)
@@ -883,12 +908,14 @@ L_RETRY:
 		{
 			if (wt->EnableUpdateEntryPoint && num_retry == 0)
 			{
+				WtLog(wt, "Trying update Entry Point...");
 				Debug("Trying update Entry Point...\n");
 				// Wide Controller との上記の通信エラーが発生した場合は
 				// EntryPoint.dat が古い可能性があるので
 				// GitHub を用いて更新を試みる
 				if (WideTryUpdateNewEntryPointModestStandard(wt, NULL))
 				{
+					WtLog(wt, "Try update Entry Point OK. Retrying...");
 					Debug("Try update Entry Point OK. Retrying...\n");
 					// 更新されたら接続リトライをしてみる
 					num_retry++;
@@ -896,6 +923,7 @@ L_RETRY:
 				}
 				else
 				{
+					WtLog(wt, "Try update Entry Point error.");
 					Debug("Try update Entry Point error.\n");
 				}
 			}
@@ -907,6 +935,7 @@ L_RETRY:
 
 	if (WpcParsePacket(&packet, recv) == false)
 	{
+		WtLog(wt, "WpcParsePacket parse error.");
 		FreeBuf(recv);
 		return PackError(ERR_PROTOCOL_ERROR);
 	}

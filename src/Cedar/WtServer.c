@@ -105,6 +105,8 @@ void WtsSessionMain(TSESSION *s)
 		{
 			StrCpy(s->wt->CurrentGateIp, sizeof(s->wt->CurrentGateIp), s->ConnectParam->HostName);
 		}
+
+		WtSessionLog(s, "s->wt->CurrentGateIp = %s", s->wt->CurrentGateIp);
 	}
 
 #ifdef	OS_WIN32
@@ -112,6 +114,8 @@ void WtsSessionMain(TSESSION *s)
 #endif  // OS_WIN32
 
 	SetSockEvent(s->SockEvent);
+
+	WtSessionLog(s, "WtsSessionMain: Start main loop");
 
 	while (true)
 	{
@@ -157,6 +161,7 @@ void WtsSessionMain(TSESSION *s)
 
 			if (s->Halt)
 			{
+				WtSessionLog(s, "WtsSessionMain: Main loop: s->Halt == true. Exiting...");
 				disconnected = true;
 			}
 
@@ -179,6 +184,8 @@ void WtsSessionMain(TSESSION *s)
 			break;
 		}
 	}
+
+	WtSessionLog(s, "WtsSessionMain: Exit main loop");
 
 	// 接続先 Gate 情報を消去する
 	ClearStr(s->wt->CurrentGateIp, sizeof(s->wt->CurrentGateIp));
@@ -244,6 +251,8 @@ void WtsInsertSockIosToSendQueue(TSESSION *s)
 
 			b = WtNewDataBlock(tunnel_id, NULL, 0, s->GateTcp->UseCompress ? 1 : 0);
 			InsertQueue(s->BlockQueue, b);
+
+			WtSessionLog(s, "Tunnel Id %u: Disconnected", tunnel_id);
 
 			WtFreeTunnel(t);
 //			Debug("WtFreeTunnel: %u\n", tunnel_id);
@@ -365,6 +374,7 @@ void WtsRecvFromGate(TSESSION *s)
 		{
 			if (WtIsTunnelIdExistsInUsedTunnelIdList(s->UsedTunnelList, tunnel_id))
 			{
+				WtSessionLog(s, "WtIsTunnelIdExistsInUsedTunnelIdList hit. tunnel_id = %u", tunnel_id);
 				// TODO: 最近切断されてから一定時間が経過していないトンネル ID 宛
 				// の通信が来たので切断指令を返信する
 				if (last_tid1 != tunnel_id)
@@ -379,6 +389,7 @@ void WtsRecvFromGate(TSESSION *s)
 
 			// まだ確立されていない新しいトンネル宛にデータが届いたので
 			// 新しいトンネルを確立する
+			WtSessionLog(s, "WtsCreateNewTunnel: tunnel_id = %u");
 			t = WtsCreateNewTunnel(s, tunnel_id);
 		}
 
@@ -397,7 +408,10 @@ void WtsRecvFromGate(TSESSION *s)
 		{
 			// データ無し (切断指示を受信した)
 //			Debug("Disconnect Tunnel: %u, time: %I64u\n", tunnel_id, SystemTime64());
-			SockIoDisconnect(t->SockIo);
+			if (SockIoDisconnect(t->SockIo))
+			{
+				WtSessionLog(s, "Tunnel ID %u: Received the disconnect command from the Gate", tunnel_id);
+			}
 		}
 
 		WtFreeDataBlock(block, false);
@@ -449,9 +463,9 @@ void WtsNewTunnelThread(THREAD *thread, void *param)
 		p->SockIo->InitialPack = pack;
 
 		{
-			char tmp[MAX_PATH];
+			char tmp[MAX_PATH] = CLEAN;
 			PackGetStr(pack, "ClientHost", tmp, sizeof(tmp));
-			Debug("ClientHost: %s\n", tmp);
+			WtSessionLog(s, "New Tunnel ID %u: ClientHost: %s", p->TunnelId, tmp);
 		}
 	}
 
@@ -461,7 +475,9 @@ void WtsNewTunnelThread(THREAD *thread, void *param)
 
 	CopyIP(&p->SockIo->ServerLocalIP, &p->Session->ServerLocalIP);
 
+	WtSessionLog(s, "Tunnel ID Start AcceptProc(): %u", p->TunnelId);
 	p->Session->AcceptProc(thread, p->SockIo, p->Session->AcceptProcParam);
+	WtSessionLog(s, "Tunnel ID Exit AcceptProc(): %u", p->TunnelId);
 
 	SockIoDisconnect(p->SockIo);
 
@@ -500,6 +516,7 @@ TUNNEL *WtsCreateNewTunnel(TSESSION *s, UINT tunnel_id)
 	p = ZeroMalloc(sizeof(WTS_NEW_TUNNEL_THREAD_PARAM));
 	p->Session = s;
 	p->SockIo = sockio;
+	p->TunnelId = tunnel_id;
 	AddRef(s->Ref);
 
 	thread = NewThread(WtsNewTunnelThread, p);
@@ -587,7 +604,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 	if (StartSSLEx(s, NULL, NULL, true, 0, sni) == false)
 	{
 		// 失敗
-		Debug("StartSSL Failed.\n");
+		WtSessionLog(session, "StartSSL Failed.");
 		session->ErrorCode = ERR_PROTOCOL_ERROR;
 		*should_retry_proxy_alternative = true;
 		return;
@@ -601,7 +618,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 		if (WtIsTrustedCert(wt, s->RemoteX) == false)
 		{
 			// 失敗
-			Debug("WtIsTrustedCert Failed.\n");
+			WtSessionLog(session, "WtIsTrustedCert Failed.");
 			session->ErrorCode = ERR_SSL_X509_UNTRUSTED;
 
 			*should_retry_proxy_alternative = true;
@@ -613,7 +630,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 	if (WtgClientUploadSignature(s) == false)
 	{
 		// 失敗
-		Debug("ClientUploadSignature Failed.\n");
+		WtSessionLog(session, "ClientUploadSignature Failed.");
 		session->ErrorCode = ERR_DISCONNECTED;
 		return;
 	}
@@ -623,14 +640,14 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 	if (p == NULL)
 	{
 		// 失敗
-		Debug("HttpClientRecv Failed.\n");
+		WtSessionLog(session, "HttpClientRecv Failed.");
 		session->ErrorCode = ERR_DISCONNECTED;
 		return;
 	}
 	if (PackGetInt(p, "hello") == 0)
 	{
 		// 失敗
-		Debug("PackGetInt Failed.\n");
+		WtSessionLog(session, "PackGetInt Failed.");
 		FreePack(p);
 		session->ErrorCode = ERR_PROTOCOL_ERROR;
 		return;
@@ -655,7 +672,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 	if (HttpClientSend(s, p) == false)
 	{
 		// 失敗
-		Debug("HttpClientSend Failed.\n");
+		WtSessionLog(session, "HttpClientSend Failed.");
 		FreePack(p);
 		session->ErrorCode = ERR_DISCONNECTED;
 		return;
@@ -666,7 +683,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 	p = HttpClientRecv(s);
 	if (p == NULL)
 	{
-		Debug("HttpClientRecv Failed.\n");
+		WtSessionLog(session, "HttpClientRecv Failed.");
 		session->ErrorCode = ERR_DISCONNECTED;
 		return;
 	}
@@ -674,7 +691,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 	code = PackGetInt(p, "code");
 	if (code != ERR_NO_ERROR)
 	{
-		Debug("Gate Error: %u\n", code);
+		WtSessionLog(session, "Gate Error: %u", code);
 		// エラー発生
 		FreePack(p);
 		session->ErrorCode = code;
@@ -702,7 +719,7 @@ void WtsConnectInner(TSESSION *session, SOCK *s, char *sni, bool *should_retry_p
 
 	CopyIP(&session->ServerLocalIP, &s->LocalIP);
 
-	Debug("Connected.\n");
+	WtSessionLog(session, "Connected. LocalIP = %r", &session->ServerLocalIP);
 
 	session->WasConnected = true;
 
@@ -761,7 +778,7 @@ void WtsConnectMain(TSESSION *session)
 		return;
 	}
 
-	Debug("WtsConnectMain Start.\n");
+	WtSessionLog(session, "WtsConnectMain Start.");
 
 	sni = connect->HostName;
 
@@ -770,7 +787,7 @@ void WtsConnectMain(TSESSION *session)
 	if (s == NULL)
 	{
 		// 失敗
-		Debug("WtSockConnect Failed.\n");
+		WtSessionLog(session, "WtSockConnect Failed.");
 
 		if (connect->ProxyType == PROXY_HTTP && err != ERR_PROXY_CONNECT_FAILED &&
 			IsEmptyStr(connect->HostNameForProxy) == false && StrCmpi(connect->HostNameForProxy, connect->HostName) != 0)
@@ -778,13 +795,13 @@ void WtsConnectMain(TSESSION *session)
 L_PROXY_RETRY_WITH_ALTERNATIVE_FQDN:
 			// HTTP プロキシサーバーの場合で単純プロキシサーバー接続不具合以外
 			// の場合は、接続先接続先を HostNameForProxy にして再試行する
-			Debug("WtsConnectMain: Try 1\n");
+			WtSessionLog(session, "WtsConnectMain: Try 1");
 
 			s = WtSockConnect(connect, &err, true);
 
 			if (s == NULL)
 			{
-				Debug("WtSockConnect Failed 2. %u\n", err);
+				WtSessionLog(session, "WtSockConnect Failed 2. %u", err);
 				session->ErrorCode = err;
 				return;
 			}
@@ -800,14 +817,19 @@ L_PROXY_RETRY_WITH_ALTERNATIVE_FQDN:
 		}
 	}
 
-	Debug("WtSockConnect Ok.\n");
+	WtSessionLog(session, "WtSockConnect Ok.");
 
 	session->Sock = s;
 	AddRef(s->ref);
 
 	// 接続処理
 	should_retry_proxy_alternative = false;
+
+	WtSessionLog(session, "Begin WtsConnectInner()");
+
 	WtsConnectInner(session, s, sni, &should_retry_proxy_alternative);
+
+	WtSessionLog(session, "End WtsConnectInner()");
 
 	Disconnect(s);
 	ReleaseSock(s);
@@ -818,7 +840,7 @@ L_PROXY_RETRY_WITH_ALTERNATIVE_FQDN:
 		// の場合は、接続先接続先を HostNameForProxy にして再試行する
 		session->Sock = NULL;
 
-		Debug("WtsConnectMain: Try 0 error\n");
+		WtSessionLog(session, "WtsConnectMain: Try 0 error");
 
 		Disconnect(s);
 		ReleaseSock(s);
@@ -894,6 +916,7 @@ TSESSION *WtsNewSession(THREAD *thread, WT *wt, WT_CONNECT *connect, WT_ACCEPT_P
 	}
 
 	t = ZeroMalloc(sizeof(TSESSION));
+	Format(t->ServerSessionName, sizeof(t->ServerSessionName), "TSESSION_%04u", ++wt->ServerSessionNameSeed);
 	t->Lock = NewLock();
 	t->Ref = NewRef();
 	t->SessionType = WT_SESSION_SERVER;
@@ -912,6 +935,11 @@ TSESSION *WtsNewSession(THREAD *thread, WT *wt, WT_CONNECT *connect, WT_ACCEPT_P
 
 	t->AcceptThreadList = NewList(NULL);
 	t->UsedTunnelList = WtNewUsedTunnelIdList();
+
+	WtLogEx(wt, t->ServerSessionName, "WtsNewSession: Create New Server Session: HostName = %s, HostNameForProxy = %s, Port = %u, "
+		"ProxyType = %u, ProxyHostName = %s, ProxyPort = %u, ProxyUsername = %s, ProxyUserAgent = %s",
+		connect->HostName, connect->HostNameForProxy, connect->Port, connect->ProxyType,
+		connect->ProxyHostName, connect->ProxyPort, connect->ProxyUsername, connect->ProxyUserAgent);
 
 	return t;
 };

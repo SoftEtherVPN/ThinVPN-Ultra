@@ -163,6 +163,7 @@ struct TSESSION
 	bool Halt;							// 停止フラグ
 	LIST *AcceptThreadList;				// ACCEPT したスレッドのリスト
 	bool WasConnected;					// 接続されたことがあるかどうか
+	char ServerSessionName[64];
 
 	// Client 用
 	TUNNEL *ClientTunnel;				// トンネル

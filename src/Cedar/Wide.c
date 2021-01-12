@@ -617,20 +617,24 @@ void WideServerConnectMainThread(THREAD *thread, void *param)
 
 	w = p->Wide;
 
+	WideLog(w, "WideServerConnectMainThread");
+
 	for (i = 0;;i++)
 	{
-		WT_CONNECT c;
+		WT_CONNECT c = CLEAN;
 
 LABEL_CONNECT_RETRY:
 
 		if (p->Halt)
 		{
+			WideLog(w, "WideServerConnectMainThread: Halt == true");
 			break;
 		}
 
 		// 接続先の Gate の取得
-		Debug("ServerConnect...\n");
+		WideLog(w, "ServerConnect... (i = %u)", i);
 		ret = WideServerConnect(w, &c);
+		WideLog(w, "WideServerConnect: Error code = %u", ret);
 
 		// サーバーから文字列メッセージが届いていれば WIDE 構造体に報告する
 		if (UniIsEmptyStr(c.MsgForServer) == false)
@@ -652,8 +656,18 @@ LABEL_CONNECT_RETRY:
 			w->MsgForServerArrived = false;
 		}
 
+		if (w->MsgForServerArrived)
+		{
+			WideLog(w, "w->MsgForServerArrived = %u", w->MsgForServerArrived);
+		}
+
 		UniStrCpy(w->SessionLifeTimeMsg, sizeof(w->SessionLifeTimeMsg), c.SessionLifeTimeMsg);
 		w->SessionLifeTime = c.SessionLifeTime;
+
+		if (w->SessionLifeTime != 0)
+		{
+			WideLog(w, "w->SessionLifeTime = %u", w->SessionLifeTime);
+		}
 
 		if (ret != ERR_NO_ERROR)
 		{
@@ -661,13 +675,14 @@ LABEL_CONNECT_RETRY:
 
 			if (ret == ERR_NO_INIT_CONFIG)
 			{
-				char pcid[MAX_PATH];
+				char pcid[MAX_PATH] = CLEAN;
 
 				pcid_candidate_count = 0;
 
 LABEL_RETRY:
 				// pcid が指定されていない
 				ret = WideServerGetPcidCandidate(w, pcid, sizeof(pcid), MsGetUserName());
+				WideLog(w, "WideServerGetPcidCandidate: Error code = %u, pcid = \"%s\"", ret, pcid);
 
 				if (ret == ERR_NO_ERROR)
 				{
@@ -683,6 +698,7 @@ LABEL_RETRY:
 
 						if (ret == ERR_NO_ERROR)
 						{
+							WideLog(w, "WideServerGetCertAndKey OK.");
 							// 再接続
 							goto LABEL_CONNECT_RETRY;
 						}
@@ -690,6 +706,7 @@ LABEL_RETRY:
 						{
 							// すでに候補としてもらった PCID が使用されている
 							pcid_candidate_count++;
+							WideLog(w, "WideServerGetCertAndKey error. ERR_PCID_ALREADY_EXISTS. pcid_candidate_count = %u", pcid_candidate_count);
 
 							if (pcid_candidate_count < 10)
 							{
@@ -703,6 +720,7 @@ LABEL_RETRY:
 					}
 					else
 					{
+						WideLog(w, "WideServerGetCertAndKey error.");
 						ret = ERR_INTERNAL_ERROR;
 					}
 				}
@@ -711,12 +729,14 @@ LABEL_RETRY:
 			if (ret == ERR_RESET_CERT && w->ResetCertProc != NULL)
 			{
 				// 証明書のリセット要求が届いた
+				WideLog(w, "ERR_RESET_CERT. Calling ResetCertProc()...");
 				w->ResetCertProc(w, w->ResetCertProcParam);
 			}
 
 			// エラー発生
 			w->ServerErrorCode = ret;
-			Debug("WideServerConnect: %S\n", _E(ret));
+			WideLog(w, "WideServerConnect error code: %u", ret);
+			WideLog(w, "WideServerConnect error str: %S", _E(ret));
 		}
 		else
 		{
@@ -726,15 +746,17 @@ LABEL_RETRY:
 			{
 				// PCID の保存
 				StrCpy(w->Pcid, sizeof(w->Pcid), c.Pcid);
-				Debug("PCID=%s\n", c.Pcid);
+				WideLog(w, "PCID=%s", c.Pcid);
 			}
 			Unlock(w->SettingLock);
 
 			// 接続先 Gate が決定した
-			Debug("Redirecting to %s:%u... (for proxy: %s)\n", c.HostName, c.Port, c.HostNameForProxy);
+			WideLog(w, "Redirecting to %s:%u... (for proxy: %s)", c.HostName, c.Port, c.HostNameForProxy);
 
 			// 接続
 			w->ServerErrorCode = ERR_NO_ERROR;
+
+			WideLog(w, "Start WtsStart()");
 			s = WtsStart(w->wt, &c, w->ServerAcceptProc, w->ServerAcceptParam);
 
 			w->IsConnected = true;
@@ -744,6 +766,7 @@ LABEL_RETRY:
 			{
 				if (p->Halt)
 				{
+					WideLog(w, "WideServerConnectMainThread: p->Halt == true");
 					// 切断
 					break;
 				}
@@ -753,12 +776,15 @@ LABEL_RETRY:
 					// 切断されている
 					if (s->ErrorCode != ERR_NO_ERROR)
 					{
+						WideLog(w, "WideServerConnectMainThread: Disconnected: s->ErrorCode = %u", s->ErrorCode);
+						WideLog(w, "WideServerConnectMainThread: Disconnected: s->ErrorCode string = %S", _E(s->ErrorCode));
 						// 何らかのエラーが発生して切断
 						w->ServerErrorCode = s->ErrorCode;
 					}
 					else
 					{
 						// Gate から切断されて切断
+						WideLog(w, "WideServerConnectMainThread: Disconnected: Disconnected from the Gate");
 						w->ServerErrorCode = ERR_DISCONNECTED;
 					}
 
@@ -802,6 +828,8 @@ LABEL_RETRY:
 				interval *= 50;
 			}
 
+			WideLog(w, "Retry level = %u (ServerErrorCode = %u)", level, w->ServerErrorCode);
+
 			switch (w->ServerErrorCode)
 			{
 			case ERR_RETRY_AFTER_15_MINS:
@@ -825,10 +853,17 @@ LABEL_RETRY:
 				break;
 			}
 
+			WideLog(w, "Retry interval base = %u", interval);
+
 			interval = (UINT)((UINT64)interval * (UINT64)(Rand32() % 1000) / 1500ULL);
 
-			Debug("Wait %u msec for retry...\n", interval);
+			WideLog(w, "Retry interval actual = %u", interval);
+
+			WideLog(w, "Wait %u msec for retry...", interval);
+
 			Wait(p->HaltEvent, interval);
+
+			WideLog(w, "Wait %u msec for retry completed or aborted.", interval);
 		}
 	}
 #endif  // OS_WIN32
@@ -848,9 +883,9 @@ void WideServerConnectThread(THREAD *thread, void *param)
 		return;
 	}
 
-	Debug("WideServerConnectThread Start.\n");
-
 	w = (WIDE *)param;
+
+	WideLog(w, "WideServerConnectThread Start.");
 
 	wt = w->wt;
 
@@ -865,6 +900,12 @@ void WideServerConnectThread(THREAD *thread, void *param)
 	}
 	Unlock(w->SettingLock);
 
+	WideLog(w, "INTERNET_SETTING.ProxyType = %u", setting.ProxyType);
+	WideLog(w, "INTERNET_SETTING.ProxyHostName = %s", setting.ProxyHostName);
+	WideLog(w, "INTERNET_SETTING.ProxyPort = %u", setting.ProxyPort);
+	WideLog(w, "INTERNET_SETTING.ProxyUsername = %s", setting.ProxyUsername);
+	WideLog(w, "INTERNET_SETTING.ProxyUserAgent = %s", setting.ProxyUserAgent);
+
 	if (server_x == NULL || server_k == NULL)
 	{
 		// 証明書が登録されていない
@@ -872,10 +913,12 @@ void WideServerConnectThread(THREAD *thread, void *param)
 		{
 			w->FirstFlag = true;
 			w->ServerErrorCode = ERR_PLEASE_WAIT;
+			WideLog(w, "w->ServerErrorCode = ERR_PLEASE_WAIT;");
 		}
 		else
 		{
 			w->ServerErrorCode = ERR_NO_INIT_CONFIG;
+			WideLog(w, "w->ServerErrorCode = ERR_NO_INIT_CONFIG;");
 		}
 	}
 	else
@@ -898,6 +941,7 @@ void WideServerConnectThread(THREAD *thread, void *param)
 			if (w->HaltReconnectThread)
 			{
 				// 接続停止命令が届いた
+				WideLog(w, "w->HaltReconnectThread == true");
 				break;
 			}
 
@@ -915,7 +959,7 @@ void WideServerConnectThread(THREAD *thread, void *param)
 		ReleaseEvent(param.HaltEvent);
 	}
 
-	Debug("WideServerConnectThread: %S\n", _E(w->ServerErrorCode));
+	WideLog(w, "WideServerConnectThread: %S", _E(w->ServerErrorCode));
 
 	FreeX(server_x);
 	FreeK(server_k);
@@ -1600,12 +1644,14 @@ void WideServerReconnectEx(WIDE *w, bool stop)
 		if (w->ConnectThread != NULL)
 		{
 			// 接続スレッドを停止
+			WideLog(w, "WideServerStopConnectThread");
 			WideServerStopConnectThread(w);
 		}
 
 		if (stop == false)
 		{
 			// 接続スレッドを開始
+			WideLog(w, "WideServerStartConnectThread");
 			WideServerStartConnectThread(w);
 		}
 	}
@@ -1744,6 +1790,11 @@ WIDE *WideServerStartEx2(char *svc_name, WT_ACCEPT_PROC *accept_proc, void *acce
 
 	w = ZeroMalloc(sizeof(WIDE));
 
+	w->WideLog = NewLog(WIDE_LOG_DIRNAME, "tunnel", LOG_SWITCH_DAY);
+	w->WideLog->Flush = true;
+
+	WideLog(w, "-------------------- Start Tunnel System --------------------");
+
 	w->SeLang = se_lang;
 	if (master_cert == NULL)
 	{
@@ -1775,7 +1826,11 @@ WIDE *WideServerStartEx2(char *svc_name, WT_ACCEPT_PROC *accept_proc, void *acce
 			fixed_entrance_url);
 	}
 
+	WideLog(w, "FixedEntranceUrl: \"%s\"", w->wt->FixedEntranceUrl);
+
 	StrCpy(w->SvcName, sizeof(w->SvcName), svc_name);
+
+	WideLog(w, "SvcName: \"%s\"", w->SvcName);
 
 	// 接続を開始
 	WideServerReconnect(w);
@@ -1904,6 +1959,116 @@ void FreeAcceptQueue(ACCEPT_QUEUE *aq)
 	Free(aq);
 }
 
+// ログ
+void WtSessionLog(TSESSION* s, char* format, ...)
+{
+	va_list args;
+	char format2[MAX_SIZE * 2] = CLEAN;
+	// 引数チェック
+	if (format == NULL || s == NULL || s->wt == NULL || s->wt->Wide == NULL || s->wt->Wide->WideLog == NULL)
+	{
+		return;
+	}
+
+	Format(format2, sizeof(format2), "[%s] %s", s->ServerSessionName, format);
+
+	va_start(args, format);
+
+	WideLogMain(s->wt->Wide, format2, args);
+
+	va_end(args);
+}
+void WtLog(WT* wt, char* format, ...)
+{
+	va_list args;
+	char format2[MAX_SIZE * 2] = CLEAN;
+	// 引数チェック
+	if (format == NULL || wt == NULL || wt->Wide == NULL || wt->Wide->WideLog == NULL)
+	{
+		return;
+	}
+
+	Format(format2, sizeof(format2), "[%s] %s", "System", format);
+
+	va_start(args, format);
+
+	WideLogMain(wt->Wide, format2, args);
+
+	va_end(args);
+}
+void WideLog(WIDE* w, char* format, ...)
+{
+	va_list args;
+	char format2[MAX_SIZE * 2] = CLEAN;
+	// 引数チェック
+	if (format == NULL || w == NULL || w->WideLog == NULL)
+	{
+		return;
+	}
+
+	Format(format2, sizeof(format2), "[%s] %s", "System", format);
+
+	va_start(args, format);
+
+	WideLogMain(w, format2, args);
+
+	va_end(args);
+}
+
+void WtLogEx(WT* wt, char* prefix, char* format, ...)
+{
+	va_list args;
+	char format2[MAX_SIZE * 2] = CLEAN;
+	// 引数チェック
+	if (format == NULL || wt == NULL || wt->Wide == NULL || wt->Wide->WideLog == NULL)
+	{
+		return;
+	}
+
+	Format(format2, sizeof(format2), "[%s] %s", prefix, format);
+
+	va_start(args, format);
+
+	WideLogMain(wt->Wide, format2, args);
+
+	va_end(args);
+}
+void WideLogEx(WIDE* w, char* prefix, char* format, ...)
+{
+	va_list args;
+	char format2[MAX_SIZE * 2] = CLEAN;
+	// 引数チェック
+	if (format == NULL || w == NULL || w->WideLog == NULL)
+	{
+		return;
+	}
+
+	Format(format2, sizeof(format2), "[%s] %s", prefix, format);
+
+	va_start(args, format);
+
+	WideLogMain(w, format2, args);
+
+	va_end(args);
+}
+
+void WideLogMain(WIDE* w, char *format, va_list args)
+{
+	char buf3[MAX_SIZE * 2 + 64] = CLEAN;
+	wchar_t buf[MAX_SIZE * 2 + 64] = CLEAN;
+	if (w == NULL || format == NULL || w->WideLog == NULL)
+	{
+		return;
+	}
+
+	FormatArgs(buf3, sizeof(buf3), format, args);
+	StrToUni(buf, sizeof(buf), buf3);
+
+	InsertUnicodeRecord(w->WideLog, buf);
+
+	Debug("WIDE_LOG: %S\n", buf);
+}
+
 // Server の停止
 void WideServerStop(WIDE *w)
 {
@@ -1934,6 +2099,10 @@ void WideServerStop(WIDE *w)
 	{
 		FreeAcceptQueue(w->AcceptQueue);
 	}
+
+	WideLog(w, "-------------------- Stop Tunnel System --------------------");
+
+	FreeLog(w->WideLog);
 
 	Free(w);
 }

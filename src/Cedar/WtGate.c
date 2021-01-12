@@ -1227,12 +1227,15 @@ bool WtIsTTcpDisconnected(TSESSION *s, TTCP *ttcp)
 	{
 		if ((ttcp->LastCommTime + (UINT64)ttcp->TunnelTimeout) < s->Tick)
 		{
+			WtSessionLog(s, "WtIsTTcpDisconnected: Receive timeout detected. ttcp->LastCommTime = %I64u, ttcp->TunnelTimeout = %u, s->Tick = %u",
+				ttcp->LastCommTime, ttcp->TunnelTimeout, s->Tick);
 			ttcp->Disconnected = true;
 		}
 	}
 
 	if (ttcp->Disconnected)
 	{
+		WtSessionLog(s, "ttcp->Disconnected == true");
 		Disconnect(ttcp->Sock);
 
 		return true;
@@ -1604,6 +1607,7 @@ READ_DATA_SIZE:
 			if (i > WT_MAX_BLOCK_SIZE)
 			{
 				// 不正なデータサイズを受信。通信エラーか
+				WtSessionLog(s, "WtParseRecvTTcp: Invalid receive data. i > WT_MAX_BLOCK_SIZE. i = %u", i);
 				ttcp->Disconnected = true;
 				ttcp->WantSize = sizeof(UINT);
 				ReadFifo(fifo, NULL, sizeof(UINT));
@@ -1744,6 +1748,7 @@ void WtSendTTcp(TSESSION *s, TTCP *ttcp)
 		{
 			// 切断された
 			ttcp->Disconnected = true;
+			WtSessionLog(s, "WtSendTTcp: WtSendSock(): Physical socket is disconnected.");
 			ClearFifo(fifo);
 			break;
 		}
@@ -1791,6 +1796,7 @@ void WtRecvTTcpEx(TSESSION *s, TTCP *ttcp, UINT remain_buf_size)
 	sock = ttcp->Sock;
 	if (sock->Connected == false)
 	{
+		WtSessionLog(s, "WtRecvTTcpEx: sock->Connected == false");
 		ttcp->Disconnected = true;
 		return;
 	}
@@ -1811,6 +1817,7 @@ RECV_START:
 	{
 TTCP_DISCONNECTED:
 		// コネクションが切断された
+		WtSessionLog(s, "WtRecvTTcpEx: WtRecvSock(): Physical socket is disconnected.");
 		ttcp->Disconnected = true;
 		return;
 	}
@@ -1819,6 +1826,8 @@ TTCP_DISCONNECTED:
 		// 受信待ち
 		if ((s->Tick > ttcp->LastCommTime) && ((s->Tick - ttcp->LastCommTime) >= (UINT64)ttcp->TunnelTimeout))
 		{
+			WtSessionLog(s, "WtIsTTcpDisconnected: Receive timeout detected. ttcp->LastCommTime = %I64u, ttcp->TunnelTimeout = %u, s->Tick = %u",
+				ttcp->LastCommTime, ttcp->TunnelTimeout, s->Tick);
 			// タイムアウト発生
 			goto TTCP_DISCONNECTED;
 		}

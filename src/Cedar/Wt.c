@@ -379,22 +379,24 @@ bool SockIoIsConnected(SOCKIO *io)
 }
 
 // 切断
-void SockIoDisconnect(SOCKIO *io)
+bool SockIoDisconnect(SOCKIO* io)
 {
 	// 引数チェック
 	if (io == NULL)
 	{
-		return;
+		return false;
 	}
 	if (io->Disconnected)
 	{
-		return;
+		return false;
 	}
 
 	io->Disconnected = true;
 
 	SockIoSetIoEvent(io);
 	SockIoSetSentNoticeEvent(io);
+
+	return true;
 }
 
 // すべて受信

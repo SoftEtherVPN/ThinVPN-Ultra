@@ -125,6 +125,7 @@ struct WTS_NEW_TUNNEL_THREAD_PARAM
 {
 	TSESSION *Session;
 	SOCKIO *SockIo;
+	UINT TunnelId;
 };
 
 // 関数プロトタイプ

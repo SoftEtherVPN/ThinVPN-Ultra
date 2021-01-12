@@ -152,6 +152,10 @@ struct SESSION_AND_CLIENT
 // その場合次のセッションリスト報告を送信するまでの間の遅延
 //#define	WIDE_REPORT_FAST_SEND_DELAY		4000
 
+// ログ
+#define WIDE_LOG_DIRNAME				"@tunnel_log"
+
+
 
 // WIDE オブジェクトの種類
 #define WIDE_TYPE_GATE			0		// WideGate
@@ -196,6 +200,8 @@ struct WIDE
 	char SvcName[32];
 	UINT SeLang;
 	UCHAR ClientId[SHA1_SIZE];
+
+	LOG* WideLog;
 
 	// WideClient
 	char RecvUrl[MAX_PATH];
@@ -376,6 +382,16 @@ bool WideServerTryAutoReconnect(WIDE *w);
 BUF *WideServerSaveLocalKeyToBuffer(K *k, X *x);
 bool WideServerLoadLocalKeyFromBuffer(BUF *buf, K **k, X **x);
 CRYPT *WideServerLocalKeyFileEncrypt();
+
+void WideLog(WIDE* w, char* format, ...);
+void WideLogEx(WIDE* w, char* prefix, char* format, ...);
+
+void WtLog(WT* wt, char* format, ...);
+void WtLogEx(WT* wt, char* prefix, char* format, ...);
+
+void WtSessionLog(TSESSION *s, char* format, ...);
+
+void WideLogMain(WIDE* w, char* format, va_list args);
 
 // WideServer - AcceptQueue
 WIDE *WideServerStartForAcceptQueue(char *svc_name, X *master_cert, char *entrance);

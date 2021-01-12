@@ -101,6 +101,7 @@ static char *delete_targets[] =
 	"bridge_log",
 	"packet_log_archive",
 	"azure_log",
+	"tunnel_log",
 };
 
 static UINT eraser_check_interval = DISK_FREE_CHECK_INTERVAL_DEFAULT;

@@ -248,6 +248,7 @@ struct WT
 	char System[MAX_PATH];
 	UINT64 BootTime;
 	UINT64 BootTick;
+	UINT ServerSessionNameSeed;
 
 	// Gate 用
 	LISTENER *Listener;				// リスナー
@@ -356,7 +357,7 @@ void SockIoReplaceIoEvent(SOCKIO *io, SOCK_EVENT *e);
 void SockIoSetSentNoticeEvent(SOCKIO *io);
 void SockIoSetTimeout(SOCKIO *io, UINT timeout);
 bool SockIoIsConnected(SOCKIO *io);
-void SockIoDisconnect(SOCKIO *io);
+bool SockIoDisconnect(SOCKIO *io);
 bool SockIoSendPack(SOCKIO *io, PACK *p);
 PACK *SockIoRecvPack(SOCKIO *io);
 LIST *WtNewUsedTunnelIdList();
