@@ -435,6 +435,23 @@ UINT DgOtpDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *param
 	{
 	case WM_INITDIALOG:
 		DgOptDlgInit(hWnd, dg);
+
+		SetTimer(hWnd, 1, 100, NULL);
+		break;
+
+	case WM_TIMER:
+		switch (wParam)
+		{
+		case 1:
+			KillTimer(hWnd, 1);
+
+			if (Vars_ActivePatch_GetBool("ThinSupportSms"))
+			{
+				OnceMsg(hWnd, _UU("DG_SMS_HELP_TITLE"), _UU("DG_SMS_HELP"), false, ICO_INFORMATION);
+			}
+
+			break;
+		}
 		break;
 
 	case WM_COMMAND:
@@ -576,9 +593,18 @@ void DgOptDlgUpdate(HWND hWnd, DG *dg)
 
 	if (enabled)
 	{
-		if (!(InStr(email, "@") && InStr(email, ".")))
+		if (Vars_ActivePatch_GetBool("ThinSupportSms") == false)
 		{
-			ok = false;
+			// Mail
+			if (!(InStr(email, "@") && InStr(email, ".")))
+			{
+				ok = false;
+			}
+		}
+		else
+		{
+			// SMS
+			ok = IsFilledStr(email);
 		}
 	}
 

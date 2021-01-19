@@ -481,6 +481,11 @@ DG_MAC_SETTINGS_REQUIRED		Client MAC Address Authentication is enabled, but no M
 
 DG_NO_LOCAL_MAC_ADDRESS_LIST	The $APPSHORT$ Enterprise Policy Enforcement Server currently enforces the Client MAC Address Authentication. The current policy enforces the central administration of the MAC adddress list by the CLIENT_ALLOWED_MAC_LIST_URL policy item.\r\n\rnAlso, the current policy enforces the NO_LOCAL_MAC_ADDRESS_LIST item to 1 (true).\r\n\r\nTherefore the local MAC address list cannot be edited manually by the local user.\r\n\r\nPlease contact to your system administrator to add / delete MAC addresses to the central list.
 
+DG_SMS_HELP     This Thin Telework System Private Version's relay system may use SMS authentication instead of email address authentication for One Time Password (OTP) authentication.\r\n\r\nIf the relay system uses SMS authentication, enter your cell phone number (e.g. 09001234567) instead of your e-mail address in the field.\r\n\r\nIf the relay system uses SMS authentication, you cannot use your e-mail address even if you enter it. To find out if this relay system uses SMS authentication, contact the administrator of the relay system.
+
+DG_SMS_HELP_TITLE   About SMS Authentication
+
+
 
 
 # インストーラ関係
