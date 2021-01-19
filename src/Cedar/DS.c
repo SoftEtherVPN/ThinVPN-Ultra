@@ -287,7 +287,12 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 		b->DisableShare = true;
 	}
 
-	b->IsLimitedFirewallMandated = IniIntValue(o, "ENFORCE_LIMITED_FIREWALL");
+	if (Vars_ActivePatch_GetBool("IsPublicVersion") == false)
+	{
+		// パブリック版以外では ENFORCE_LIMITED_FIREWALL を設定可能
+		b->IsLimitedFirewallMandated = IniIntValue(o, "ENFORCE_LIMITED_FIREWALL");
+	}
+
 	b->EnforceProcessWatcherAlways = IniIntValue(o, "ENFORCE_PROCESS_WATCHER_ALWAYS");
 	b->EnforceProcessWatcher = b->EnforceProcessWatcherAlways || IniIntValue(o, "ENFORCE_PROCESS_WATCHER");
 
