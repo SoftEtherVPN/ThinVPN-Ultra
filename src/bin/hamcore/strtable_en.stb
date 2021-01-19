@@ -7891,6 +7891,8 @@ SW_COMPONENT_$APP_ID_PREFIX$THINCLIENT_DESCRIPTION			Install it on the PC you wa
 SW_WELCOME_UAC_WARNING						There is a possibility that you are operating the screen of this computer remotely by using $APPFULL_SERVER$.\r\n\r\nIt is recommended that you do not remotely operate the software of $APPFULL_SERVER$, but directly operate the screen of the PC that serves as the server to upgrade the software.\r\n\r\nDo you really want to continue working remotely?\r\n\r\n\r\nOnce you click 'OK', the computer's Windows User Account Control (UAC) pop-up will appear. Since the current mode of operation of $APPSHORT_SERVER$ is User Mode, the screen may be disconnected or rendered inoperable when the UAC pop-up appears. If this happens, wait for about 1 to 2 minutes and then try to reconnect. If the connection does not recover, please operate the screen of the computer that serves as the server directly and perform the update.
 
 
+SW_AUTO_ADMIN_ERROR							You must have Administrators or SYSTEM privileges to run the unattended installation mode. Run this command with Administrators or SYSTEM privileges, or elevate privileges when UAC pops up (UAC is available on Windows Vista and later).
+
 
 
 
