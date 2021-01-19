@@ -303,9 +303,10 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 
 		if (b->EnforceMacCheck)
 		{
-			if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+			if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") ||
+				Vars_ActivePatch_GetBool("IsPrivateVersion"))
 			{
-				// セキュリティ強化版では、NO_LOCAL_MAC_ADDRESS_LIST のポリシー指定を読み込むことができる
+				// セキュリティ強化版またはプライベート版では、NO_LOCAL_MAC_ADDRESS_LIST のポリシー指定を読み込むことができる
 				b->NoLocalMacAddressList = IniIntValue(o, "NO_LOCAL_MAC_ADDRESS_LIST");
 			}
 		}
