@@ -2590,6 +2590,16 @@ void DuOptionDlgUpdate(HWND hWnd, DU_OPTION *t)
 		return;
 	}
 
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+	{
+		if (MsIsVista() && MsIsAdmin())
+		{
+			// LGWAN 版で Windows Vista 以降で Administrators 権限の場合はユーザー指定
+			// EXE 関係のコントロールを無効化する
+			SetEnable(hWnd, C_USERPATH, false);
+		}
+	}
+
 	SetEnable(hWnd, S_CHECK_CERT, IsChecked(hWnd, C_CHECK_CERT));
 
 	SetEnable(hWnd, E_PATH, IsChecked(hWnd, C_USERPATH));
@@ -2604,7 +2614,7 @@ void DuOptionDlgUpdate(HWND hWnd, DU_OPTION *t)
 		wchar_t tmp[MAX_PATH];
 
 		GetTxt(hWnd, E_PATH, tmp, sizeof(tmp));
-
+		
 		if (UniIsEmptyStr(tmp))
 		{
 			b = false;

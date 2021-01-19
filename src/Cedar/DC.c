@@ -1207,6 +1207,19 @@ void DcNormalizeConfig(DC *dc)
 		return;
 	}
 
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+	{
+		if (MsIsVista() && MsIsAdmin())
+		{
+			// LGWAN 版で Windows Vista 以降で Administrators 権限の場合はユーザー指定
+			// EXE を実行できないようにする
+			if (dc->MstscLocation == DC_MSTSC_USERPATH)
+			{
+				dc->MstscLocation = DC_MSTSC_SYSTEM32;
+			}
+		}
+	}
+
 	// mstsc に関する設定の確認
 	if (dc->MstscLocation == DC_MSTSC_SYSTEM32)
 	{
