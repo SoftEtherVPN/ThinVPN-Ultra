@@ -2056,7 +2056,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 			Show(t->hWnd, 0);
 		}
 
-		if ((s->IsLimitedMode && (dc->DisableLimitedFw == false || s->IsEnspectionEnabled)) || Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") || (Vars_ActivePatch_GetInt("ThinFwMode") == 1 && dc->DisableLimitedFw == false) || (Vars_ActivePatch_GetInt("ThinFwMode") == 2))
+		if ((s->IsLimitedMode && (dc->DisableLimitedFw == false || s->IsEnspectionEnabled)) || Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") || (Vars_ActivePatch_GetInt("ThinFwMode") == 1 && dc->DisableLimitedFw == false) || (Vars_ActivePatch_GetInt("ThinFwMode") == 2) || s->IsLimitedFirewallMandated)
 		{
 			bool mandate = s->IsEnspectionEnabled;
 
@@ -2066,11 +2066,17 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 				mandate = true;
 			}
 
+			if (s->IsLimitedFirewallMandated)
+			{
+				// ポリシーで完全閉域化 FW を強制有効する設定になっている
+				mandate = true;
+			}
+
 			// 接続先サーバーが「行政システム適応モード」の場合はファイアウォールを
 			// 勧める画面を表示する
 			if (MsIsVista())
 			{
-				if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") && Vars_ActivePatch_GetInt("ThinFwMode") != 2)
+				if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") && Vars_ActivePatch_GetInt("ThinFwMode") != 2 && s->IsLimitedFirewallMandated == false)
 				{
 					// 2020/10/02 ThinTelework_EnforceStrongSecurity が ON の場合は
 					// mandate をしないようにする

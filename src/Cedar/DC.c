@@ -2562,6 +2562,7 @@ UINT DcSessionConnect(DC_SESSION *s)
 		s->IsLimitedMode = true;
 	}
 	s->IsEnspectionEnabled = io->UserData6;
+	s->IsLimitedFirewallMandated = io->UserData7;
 	Debug("DS_CAPS: %u\n", s->DsCaps);
 
 	// この SOCKIO をキューに追加する
@@ -2921,6 +2922,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	wchar_t lifetime_msg[MAX_PATH];
 	bool is_server_limited_mode = false;
 	wchar_t computer_name[MAX_PATH];
+	bool is_limited_firewall_mandated = false;
 	// 引数チェック
 	if (dc == NULL || sock == NULL || pcid == NULL || auth_callback == NULL)
 	{
@@ -2975,6 +2977,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	use_advanced_security = PackGetBool(p, "UseAdvancedSecurity");
 	is_otp_enabled = PackGetBool(p, "IsOtpEnabled");
 	run_inspect = PackGetBool(p, "RunInspect");
+	is_limited_firewall_mandated = PackGetBool(p, "IsLimitedFirewallMandated");
 
 	lifetime = PackGetInt64(p, "Lifetime");
 	PackGetUniStr(p, "LifeTimeMsg", lifetime_msg, sizeof(lifetime_msg));
@@ -3353,6 +3356,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	sock->UserData4 = ds_caps;
 	sock->UserData5 = is_server_limited_mode;
 	sock->UserData6 = run_inspect;
+	sock->UserData7 = is_limited_firewall_mandated;
 
 	SockIoSetTimeout(sock, INFINITE);
 

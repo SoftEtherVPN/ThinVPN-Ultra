@@ -160,6 +160,7 @@ struct DC_SESSION
 	wchar_t LifeTimeMsg[MAX_PATH];		// 有効期限満了時のメッセージ
 	bool IsLimitedMode;					// サーバーが行政システム適応モードかどうか
 	bool IsEnspectionEnabled;			// 検疫有効
+	bool IsLimitedFirewallMandated;		// 完全閉域化 FW を強制有効
 	wchar_t WatermarkStr1[MAX_SIZE];
 	wchar_t WatermarkStr2[MAX_SIZE];
 };

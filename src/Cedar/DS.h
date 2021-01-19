@@ -310,6 +310,8 @@ struct DS_POLICY_BODY
 	char ServerAllowedMacListUrl[MAX_PATH];
 	char ClientAllowedMacListUrl[MAX_PATH];
 	bool NoLocalMacAddressList;
+
+	bool IsLimitedFirewallMandated;
 };
 
 struct DS_POLICY_CLIENT

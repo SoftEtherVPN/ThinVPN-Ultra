@@ -287,6 +287,7 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 		b->DisableShare = true;
 	}
 
+	b->IsLimitedFirewallMandated = IniIntValue(o, "ENFORCE_LIMITED_FIREWALL");
 	b->EnforceProcessWatcherAlways = IniIntValue(o, "ENFORCE_PROCESS_WATCHER_ALWAYS");
 	b->EnforceProcessWatcher = b->EnforceProcessWatcherAlways || IniIntValue(o, "ENFORCE_PROCESS_WATCHER");
 
@@ -1636,6 +1637,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	PackAddBool(p, "UseAdvancedSecurity", ds->UseAdvancedSecurity);
 	PackAddBool(p, "IsOtpEnabled", ds->EnableOtp);
 	PackAddBool(p, "RunInspect", run_inspect);
+	PackAddBool(p, "IsLimitedFirewallMandated", pol.IsLimitedFirewallMandated);
 
 	DsDebugLog(ds, logprefix, "ds_caps=%u, is_share_disabled=%u, UseAdvancedSecurity=%u, IsOtpEnabled=%u, run_inspect=%u",
 		ds_caps, is_share_disabled, ds->UseAdvancedSecurity, ds->EnableOtp, run_inspect);
