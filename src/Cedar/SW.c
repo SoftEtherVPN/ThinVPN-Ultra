@@ -6935,13 +6935,16 @@ void SwDefineComponents(SW* sw)
 		NULL, 0, _UU("PRODUCT_NAME_NOSHARE_POSTFIX"), "SW_COMPONENT_" APP_ID_PREFIX "THINSVR_DESCRIPTION_NS_POSTFIX");
 	Add(sw->ComponentList, c);
 
-	// NTT Client
-	c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_THIN_CLIENT, ICO_THINCLIENT, 13, DI_FILENAME_DESKCLIENT,
-		SW_LONG_THINCLIENT, false, sizeof(ntt_client_files) / sizeof(char*), ntt_client_files,
-		DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_THINCLIENT"),
-		NULL, 0, NULL, NULL);
+	if (Vars_ActivePatch_GetBool("ThinSetupServerOnly") == false)
+	{
+		// NTT Client
+		c = SwNewComponent(SW_NAME_THINCLIENT, NULL, SW_CMP_THIN_CLIENT, ICO_THINCLIENT, 13, DI_FILENAME_DESKCLIENT,
+			SW_LONG_THINCLIENT, false, sizeof(ntt_client_files) / sizeof(char*), ntt_client_files,
+			DI_FILENAME_DESKCLIENT, _UU("SW_RUN_TEXT_THINCLIENT"),
+			NULL, 0, NULL, NULL);
 
-	Add(sw->ComponentList, c);
+		Add(sw->ComponentList, c);
+	}
 }
 
 // Detect the available components
