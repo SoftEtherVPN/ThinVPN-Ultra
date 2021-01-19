@@ -935,6 +935,7 @@ void SetWizardButtonEx(WIZARD_PAGE *p, bool enable_next, bool enable_back, bool 
 void JumpWizard(WIZARD_PAGE *p, UINT next_id);
 void CloseWizard(WIZARD_PAGE *p);
 void SetUacIcon(HWND hWnd, UINT id);
+void ClickWizardButton(WIZARD* w, UINT psbtn_id);
 
 LIST *NewBitmapList();
 void FreeBitmapList(LIST *o);

@@ -1704,6 +1704,18 @@ void CloseWizard(WIZARD_PAGE *p)
 	}
 }
 
+// Click the wizard button
+void ClickWizardButton(WIZARD* w, UINT psbtn_id)
+{
+	// Validate arguments
+	if (w == NULL)
+	{
+		return;
+	}
+
+	PropSheet_PressButton(w->hWndWizard, psbtn_id);
+}
+
 // Show the wizard
 void ShowWizard(HWND hWndParent, WIZARD *w, UINT start_id)
 {

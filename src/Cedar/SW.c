@@ -694,6 +694,20 @@ bool SwSfxExtractProcess(HWND hWnd, bool* hide_error_msg)
 				Zero(copy_of_me, sizeof(copy_of_me));
 			}
 
+			// Copy EntryPoint.dat physical file if exists
+			wchar_t entry_point[MAX_PATH] = CLEAN;
+			CombinePathW(entry_point, sizeof(entry_point), MsGetMyTempDirW(), L"EntryPoint.dat");
+			if (FileCopyW(L"@EntryPoint.dat", entry_point))
+			{
+				// EntryPoint.dat ファイルを自分でも読み込んでみます
+				// 文法エラーがあると強制終了されます
+				X* cert = NULL;
+				char url[MAX_PATH] = CLEAN;
+				char mode[64] = CLEAN;
+				char system[64] = CLEAN;
+				WideLoadEntryPoint(&cert, url, sizeof(url), NULL, mode, sizeof(mode), system, sizeof(system));
+			}
+
 			// Add a path of this own
 			UniFormat(tmp, sizeof(tmp), L" /CALLERSFXPATH:\"%s\"", copy_of_me);
 			UniStrCat(params, sizeof(params), tmp);
@@ -1786,6 +1800,7 @@ UINT SwFinish(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard,
 		wizard->CloseConfirmMsg = NULL;
 
 		sw->ExitCode = 0;
+
 		break;
 
 	case WM_WIZ_SHOW:
@@ -1806,9 +1821,24 @@ UINT SwFinish(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard,
 			SetText(hWnd, B_RUN, sw->CurrentComponent->StartDescription);
 			Show(hWnd, B_RUN);
 			Format(tmp, sizeof(tmp), "UI_NoCheck_%s_%u", sw->CurrentComponent->Name, sw->IsSystemMode);
-			Check(hWnd, B_RUN, !MsRegReadInt(REG_CURRENT_USER, SW_REG_KEY, tmp));
+
+			if (sw->Auto)
+			{
+				Check(hWnd, B_RUN, true);
+			}
+			else
+			{
+				Check(hWnd, B_RUN, !MsRegReadInt(REG_CURRENT_USER, SW_REG_KEY, tmp));
+			}
+
 			sw->Run = IsChecked(hWnd, B_RUN);
 		}
+
+		if (sw->Auto)
+		{
+			ClickWizardButton(wizard, PSBTN_FINISH);
+		}
+
 		break;
 
 	case WM_WIZ_HIDE:
@@ -5046,6 +5076,11 @@ UINT SwReady(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, 
 
 	case WM_WIZ_SHOW:
 		SetWizardButton(wizard_page, true, true, true, false);
+
+		if (sw->Auto)
+		{
+			ClickWizardButton(wizard, PSBTN_NEXT);
+		}
 		break;
 
 	case WM_WIZ_HIDE:
@@ -5395,6 +5430,7 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WI
 		SwDirUpdate(hWnd, sw, wizard_page);
 
 		SetTimer(hWnd, 1, 100, NULL);
+
 		break;
 
 	case WM_TIMER:
@@ -5405,6 +5441,11 @@ UINT SwDir(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, WI
 		SetWizardButton(wizard_page, true, false, true, false);
 
 		SwDirUpdate(hWnd, sw, wizard_page);
+
+		if (sw->Auto)
+		{
+			ClickWizardButton(wizard, PSBTN_NEXT);
+		}
 		break;
 
 	case WM_WIZ_HIDE:
@@ -5708,6 +5749,11 @@ UINT SwWarning(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard
 		Focus(hWnd, E_TEXT);
 
 		SetWizardButton(wizard_page, true, true, true, false);
+
+		if (sw->Auto)
+		{
+			ClickWizardButton(wizard, PSBTN_NEXT);
+		}
 		break;
 
 	case WM_WIZ_HIDE:
@@ -5904,13 +5950,26 @@ UINT SwEula(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard, W
 			//sw->EulaAgreed = true;
 		}
 
-		Check(hWnd, B_AGREE, sw->EulaAgreed);
+		if (sw->Auto)
+		{
+			Check(hWnd, B_AGREE, true);
+		}
+		else
+		{
+			Check(hWnd, B_AGREE, sw->EulaAgreed);
+		}
 
 		UnselectEdit(hWnd, E_TEXT);
 
 		Focus(hWnd, E_TEXT);
 
 		SwEulaUpdate(hWnd, sw, wizard, wizard_page);
+
+		if (sw->Auto)
+		{
+			ClickWizardButton(wizard, PSBTN_NEXT);
+		}
+
 		break;
 
 	case WM_WIZ_HIDE:
@@ -6077,6 +6136,7 @@ UINT SwComponents(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wiz
 		}
 
 		LvInsertColumn(hWnd, L_LIST, 0, L"Component", 515);
+
 		break;
 
 	case WM_WIZ_SHOW:
@@ -6085,6 +6145,11 @@ UINT SwComponents(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wiz
 		SwComponentsInit(hWnd, sw);
 
 		SwComponentsUpdate(hWnd, sw, wizard, wizard_page);
+
+		if (sw->Auto)
+		{
+			ClickWizardButton(wizard, PSBTN_NEXT);
+		}
 
 		break;
 
@@ -6347,6 +6412,10 @@ UINT SwWelcomeDlg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wiz
 
 		sw->DoubleClickBlocker = false;
 
+		if (sw->Auto)
+		{
+			ClickWizardButton(wizard, PSBTN_NEXT);
+		}
 		break;
 
 	case WM_WIZ_HIDE:
@@ -7174,6 +7243,7 @@ void SwParseCommandLine(SW* sw)
 		{"ISWEBINSTALLER", NULL, NULL, NULL, NULL, },
 		{"SUINSTMODE", NULL, NULL, NULL, NULL, },
 		{"URDPINSTMODE", NULL, NULL, NULL, NULL, },
+		{"AUTO", NULL, NULL, NULL, NULL, },
 	};
 	// Validate arguments
 	if (sw == NULL)
@@ -7203,6 +7273,8 @@ void SwParseCommandLine(SW* sw)
 			sw->HideStartCommand = GetParamYes(o, "HIDESTARTCOMMAND");
 			//sw->SuInstMode = GetParamYes(o, "SUINSTMODE");
 			sw->UrdpInstMode = GetParamYes(o, "URDPINSTMODE");
+
+			sw->Auto = GetParamYes(o, "AUTO");
 
 			StrCpy(sw->SfxMode, sizeof(sw->SfxMode), GetParamStr(o, "SFXMODE"));
 			UniStrCpy(sw->SfxOut, sizeof(sw->SfxOut), GetParamUniStr(o, "SFXOUT"));
@@ -7294,6 +7366,28 @@ UINT SWExecMain()
 	else
 	{
 		// Normal mode
+		if (sw->Auto && MsIsAdmin() == false)
+		{
+			// 自動モードで Admin 権限でない場合は Admin 権限に昇格する
+			if (MsIsVista())
+			{
+			L_ADMIN_RETRY:
+				if (SwReExecMyself(sw, NULL, true) == false)
+				{
+					if (MsgBox(NULL, MB_ICONEXCLAMATION | MB_TOPMOST | MB_SYSTEMMODAL | MB_RETRYCANCEL, _UU("SW_AUTO_ADMIN_ERROR")) == IDRETRY)
+					{
+						goto L_ADMIN_RETRY;
+					}
+				}
+			}
+			else
+			{
+				MsgBox(NULL, MB_ICONSTOP | MB_TOPMOST | MB_SYSTEMMODAL, _UU("SW_AUTO_ADMIN_ERROR"));
+			}
+
+			goto LABEL_CLEANUP;
+		}
+
 		// Load setuplog.dat
 		if (IsFileExistsW(L"@" L"setuplog.dat") && (logfile = SwLoadLogFile(sw, L"@" L"setuplog.dat")) == NULL)
 		{
@@ -7327,6 +7421,7 @@ UINT SWExecMain()
 		}
 	}
 
+LABEL_CLEANUP:
 	// Release the SW
 	ret = FreeSw(sw);
 

@@ -332,6 +332,8 @@ typedef struct SW
 	bool OverwriteFlag_DisableUserMode;
 	bool DisableDirectoryChange;
 
+	bool Auto;
+
 	ONCEMSG_DLG* DenyTsConnectionPolicyWarningDlg;
 
 	DC_NWDETECT_RESULT NwDetectResult;	// ネットワーク自動検出の結果
