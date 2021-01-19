@@ -476,6 +476,7 @@ bool Vars_ActivePatch_GetBool(char* name);
 UINT64 Vars_ActivePatch_GetInt64(char* name);
 char* Vars_ActivePatch_GetStr(char* name);
 char* Vars_ActivePatch_GetStrEx(char* name, char *default_str);
+bool Vars_ActivePatch_Exists(char* name);
 
 UINT* GenerateShuffleList(UINT num);
 UINT* GenerateShuffleListWithSeed(UINT num, void* seed, UINT seed_size);

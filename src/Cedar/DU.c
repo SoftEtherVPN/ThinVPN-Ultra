@@ -2547,6 +2547,8 @@ void DuOptionDlgInit(HWND hWnd, DU_OPTION *t)
 
 	Check(hWnd, C_LIMITED_FW, !dc->DisableLimitedFw);
 
+	SetShow(hWnd, C_LIMITED_FW, Vars_ActivePatch_Exists("ThinFwMode") == false);
+
 	if (Vars_ActivePatch_GetBool("ThinTelework_DisableOmakeFunctions"))
 	{
 		Hide(hWnd, C_SHOW_THEEND);

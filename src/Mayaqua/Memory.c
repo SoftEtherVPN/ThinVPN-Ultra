@@ -243,6 +243,17 @@ char* Vars_ActivePatch_GetStrEx(char* name, char* default_str)
 
 	return p;
 }
+bool Vars_ActivePatch_Exists(char* name)
+{
+	void* data_ptr = NULL;
+	UINT data_size = 0;
+	if (Vars_ActivePatch_GetData(name, &data_ptr, &data_size))
+	{
+		return true;
+	}
+
+	return false;
+}
 
 // New PRand
 PRAND *NewPRand(void *key, UINT key_size)
