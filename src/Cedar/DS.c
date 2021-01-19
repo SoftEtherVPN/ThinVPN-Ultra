@@ -3209,6 +3209,8 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 		{
 			if (UniIsEmptyStr(t->MsgForServer))
 			{
+				// 2021.1.20 このメッセージにはあまり意味がないので無効化
+#if 0
 				// 特に規制が設定されていない
 				// 利用禁止ブラックリストにも入っていない
 				char list_msg[256] = {0};
@@ -3239,6 +3241,7 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 				UniFormat(t->MsgForServer2, sizeof(t->MsgForServer2), _UU("DS_POLICY_DEFAULT_MSG"), list_msg);
 
 				ReleaseStrList(dns_list);
+#endif // 0
 			}
 		}
 	}
