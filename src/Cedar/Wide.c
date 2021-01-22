@@ -1312,11 +1312,23 @@ UINT WideServerSendOtpEmail(WIDE *w, char *otp, char *email, char *ip, char *fqd
 	PackAddStr(r, "Ip", ip);
 	PackAddStr(r, "Fqdn", fqdn);
 
+	WideLog(w, "SendOtpEmail. OTP = %s, Email = %s, IP = %s, Fqdn = %s",
+		otp, email, ip, fqdn);
+
 	p = WideCall(w, "SendOtpEmail", r, false, true);
 	FreePack(r);
 
 	ret = GetErrorFromPack(p);
 	FreePack(p);
+
+	if (ret != ERR_NO_ERROR)
+	{
+		WideLog(w, "SendOtpEmail Error Code = %u", ret);
+	}
+	else
+	{
+		WideLog(w, "SendOtpEmail OK.");
+	}
 
 	return ret;
 }
