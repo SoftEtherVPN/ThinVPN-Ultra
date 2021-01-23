@@ -287,6 +287,10 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 		b->DisableShare = true;
 	}
 
+	b->AuthLockoutCount = IniIntValue(o, "AUTH_LOCKOUT_COUNT");
+	b->AuthLockoutTimeout = IniIntValue(o, "AUTH_LOCKOUT_TIMEOUT");
+	b->IdleTimeout = IniIntValue(o, "IDLE_TIMEOUT");
+
 	if (Vars_ActivePatch_GetBool("IsPublicVersion") == false)
 	{
 		// パブリック版以外では ENFORCE_LIMITED_FIREWALL を設定可能
@@ -1891,6 +1895,23 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	// ユーザー認証を実施
 	if (ds->UseAdvancedSecurity == false)
 	{
+		// アカウントロックアウト検査
+		if (pol.AuthLockoutTimeout != 0 && pol.AuthLockoutCount != 0)
+		{
+			if (GetLockout(ds->Lockout, "", pol.AuthLockoutTimeout * 1000) >= pol.AuthLockoutCount)
+			{
+				// ロックアウト発生
+				DsLogEx(ds, DS_LOG_WARNING, "DSL_LOCKOUT", tunnel_id, "", pol.AuthLockoutCount, pol.AuthLockoutTimeout);
+				DsSendError(sock, ((client_build < 9862) ? ERR_ACCESS_DENIED : ERR_DESK_AUTH_LOCKOUT));
+				FreePack(p);
+				DsDebugLog(ds, logprefix, "Error: ERR_DESK_AUTH_LOCKOUT (%s:%u)", __FILE__, __LINE__);
+
+				// ロックアウト記録
+				AddLockout(ds->Lockout, "", pol.AuthLockoutTimeout * 1000);
+				return;
+			}
+		}
+
 		HUB *hub = GetHub(ds->Server->Cedar, CEDAR_DESKVPN_HUBNAME);
 		bool is_password_empty = false;
 
@@ -1974,6 +1995,13 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			DsSendError(sock, ERR_DESK_BAD_PASSWORD);
 			FreePack(p);
 			DsDebugLog(ds, logprefix, "Error: ERR_DESK_BAD_PASSWORD (%s:%u)", __FILE__, __LINE__);
+
+			// ロックアウト記録
+			if (pol.AuthLockoutTimeout != 0 && pol.AuthLockoutCount != 0)
+			{
+				AddLockout(ds->Lockout, "", pol.AuthLockoutTimeout * 1000);
+			}
+
 			return;
 		}
 
@@ -1997,6 +2025,27 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		UCHAR *cert_buf;
 		USER *user = NULL;
 
+		Zero(auth_username, sizeof(auth_username));
+		PackGetStr(p, "username", auth_username, sizeof(auth_username));
+
+		// アカウントロックアウト検査
+		if (pol.AuthLockoutTimeout != 0 && pol.AuthLockoutCount != 0)
+		{
+			if (GetLockout(ds->Lockout, auth_username, pol.AuthLockoutTimeout * 1000) >= pol.AuthLockoutCount)
+			{
+				// ロックアウト発生
+				DsLogEx(ds, DS_LOG_WARNING, "DSL_LOCKOUT", tunnel_id, auth_username, pol.AuthLockoutCount, pol.AuthLockoutTimeout);
+				DsSendError(sock, ((client_build < 9862) ? ERR_ACCESS_DENIED : ERR_DESK_AUTH_LOCKOUT));
+				FreePack(p);
+				DsDebugLog(ds, logprefix, "Error: ERR_DESK_AUTH_LOCKOUT (%s:%u)", __FILE__, __LINE__);
+
+				// ロックアウト記録
+				AddLockout(ds->Lockout, auth_username, pol.AuthLockoutTimeout * 1000);
+
+				return;
+			}
+		}
+
 		// IP アドレスを確認する
 		if (IsIpDeniedByAcList(&client_ip, hub->HubDb->AcList))
 		{
@@ -2015,8 +2064,6 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 		Lock(hub->lock);
 
-		Zero(auth_username, sizeof(auth_username));
-		PackGetStr(p, "username", auth_username, sizeof(auth_username));
 
 		is_smartcard_auth = PackGetBool(p, "IsSmartCardAuth");
 
@@ -2237,6 +2284,12 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 			}
 			DsSendError(sock, ERR_AUTH_FAILED);
 			FreePack(p);
+
+			// ロックアウト記録
+			if (pol.AuthLockoutTimeout != 0 && pol.AuthLockoutCount != 0)
+			{
+				AddLockout(ds->Lockout, auth_username, pol.AuthLockoutTimeout * 1000);
+			}
 			return;
 		}
 
@@ -4832,6 +4885,8 @@ DS *NewDs(bool is_user_mode, bool force_share_disable)
 
 	ds = ZeroMalloc(sizeof(DS));
 
+	ds->Lockout = NewLockout();
+
 	ds->ConfigLock = NewLock();
 
 	ds->CurrentNumSessions = NewCounter();
@@ -5149,6 +5204,8 @@ void FreeDs(DS *ds)
 	DeleteLock(ds->RDPSessionIncDecLock);
 
 	DeleteLock(ds->ConfigLock);
+
+	FreeLockout(ds->Lockout);
 
 	Free(ds);
 

@@ -217,6 +217,20 @@ struct ACTIVE_PATCH_ENTRY
 	UINT DataSize;
 };
 
+// Lockout Entry
+struct LOCKOUT_ENTRY
+{
+	char Key[MAX_SIZE];
+	UINT Count;
+	UINT64 LastTick64;
+};
+
+// Lockout
+struct LOCKOUT
+{
+	LIST* EntryList;
+};
+
 // Function prototype
 HASH_LIST *NewHashList(GET_HASH *get_hash_proc, COMPARE *compare_proc, UINT bits, bool make_list);
 void ReleaseHashList(HASH_LIST *h);
@@ -230,6 +244,12 @@ void LockHashList(HASH_LIST *h);
 void UnlockHashList(HASH_LIST *h);
 bool IsInHashListKey(HASH_LIST *h, UINT key);
 void *HashListKeyToPointer(HASH_LIST *h, UINT key);
+
+void LockoutGcNoLock(LOCKOUT* o, UINT64 expires_span);
+UINT GetLockout(LOCKOUT* o, char* key, UINT64 expires_span);
+void AddLockout(LOCKOUT* o, char* key, UINT64 expires_span);
+void FreeLockout(LOCKOUT* o);
+LOCKOUT* NewLockout();
 
 PRAND *NewPRand(void *key, UINT key_size);
 void FreePRand(PRAND *r);

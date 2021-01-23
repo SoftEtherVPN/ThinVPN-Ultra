@@ -305,7 +305,7 @@ ERR_326					The destination $APPSHORT_SERVER$ has the Client Quarantine System e
 ERR_327					The destination $APPSHORT_SERVER$ has the Client Quarantine System enabled to validate the anti-virus and Windows Update state on the computer.\r\n\r\nThis client computer has no Windows Update activated.\r\n\r\nThe connection is not allowed. Please make sure that Windows Update is certainly activated, and all updates are applied.
 ERR_328					The destination $APPSHORT_SERVER$ has the Client MAC Address Authentication System. However, the MAC address of this client computer is not registered on the MAC address list on the destination $APPSHORT_SERVER$.\r\n\r\nRun the 'ipconfig /all' command to obtain the MAC address of this client computer, and add the address to the $APPSHORT_SERVER$ configuration tool.
 ERR_329					The destination $APPSHORT_SERVER$ is controlled by the Enterprise Policy Enforcement Server. The Enterprise Policy Enforcement Server has the SERVER_ALLOWED_MAC_LIST_URL option enabled. The MAC address of the destination $APPSHORT_SERVER$'s computer must be listed on the text file which is specified on the SERVER_ALLOWED_MAC_LIST_URL option.\r\n\r\nContact to the Enterprise Policy Enforcement Server administrator on your network. Ask the administrator to add the MAC address to the text file specified by the SERVER_ALLOWED_MAC_LIST_URL option.
-
+ERR_330					A lockout has occurred because the user authentication failed a certain number of times on the connection $APPSHORT_SERVER$. The same user cannot be authenticated until the lockout time expires. Please restart the service of the $APPSHORT_SERVER$ you are connecting to in order to release the lockout immediately.\r\n\r\nThe number of lockouts and the interval between lockouts are defined by the "AUTH_LOCKOUT_COUNT" and "AUTH_LOCKOUT_TIMEOUT" values of the policy server installed by the network administrator of the destination $APPSHORT_SERVER$. For more information, please contact your network administrator. For more information, please contact your network administrator.
 
 
 
@@ -376,7 +376,7 @@ DSL_TUNNEL_RELAY_STOP			The connected client computer (IP address: %S, Hostname:
 DSL_AUTH_ERROR			Tunnel %u: Client computer (IP address: %S, hostname: %S) is very frequently connected to this computer. Recent %u seconds, %u times to connect to this server. Be caution!
 DSL_PROCESS_START		A process started. Process ID: %u, Process filename: "%s", 64 bits: %s, Command-line arguments: %s
 DSL_PROCESS_END			The process terminated. Process ID: %u, Process filename: "%s", 64 bits: %s, Command-line arguments: %s
-
+DSL_LOCKOUT				Tunnel %u: User %S cannot be authenticated because the authentication lockout threshold has been exceeded. Lockout threshold: %u times, timeout: %u seconds.
 
 
 

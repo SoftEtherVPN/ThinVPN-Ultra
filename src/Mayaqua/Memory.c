@@ -255,6 +255,143 @@ bool Vars_ActivePatch_Exists(char* name)
 	return false;
 }
 
+// Lockout GC
+void LockoutGcNoLock(LOCKOUT* o, UINT64 expires_span)
+{
+	if (o == NULL)
+	{
+		return;
+	}
+
+	UINT i;
+
+	UINT64 now = Tick64();
+
+	LIST* delete_list = NewList(NULL);
+
+	for (i = 0;i < LIST_NUM(o->EntryList);i++)
+	{
+		LOCKOUT_ENTRY* e = LIST_DATA(o->EntryList, i);
+
+		if (now > (e->LastTick64 + expires_span))
+		{
+			Add(delete_list, e);
+		}
+	}
+
+	for (i = 0;i < LIST_NUM(delete_list);i++)
+	{
+		LOCKOUT_ENTRY* e = LIST_DATA(delete_list, i);
+
+		Delete(o->EntryList, e);
+
+		Free(e);
+	}
+
+	ReleaseList(delete_list);
+}
+
+// Lockout Get
+UINT GetLockout(LOCKOUT* o, char* key, UINT64 expires_span)
+{
+	UINT i;
+	UINT ret = 0;
+	if (o == NULL || key == NULL || expires_span == 0)
+	{
+		return 0;
+	}
+
+	LockList(o->EntryList);
+	{
+		LockoutGcNoLock(o, expires_span);
+
+		for (i = 0;i < LIST_NUM(o->EntryList);i++)
+		{
+			LOCKOUT_ENTRY* e = LIST_DATA(o->EntryList, i);
+
+			if (StrCmpi(e->Key, key) == 0)
+			{
+				ret = e->Count;
+				break;
+			}
+		}
+	}
+	UnlockList(o->EntryList);
+
+	return ret;
+}
+
+// Lockout Add
+void AddLockout(LOCKOUT* o, char* key, UINT64 expires_span)
+{
+	UINT i;
+	if (o == NULL || key == NULL || expires_span == 0)
+	{
+		return;
+	}
+
+	UINT64 tick = Tick64();
+
+	LockList(o->EntryList);
+	{
+		LockoutGcNoLock(o, expires_span);
+
+		for (i = 0;i < LIST_NUM(o->EntryList);i++)
+		{
+			LOCKOUT_ENTRY* e = LIST_DATA(o->EntryList, i);
+
+			if (StrCmpi(e->Key, key) == 0)
+			{
+				e->Count++;
+				e->LastTick64 = tick;
+
+				UnlockList(o->EntryList);
+				return;
+			}
+		}
+
+		LOCKOUT_ENTRY* e = ZeroMalloc(sizeof(LOCKOUT_ENTRY));
+
+		e->Count = 1;
+		e->LastTick64 = tick;
+		StrCpy(e->Key, sizeof(e->Key), key);
+
+		Add(o->EntryList, e);
+	}
+	UnlockList(o->EntryList);
+}
+
+// Free lockout
+void FreeLockout(LOCKOUT* o)
+{
+	UINT i;
+	if (o == NULL)
+	{
+		return;
+	}
+
+	for (i = 0;i < LIST_NUM(o->EntryList);i++)
+	{
+		LOCKOUT_ENTRY* e = LIST_DATA(o->EntryList, i);
+
+		Free(e);
+	}
+
+	ReleaseList(o->EntryList);
+
+	Free(o);
+}
+
+// Create lockout
+LOCKOUT* NewLockout()
+{
+	LOCKOUT* o = ZeroMalloc(sizeof(LOCKOUT));
+
+	o->EntryList = NewList(NULL);
+
+	return o;
+}
+
 // New PRand
 PRAND *NewPRand(void *key, UINT key_size)
 {

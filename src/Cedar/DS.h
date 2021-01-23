@@ -249,6 +249,8 @@ struct DS
 	bool EnableWoLTarget;
 	bool EnableWoLTrigger;
 
+	LOCKOUT* Lockout;
+
 	LOCK* ConfigLock;
 };
 
@@ -312,6 +314,10 @@ struct DS_POLICY_BODY
 	bool NoLocalMacAddressList;
 
 	bool IsLimitedFirewallMandated;
+
+	UINT AuthLockoutCount;
+	UINT AuthLockoutTimeout;
+	UINT IdleTimeout;
 };
 
 struct DS_POLICY_CLIENT

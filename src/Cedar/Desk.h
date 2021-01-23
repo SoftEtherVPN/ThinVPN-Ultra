@@ -141,6 +141,7 @@
 #define ERR_DESK_INSPECTION_WU_ERROR	327		// 検疫 Windows Update エラー
 #define ERR_DESK_INSPECTION_MAC_ERROR	328		// MAC エラー
 #define ERR_DESK_SERVER_ALLOWED_MAC_LIST	329	// SERVER_ALLOWED_MAC_LIST に該当するものがない
+#define ERR_DESK_AUTH_LOCKOUT			330		// 認証ロックアウト
 
 
 
