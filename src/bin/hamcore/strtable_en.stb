@@ -433,6 +433,8 @@ DU_FELONY_FONT_7 				Segoe UI
 
 DU_SOUMU_DISABLE_SHARE			The Ministry of Internal Affairs and Communications (MIC) guidelines such as "Guidelines for Information Security Policies of Local Governments" and "Telework Security Requirements for LGWAN Connection Systems Based on Countermeasures Against New Corona Viruses" are quite important, and should be respected. To prevent information leakage, the clipboard, hard disk (file), printer, serial port, webcam, and microphone sharing functions have been disabled in $APPFULL$.
 
+DU_IDLE_TIMEOUT					An idle timeout has occurred because the mouse has been inactive for %u seconds.\r\n\r\nThe interval seconds of the idle timeout is specified by the "IDLE_TIMEOUT" value of the policy server installed by the network administrator of the destination $APPSHORT_SERVER$. For more information, please contact your network administrator.
+
 
 
 # PacketiX Desktop VPN サーバー管理ツール関係

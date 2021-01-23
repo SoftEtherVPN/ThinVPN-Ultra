@@ -1269,6 +1269,7 @@ void MsSetEnableMinidump(bool enabled);
 void MsWriteMinidump(wchar_t *filename, void *ex);
 void MsDeleteClipboardAndHistory();
 bool MsHasClipboardBitmapAndNonText();
+UINT MsGetProcessExitCode(void* process_handle);
 
 
 void *MsInitGlobalLock(char *name, bool ts_local);

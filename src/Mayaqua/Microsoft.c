@@ -2848,6 +2848,24 @@ bool MsIsFileLockedW(wchar_t *name)
 	return false;
 }
 
+// Get the process exit code
+UINT MsGetProcessExitCode(void* process_handle)
+{
+	if (process_handle == NULL)
+	{
+		return 0;
+	}
+
+	DWORD code = 0;
+
+	if (GetExitCodeProcess(process_handle, &code) == false)
+	{
+		return 0;
+	}
+
+	return code;
+}
+
 // Wait for the process termination
 UINT MsWaitProcessExit(void *process_handle)
 {

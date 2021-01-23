@@ -2250,8 +2250,10 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 						timeout = (UINT)s->LifeTime;
 					}
 
+					UINT exit_code = 0;
+
 					// プロセスが終了 or タイムアウト するまで待つ
-					timeouted = !DcWaitForProcessExit(process, timeout, need_to_watch_gov_fw);
+					timeouted = !DcWaitForProcessExit(process, timeout, need_to_watch_gov_fw, s->IdleTimeout * 1000ULL, &exit_code);
 
 					if (water != NULL)
 					{

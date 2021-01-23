@@ -161,6 +161,7 @@ struct DC_SESSION
 	bool IsLimitedMode;					// サーバーが行政システム適応モードかどうか
 	bool IsEnspectionEnabled;			// 検疫有効
 	bool IsLimitedFirewallMandated;		// 完全閉域化 FW を強制有効
+	UINT64 IdleTimeout;					// アイドルタイムアウト
 	wchar_t WatermarkStr1[MAX_SIZE];
 	wchar_t WatermarkStr2[MAX_SIZE];
 };
@@ -302,7 +303,7 @@ UINT DcGetMstscArguments(DC_SESSION *s, wchar_t *mstsc_exe, char *arg, UINT arg_
 UINT DcGetUrdpClientArguments(DC_SESSION *s, char *arg, UINT arg_size, bool disable_share, UINT version);
 void *DcRunMstsc(DC *dc, wchar_t *mstsc_exe, char *arg, char *target, bool disable_share, UINT *process_id, bool *rdp_file_write_failed);
 void *DcRunUrdpClient(char *arg, UINT *process_id, UINT version);
-bool DcWaitForProcessExit(void *h, UINT timeout, bool watch_gov_fw_exit);
+bool DcWaitForProcessExit(void *h, UINT timeout, bool watch_gov_fw_exit, UINT64 idle_timeout, UINT *exit_code);
 void DcInitMstscRdpFile();
 bool DcSetMstscRdpFileInt(char *key_name, UINT value);
 bool DcSetMstscRdpFileStr(char *key_name, char *value);

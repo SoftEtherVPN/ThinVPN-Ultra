@@ -938,9 +938,12 @@ wchar_t *DcReadRdpFile(wchar_t *name, bool *is_empty)
 }
 
 // プロセスの終了まで待機する
-bool DcWaitForProcessExit(void *h, UINT timeout, bool watch_gov_fw_exit)
+bool DcWaitForProcessExit(void* h, UINT timeout, bool watch_gov_fw_exit, UINT64 idle_timeout, UINT* exit_code)
 {
 	bool ret = false;
+	UINT code = 0;
+	bool idle_timeout_occured = false;
+
 #ifdef	OS_WIN32
 	// 引数チェック
 	if (h == NULL)
@@ -948,7 +951,7 @@ bool DcWaitForProcessExit(void *h, UINT timeout, bool watch_gov_fw_exit)
 		return true;
 	}
 
-	if (watch_gov_fw_exit == false)
+	if (watch_gov_fw_exit == false && idle_timeout == 0)
 	{
 		// 通常モード
 		if (Win32WaitProcess(h, timeout) == false)
@@ -965,8 +968,12 @@ bool DcWaitForProcessExit(void *h, UINT timeout, bool watch_gov_fw_exit)
 	else
 	{
 		// gov fw が停止したらタイムアウトしたものとみなすモード
+		// またはマウスが一定時間動かなかったらタイムアウトしたとみなすモード
 		UINT64 now = Tick64();
 		UINT64 giveup = now + (UINT64)timeout;
+		UINT64 idle_timeout_tick = 0;
+		UINT last_cursor_pos_hash = INFINITE;
+
 		if (timeout == INFINITE)
 		{
 			giveup = 0xFFFFFFFFFFFFFFFFULL;
@@ -990,11 +997,37 @@ bool DcWaitForProcessExit(void *h, UINT timeout, bool watch_gov_fw_exit)
 				break;
 			}
 
-			if (IsSingleInstanceExists(DU_GOV_FW2_SINGLE_INSTANCE_NAME, false) == false)
+			if (watch_gov_fw_exit)
 			{
-				// gov fw が終了された
-				ret = false;
-				break;
+				if (IsSingleInstanceExists(DU_GOV_FW2_SINGLE_INSTANCE_NAME, false) == false)
+				{
+					// gov fw が終了された
+					ret = false;
+					break;
+				}
+			}
+
+			if (idle_timeout != 0)
+			{
+				UINT cursor_pos_hash = MsGetCursorPosHash();
+
+				if (last_cursor_pos_hash != cursor_pos_hash)
+				{
+					// マウスカーソルが動いた！
+					idle_timeout_tick = Tick64() + idle_timeout;
+
+					last_cursor_pos_hash = cursor_pos_hash;
+				}
+				else
+				{
+					if (idle_timeout_tick != 0 && Tick64() > idle_timeout_tick)
+					{
+						// マウスカーソルが一定時間動かなかった。タイムアウト
+						ret = false;
+						idle_timeout_occured = true;
+						break;
+					}
+				}
 			}
 		}
 
@@ -1005,9 +1038,26 @@ bool DcWaitForProcessExit(void *h, UINT timeout, bool watch_gov_fw_exit)
 		}
 	}
 
+	code = MsGetProcessExitCode(h);
+
 	Win32CloseProcess(h);
 
 #endif  // OS_WIN32
+
+	if (exit_code != NULL)
+	{
+		*exit_code = code;
+	}
+
+	// マウスカーソルタイムアウト発生 エラーメッセージ
+#ifdef	OS_WIN32
+	if (idle_timeout_occured)
+	{
+		// MB_OK | MB_TOPMOST | MB_SYSTEMMODAL | MB_TOPMOST
+		MsgBoxEx(NULL, 0x00000000L | 0x00000040L | 0x00001000L | 0x00040000L, _UU("DU_IDLE_TIMEOUT"), idle_timeout / 1000);
+	}
+#endif	// OS_WIN32
+
 	return ret;
 }
 
@@ -2576,6 +2626,7 @@ UINT DcSessionConnect(DC_SESSION *s)
 	}
 	s->IsEnspectionEnabled = io->UserData6;
 	s->IsLimitedFirewallMandated = io->UserData7;
+	s->IdleTimeout = io->UserData8;
 	Debug("DS_CAPS: %u\n", s->DsCaps);
 
 	// この SOCKIO をキューに追加する
@@ -2936,6 +2987,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	bool is_server_limited_mode = false;
 	wchar_t computer_name[MAX_PATH];
 	bool is_limited_firewall_mandated = false;
+	UINT idle_timeout = 0;
 	// 引数チェック
 	if (dc == NULL || sock == NULL || pcid == NULL || auth_callback == NULL)
 	{
@@ -2991,6 +3043,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	is_otp_enabled = PackGetBool(p, "IsOtpEnabled");
 	run_inspect = PackGetBool(p, "RunInspect");
 	is_limited_firewall_mandated = PackGetBool(p, "IsLimitedFirewallMandated");
+	idle_timeout = PackGetInt(p, "IdleTimeout");
 
 	lifetime = PackGetInt64(p, "Lifetime");
 	PackGetUniStr(p, "LifeTimeMsg", lifetime_msg, sizeof(lifetime_msg));
@@ -3370,6 +3423,7 @@ UINT DcConnectMain(DC *dc, DC_SESSION *dcs, SOCKIO *sock, char *pcid, DC_AUTH_CA
 	sock->UserData5 = is_server_limited_mode;
 	sock->UserData6 = run_inspect;
 	sock->UserData7 = is_limited_firewall_mandated;
+	sock->UserData8 = idle_timeout;
 
 	SockIoSetTimeout(sock, INFINITE);
 
