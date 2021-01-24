@@ -1766,8 +1766,8 @@ CEDAR *NewCedar(X *server_x, K *server_k)
 
 	c->VerString = CopyStr(tmp);
 
-	Format(tmp, sizeof(tmp), "Compiled %04u/%02u/%02u %02u:%02u:%02u, UltraLib: %s.",
-		BUILD_DATE_Y, BUILD_DATE_M, BUILD_DATE_D, BUILD_DATE_HO, BUILD_DATE_MI, BUILD_DATE_SE, ULTRA_COMMIT_ID);
+	Format(tmp, sizeof(tmp), "Compiled %04u/%02u/%02u %02u:%02u:%02u, UltraLib: %s - %s.",
+		BUILD_DATE_Y, BUILD_DATE_M, BUILD_DATE_D, BUILD_DATE_HO, BUILD_DATE_MI, BUILD_DATE_SE, ULTRA_COMMIT_ID, ULTRA_VER_LABEL);
 
 	c->BuildInfo = CopyStr(tmp);
 

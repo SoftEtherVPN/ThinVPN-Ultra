@@ -252,6 +252,29 @@ namespace BuildTool
             return true;
         }
 
+        public static string GetUltraVersionLabel()
+        {
+            string tmpPath = Paths.SolutionBaseDirName;
+
+            string readmePath = Path.Combine(tmpPath, @"..\submodules\IPA-DN-Ultra\README.md");
+
+            string[] lines = File.ReadAllLines(readmePath);
+
+            string tag = "[Current Version]";
+            foreach (string line in lines)
+            {
+                int i = line.IndexOf(tag, StringComparison.OrdinalIgnoreCase);
+                if (i != -1)
+                {
+                    string ver = line.Substring(i + tag.Length).Trim();
+
+                    return ver;
+                }
+            }
+
+            return "Unknown";
+        }
+
         public static string GetUltraSubmoduleCommitId()
         {
             string tmpPath = Paths.SolutionBaseDirName;

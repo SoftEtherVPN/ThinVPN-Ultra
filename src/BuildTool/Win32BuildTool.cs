@@ -100,7 +100,7 @@ namespace BuildTool
     public static class Win32BuildTool
     {
         // Generate a version information resource
-        public static void GenerateVersionInfoResource(string targetExeName, string outName, string rc_name, string product_name, string postfix, string commitId)
+        public static void GenerateVersionInfoResource(string targetExeName, string outName, string rc_name, string product_name, string postfix, string commitId, string verLabel)
         {
             int build, version;
             string name;
@@ -123,7 +123,7 @@ namespace BuildTool
 
             string exeFileName = Path.GetFileName(targetExeName);
 
-            exeFileName += " (Ultra: " + commitId + ")";
+            exeFileName += " (Ultra: " + verLabel + ", " + commitId + ")";
 
             if (Str.IsEmptyStr(product_name))
             {
