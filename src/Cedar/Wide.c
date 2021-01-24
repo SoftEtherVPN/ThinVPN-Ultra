@@ -1818,6 +1818,35 @@ WIDE *WideServerStartEx2(char *svc_name, WT_ACCEPT_PROC *accept_proc, void *acce
 	w->WideLog->Flush = true;
 
 	WideLog(w, "-------------------- Start Tunnel System (Server) --------------------");
+	WideLog(w, "CEDAR_VER: %u", CEDAR_VER);
+	WideLog(w, "CEDAR_BUILD: %u", CEDAR_BUILD);
+	WideLog(w, "BUILD_DATE: %04u/%02u/%02u %02u:%02u:%02u", BUILD_DATE_Y, BUILD_DATE_M, BUILD_DATE_D,
+		BUILD_DATE_HO, BUILD_DATE_MI, BUILD_DATE_SE);
+	WideLog(w, "ULTRA_COMMIT_ID: %s", ULTRA_COMMIT_ID);
+	WideLog(w, "ULTRA_VER_LABEL: %s", ULTRA_VER_LABEL);
+
+	OS_INFO *os = GetOsInfo();
+	if (os != NULL)
+	{
+		WideLog(w, "OsType: %u", os->OsType);
+		WideLog(w, "OsServicePack: %u", os->OsServicePack);
+		WideLog(w, "OsSystemName: %s", os->OsSystemName);
+		WideLog(w, "OsProductName: %s", os->OsProductName);
+		WideLog(w, "OsVendorName: %s", os->OsVendorName);
+		WideLog(w, "OsVersion: %s", os->OsVersion);
+		WideLog(w, "KernelName: %s", os->KernelName);
+		WideLog(w, "KernelVersion: %s", os->KernelVersion);
+	}
+
+	MEMINFO mem = CLEAN;
+	GetMemInfo(&mem);
+
+	WideLog(w, "Memory - TotalMemory: %I64u", mem.TotalMemory);
+	WideLog(w, "Memory - UsedMemory: %I64u", mem.UsedMemory);
+	WideLog(w, "Memory - FreeMemory: %I64u", mem.FreeMemory);
+	WideLog(w, "Memory - TotalPhys: %I64u", mem.TotalPhys);
+	WideLog(w, "Memory - UsedPhys: %I64u", mem.UsedPhys);
+	WideLog(w, "Memory - FreePhys: %I64u", mem.FreePhys);
 
 	w->SeLang = se_lang;
 	if (master_cert == NULL)
