@@ -591,6 +591,8 @@ bool Aead_ChaCha20Poly1305_Ietf_IsOpenSSL();
 
 void Aead_ChaCha20Poly1305_Ietf_Test();
 
+bool OcspVerify(X* cert, X* issuer);
+
 
 #ifdef	ENCRYPT_C
 // Inner function

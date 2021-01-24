@@ -225,6 +225,9 @@ bool CheckStrListIncludedInOtherStrMac(char *str1, char *str2);
 
 bool CheckPasswordComplexity(char *str);
 
+TOKEN_LIST* StrToLinesList(char* str);
+char* GetFirstFilledStrFromStr(char* str);
+
 
 // *** JSON strings support
 // Original source code from Parson ( http://kgabis.github.com/parson/ )

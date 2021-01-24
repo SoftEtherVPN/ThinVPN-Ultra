@@ -2844,7 +2844,7 @@ bool ServerAccept(CONNECTION *c)
 												// Confirmed that the client has had this certificate
 												// certainly because the signature matched.
 												// Check whether the certificate is valid.
-												auth_ret = SamAuthUserByCert(hub, username, x);
+												auth_ret = SamAuthUserByCert(hub, username, x, false, NULL);
 												if (auth_ret)
 												{
 													// Copy the certificate
@@ -2897,7 +2897,7 @@ bool ServerAccept(CONNECTION *c)
 								{
 									Debug("Got to SamAuthUserByCert %s\n", username); // XXX
 									// Check whether the certificate is valid.
-									auth_ret = SamAuthUserByCert(hub, username, x);
+									auth_ret = SamAuthUserByCert(hub, username, x, false, NULL);
 									if (auth_ret)
 									{
 										// Copy the certificate

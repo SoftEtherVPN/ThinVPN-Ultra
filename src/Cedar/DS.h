@@ -318,6 +318,7 @@ struct DS_POLICY_BODY
 	UINT AuthLockoutCount;
 	UINT AuthLockoutTimeout;
 	UINT IdleTimeout;
+	bool EnableOcsp;
 };
 
 struct DS_POLICY_CLIENT

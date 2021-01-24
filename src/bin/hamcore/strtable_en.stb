@@ -377,6 +377,7 @@ DSL_AUTH_ERROR			Tunnel %u: Client computer (IP address: %S, hostname: %S) is ve
 DSL_PROCESS_START		A process started. Process ID: %u, Process filename: "%s", 64 bits: %s, Command-line arguments: %s
 DSL_PROCESS_END			The process terminated. Process ID: %u, Process filename: "%s", 64 bits: %s, Command-line arguments: %s
 DSL_LOCKOUT				Tunnel %u: User %S cannot be authenticated because the authentication lockout threshold has been exceeded. Lockout threshold: %u times, timeout: %u seconds.
+DSL_AUTH_CERT_OCSP_ERROR	Tunnel %u: The certificate presented by user %S failed verification with OCSP (Digital Certificate Verification Protocol). Since the value of "ENABLE_OCSP" in the policy server installed by the network administrator is set to 1, verification with OCSP was performed, but the OCSP server returned an error. Please contact the administrator of the OCSP server for details. If you set the value of "ENABLE_OCSP" in the policy server to 0, this error will no longer occur. The certificate data presented by the client is as follows: %s
 
 
 

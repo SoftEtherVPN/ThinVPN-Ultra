@@ -324,14 +324,21 @@ bool SamAuthUserByPlainPassword(CONNECTION *c, HUB *hub, char *username, char *p
 }
 
 // Certificate authentication of user
-bool SamAuthUserByCert(HUB *h, char *username, X *x)
+bool SamAuthUserByCert(HUB* h, char* username, X* x, bool check_ocsp, bool* ocsp_verify_error)
 {
+	static bool dummy_bool = false;
 	bool b = false;
 	// Validate arguments
 	if (h == NULL || username == NULL || x == NULL)
 	{
 		return false;
 	}
+	if (ocsp_verify_error == NULL)
+	{
+		ocsp_verify_error = &dummy_bool;
+	}
+
+	*ocsp_verify_error = false;
 
 	if (GetGlobalServerFlag(GSF_DISABLE_CERT_AUTH) != 0)
 	{
@@ -350,6 +357,8 @@ bool SamAuthUserByCert(HUB *h, char *username, X *x)
 		HLog(h, "LH_AUTH_NG_CERT", username, tmp);
 		return false;
 	}
+
+	X* root_cert_copy = NULL;
 
 	AcLock(h);
 	{
@@ -402,6 +411,14 @@ bool SamAuthUserByCert(HUB *h, char *username, X *x)
 										b = false;
 									}
 								}
+
+								if (b)
+								{
+									if (CompareX(root_cert, x) == false)
+									{
+										root_cert_copy = CloneX(root_cert);
+									}
+								}
 							}
 						}
 						UnlockList(h->HubDb->RootCertList);
@@ -422,6 +439,23 @@ bool SamAuthUserByCert(HUB *h, char *username, X *x)
 		GetAllNameFromX(tmp, sizeof(tmp), x);
 
 		HLog(h, "LH_AUTH_OK_CERT", username, tmp);
+	}
+
+	if (root_cert_copy != NULL)
+	{
+		if (b)
+		{
+			if (check_ocsp)
+			{
+				// OCSP 検査
+				if (OcspVerify(x, root_cert_copy) == false)
+				{
+					*ocsp_verify_error = true;
+				}
+			}
+		}
+
+		FreeX(root_cert_copy);
 	}
 
 	return b;

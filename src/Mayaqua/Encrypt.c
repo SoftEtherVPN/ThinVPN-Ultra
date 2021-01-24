@@ -79,6 +79,21 @@
 
 #define	__WINCRYPT_H__
 
+#ifdef	_WIN32
+// Include windows.h for Socket API
+#define	_WIN32_IE			0x0600
+#define	_WIN32_WINNT		0x0502
+#define	WINVER				0x0502
+#include <Ws2tcpip.h>
+#include <Wspiapi.h>
+#include <winsock2.h>
+#include <windows.h>
+#include <Iphlpapi.h>
+#include <ws2ipdef.h>
+#include <netioapi.h>
+#include <Icmpapi.h>
+#endif	// _WIN32
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -105,7 +120,12 @@
 #include <openssl/pem.h>
 #include <openssl/conf.h>
 #include <openssl/x509v3.h>
+#include <openssl/ocsp.h>
+#include <openssl/ocsperr.h>
 #include <Mayaqua/Mayaqua.h>
+#ifdef	UNIX_MACOS
+#include <sys/event.h>
+#endif	// UNIX_MACOS
 
 LOCK *openssl_lock = NULL;
 
@@ -6343,4 +6363,560 @@ void Aead_ChaCha20Poly1305_Ietf_Test()
 	Free(encrypted);
 	Free(decrypted);
 }
+
+// From:
+// https://github.com/openvinotoolkit/security_addon/blob/6eb8595dc12066d4c90f8028a358a8cdfe50dccf/License_service/src/app/certverify.c
+typedef	unsigned int ovsa_status_t;
+
+#define OVSA_OK						0
+#define OVSA_CRYPTO_X509_ERROR		1
+#define OVSA_INVALID_FILE_PATH		2
+#define OVSA_INVALID_PARAMETER		3
+#define OVSA_MEMIO_ERROR			4
+#define OVSA_CRYPTO_GENERIC_ERROR	5
+#define OVSA_CRYPTO_BIO_ERROR		6
+#define OVSA_OCSP_VERIFY_ERROR		7
+
+
+#define openssl_fdset(a, b)  FD_SET(a, b)
+#define OCSP_REQ_TIMEOUT	3000
+#define	MAX_URL_SIZE		MAX_PATH
+
+static void ovsa_server_safe_free(void** pp)
+{
+	if (pp != NULL)
+	{
+		free(*pp);
+	}
+}
+
+static ovsa_status_t ovsa_server_crypto_add_ocsp_cert(OCSP_REQUEST** req, const X509* xcert,
+	const EVP_MD* cert_id_md, const X509* issuer,
+	STACK_OF(OCSP_CERTID)* ids) {
+	ovsa_status_t ret = OVSA_OK;
+	OCSP_CERTID* id = NULL;
+
+	if ((xcert == NULL) || (cert_id_md == NULL) || (issuer == NULL) || (ids == NULL)) {
+		Debug("Error: Adding ocsp certificate failed with invalid parameter\n");
+		return OVSA_INVALID_PARAMETER;
+	}
+
+	*req = OCSP_REQUEST_new();
+	if (*req == NULL) {
+		Debug("Error: Adding ocsp certificate failed to allocate ocsp request\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	id = OCSP_cert_to_id(cert_id_md, xcert, issuer);
+	if (id == NULL || !sk_OCSP_CERTID_push(ids, id)) {
+		Debug("Error: Adding ocsp certificate failed to create ocsp cert_id\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	if (!OCSP_request_add0_id(*req, id)) {
+		Debug("Error: Adding ocsp certificate failed to create ocsp request\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+end:
+	//if (ret < OVSA_OK) {
+	//	ERR_print_errors(g_bio_err);
+	//}
+	return ret;
+}
+
+static OCSP_RESPONSE* ovsa_server_crypto_query_responder(BIO* connect_bio, const char* host,
+	const char* path, OCSP_REQUEST* req,
+	int req_timeout) {
+	OCSP_REQ_CTX* ctx = NULL;
+	OCSP_RESPONSE* resp = NULL;
+	int fd = 0, ret = 0, add_host = 1;
+	fd_set confds;
+	struct timeval tv;
+
+	if ((connect_bio == NULL) || (host == NULL) || (path == NULL) || (req == NULL)) {
+		Debug("Error: Querying responder failed with invalid parameter\n");
+		return NULL;
+	}
+
+	if (req_timeout != -1) {
+		BIO_set_nbio(connect_bio, 1);
+	}
+
+	ret = BIO_do_connect(connect_bio);
+	if ((ret <= 0) && ((req_timeout == -1) || !BIO_should_retry(connect_bio))) {
+		Debug("Error: Querying responder failed in connecting BIO\n");
+		return NULL;
+	}
+
+	if (BIO_get_fd(connect_bio, &fd) < 0) {
+		Debug("Error: Querying responder failed in getting connection fd\n");
+		goto end;
+	}
+
+	if (req_timeout != -1 && ret <= 0) {
+		FD_ZERO(&confds);
+		openssl_fdset(fd, &confds);
+		tv.tv_usec = 0;
+		tv.tv_sec = req_timeout;
+		ret = select(fd + 1, NULL, (void*)&confds, NULL, &tv);
+		if (ret == 0) {
+			Debug("Error: Querying responder failed to connect due to timeout\n");
+			return NULL;
+		}
+	}
+
+	ctx = OCSP_sendreq_new(connect_bio, path, NULL, -1);
+	if (ctx == NULL) {
+		Debug("Error: Querying responder failed to send OCSP request\n");
+		return NULL;
+	}
+
+	if (add_host == 1 && OCSP_REQ_CTX_add1_header(ctx, "Host", host) == 0) {
+		Debug("Error: Querying responder failed to add header\n");
+		goto end;
+	}
+
+	if (!OCSP_REQ_CTX_set1_req(ctx, req)) {
+		Debug("Error: Querying responder failed to set OCSP request\n");
+		goto end;
+	}
+
+	for (;;) {
+		ret = OCSP_sendreq_nbio(&resp, ctx);
+		if (ret != -1) {
+			if (ret == 0) {
+				Debug(
+					"Error: Querying responder failed to perform I/O on the OCSP "
+					"request\n");
+			}
+			break;
+		}
+
+		if (req_timeout == -1) {
+			continue;
+		}
+
+		FD_ZERO(&confds);
+		openssl_fdset(fd, &confds);
+		tv.tv_usec = 0;
+		tv.tv_sec = req_timeout;
+
+		if (BIO_should_read(connect_bio)) {
+			ret = select(fd + 1, (void*)&confds, NULL, NULL, &tv);
+		}
+		else if (BIO_should_write(connect_bio)) {
+			ret = select(fd + 1, NULL, (void*)&confds, NULL, &tv);
+		}
+		else {
+			Debug(
+				"Error: Querying responder failed due to unexpected "
+				"retry condition\n");
+			goto end;
+		}
+		if (ret == 0) {
+			Debug("Error: Querying responder timed out on request\n");
+			break;
+		}
+		if (ret == -1) {
+			Debug("Error: Querying responder failed in select\n");
+			break;
+		}
+	}
+
+end:
+	OCSP_REQ_CTX_free(ctx);
+	return resp;
+}
+
+static OCSP_RESPONSE* ovsa_server_crypto_process_responder(OCSP_REQUEST* req, const char* host,
+	const char* path, const char* port,
+	int use_ssl, int req_timeout) {
+	BIO* connect_bio = NULL;
+	BIO* ssl_bio = NULL;
+	SSL_CTX* ctx = NULL;
+	OCSP_RESPONSE* resp = NULL;
+
+	if (host == NULL) {
+		Debug("Error: Process responder failed with invalid parameter\n");
+		return NULL;
+	}
+
+	connect_bio = BIO_new_connect(host);
+	if (connect_bio == NULL) {
+		Debug("Error: Process responder failed in getting the connect BIO\n");
+		goto end;
+	}
+
+	if (port != NULL) {
+		BIO_set_conn_port(connect_bio, port);
+	}
+
+	if (use_ssl == 1) {
+		ctx = SSL_CTX_new(TLS_client_method());
+		if (ctx == NULL) {
+			Debug("Error: Process responder failed in creating SSL context\n");
+			goto end;
+		}
+
+		SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
+		ssl_bio = BIO_new_ssl(ctx, 1);
+		connect_bio = BIO_push(ssl_bio, connect_bio);
+	}
+
+	resp = ovsa_server_crypto_query_responder(connect_bio, host, path, req, req_timeout);
+	if (resp == NULL) {
+		Debug("Error: OCSP process responder failed in querying\n");
+	}
+
+end:
+	BIO_free_all(connect_bio);
+	SSL_CTX_free(ctx);
+	return resp;
+}
+
+static ovsa_status_t ovsa_server_crypto_ocsp_revocation_check(char* ocsp_uri_field,
+	X509* xcert,
+	X509* issuer) {
+	ovsa_status_t ret = OVSA_OK;
+	STACK_OF(X509)* issuers = NULL;
+//	X509* issuer = NULL;
+	OCSP_REQUEST* req = NULL;
+	OCSP_RESPONSE* resp = NULL;
+	STACK_OF(OCSP_CERTID)* ids = NULL;
+	STACK_OF(OPENSSL_STRING)* reqnames = NULL;
+	OCSP_BASICRESP* basic_response = NULL;
+	X509_NAME* subject = NULL;
+	X509_NAME_ENTRY* common_name_entry = NULL;
+	STACK_OF(X509)* signer_issuer = NULL;
+	unsigned const char* common_name = NULL;
+	char* host = NULL;
+	char* port = NULL;
+	char* path = "/";
+	char* thost = NULL;
+	char* tport = NULL;
+	char* tpath = NULL;
+	int ocsp_verify = 0, use_ssl = -1;
+	int lastpos = -1, req_timeout = OCSP_REQ_TIMEOUT;
+	size_t ocsp_uri_field_len = 0, host_len = 0;
+	char ocsp_uri[MAX_PATH];
+
+	if ((ocsp_uri_field == NULL) || (xcert == NULL) || (issuer == NULL)) {
+		Debug("Error: OCSP revocation check failed with invalid parameter\n");
+		return OVSA_INVALID_PARAMETER;
+	}
+
+	if ((issuers = sk_X509_new_null()) == NULL) {
+		Debug("Error: OCSP revocation check failed to allocate stack for issuers\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	issuer = X509_dup(issuer);
+
+	sk_X509_push(issuers, issuer);
+
+	reqnames = sk_OPENSSL_STRING_new_null();
+	if (reqnames == NULL) {
+		Debug("Error: OCSP revocation check failed to allocate string\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	ids = sk_OCSP_CERTID_new_null();
+	if (ids == NULL) {
+		Debug("Error: OCSP revocation check failed to allocate ocsp cert_id\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	/* Add the certificates along with issuer for checking OCSP revocation */
+	ret = ovsa_server_crypto_add_ocsp_cert(&req, xcert, EVP_sha1(), issuer, ids);
+	if (ret < OVSA_OK) {
+		Debug(
+			"Error: OCSP revocation check failed to add "
+			"certificate for ocsp check\n");
+		goto end;
+	}
+
+	/* Extract the subject from the certificate */
+	subject = X509_get_subject_name(xcert);
+	if (subject == NULL) {
+		Debug("Error: OCSP revocation check failed to get the subject\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	/* Extract the common name from subject */
+	for (;;) {
+		lastpos = X509_NAME_get_index_by_NID(subject, NID_commonName, lastpos);
+		if (lastpos == -1) {
+			break;
+		}
+
+		common_name_entry = X509_NAME_get_entry(subject, lastpos);
+		common_name = ASN1_STRING_get0_data(X509_NAME_ENTRY_get_data(common_name_entry));
+	}
+
+	if (common_name != NULL) {
+		if (!sk_OPENSSL_STRING_push(reqnames, (char*)common_name)) {
+			Debug("Error: OCSP revocation check failed to push the common name\n");
+			ret = OVSA_CRYPTO_X509_ERROR;
+			goto end;
+		}
+	}
+	else {
+		Debug("Error: OCSP revocation check failed to get the common name\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	/* Add nonce to the OCSP request */
+	if (!OCSP_request_add1_nonce(req, NULL, -1)) {
+		Debug("Error: OCSP revocation check failed to add nonce to OCSP request\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	///* Print the OCSP request */
+	//if ((req != NULL) && !OCSP_REQUEST_print(g_bio_err, req, 0)) {
+	//	Debug("Error: OCSP revocation check failed to print the OCSP request\n");
+	//	ret = OVSA_CRYPTO_X509_ERROR;
+	//	goto end;
+	//}
+
+	ocsp_uri[0] = 0;
+
+	//ret = ovsa_server_get_string_length(ocsp_uri_field, &ocsp_uri_field_len);
+	//if ((ret < OVSA_OK)/* || (ocsp_uri_field_len == EOK)*/) {
+	//	Debug(
+	//		"Error: OCSP revocation check failed in getting the size of the "
+	//		"ocsp_uri field\n");
+	//	ret = OVSA_INVALID_FILE_PATH;
+	//	goto end;
+	//}
+
+	/* copy the OCSP URI */
+	StrCpy(ocsp_uri, sizeof(ocsp_uri), ocsp_uri_field);
+	//	Debug("Error: OCSP revocation check failed in getting the ocsp_uri\n");
+	//	ret = OVSA_MEMIO_ERROR;
+	//	goto end;
+	//}
+
+	/* Specify the Proxy for doing the OCSP revocation check */
+	//host = secure_getenv("PROXY");
+	//if (host == NULL) {
+		/* If proxy is not mentioned, parse the OCSP URL for doing the OCSP
+		 * revocation check */
+		if (!OCSP_parse_url(ocsp_uri, &host, &port, &path, &use_ssl)) {
+			Debug("Error: OCSP revocation check failed in parsing URL\n");
+			ret = OVSA_CRYPTO_GENERIC_ERROR;
+			goto end;
+		}
+		thost = host;
+		tport = port;
+		tpath = path;
+	/*}
+	else {
+		ret = ovsa_server_get_string_length(host, &host_len);
+		if ((ret < OVSA_OK) || (host_len == EOK)) {
+			Debug("Error: OCSP revocation check failed since HOST is not set\n");
+			ret = OVSA_INVALID_FILE_PATH;
+			goto end;
+		}
+	}*/
+
+	/* Get the OCSP response */
+	resp = ovsa_server_crypto_process_responder(req, host, ocsp_uri, port, use_ssl, req_timeout);
+	if (resp == NULL) {
+		Debug(
+			"Error: OCSP revocation check failed in getting the ocsp "
+			"response\nPlease try with proxy: Ex: export "
+			"PROXY=<proxy-name:port_number>\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	/* Check the OCSP response status */
+	ocsp_verify = OCSP_response_status(resp);
+	if (ocsp_verify != OCSP_RESPONSE_STATUS_SUCCESSFUL) {
+		Debug("OCSP Responder Error: %s (%d)\n",
+			OCSP_response_status_str(ocsp_verify), ocsp_verify);
+	}
+
+	///* Print the OCSP response */
+	//if (!OCSP_RESPONSE_print(g_bio_err, resp, 0)) {
+	//	Debug("Error: OCSP revocation check failed to print the OCSP response\n");
+	//	ret = OVSA_CRYPTO_X509_ERROR;
+	//	goto end;
+	//}
+
+	/* Decode the OCSP response */
+	basic_response = OCSP_response_get1_basic(resp);
+	if (basic_response == NULL) {
+		Debug("Error: OCSP revocation check failed in parsing response\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+	/* Verify the nonce in OCSP response */
+	if (req != NULL && ((ocsp_verify = OCSP_check_nonce(req, basic_response)) <= 0)) {
+		if (ocsp_verify == -1)
+			Debug("Warning: No nonce in OCSP response\n");
+		else {
+			Debug("OCSP nonce Verify error\n");
+			ret = OVSA_CRYPTO_X509_ERROR;
+			goto end;
+		}
+	}
+
+	/* Verify the OCSP response */
+	ocsp_verify = OCSP_basic_verify(basic_response, NULL, NULL, 0);
+	if (ocsp_verify <= 0 && issuers) {
+		signer_issuer = (STACK_OF(X509)*)OCSP_resp_get0_certs(basic_response);
+		if (signer_issuer == NULL) {
+			signer_issuer = issuers;
+		}
+
+		ocsp_verify = OCSP_basic_verify(basic_response, signer_issuer, NULL, OCSP_TRUSTOTHER);
+		if (ocsp_verify > 0) {
+			ERR_clear_error();
+		}
+	}
+	if (ocsp_verify <= 0) {
+		Debug("OCSP Response Verify Failure\n");
+		ret = OVSA_OCSP_VERIFY_ERROR;
+		goto end;
+	}
+	else {
+		Debug("OCSP Response verify OK = %d\n", ocsp_verify);
+	}
+
+	///* Print the OCSP summary */
+	//ret = ovsa_server_crypto_print_ocsp_summary(g_bio_err, basic_response, req, reqnames, ids, nsec,
+	//	maxage);
+	//if (ret < OVSA_OK) {
+	//	Debug("Error: OCSP revocation check failed in getting the ocsp status\n");
+	//	ret = OVSA_CRYPTO_X509_ERROR;
+	//	goto end;
+	//}
+
+end:
+	//ovsa_server_safe_free(&ocsp_uri_field);
+	sk_X509_pop_free(issuers, X509_free);
+	OCSP_REQUEST_free(req);
+	OCSP_RESPONSE_free(resp);
+	OCSP_BASICRESP_free(basic_response);
+	sk_OPENSSL_STRING_free(reqnames);
+	sk_OCSP_CERTID_free(ids);
+	ovsa_server_safe_free(&thost);
+	ovsa_server_safe_free(&tport);
+	ovsa_server_safe_free(&tpath);
+	//if (ret < OVSA_OK) {
+	//	ERR_print_errors(g_bio_err);
+	//}
+	return ret;
+}
+
+
+static ovsa_status_t ovsa_server_crypto_extract_ocsp_uri(X509* xcert, char *url, UINT url_size) {
+	STACK_OF(OPENSSL_STRING)* ocsp_uri_list = NULL;
+	ovsa_status_t ret = OVSA_OK;
+	BIO* ocsp_bio = NULL;
+	BUF_MEM* ocsp_ptr = NULL;
+	int ocsp_uri_count = 0;
+
+	if (xcert == NULL) {
+		Debug("Error: Extracting ocsp uri failed with invalid parameter\n");
+		return OVSA_INVALID_PARAMETER;
+	}
+
+	/* Extract the OCSP URI from the certificate */
+	ocsp_uri_list = X509_get1_ocsp(xcert);
+	if (ocsp_uri_list != NULL) {
+		ocsp_bio = BIO_new(BIO_s_mem());
+		if (ocsp_bio == NULL) {
+			Debug(
+				"Error: Extracting ocsp uri failed in getting new BIO for ocsp\n");
+			ret = OVSA_CRYPTO_BIO_ERROR;
+			goto end;
+		}
+
+		for (ocsp_uri_count = 0; ocsp_uri_count < sk_OPENSSL_STRING_num(ocsp_uri_list);
+			ocsp_uri_count++) {
+			BIO_printf(ocsp_bio, "%s\n", sk_OPENSSL_STRING_value(ocsp_uri_list, ocsp_uri_count));
+		}
+
+		BIO_get_mem_ptr(ocsp_bio, &ocsp_ptr);
+		if (ocsp_ptr == NULL) {
+			Debug("Error: Extracting ocsp uri failed to extract the ocsp_uri\n");
+			ret = OVSA_CRYPTO_BIO_ERROR;
+			goto end;
+		}
+
+		//ret = ovsa_server_safe_malloc(ocsp_ptr->length + NULL_TERMINATOR, ocsp_uri);
+		//if (ret < OVSA_OK) {
+		//	Debug(
+		//		"Error: Extracting ocsp uri failed in allocating memory for the "
+		//		"ocsp\n");
+		//	ret = OVSA_MEMORY_ALLOC_FAIL;
+		//	goto end;
+		//}
+
+		char tmp[MAX_PATH] = CLEAN;
+
+		Copy(tmp, ocsp_ptr->data, MIN(ocsp_ptr->length, sizeof(tmp) - 1));
+
+		char* tmp2 = GetFirstFilledStrFromStr(tmp);
+
+		StrCpy(url, url_size, tmp2);
+
+		Free(tmp2);
+	}
+	else {
+		Debug(
+			"Error: Extracting ocsp uri since certificate doesn't have OCSP URI\n");
+		ret = OVSA_CRYPTO_X509_ERROR;
+		goto end;
+	}
+
+end:
+	X509_email_free(ocsp_uri_list);
+	BIO_free_all(ocsp_bio);
+	//if (ret < OVSA_OK) {
+	//	ERR_print_errors(g_bio_err);
+	//}
+	return ret;
+}
+
+bool OcspVerify(X* cert, X* issuer)
+{
+	if (cert == NULL || issuer == NULL)
+	{
+		return true;
+	}
+
+	char url[MAX_PATH] = CLEAN;
+
+	if (ovsa_server_crypto_extract_ocsp_uri(cert->x509, url, sizeof(url)) != OVSA_OK)
+	{
+		Debug("No URL\n");
+		return true;
+	}
+
+	Debug("URL: %s\n", url);
+
+	UINT err = ovsa_server_crypto_ocsp_revocation_check(url, cert->x509, issuer->x509);
+
+	if (err == OVSA_OCSP_VERIFY_ERROR)
+	{
+		return false;
+	}
+
+	return true;
+}
+
 

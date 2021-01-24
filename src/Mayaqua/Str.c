@@ -105,6 +105,75 @@ static BYTESTR bytestr[] =
 	{0, "Bytes"},
 };
 
+char* GetFirstFilledStrFromStr(char* str)
+{
+	TOKEN_LIST* t = StrToLinesList(str);
+	if (t == NULL)
+	{
+		return CopyStr("");
+	}
+
+	char* ret = NULL;
+
+	UINT i;
+	for (i = 0;i < t->NumTokens;i++)
+	{
+		char* line = t->Token[i];
+
+		if (IsFilledStr(line))
+		{
+			ret = CopyStr(line);
+		}
+	}
+
+	FreeToken(t);
+
+	if (ret == NULL)
+	{
+		ret = CopyStr("");
+	}
+
+	return ret;
+}
+
+TOKEN_LIST* StrToLinesList(char* str)
+{
+	if (str == NULL) str = "";
+
+	BUF* buf = NewBuf();
+	WriteBuf(buf, str, StrLen(str));
+
+	LIST* o = NewList(NULL);
+
+	SeekBufToBegin(buf);
+
+	while (true)
+	{
+		char* line = CfgReadNextLine(buf);
+		if (line == NULL)
+		{
+			break;
+		}
+
+		Add(o, line);
+	}
+
+	UINT i;
+	TOKEN_LIST* ret = ZeroMalloc(sizeof(TOKEN_LIST));
+	ret->NumTokens = LIST_NUM(o);
+	ret->Token = ZeroMalloc(sizeof(char*) * ret->NumTokens);
+	for (i = 0;i < LIST_NUM(o);i++)
+	{
+		char* line = LIST_DATA(o, i);
+		ret->Token[i] = line;
+	}
+
+	FreeBuf(buf);
+	ReleaseList(o);
+
+	return ret;
+}
+
 bool CheckStrListIncludedInOtherStrMac(char *str1, char *str2)
 {
 	bool ret = false;

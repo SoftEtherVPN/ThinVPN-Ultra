@@ -290,6 +290,7 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 	b->AuthLockoutCount = IniIntValue(o, "AUTH_LOCKOUT_COUNT");
 	b->AuthLockoutTimeout = IniIntValue(o, "AUTH_LOCKOUT_TIMEOUT");
 	b->IdleTimeout = IniIntValue(o, "IDLE_TIMEOUT");
+	b->EnableOcsp = IniIntValue(o, "ENABLE_OCSP");
 
 	if (Vars_ActivePatch_GetBool("IsPublicVersion") == false)
 	{
@@ -2168,15 +2169,29 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 										// 署名が一致したのでクライアントが確かにこの
 										// 証明書を持っていたことが確認できた。
 										// 証明書が有効かどうかをチェックする。
-										auth_ret = SamAuthUserByCert(hub, auth_username, x);
+										bool ocsp_verify_error = false;
+										auth_ret = SamAuthUserByCert(hub, auth_username, x, pol.EnableOcsp, &ocsp_verify_error);
 
 										if (auth_ret)
 										{
-											if (first_connection)
+											if (ocsp_verify_error == false)
 											{
+												// 成功
+												if (first_connection)
+												{
+													wchar_t tmp[MAX_SIZE];
+													GetAllNameFromX(tmp, sizeof(tmp), x);
+													DsLogEx(ds, DS_LOG_INFO, "DSL_AUTH_CERT_OK",
+														tunnel_id, auth_username, tmp);
+												}
+											}
+											else
+											{
+												// OCSP 検証失敗
+												auth_ret = false;
 												wchar_t tmp[MAX_SIZE];
 												GetAllNameFromX(tmp, sizeof(tmp), x);
-												DsLogEx(ds, DS_LOG_INFO, "DSL_AUTH_CERT_OK",
+												DsLogEx(ds, DS_LOG_INFO, "DSL_AUTH_CERT_OCSP_ERROR",
 													tunnel_id, auth_username, tmp);
 											}
 										}
