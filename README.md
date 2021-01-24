@@ -1,24 +1,22 @@
-# IPA-DN-Ultra ���C�u���� �����[�X�m�[�g (�X�V����)
-���̃��C�u�����͖������ł��B�܂��g�p���邱�Ƃ͂ł��܂���B2021/1/20 �o
+﻿# IPA-DN-Ultra ライブラリ リリースノート (更新履歴)
+このライブラリは未完成です。まだ使用することはできません。2021/1/20 登
 
+## [Current Version] beta7preview9
 
-## �J����
-1. CRL �܂��� OCSP
-1. �A�J�E���g���b�N
-1. �����쎞�̃^�C���A�E�g�ݒ�
-1. �ő厞�Ԃ̐ݒ�
-
-## 2021/01/19
-### �V���E�e�����[�N�V�X�e��
-1. �V���E�e�����[�N�V�X�e�� �T�[�o�[�̎����C���X�g�[�� (���l�C���X�g�[��) �ɑΉ������B��ʂ̃R���s���[�^�ւ̃T�[�o�[�̃C���X�g�[�������K�ɂȂ�B�C���X�g�[���� EXE �t�@�C�������s����ۂɁu/auto:1�v�Ƃ����R�}���h���C���I�v�V�������w�肷�邱�Ƃɂ��A�C���X�g�[���̓f�t�H���g�̃I�v�V�����̂܂܁A���l�ōŌ�܂Ői�݁A�T�[�o�[�ݒ�c�[���������I�ɋN������Ƃ���܂Ői�ނ悤�ɂȂ�B�Ȃ��A���̃R�}���h���C���I�v�V�������w�肵�Ď��s����ۂɂ́AAdministrators �������K�v�ł���B�������Ȃ��ꍇ�́AUAC �|�b�v�A�b�v���\�������B�܂��A�C���X�g�[�����Ƀf�t�H���g�Ŏ��ɐi�ނ��Ƃ��ł��Ȃ��悤�ȃG���[�����������ꍇ�́A���Y�G���[�̕\�������Œ�~����̂ŁA����ȍ~�͎蓮�ŃC���X�g�[��������K�v������B
-2. �v���C�x�[�g�łŊ��S�扻�t�@�C�A�E�H�[���@�\�ɑΉ������B�A�v���P�[�V�����r���h���ɂ����āA�\�[�X�R�[�h���́usrc/Vars/VarsActivePatch.h�v�́uThinFwMode�v���ڂ��utrue�v�ɕύX���邱�Ƃɂ��A�u���S�扻�t�@�C�A�E�H�[���v�@�\���N���C�A���g�ڑ����ɌĂяo�����悤�ɂȂ�B�u���S�扻�t�@�C�A�E�H�[���v�ɂ����ĒʐM���O�I�ɋ�����ʐM�� IP �A�h���X (IP �T�u�l�b�g) �̃��X�g�́A�C���X�g�[���̃r���h���ɗ\�߁usrc/bin/hamcore/WhiteListRules.txt�v�ɗ񋓂��Ă����K�v������B�N���C�A���g�����V�����o�[�W�������K�v�ł���B
-3. �A�v���̃C���X�g�[���r���h���̃\�[�X�R�[�h���́usrc/Vars/VarsActivePatch.h�v�́uThinFwMode�v���ڂ��ufalse�v�̏ꍇ�ł����Ă��A�|���V�[�K���T�[�o�[�ŁuENFORCE_LIMITED_FIREWALL�v���ڂ��u1�v�ɐݒ肷�邱�Ƃɂ��A�u���S�扻�t�@�C�A�E�H�[���v�@�\�������I�ɗL���ɂ��邱�Ƃ��ł���悤�ɂ����B�N���C�A���g�����V�����o�[�W�������K�v�ł���B�v���C�x�[�g�ł� LGWAN �łł͗��p�ł��邪�A�p�u���b�N�łł͗��p�ł��Ȃ��B
-4. �T�[�o�[���Łutunnel_log�v�f�B���N�g���ɃT�[�o�[�ƒ��p�V�X�e���Ƃ̊Ԃ̒ʐM�̏ڍׂȃ��O���o�͂���悤�ɂ����B�T�[�o�[�ƒ��p�V�X�e���Ƃ̊Ԃ��p�ɂɐ؂��悤�ȏꍇ�́A���̃��O���m�F���邱�Ƃɂ��A��������肷�邱�Ƃ��e�ՂƂȂ�B
-5. �C���X�g�[���̃r���h�ɂ����āA�T�[�o�[�A�v���݂̂��r���h���邱�Ƃ��ł���悤�ɂȂ����B�\�[�X�R�[�h���́usrc/Vars/VarsActivePatch.h�v�́uThinSetupServerOnly�v���ڂ��utrue�v�ɕύX���邱�Ƃɂ��A�T�[�o�[�A�v���݂̂��܂ރC���X�g�[�����쐬�����B�N���C�A���g�A�v�����܂ރC���X�g�[���ƁA�T�[�o�[�A�v���݂̂��܂ރC���X�g�[���� 2 ��ނ��r���h�������ꍇ�́A���w�b�_�t�@�C�����������āA2 ��r���h���邱�ƁB
-6. �uMAC �A�h���X�F�؂ɂ����� MAC �A�h���X�̃��X�g���A�|���V�[�K���T�[�o�[���ňꌳ�Ǘ����A���[�U�[�Ɏ��R�Ɋė����������Ȃ��v�Ƃ����v�]�ɑΉ����邽�߁A�|���V�[�K���T�[�o�[�̐ݒ�t�@�C���ɁuNO_LOCAL_MAC_ADDRESS_LIST�v��ǉ������B������u1�v�ɐݒ肷�邱�Ƃɂ��A���[�U�[�� MAC �A�h���X�F�؂ɂ����� MAC �A�h���X�̃��X�g���蓮�Őݒ肷�邱�Ƃ��ł��Ȃ��Ȃ�B�Ȃ��A�uNO_LOCAL_MAC_ADDRESS_LIST�v���L���ƂȂ邽�߂ɂ́A�|���V�[�ݒ�t�@�C���́uCLIENT_ALLOWED_MAC_LIST_URL�v����сuENFORCE_MACCHECK�v���ݒ肳��Ă���K�v������B
-7. LGWAN �łɂ����āA�N���C�A���g�� Administrators �܂��� SYSTEM �����œ��삵�Ă���ꍇ�́A���[�U�[���w�肵�� mstsc.exe �t�@�C�������s���邱�Ƃ��ł��Ȃ��悤�ɂ����B
-8. OTP �ɂ����� SMS �F�؂ɑΉ������B(�n�C�p�[�X�P�[���ł̂݁B) �ڍׂ́A�n�C�p�[�X�P�[���ł̃h�L�������g���Q�Ƃ��邱�ƁB
-9. �C���X�g�[���� EXE �t�@�C���Ɠ����f�B���N�g���� EntryPoint.dat �t�@�C�� (�e�L�X�g�t�@�C��) ���ݒu����Ă���ꍇ�́A���̃t�@�C�����A�C���X�g�[���r���h���ɖ��ߍ��܂�� EntryPoint.dat �t�@�C���ɗD�悵�āA�T�[�o�[�Ƌ��ɃC���X�g�[�������悤�ɂ����B����́A���Ƃ��΃V���E�e�����[�N�V�X�e�����p�V�X�e����g�ݍ��񂾃A�v���C�A���X�����������Ƃ��AHTML �Ǘ���ʓ�����A���̒��p�V�X�e���ɐڑ��ł���C���X�g�[���� ZIP �t�@�C�����_�E�����[�h�ł���悤�ȋ@�\����������ۂɁA��ϕ֗��ł���BEXE �t�@�C�����̂��̂͂��ׂẴV�X�e���ŋ��ʂɂ��Ă����AEntryPoint.dat �t�@�C���̂݁A�V�X�e�����ɈقȂ�t�@�C���������������� ZIP �Ń_�E�����[�h�\�Ƃ���V�X�e�����A�e�Ղɍ\�z�ł���悤�ɂȂ����B���̂��Ƃɂ��A���[�U�[�̓C���X�g�[����Ǝ��Ƀr���h����K�v���Ȃ��A���Y�A�v���C�A���X�̐������� 1 ��̂݃r���h����΂悢�B�����āA���̂��Ƃ� Microsoft Authenticode �������C���X�g�[���ɃA�v���C�A���X�o�׌������炩���ߕt�^���邱�Ƃ��ł��邱�Ƃ��Ӗ�����̂ł���B
+## シン・テレワークシステム beta7preview9 の新機能
+1. シン・テレワークシステム サーバーの自動インストーラ (無人インストーラ) に対応した。大量のコンピュータへのサーバーのインストールが快適になる。インストーラの EXE ファイルを実行する際に「/auto:1」というコマンドラインオプションを指定することにより、インストーラはデフォルトのオプションのまま、無人で最後まで進み、サーバー設定ツールが自動的に起動するところまで進むようになる。なお、このコマンドラインオプションを指定して実行する際には、Administrators 権限が必要である。権限がない場合は、UAC ポップアップが表示される。また、インストール中にデフォルトで次に進むことができないようなエラーが発生した場合は、当該エラーの表示部分で停止するので、それ以降は手動でインストールをする必要がある。
+1. プライベート版で完全閉域化ファイアウォール機能に対応した。アプリケーションビルド時において、ソースコード中の「src/Vars/VarsActivePatch.h」の「ThinFwMode」項目を「true」に変更することにより、「完全閉域化ファイアウォール」機能がクライアント接続時に呼び出されるようになる。「完全閉域化ファイアウォール」において通信を例外的に許可する通信先 IP アドレス (IP サブネット) のリストは、インストーラのビルド時に予め「src/bin/hamcore/WhiteListRules.txt」に列挙しておく必要がある。クライアント側も新しいバージョンが必要である。
+1. アプリのインストーラビルド時のソースコード中の「src/Vars/VarsActivePatch.h」の「ThinFwMode」項目が「false」の場合であっても、ポリシー規制サーバーで「ENFORCE_LIMITED_FIREWALL」項目を「1」に設定することにより、「完全閉域化ファイアウォール」機能を強制的に有効にすることができるようにした。クライアント側も新しいバージョンが必要である。プライベート版と LGWAN 版では利用できるが、パブリック版では利用できない。
+1. サーバー側で「tunnel_log」ディレクトリにサーバーと中継システムとの間の通信の詳細なログを出力するようにした。サーバーと中継システムとの間が頻繁に切れるような場合は、このログを確認することにより、原因を特定することが容易となる。
+1. インストーラのビルドにおいて、サーバーアプリのみをビルドすることができるようになった。ソースコード中の「src/Vars/VarsActivePatch.h」の「ThinSetupServerOnly」項目を「true」に変更することにより、サーバーアプリのみを含むインストーラが作成される。クライアントアプリも含むインストーラと、サーバーアプリのみを含むインストーラの 2 種類をビルドしたい場合は、同ヘッダファイルを書換えて、2 回ビルドすること。
+1. 「MAC アドレス認証における MAC アドレスのリストを、ポリシー規制サーバー側で一元管理し、ユーザーに自由に管理させたくない」という要望に対応するため、ポリシー規制サーバーの設定ファイルに「NO_LOCAL_MAC_ADDRESS_LIST」を追加した。これを「1」に設定することにより、ユーザーは MAC アドレス認証における MAC アドレスのリストを手動で設定することができなくなる。なお、「NO_LOCAL_MAC_ADDRESS_LIST」が有効となるためには、ポリシー設定ファイルの「CLIENT_ALLOWED_MAC_LIST_URL」および「ENFORCE_MACCHECK」が設定されている必要がある。
+1. LGWAN 版において、クライアントが Administrators または SYSTEM 権限で動作している場合は、ユーザーが指定した mstsc.exe ファイルを実行することができないようにした。
+1. OTP における SMS 認証に対応した。(ハイパースケール版のみ。) 詳細は、ハイパースケール版のドキュメントを参照すること。
+1. インストーラの EXE ファイルと同じディレクトリに EntryPoint.dat ファイル (テキストファイル) が設置されている場合は、このファイルが、インストーラビルド時に埋め込まれる EntryPoint.dat ファイルに優先して、サーバーと共にインストールされるようにした。これは、たとえばシン・テレワークシステム中継システムを組み込んだアプライアンスを実装したとき、HTML 管理画面等から、その中継システムに接続できるインストーラの ZIP ファイルをダウンロードできるような機能を実装する際に、大変便利である。EXE ファイルそのものはすべてのシステムで共通にしておき、EntryPoint.dat ファイルのみ、システム毎に異なるファイルを自動生成して ZIP でダウンロード可能とするシステムを、容易に構築できるようになった。このことにより、ユーザーはインストーラを独自にビルドする必要がなく、当該アプライアンスの製造元が 1 回のみビルドすればよい。そして、このことは Microsoft Authenticode 署名をインストーラにアプライアンス出荷元があらかじめ付与することができることも意味するのである。
+1. クライアント証明書認証における OCSP (Online Certificate Status Protocol) 検証の実装。ポリシー規制サーバーの「ENABLE_OCSP」項目を「1」に設定することにより、サーバーは、クライアント証明書認証要求があった場合で、かつ認証がサーバーにあらかじめ登録されている信頼された証明書 (CA 等) による署名の検証によって実施される場合に、当該クライアント証明書の拡張フィールドに OCSP サーバーの URL が記載されている場合は、その OCSP サーバーの URL 宛に OCSP プロトコルにより証明書が有効かどうかの検証を試みます。無効であると回答された場合は、ログファイルにその旨を記載し、証明書認証は失敗します。OCSP サーバーとの通信に失敗した場合は、検証は成功したものとみなされます。
+1. アカウントロックアウト機能の実装。ポリシー規制サーバーの「AUTH_LOCKOUT_COUNT」および「AUTH_LOCKOUT_TIMEOUT」項目を 1 以上の整数に設定することにより、ユーザー認証 (パスワード認証) においてパスワードを誤った場合のアカウントロックアウトが可能となりました。AUTH_LOCKOUT_COUNT には、ロックアウトが発生するまでの認証失敗回数を指定します。AUTH_LOCKOUT_TIMEOUT には、ロックアウトが自動解除されるまでのタイムアウト値を秒単位で指定します。
+1. 無操作時のタイムアウト実装。ポリシー規制サーバーの「IDLE_TIMEOUT」項目を 1 以上の整数に設定することにより、ユーザーがクライアント側でマウスを「IDLE_TIMEOUT」で指定された秒数以上無操作であった場合は、クライアント側の接続が切断され、無操作タイムアウトが発生した旨のメッセージボックスがクライアント側の画面に表示されるようになります。この機能が有効となるには、クライアント側のバージョンも beta7preview9 以降である必要があります。それ以前のクライアントの場合は、無視されます。
+1. ポリシー規制サーバーの「SERVER_ALLOWED_MAC_LIST_URL」による MAC アドレス一覧テキストファイルの指定において、MAC アドレス一覧テキストファイルの先頭行に UTF-8 の BOM 文字が入っていた場合、その BOM 文字を除外して処理を行なうように改良しました。
 
 
 
