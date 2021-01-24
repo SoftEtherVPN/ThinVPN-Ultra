@@ -2426,6 +2426,17 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 						ICO_INFORMATION, true);
 				}
 			}
+
+			wchar_t* memory_msg = DsCheckSufficientMemoryGetMsg();
+			if (UniIsFilledUniStr(memory_msg))
+			{
+				// メモリ問題を表示する
+				if (dg->MsgForServerDlg3 == NULL) // 既に過去にメッセージが表示されたことがある場合は新たに表示しない
+				{
+					dg->MsgForServerDlg3 = StartAsyncOnceMsg(_UU("DS_MEMORY_TITLE"), memory_msg, true,
+						ICO_MEMORY, true);
+				}
+			}
 		}
 	}
 
@@ -3127,6 +3138,13 @@ void DgMain(DG *dg)
 		// メッセージ画面 2 が表示されたままの場合は閉じる
 		StopAsyncOnceMsg(dg->MsgForServerDlg2);
 		dg->MsgForServerDlg2 = NULL;
+	}
+
+	if (dg->MsgForServerDlg3 != NULL)
+	{
+		// メッセージ画面 3 が表示されたままの場合は閉じる
+		StopAsyncOnceMsg(dg->MsgForServerDlg3);
+		dg->MsgForServerDlg3 = NULL;
 	}
 
 	EndRpc(rpc);

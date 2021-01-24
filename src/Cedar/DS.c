@@ -5282,3 +5282,31 @@ void DsWriteSecureCertAndKey(X *cert, K *key)
 	FreePack(p);
 }
 
+
+// 十分なメモリがあるかチェックする
+wchar_t* DsCheckSufficientMemoryGetMsg()
+{
+	wchar_t* ret = NULL;
+
+#ifdef OS_WIN32
+
+	MEMINFO info = CLEAN;
+
+	GetMemInfo(&info);
+
+	if (info.TotalPhys != 0)
+	{
+		if (info.FreePhys <= 500000000ULL) // 空きメモリがおおむね 500MB 未満の場合
+		{
+			return _UU("DS_MEMORY_MSG_1");
+		}
+		else if (info.TotalPhys <= 5000000000ULL) // 合計メモリがおおむね 4GB 以下の場合
+		{
+			return _UU("DS_MEMORY_MSG_2");
+		}
+	}
+
+#endif // OS_WIN32
+
+	return ret;
+}

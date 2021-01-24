@@ -92,6 +92,7 @@ typedef struct DG
 	bool Hello;
 	ONCEMSG_DLG *MsgForServerDlg;
 	ONCEMSG_DLG *MsgForServerDlg2;
+	ONCEMSG_DLG* MsgForServerDlg3;
 	bool IsAdminOrSystem_Cache;
 } DG;
 

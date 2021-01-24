@@ -394,6 +394,7 @@ bool DsTryRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsAddRadiusCache(DS *ds, UCHAR *client_id, char *username, char *password);
 void DsCleanAllRadiusCache(DS *ds);
 void DsGenerateNewOtp(char *dst, UINT size, UINT len);
+wchar_t* DsCheckSufficientMemoryGetMsg();
 
 #ifdef	OS_WIN32
 void DsWin32ProcessWatcherCallback(bool start, MS_PROCESS* process, void* param);
