@@ -771,6 +771,9 @@ char *CfgReadNextLine(BUF *b)
 		}
 	}
 
+	// Remove BOM
+	RemoveBomFromStr(buf);
+
 	return buf;
 }
 

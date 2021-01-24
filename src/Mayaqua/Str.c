@@ -105,6 +105,23 @@ static BYTESTR bytestr[] =
 	{0, "Bytes"},
 };
 
+void RemoveBomFromStr(char* str)
+{
+	if (str == NULL)
+	{
+		return;
+	}
+
+	UINT len = StrLen(str);
+	if (len >= 3)
+	{
+		if ((UCHAR)str[0] == 0xEF && (UCHAR)str[1] == 0xBB && (UCHAR)str[2] == 0xBF)
+		{
+			memmove(str, str + 3, len - 3 + 1);
+		}
+	}
+}
+
 char* GetFirstFilledStrFromStr(char* str)
 {
 	TOKEN_LIST* t = StrToLinesList(str);
@@ -123,6 +140,7 @@ char* GetFirstFilledStrFromStr(char* str)
 		if (IsFilledStr(line))
 		{
 			ret = CopyStr(line);
+			break;
 		}
 	}
 

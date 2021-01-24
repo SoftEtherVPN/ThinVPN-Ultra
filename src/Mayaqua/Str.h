@@ -227,6 +227,7 @@ bool CheckPasswordComplexity(char *str);
 
 TOKEN_LIST* StrToLinesList(char* str);
 char* GetFirstFilledStrFromStr(char* str);
+void RemoveBomFromStr(char* str);
 
 
 // *** JSON strings support
