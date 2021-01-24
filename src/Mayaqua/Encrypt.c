@@ -6868,7 +6868,7 @@ static ovsa_status_t ovsa_server_crypto_extract_ocsp_uri(X509* xcert, char *url,
 
 		char tmp[MAX_PATH] = CLEAN;
 
-		Copy(tmp, ocsp_ptr->data, MIN(ocsp_ptr->length, sizeof(tmp) - 1));
+		Copy(tmp, ocsp_ptr->data, MIN((UINT)ocsp_ptr->length, sizeof(tmp) - 1));
 
 		char* tmp2 = GetFirstFilledStrFromStr(tmp);
 
