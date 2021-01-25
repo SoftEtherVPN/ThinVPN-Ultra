@@ -5039,6 +5039,14 @@ UINT SwNwSelect(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizar
 
 			SetWizardButton(wizard_page, IsChecked(hWnd, C_NW1) || IsChecked(hWnd, C_NW2),
 				true, true, false);
+
+			if (sw->NwDetectResult.IsFinished)
+			{
+				if (sw->Auto)
+				{
+					ClickWizardButton(wizard, PSBTN_NEXT);
+				}
+			}
 			break;
 		}
 		break;
@@ -6768,7 +6776,7 @@ void SwUiMain(SW* sw)
 
 		ShowWizard(NULL, w, start_page);
 
-		if (sw->Run)
+		if (sw->Run && sw->NoAfterRun == false)
 		{
 			// Auto run the app
 			wchar_t tmp[MAX_PATH];
@@ -7275,6 +7283,7 @@ void SwParseCommandLine(SW* sw)
 			sw->UrdpInstMode = GetParamYes(o, "URDPINSTMODE");
 
 			sw->Auto = GetParamYes(o, "AUTO");
+			sw->NoAfterRun = GetParamYes(o, "NOAFTERRUN");
 
 			StrCpy(sw->SfxMode, sizeof(sw->SfxMode), GetParamStr(o, "SFXMODE"));
 			UniStrCpy(sw->SfxOut, sizeof(sw->SfxOut), GetParamUniStr(o, "SFXOUT"));

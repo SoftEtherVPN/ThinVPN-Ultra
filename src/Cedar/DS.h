@@ -319,6 +319,7 @@ struct DS_POLICY_BODY
 	UINT AuthLockoutTimeout;
 	UINT IdleTimeout;
 	bool EnableOcsp;
+	UINT RequireMinimumClientBuild;
 };
 
 struct DS_POLICY_CLIENT

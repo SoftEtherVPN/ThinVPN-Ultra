@@ -333,6 +333,7 @@ typedef struct SW
 	bool DisableDirectoryChange;
 
 	bool Auto;
+	bool NoAfterRun:
 
 	ONCEMSG_DLG* DenyTsConnectionPolicyWarningDlg;
 

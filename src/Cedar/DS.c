@@ -287,6 +287,12 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 		b->DisableShare = true;
 	}
 
+	if (Vars_ActivePatch_GetBool("IsPublicVersion") == false)
+	{
+		b->RequireMinimumClientBuild = IniIntValue(o, "REQUIRE_MIMIMUM_CLIENT_BUILD");
+		b->RequireMinimumClientBuild = MIN(b->RequireMinimumClientBuild, CEDAR_BUILD);
+	}
+
 	b->AuthLockoutCount = IniIntValue(o, "AUTH_LOCKOUT_COUNT");
 	b->AuthLockoutTimeout = IniIntValue(o, "AUTH_LOCKOUT_TIMEOUT");
 	b->IdleTimeout = IniIntValue(o, "IDLE_TIMEOUT");
@@ -1387,6 +1393,16 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 		// サーバー側 MAC アドレスチェック失敗
 		DsDebugLog(ds, logprefix, "Error: %s:%u", __FILE__, __LINE__);
 		DsSendError(sock, support_server_allowed_mac_list_err ? ERR_DESK_SERVER_ALLOWED_MAC_LIST : ERR_DESK_UNKNOWN_AUTH_TYPE);
+		FreePack(p);
+		return;
+	}
+
+	if (client_build != 0 && pol.RequireMinimumClientBuild != 0 && client_build < pol.RequireMinimumClientBuild)
+	{
+		// ポリシーの REQUIRE_MIMIMUM_CLIENT_BUILD で指定されているよりも新しいクライアントビルドが必要です
+		DsDebugLog(ds, logprefix, "Error: %s:%u", __FILE__, __LINE__);
+		DsDebugLog(ds, logprefix, "client_build %u < pol.RequireMinimumClientBuild %u", client_build, pol.RequireMinimumClientBuild);
+		DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
 		FreePack(p);
 		return;
 	}
