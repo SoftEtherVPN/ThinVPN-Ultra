@@ -302,6 +302,18 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 	{
 		// パブリック版以外では ENFORCE_LIMITED_FIREWALL を設定可能
 		b->IsLimitedFirewallMandated = IniIntValue(o, "ENFORCE_LIMITED_FIREWALL");
+
+		if (b->IsLimitedFirewallMandated)
+		{
+			// ENFORCE_LIMITED_FIREWALL_COMPUTERNAME_STARTWITH
+			ws = IniUniStrValue(o, "ENFORCE_LIMITED_FIREWALL_COMPUTERNAME_STARTWITH");
+			if (UniIsEmptyStr(ws) == false)
+			{
+				UniStrCpy(b->LimitedFirewallMandateExcludeComputernameStartWith,
+					sizeof(b->LimitedFirewallMandateExcludeComputernameStartWith),
+					ws);
+			}
+		}
 	}
 
 	b->EnforceProcessWatcherAlways = IniIntValue(o, "ENFORCE_PROCESS_WATCHER_ALWAYS");
@@ -1248,6 +1260,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	bool server_allowed_mac_list_check_ok = true;
 	bool support_server_allowed_mac_list_err = false;
 	UINT total_relay_size = 0;
+	bool enforce_limited_fw_excluded = false;
 	char logprefix[128] = CLEAN;
 	// 引数チェック
 	if (ds == NULL || sock == NULL)
@@ -1366,6 +1379,32 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	PackGetUniStr(p, "ComputerName", computer_name, sizeof(computer_name));
 	PackGetUniStr(p, "UserName", user_name, sizeof(user_name));
 	PackGetIp(p, "ClientLocalIP", &client_local_ip);
+
+	// ENFORCE_LIMITED_FIREWALL_COMPUTERNAME_STARTWITH 検査
+	if (UniIsFilledStr(pol.LimitedFirewallMandateExcludeComputernameStartWith))
+	{
+		UNI_TOKEN_LIST* t = UniParseToken(pol.LimitedFirewallMandateExcludeComputernameStartWith, L";, \t");
+
+		if (t != NULL)
+		{
+			UINT i;
+
+			for (i = 0;i < t->NumTokens;i++)
+			{
+				wchar_t* s = t->Token[i];
+
+				if (UniIsFilledStr(s))
+				{
+					if (UniStartWith(computer_name, s))
+					{
+						enforce_limited_fw_excluded = true;
+					}
+				}
+			}
+
+			UniFreeToken(t);
+		}
+	}
 
 	if (MsIsWinXPOrWinVista() == false)
 	{
@@ -1663,7 +1702,8 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 	PackAddBool(p, "UseAdvancedSecurity", ds->UseAdvancedSecurity);
 	PackAddBool(p, "IsOtpEnabled", ds->EnableOtp);
 	PackAddBool(p, "RunInspect", run_inspect);
-	PackAddBool(p, "IsLimitedFirewallMandated", pol.IsLimitedFirewallMandated);
+	Debug("enforce_limited_fw_excluded = %u\n", enforce_limited_fw_excluded);
+	PackAddBool(p, "IsLimitedFirewallMandated", pol.IsLimitedFirewallMandated && (enforce_limited_fw_excluded == false));
 	PackAddInt(p, "IdleTimeout", pol.IdleTimeout);
 
 	DsDebugLog(ds, logprefix, "ds_caps=%u, is_share_disabled=%u, UseAdvancedSecurity=%u, IsOtpEnabled=%u, run_inspect=%u",

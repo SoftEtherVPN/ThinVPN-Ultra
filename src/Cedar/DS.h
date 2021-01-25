@@ -320,6 +320,7 @@ struct DS_POLICY_BODY
 	UINT IdleTimeout;
 	bool EnableOcsp;
 	UINT RequireMinimumClientBuild;
+	wchar_t LimitedFirewallMandateExcludeComputernameStartWith[MAX_PATH];
 };
 
 struct DS_POLICY_CLIENT
