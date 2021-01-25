@@ -7252,6 +7252,7 @@ void SwParseCommandLine(SW* sw)
 		{"SUINSTMODE", NULL, NULL, NULL, NULL, },
 		{"URDPINSTMODE", NULL, NULL, NULL, NULL, },
 		{"AUTO", NULL, NULL, NULL, NULL, },
+		{"NOAFTERRUN", NULL, NULL, NULL, NULL, },
 	};
 	// Validate arguments
 	if (sw == NULL)
