@@ -6998,19 +6998,22 @@ void SwDefineComponents(SW* sw)
 		return;
 	}
 
-	// NTT Server (共有機能有効版)
-	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER, ICO_USER_ADMIN, 14, DI_FILENAME_DESKSERVER,
-		SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char*), ntt_server_files,
-		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
-		NULL, 0, NULL, NULL);
-	Add(sw->ComponentList, c);
+	if (Vars_ActivePatch_GetBool("ThinSetupClientOnly") == false)
+	{
+		// NTT Server (共有機能有効版)
+		c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER, ICO_USER_ADMIN, 14, DI_FILENAME_DESKSERVER,
+			SW_LONG_THINSVR, false, sizeof(ntt_server_files) / sizeof(char*), ntt_server_files,
+			DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
+			NULL, 0, NULL, NULL);
+		Add(sw->ComponentList, c);
 
-	// NTT Server (共有機能無効版)
-	c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER_NS, ICO_USER_ADMIN, 14, DI_FILENAME_DESKSERVER,
-		SW_LONG_THINSVR, false, sizeof(ntt_server_ns_files) / sizeof(char*), ntt_server_ns_files,
-		DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
-		NULL, 0, _UU("PRODUCT_NAME_NOSHARE_POSTFIX"), "SW_COMPONENT_" APP_ID_PREFIX "THINSVR_DESCRIPTION_NS_POSTFIX");
-	Add(sw->ComponentList, c);
+		// NTT Server (共有機能無効版)
+		c = SwNewComponent(SW_NAME_THINSVR, GC_SVC_NAME_THINSVR, SW_CMP_THIN_SERVER_NS, ICO_USER_ADMIN, 14, DI_FILENAME_DESKSERVER,
+			SW_LONG_THINSVR, false, sizeof(ntt_server_ns_files) / sizeof(char*), ntt_server_ns_files,
+			DI_FILENAME_DESKCONFIG, _UU("SW_RUN_TEXT_THINSVR"),
+			NULL, 0, _UU("PRODUCT_NAME_NOSHARE_POSTFIX"), "SW_COMPONENT_" APP_ID_PREFIX "THINSVR_DESCRIPTION_NS_POSTFIX");
+		Add(sw->ComponentList, c);
+	}
 
 	if (Vars_ActivePatch_GetBool("ThinSetupServerOnly") == false)
 	{
