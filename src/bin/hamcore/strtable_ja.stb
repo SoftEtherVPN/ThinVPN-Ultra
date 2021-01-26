@@ -230,6 +230,7 @@ ERR_145					この操作は実行できません。VPN Gate 公開 VPN 中継サ
 ERR_146					VPN Gate サービスが VPN Client 内で動作している場合は、この設定画面から VPN Gate サービスを停止することはできません。VPN Gate サービスを停止するには、VPN Client 接続マネージャの設定ツールを使用してください。
 ERR_147					この機能はオープンソース版 SoftEther VPN にはまだ実装されていません。
 ERR_148					Windows システムがサスペンド状態に移行中のため、VPN 通信が切断されました。
+ERR_150					プロキシサーバーの設定により、現在、中継システムへの接続が無効化されています。セッションは確立されません。中継システムへの接続を有効にするには、プロキシサーバーの設定画面を開いてください。
 
 
 
@@ -444,7 +445,7 @@ DU_IDLE_TIMEOUT			マウスが %u 秒間未操作であったため、アイド�
 DG_TITLE				$APPFULL_SERVER$管理ツール
 DG_PROXY_FROM_IE		現在の Internet Explorer のプロキシサーバーの設定を読み込みました。
 DG_INTERNET_CONNECT_OK_1	正常に中継システムに接続されています。\r\nこのコンピュータの ID は 「%S」 です。\r\n\r\n現在、$APPSHORT$ を経由してこのコンピュータにリモートアクセスできる状態となっています。
-DG_INTERNET_CONNECT_OK_2	「クライアントからの接続を禁止する」状態になっています。\r\n\r\n現在は中継システム経由でこのコンピュータにリモートアクセスすることはできません。
+DG_INTERNET_CONNECT_OK_2	「クライアントからの接続を禁止する」状態になっています。現在はこのコンピュータにリモートアクセスすることはできません。中継システムとのセッションは維持されており、WoL トリガー機能が有効な場合は引き続き利用可能です。中継システムから完全切断したい場合は「プロキシサーバーの設定」をクリックし、接続を無効化できます。
 DG_CURRENT_OK			現在の状態:
 DG_CURRENT_ERROR		エラー発生:
 DG_CHANGE_PCID_OK		このコンピュータのコンピュータ ID を '%S' に設定しました。
@@ -827,6 +828,7 @@ ERRDLG_DEVICE_ERROR		仮想 LAN カード (デバイス名: %S) が停止され�
 
 
 # プロトコル関係
+PROTO_NO_CONNECTION		接続は無効化されています
 PROTO_DIRECT_TCP		直接 TCP/IP 接続
 PROTO_HTTP_PROXY		HTTP プロキシ経由接続
 PROTO_SOCKS_PROXY		SOCKS プロキシ経由接続
@@ -4619,6 +4621,7 @@ S2						プロキシサーバー設定
 C_DIRECT				プロキシサーバーを使用せず、直接外部ネットワークに接続する(&N)
 C_HTTP					HTTP プロキシサーバーを使用して外部ネットワークに接続する(&H)
 C_SOCKS					SOCKS プロキシサーバーを使用して外部ネットワークに接続する(&S)
+C_NO_CONNECTION			中継システムへの接続を無効化する(&D)
 S_ADDRESS				プロキシサーバーのアドレス(&A):
 S_PORT					ポート番号(&P):
 S_USERNAME				ユーザー名(&U):

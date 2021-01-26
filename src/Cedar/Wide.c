@@ -925,15 +925,27 @@ void WideServerConnectThread(THREAD *thread, void *param)
 	{
 		// 接続を試行
 		CONNECT_MAIN_THREAD_PARAM param;
-		THREAD *t;
+		THREAD *t = NULL;
 
 		Zero(&param, sizeof(param));
 		param.Wide = w;
 		param.Halt = false;
 		param.HaltEvent = NewEvent();
 
-		// 接続メインスレッドの作成
-		t = NewThread(WideServerConnectMainThread, &param);
+		INTERNET_SETTING setting = CLEAN;
+
+		WideGetInternetSetting(w, &setting);
+
+		if (setting.ProxyType == PROXY_NO_CONNECT)
+		{
+			// 接続停止中！ けしからんな
+			w->ServerErrorCode = ERR_PROXY_NO_CONNECTION;
+		}
+		else
+		{
+			// 接続メインスレッドの作成
+			t = NewThread(WideServerConnectMainThread, &param);
+		}
 
 		while (true)
 		{
@@ -951,10 +963,14 @@ void WideServerConnectThread(THREAD *thread, void *param)
 		// 接続メインスレッドの停止
 		param.Halt = true;
 		Set(param.HaltEvent);
-		WaitThread(t, INFINITE);
 
-		// スレッドの解放
-		ReleaseThread(t);
+		if (t != NULL)
+		{
+			WaitThread(t, INFINITE);
+
+			// スレッドの解放
+			ReleaseThread(t);
+		}
 
 		ReleaseEvent(param.HaltEvent);
 	}

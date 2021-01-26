@@ -583,6 +583,10 @@ SOCK *WpcSockConnectEx(WPC_CONNECT *param, UINT *error_code, UINT timeout, bool 
 
 	switch (param->ProxyType)
 	{
+	case PROXY_NO_CONNECT:
+		err = ERR_PROXY_NO_CONNECTION;
+		break;
+
 	case PROXY_DIRECT:
 		sock = TcpConnectEx3(param->HostName, param->Port, timeout, cancel, NULL, true, NULL, false, false, NULL);
 		if (sock == NULL)

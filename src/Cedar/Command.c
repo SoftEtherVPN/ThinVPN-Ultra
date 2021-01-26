@@ -4086,6 +4086,8 @@ wchar_t *GetProtocolName(UINT n)
 {
 	switch (n)
 	{
+	case PROXY_NO_CONNECT:
+		return _UU("PROTO_NO_CONNECTION");
 	case PROXY_DIRECT:
 		return _UU("PROTO_DIRECT_TCP");
 	case PROXY_HTTP:
@@ -12463,8 +12465,10 @@ wchar_t *GetProxyTypeStr(UINT i)
 {
 	switch (i)
 	{
-	case PROXY_DIRECT:
+	case PROXY_NO_CONNECT:
+		return _UU("PROTO_NO_CONNECTION");
 
+	case PROXY_DIRECT:
 		return _UU("PROTO_DIRECT_TCP");
 
 	case PROXY_HTTP:

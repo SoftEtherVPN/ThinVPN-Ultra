@@ -1289,6 +1289,8 @@
 #define B_RDP                           2569
 #define S_USERAGENT2                    2569
 #define B_URDP                          2570
+#define C_DIRECT2                       2570
+#define C_NO_CONNECTION                 2570
 #define S_PCID                          2571
 #define S_PCID_2                        2572
 #define S_PCID2                         2572

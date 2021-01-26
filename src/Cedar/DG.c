@@ -2805,6 +2805,7 @@ void DgProxyDlgSet(HWND hWnd, INTERNET_SETTING *t)
 		return;
 	}
 
+	Check(hWnd, C_NO_CONNECTION, t->ProxyType == PROXY_NO_CONNECT);
 	Check(hWnd, C_DIRECT, t->ProxyType == PROXY_DIRECT);
 	Check(hWnd, C_HTTP, t->ProxyType == PROXY_HTTP);
 	Check(hWnd, C_SOCKS, t->ProxyType == PROXY_SOCKS);
@@ -2840,8 +2841,12 @@ void DgProxyDlgUpdate(HWND hWnd)
 	{
 		type = PROXY_SOCKS;
 	}
+	else if (IsChecked(hWnd, C_NO_CONNECTION))
+	{
+		type = PROXY_NO_CONNECT;
+	}
 
-	if (type != PROXY_DIRECT)
+	if (type != PROXY_DIRECT && type != PROXY_NO_CONNECT)
 	{
 		if (IsEmpty(hWnd, E_ADDRESS))
 		{
@@ -2919,6 +2924,10 @@ void DgProxyDlgOnOk(HWND hWnd, INTERNET_SETTING *t)
 	else if (IsChecked(hWnd, C_SOCKS))
 	{
 		type = PROXY_SOCKS;
+	}
+	else if (IsChecked(hWnd, C_NO_CONNECTION))
+	{
+		type = PROXY_NO_CONNECT;
 	}
 
 	t->ProxyType = type;

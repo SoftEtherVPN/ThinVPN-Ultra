@@ -3267,7 +3267,7 @@ UINT DtGetInternetSetting(DS *ds, INTERNET_SETTING *t)
 // インターネット接続設定の設定
 UINT DtSetInternetSetting(DS *ds, INTERNET_SETTING *t)
 {
-	if (t->ProxyType != PROXY_DIRECT)
+	if (t->ProxyType != PROXY_DIRECT && t->ProxyType != PROXY_NO_CONNECT)
 	{
 		if (IsEmptyStr(t->ProxyHostName) || t->ProxyPort == 0)
 		{

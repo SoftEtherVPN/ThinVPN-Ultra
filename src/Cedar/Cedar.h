@@ -301,6 +301,7 @@
 #define	PROXY_DIRECT			0	// Direct TCP connection
 #define	PROXY_HTTP				1	// Connection via HTTP proxy server
 #define	PROXY_SOCKS				2	// Connection via SOCKS proxy server
+#define PROXY_NO_CONNECT		999	// No connection
 
 // Direction of data flow
 #define	TCP_BOTH				0	// Bi-directional
@@ -884,6 +885,7 @@
 #define	ERR_NOT_SUPPORTED_FUNCTION_ON_OPENSOURCE	147	// It is a feature that is not supported in the open source version
 #define	ERR_SUSPENDING					148	// System is suspending
 #define ERR_DHCP_SERVER_NOT_RUNNING		149	// DHCP server is not running
+#define ERR_PROXY_NO_CONNECTION			150	// Connection disabled
 
 
 

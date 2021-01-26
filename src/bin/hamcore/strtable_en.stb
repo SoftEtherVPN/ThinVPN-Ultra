@@ -230,6 +230,7 @@ ERR_145					Unacceptable operation. Use the VPN Gate Utility to modify the conne
 ERR_146					The VPN Gate Service is running inside the VPN Client program. You cannot stop the VPN Gate Service on this screen. Use the VPN Client Manager to enable or disable the VPN Gate Service.
 ERR_147					This feature is not supported. It hasn't been implemented yet on the open-source version of SoftEther VPN.
 ERR_148					The VPN connection was disconnected because the system is being suspended.
+ERR_150					Connection to the relay system is currently disabled due to proxy server settings. No session will be established. To enable the connection to the relay system, go to the proxy server settings page.
 
 
 
@@ -954,6 +955,7 @@ ERRDLG_DEVICE_ERROR		The connection with the VPN Server has been disconnected be
 
 
 # Concerning protocols
+PROTO_NO_CONNECTION		Connection Disabled
 PROTO_DIRECT_TCP		Direct TCP/IP Connection
 PROTO_HTTP_PROXY		Connection via HTTP Proxy
 PROTO_SOCKS_PROXY		Connection via SOCKS Proxy
@@ -4612,6 +4614,7 @@ S2						Proxy Server settings
 C_DIRECT				Do &not use proxy servers. Connect to the Internet directly
 C_HTTP					Use &HTTP Proxy Server to connect to the Internet
 C_SOCKS					Use &SOCKS Proxy Server to connect to the Internet
+C_NO_CONNECTION			Disable Connection to the Relay System
 S_ADDRESS				&Address of Proxy Server:
 S_PORT					&Port Number:
 S_USERNAME				&Username:
