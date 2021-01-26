@@ -289,7 +289,7 @@ bool DsParsePolicyFile(DS_POLICY_BODY *b, BUF *buf)
 
 	if (Vars_ActivePatch_GetBool("IsPublicVersion") == false)
 	{
-		b->RequireMinimumClientBuild = IniIntValue(o, "REQUIRE_MIMIMUM_CLIENT_BUILD");
+		b->RequireMinimumClientBuild = IniIntValue(o, "REQUIRE_MINIMUM_CLIENT_BUILD");
 		b->RequireMinimumClientBuild = MIN(b->RequireMinimumClientBuild, CEDAR_BUILD);
 	}
 
@@ -1438,7 +1438,7 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 
 	if (client_build != 0 && pol.RequireMinimumClientBuild != 0 && client_build < pol.RequireMinimumClientBuild)
 	{
-		// ポリシーの REQUIRE_MIMIMUM_CLIENT_BUILD で指定されているよりも新しいクライアントビルドが必要です
+		// ポリシーの REQUIRE_MINIMUM_CLIENT_BUILD で指定されているよりも新しいクライアントビルドが必要です
 		DsDebugLog(ds, logprefix, "Error: %s:%u", __FILE__, __LINE__);
 		DsDebugLog(ds, logprefix, "client_build %u < pol.RequireMinimumClientBuild %u", client_build, pol.RequireMinimumClientBuild);
 		DsSendError(sock, ERR_DESK_UNKNOWN_AUTH_TYPE);
@@ -2050,17 +2050,34 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 				DsLogEx(ds, DS_LOG_ERROR, "DSL_AUTH_OLD_NG", tunnel_id);
 				DsReportAuthFailed(ds, tunnel_id, &client_ip, client_host);
 			}
-			DsSendError(sock, ERR_DESK_BAD_PASSWORD);
+
+			// ロックアウト記録
+			bool lockout_as_result = false;
+			if (pol.AuthLockoutTimeout != 0 && pol.AuthLockoutCount != 0)
+			{
+				if (first_connection)
+				{
+					AddLockout(ds->Lockout, "", pol.AuthLockoutTimeout * 1000);
+				}
+
+				if (GetLockout(ds->Lockout, "", pol.AuthLockoutTimeout * 1000) >= pol.AuthLockoutCount)
+				{
+					// 結果としてロックアウトが発生した
+					lockout_as_result = true;
+				}
+			}
+
+			DsSendError(sock, lockout_as_result == false ? ERR_AUTH_FAILED : ((client_build < 9862) ? ERR_ACCESS_DENIED : ERR_DESK_AUTH_LOCKOUT));
 			FreePack(p);
 			DsDebugLog(ds, logprefix, "Error: ERR_DESK_BAD_PASSWORD (%s:%u)", __FILE__, __LINE__);
 
-			// ロックアウト記録
-			if (pol.AuthLockoutTimeout != 0 && pol.AuthLockoutCount != 0)
-			{
-				AddLockout(ds->Lockout, "", pol.AuthLockoutTimeout * 1000);
-			}
-
 			return;
+		}
+
+		if (pol.AuthLockoutTimeout != 0 && pol.AuthLockoutCount != 0)
+		{
+			// 認証成功時はロックアウト解除
+			ClearLockout(ds->Lockout, "");
 		}
 
 		if (first_connection)
@@ -2354,15 +2371,30 @@ void DsServerMain(DS *ds, SOCKIO *sock)
 				DsLogEx(ds, DS_LOG_WARNING, "DSL_AUTH_FAILED", tunnel_id);
 				DsReportAuthFailed(ds, tunnel_id, &client_ip, client_host);
 			}
-			DsSendError(sock, ERR_AUTH_FAILED);
-			FreePack(p);
+
+			bool lockout_as_result = false;
 
 			// ロックアウト記録
 			if (pol.AuthLockoutTimeout != 0 && pol.AuthLockoutCount != 0)
 			{
 				AddLockout(ds->Lockout, auth_username, pol.AuthLockoutTimeout * 1000);
+
+				if (GetLockout(ds->Lockout, auth_username, pol.AuthLockoutTimeout * 1000) >= pol.AuthLockoutCount)
+				{
+					// 結果としてロックアウトが発生した
+					lockout_as_result = true;
+				}
 			}
+
+			DsSendError(sock, lockout_as_result == false ? ERR_AUTH_FAILED : ((client_build < 9862) ? ERR_ACCESS_DENIED : ERR_DESK_AUTH_LOCKOUT));
+			FreePack(p);
 			return;
+		}
+
+		if (pol.AuthLockoutTimeout != 0 && pol.AuthLockoutCount != 0)
+		{
+			// 認証成功時はロックアウト解除
+			ClearLockout(ds->Lockout, auth_username);
 		}
 
 		DsDebugLog(ds, logprefix, "Auth OK (%s:%u)", __FILE__, __LINE__);
@@ -3315,6 +3347,7 @@ UINT DtGetStatus(DS *ds, RPC_DS_STATUS *t)
 		t->DisableMacCheck = pol.DisableMacCheck;
 		t->DisableWatermark = pol.DisableWatermark;
 		t->NoLocalMacAddressList = pol.NoLocalMacAddressList;
+		t->PolicyServerManagedMacAddressList = IsFilledStr(pol.ServerAllowedMacListUrl);
 		t->EnforceProcessWatcher = pol.EnforceProcessWatcher;
 		t->EnforceProcessWatcherAlways = pol.EnforceProcessWatcherAlways;
 	}

@@ -321,6 +321,34 @@ UINT GetLockout(LOCKOUT* o, char* key, UINT64 expires_span)
 	return ret;
 }
 
+// Lockout clear
+void ClearLockout(LOCKOUT* o, char* key)
+{
+	UINT i;
+
+	if (o == NULL || key == NULL)
+	{
+		return;
+	}
+
+	LockList(o->EntryList);
+	{
+		for (i = 0;i < LIST_NUM(o->EntryList);i++)
+		{
+			LOCKOUT_ENTRY* e = LIST_DATA(o->EntryList, i);
+
+			if (StrCmpi(e->Key, key) == 0)
+			{
+				Delete(o->EntryList, e);
+				Free(e);
+
+				break;
+			}
+		}
+	}
+	UnlockList(o->EntryList);
+}
+
 // Lockout Add
 void AddLockout(LOCKOUT* o, char* key, UINT64 expires_span)
 {

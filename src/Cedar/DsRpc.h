@@ -112,6 +112,7 @@ struct RPC_DS_STATUS
 	bool DisableMacCheck;
 	bool DisableWatermark;
 	bool NoLocalMacAddressList;
+	bool PolicyServerManagedMacAddressList;
 	bool IsAdminOrSystem;
 	bool EnforceProcessWatcher;
 	bool EnforceProcessWatcherAlways;

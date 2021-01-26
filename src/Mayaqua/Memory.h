@@ -248,6 +248,7 @@ void *HashListKeyToPointer(HASH_LIST *h, UINT key);
 void LockoutGcNoLock(LOCKOUT* o, UINT64 expires_span);
 UINT GetLockout(LOCKOUT* o, char* key, UINT64 expires_span);
 void AddLockout(LOCKOUT* o, char* key, UINT64 expires_span);
+void ClearLockout(LOCKOUT* o, char* key);
 void FreeLockout(LOCKOUT* o);
 LOCKOUT* NewLockout();
 

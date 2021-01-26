@@ -2752,7 +2752,7 @@ UINT DgMainDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, void *para
 			{
 				if (DtcGetConfig(dg->Rpc, &cfg) == ERR_NO_ERROR)
 				{
-					if ((st.EnforceMacCheck || cfg.EnableMacCheck) && IsEmptyStr(cfg.MacAddressList) && st.NoLocalMacAddressList == false)
+					if ((st.EnforceMacCheck || cfg.EnableMacCheck) && IsEmptyStr(cfg.MacAddressList) && st.NoLocalMacAddressList == false && st.PolicyServerManagedMacAddressList == false)
 					{
 						// MAC Address Auth
 						if (MsgBox(hWnd, MB_ICONQUESTION | MB_YESNO, _UU("DG_MAC_SETTINGS_REQUIRED")) == IDYES)
