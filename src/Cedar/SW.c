@@ -3983,8 +3983,9 @@ bool SwInstallMain(SW* sw, WIZARD_PAGE* wp, SW_COMPONENT* c)
 					DsWin32GetRdpPolicy(&current_policy);
 					if (current_policy.HasValidValue)
 					{
-						if (current_policy.fDenyTSConnections)
+						if (current_policy.fDenyTSConnections != INFINITE && current_policy.fDenyTSConnections != 0)
 						{
+							// ポリシーが "[未設定] or [無効] の場合" 以外
 							if (MsIsAdmin())
 							{
 								DS_WIN32_RDP_POLICY new_policy = CLEAN;
