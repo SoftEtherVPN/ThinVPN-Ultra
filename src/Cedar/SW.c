@@ -1682,6 +1682,10 @@ UINT SwUninst1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard
 
 		sw->DoubleClickBlocker = false;
 
+		if (sw->Auto)
+		{
+			ClickWizardButton(wizard, PSBTN_NEXT);
+		}
 		break;
 
 	case WM_WIZ_HIDE:
@@ -1691,10 +1695,13 @@ UINT SwUninst1(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, WIZARD* wizard
 		break;
 
 	case WM_WIZ_NEXT:
-		if (MsgBoxEx(hWnd, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2, _UU("SW_UNINSTALL_CONFIRM"),
-			sw->CurrentComponent->Title) == IDNO)
+		if (sw->Auto == false)
 		{
-			break;
+			if (MsgBoxEx(hWnd, MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2, _UU("SW_UNINSTALL_CONFIRM"),
+				sw->CurrentComponent->Title) == IDNO)
+			{
+				break;
+			}
 		}
 
 		if (SwEnterSingle(sw) == false)
