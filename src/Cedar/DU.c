@@ -2056,7 +2056,7 @@ void DuConnectMain(HWND hWnd, DU_MAIN *t, char *pcid)
 			Show(t->hWnd, 0);
 		}
 
-		if ((s->IsLimitedMode && (dc->DisableLimitedFw == false || s->IsEnspectionEnabled)) || Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") || (Vars_ActivePatch_GetInt("ThinFwMode") == 1 && dc->DisableLimitedFw == false) || (Vars_ActivePatch_GetInt("ThinFwMode") == 2) || s->IsLimitedFirewallMandated)
+		if ((s->IsLimitedMode && (dc->DisableLimitedFw == false || s->IsEnspectionEnabled)) || (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity") && dc->DisableLimitedFw == false) || (Vars_ActivePatch_GetInt("ThinFwMode") == 1 && dc->DisableLimitedFw == false) || (Vars_ActivePatch_GetInt("ThinFwMode") == 2) || s->IsLimitedFirewallMandated)
 		{
 			bool mandate = s->IsEnspectionEnabled;
 
