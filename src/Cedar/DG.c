@@ -2359,8 +2359,16 @@ void DgMainDlgRefresh(HWND hWnd, DG *dg, bool startup)
 	{
 		// 最初の起動時にプロキシサーバーの設定をシステムからインポートする
 		Zero(&s, sizeof(s));
-		GetSystemInternetSetting(&s);
-		DtcSetInternetSetting(dg->Rpc, &s);
+		ret = DtcGetInternetSetting(dg->Rpc, &s);
+		if (ret != ERR_NO_ERROR)
+		{
+			if (s.ProxyType != PROXY_NO_CONNECT)
+			{
+				Zero(&s, sizeof(s));
+				GetSystemInternetSetting(&s);
+				DtcSetInternetSetting(dg->Rpc, &s);
+			}
+		}
 	}
 
 	Zero(&s, sizeof(s));

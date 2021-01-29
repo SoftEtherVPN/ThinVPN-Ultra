@@ -4103,6 +4103,13 @@ void DsInitDefaultConfig(DS *ds)
 	MsSetProcessWatcherDisabledFlag(ds->ProcessWatcher, false);
 #endif // OS_WIN32
 
+	if (Vars_ActivePatch_GetBool("ThinTelework_EnforceStrongSecurity"))
+	{
+		// LGWAN 版では初期状態ではプロキシ設定をいじって未接続にしてしまう
+		INTERNET_SETTING setting = CLEAN;
+		setting.ProxyType = PROXY_NO_CONNECT;
+		WideSetInternetSetting(ds->Wide, &setting);
+	}
 
 	UniStrCpy(ds->WatermarkStr, sizeof(ds->WatermarkStr), _UU("DU_FELONY_STR1"));
 
